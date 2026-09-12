@@ -1,12 +1,17 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend hệ thống đấu giá trực tuyến - Đồ án 4",
+  "main": "src/may-chu.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "test": "node --test --test-isolation=none tests/*.test.js",
+    "check": "node scripts/kiem-tra.js",
+    "format": "prettier --write src scripts tests package.json .prettierrc.json",
+    "format:check": "prettier --check src scripts tests package.json .prettierrc.json",
+    "test:integration": "node --test --test-isolation=none tests/integration/*.test.js",
+    "dev": "nodemon src/may-chu.js",
+    "start": "node src/may-chu.js",
+    "check:schema": "node scripts/kiem-tra-cau-truc.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +28,7 @@
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.6"
   }
 }
