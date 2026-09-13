@@ -1,0 +1,18 @@
+const { Router: TaoBoDinhTuyen } = require('express');
+const dieuKhien = require('../controllers/don-hang');
+const { yeuCauDangNhap, quanTri } = require('../middlewares/xac-thuc');
+const boDinhTuyen = TaoBoDinhTuyen();
+boDinhTuyen.use(['/orders', '/second-chances', '/admin/orders'], yeuCauDangNhap());
+boDinhTuyen.get('/orders', dieuKhien.danhSach);
+boDinhTuyen.get('/orders/:id', dieuKhien.chiTiet);
+boDinhTuyen.patch('/orders/:id/address', dieuKhien.diaChi);
+boDinhTuyen.post('/orders/:id/payments/simulate', dieuKhien.thanhToan);
+boDinhTuyen.post('/orders/:id/shipping', dieuKhien.guiHang);
+boDinhTuyen.post('/orders/:id/delivered', dieuKhien.xacNhanDaGiao);
+boDinhTuyen.post('/orders/:id/confirm', dieuKhien.xacNhanHoanThanh);
+boDinhTuyen.post('/orders/:id/second-chance', dieuKhien.taoDeNghi);
+boDinhTuyen.get('/second-chances', dieuKhien.cacDeNghi);
+boDinhTuyen.get('/second-chances/:id', dieuKhien.chiTietDeNghi);
+boDinhTuyen.post('/second-chances/:id/respond', dieuKhien.phanHoiDeNghi);
+boDinhTuyen.get('/admin/orders', quanTri, dieuKhien.danhSachQuanTri);
+module.exports = boDinhTuyen;
