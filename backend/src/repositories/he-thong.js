@@ -15,7 +15,11 @@ const thongBaoDaCo = (nguoiDungId, loai, lienKet) =>
   );
 const quyenXemBangChung = (duongDan, nguoiDungId) =>
   coSoDuLieu.layMot(
-    `SELECT b.id FROM bang_chung_tranh_chap b JOIN tranh_chap t ON t.id=b.tranh_chap_id JOIN don_hang d ON d.id=t.don_hang_id WHERE b.duong_dan_tep=? AND (d.nguoi_mua_id=? OR d.nguoi_ban_id=?) LIMIT 1`,
+    `SELECT b.id FROM bang_chung_tranh_chap b
+     JOIN tranh_chap t ON t.id=b.tranh_chap_id
+     JOIN don_hang d ON d.id=t.don_hang_id
+     WHERE b.duong_dan_tep=? AND (d.nguoi_mua_id=? OR d.nguoi_ban_id=?)
+     LIMIT 1`,
     [duongDan, nguoiDungId, nguoiDungId],
   );
 module.exports = {

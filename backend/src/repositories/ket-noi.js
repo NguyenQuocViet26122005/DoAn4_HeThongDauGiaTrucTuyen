@@ -27,7 +27,9 @@ async function layMot(sql, cacGiaTri = []) {
   return (await truyVan(sql, cacGiaTri))[0] || null;
 }
 async function thoiGianHienTai() {
-  return (await layMot('SELECT CURRENT_TIMESTAMP(3) AS now')).now;
+  // Schema lưu DATETIME theo giây. Không đưa mili giây vào vì MySQL có thể
+  // làm tròn sang giây tiếp theo, khiến lượt hợp lệ bị tính là sau khi đóng phiên.
+  return (await layMot('SELECT CURRENT_TIMESTAMP AS now')).now;
 }
 async function giaoDich(congViec) {
   if (nguCanh.getStore()) return congViec();

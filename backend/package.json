@@ -6,9 +6,10 @@
   "scripts": {
     "test": "node --test --test-isolation=none tests/*.test.js",
     "check": "node scripts/kiem-tra.js",
-    "format": "prettier --write src scripts tests package.json .prettierrc.json",
-    "format:check": "prettier --check src scripts tests package.json .prettierrc.json",
+    "format": "prettier --write src scripts tests docs HUONG-DAN.md package.json .prettierrc.json",
+    "format:check": "prettier --check src scripts tests docs HUONG-DAN.md package.json .prettierrc.json",
     "test:integration": "node --test --test-isolation=none tests/integration/*.test.js",
+    "test:api": "node --test --test-isolation=none tests/integration/api-day-du.test.js",
     "dev": "nodemon src/may-chu.js",
     "start": "node src/may-chu.js",
     "check:schema": "node scripts/kiem-tra-cau-truc.js"

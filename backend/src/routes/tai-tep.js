@@ -7,7 +7,8 @@ const gioiHanYeuCau = require('../middlewares/gioi-han-yeu-cau');
 const boDinhTuyen = TaoBoDinhTuyen();
 const taiLen = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024, files: 1, fields: 0, parts: 1 },
+  // Busboy phát partsLimit khi chạm ngưỡng; files/fields vẫn khóa đúng một tệp.
+  limits: { fileSize: 10 * 1024 * 1024, files: 1, fields: 0, parts: 2 },
 });
 boDinhTuyen.post(
   '/uploads/:kind',
