@@ -1,0 +1,3860 @@
+{
+  "info": {
+    "name": "Đồ án 4 — API đấu giá trực tuyến",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Bộ yêu cầu đối chiếu trực tiếp các route hiện có. Chạy từng kịch bản trong huong-dan-postman.md. Không chạy toàn bộ collection liên tiếp: các nhánh mua ngay, hủy, tranh chấp và hoàn thành loại trừ nhau. Không chứa token thật hay bí mật từ .env."
+  },
+  "item": [
+    {
+      "name": "01. Kết nối và đăng nhập",
+      "item": [
+        {
+          "name": "Kiểm tra backend và MySQL",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/health",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Công khai. Kiểm tra backend và MySQL. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đăng nhập Admin",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Công khai. Đăng nhập Admin. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@daugia.local\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.token != null) pm.collectionVariables.set('maQuanTri', String(duLieu.token));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đăng nhập Người bán",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Công khai. Đăng nhập Người bán. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"minh.nb@daugia.local\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.token != null) pm.collectionVariables.set('maNguoiBan', String(duLieu.token));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đăng nhập Người mua A",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Công khai. Đăng nhập Người mua A. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nam.nm@daugia.local\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.token != null) pm.collectionVariables.set('maNguoiMuaA', String(duLieu.token));",
+                  "  if (duLieu?.token != null) pm.collectionVariables.set('maNguoiMua', String(duLieu.token));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đăng nhập Người mua B",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Công khai. Đăng nhập Người mua B. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"hoanganh@daugia.local\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.token != null) pm.collectionVariables.set('maNguoiMuaB', String(duLieu.token));",
+                  "  if (duLieu?.token != null) pm.collectionVariables.set('maNguoiMua', String(duLieu.token));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đăng ký tài khoản mới",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auth/register",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Công khai. Đăng ký tài khoản mới. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ho_ten\": \"Người dùng thử nghiệm\",\n  \"email\": \"thu-nghiem-{{$timestamp}}@example.invalid\",\n  \"mat_khau\": \"{{matKhauDangKy}}\",\n  \"so_dien_thoai\": \"0900000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('nguoiDungId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02. Hồ sơ, địa chỉ và xác minh người bán",
+      "item": [
+        {
+          "name": "Hồ sơ của tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/users/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Hồ sơ của tôi. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cập nhật họ tên và số điện thoại",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/users/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Cập nhật họ tên và số điện thoại. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ho_ten\": \"Tên cập nhật\",\n  \"so_dien_thoai\": \"0900000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Danh sách địa chỉ",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/users/me/addresses",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Danh sách địa chỉ. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Thêm địa chỉ",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/users/me/addresses",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Thêm địa chỉ. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ten_nguoi_nhan\": \"Người nhận thử nghiệm\",\n  \"sdt_nguoi_nhan\": \"0900000000\",\n  \"tinh_thanh\": \"TP Hồ Chí Minh\",\n  \"quan_huyen\": \"Khu vực thử nghiệm\",\n  \"phuong_xa\": \"Phường thử nghiệm\",\n  \"dia_chi_chi_tiet\": \"123 Đường thử nghiệm\",\n  \"la_mac_dinh\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('diaChiId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sửa địa chỉ của mình",
+          "request": {
+            "method": "PUT",
+            "url": "{{diaChiGoc}}/users/me/addresses/{{diaChiId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Sửa địa chỉ của mình. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ten_nguoi_nhan\": \"Người nhận thử nghiệm\",\n  \"sdt_nguoi_nhan\": \"0900000000\",\n  \"tinh_thanh\": \"TP Hồ Chí Minh\",\n  \"quan_huyen\": \"Khu vực thử nghiệm\",\n  \"phuong_xa\": \"Phường thử nghiệm\",\n  \"dia_chi_chi_tiet\": \"123 Đường thử nghiệm\",\n  \"la_mac_dinh\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Xóa địa chỉ của mình",
+          "request": {
+            "method": "DELETE",
+            "url": "{{diaChiGoc}}/users/me/addresses/{{diaChiId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Xóa địa chỉ của mình. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hồ sơ xác minh của tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/seller-verifications/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Hồ sơ xác minh của tôi. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gửi hồ sơ xác minh sau khi tải ảnh",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/seller-verifications",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Gửi hồ sơ xác minh sau khi tải ảnh. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loai_giay_to\": \"CCCD\",\n  \"so_giay_to\": \"GIAY-TO-THU-NGHIEM\",\n  \"anh_mat_truoc\": \"{{anhMatTruoc}}\",\n  \"anh_mat_sau\": \"{{anhMatSau}}\",\n  \"anh_selfie\": \"{{anhSelfie}}\",\n  \"ten_ngan_hang\": \"Ngân hàng thử nghiệm\",\n  \"so_tai_khoan\": \"TAI-KHOAN-THU-NGHIEM\",\n  \"chu_tai_khoan\": \"NGUOI DUNG THU NGHIEM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('xacMinhId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem người dùng",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/users",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Admin xem người dùng. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin đổi trạng thái tài khoản",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/admin/users/{{nguoiDungId}}/status",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Admin đổi trạng thái tài khoản. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trang_thai_tai_khoan\": \"TAM_NGUNG\",\n  \"ly_do\": \"Lý do xử lý thử nghiệm\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem hồ sơ chờ duyệt",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/seller-verifications",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Admin xem hồ sơ chờ duyệt. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin duyệt xác minh",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/admin/seller-verifications/{{xacMinhId}}/review",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Admin duyệt xác minh. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trang_thai\": \"DA_XAC_MINH\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03. Danh mục và sản phẩm",
+      "item": [
+        {
+          "name": "Danh mục công khai",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/categories",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Công khai. Danh mục công khai. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Thuộc tính của danh mục",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/categories/{{danhMucId}}/attributes",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Công khai. Thuộc tính của danh mục. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sản phẩm công khai",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/products",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Công khai. Sản phẩm công khai. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sản phẩm của người bán",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/products/mine",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Sản phẩm của người bán. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết sản phẩm của người bán",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/products/{{sanPhamId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Chi tiết sản phẩm của người bán. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tạo sản phẩm nháp",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/products",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Tạo sản phẩm nháp. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"danh_muc_id\": \"{{danhMucId}}\",\n  \"tieu_de\": \"Sản phẩm thử nghiệm\",\n  \"mo_ta\": \"Mô tả tình trạng và phụ kiện đi kèm.\",\n  \"tinh_trang_san_pham\": \"MOI\",\n  \"thuong_hieu\": \"Thử nghiệm\",\n  \"thuoc_tinh\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('sanPhamId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sửa sản phẩm nháp hoặc bị từ chối",
+          "request": {
+            "method": "PUT",
+            "url": "{{diaChiGoc}}/products/{{sanPhamId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Sửa sản phẩm nháp hoặc bị từ chối. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"danh_muc_id\": \"{{danhMucId}}\",\n  \"tieu_de\": \"Sản phẩm thử nghiệm\",\n  \"mo_ta\": \"Mô tả tình trạng và phụ kiện đi kèm.\",\n  \"tinh_trang_san_pham\": \"MOI\",\n  \"thuong_hieu\": \"Thử nghiệm\",\n  \"thuoc_tinh\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gắn ảnh đã tải lên vào sản phẩm",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/products/{{sanPhamId}}/images",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Gắn ảnh đã tải lên vào sản phẩm. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"duong_dan_anh\": \"{{anhSanPham}}\",\n  \"la_anh_chinh\": true,\n  \"thu_tu\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('anhId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bỏ ảnh khỏi sản phẩm nháp",
+          "request": {
+            "method": "DELETE",
+            "url": "{{diaChiGoc}}/products/{{sanPhamId}}/images/{{anhId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Bỏ ảnh khỏi sản phẩm nháp. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gửi sản phẩm cho Admin duyệt",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/products/{{sanPhamId}}/submit",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Gửi sản phẩm cho Admin duyệt. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem cả danh mục đã ngừng",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/categories",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Admin xem cả danh mục đã ngừng. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tạo danh mục thử nghiệm",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/categories",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Tạo danh mục thử nghiệm. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ten\": \"Danh mục thử nghiệm\",\n  \"duong_dan\": \"thu-nghiem-{{$timestamp}}\",\n  \"danh_muc_cha_id\": null,\n  \"dang_hoat_dong\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('danhMucId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sửa danh mục",
+          "request": {
+            "method": "PUT",
+            "url": "{{diaChiGoc}}/admin/categories/{{danhMucId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Sửa danh mục. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ten\": \"Danh mục thử nghiệm\",\n  \"duong_dan\": \"thu-nghiem-{{$timestamp}}\",\n  \"danh_muc_cha_id\": null,\n  \"dang_hoat_dong\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tạo thuộc tính động",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/categories/{{danhMucId}}/attributes",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Tạo thuộc tính động. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ten_thuoc_tinh\": \"Thương hiệu\",\n  \"khoa_thuoc_tinh\": \"thuong_hieu\",\n  \"kieu_nhap\": \"VAN_BAN\",\n  \"bat_buoc\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('thuocTinhId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sửa thuộc tính động",
+          "request": {
+            "method": "PUT",
+            "url": "{{diaChiGoc}}/admin/categories/{{danhMucId}}/attributes/{{thuocTinhId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Sửa thuộc tính động. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ten_thuoc_tinh\": \"Thương hiệu\",\n  \"khoa_thuoc_tinh\": \"thuong_hieu\",\n  \"kieu_nhap\": \"VAN_BAN\",\n  \"bat_buoc\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem sản phẩm",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/products",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Admin xem sản phẩm. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin duyệt sản phẩm",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/admin/products/{{sanPhamId}}/review",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Admin duyệt sản phẩm. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trang_thai_duyet\": \"DA_DUYET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04. Đấu giá và theo dõi",
+      "item": [
+        {
+          "name": "Danh sách phiên đấu giá",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/auctions",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Công khai. Danh sách phiên đấu giá. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Phiên do tôi bán",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/auctions/mine",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Phiên do tôi bán. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Các phiên đã tham gia",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/auctions/my-bids",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Các phiên đã tham gia. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết phiên công khai",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Công khai. Chi tiết phiên công khai. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lịch sử giá công khai",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/bids",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Công khai. Lịch sử giá công khai. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tạo phiên hai phút cho sản phẩm đã duyệt",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auctions",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Tạo phiên hai phút cho sản phẩm đã duyệt. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"san_pham_id\": \"{{sanPhamId}}\",\n  \"gia_khoi_diem\": \"18000000\",\n  \"gia_san\": null,\n  \"gia_mua_ngay\": \"25000000\",\n  \"thoi_gian_bat_dau\": \"{{batDauISO}}\",\n  \"thoi_gian_ket_thuc\": \"{{ketThucISO}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('phienId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A cam kết tối đa 20 triệu",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/bids",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMuaA}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người mua A. A cam kết tối đa 20 triệu. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gia_toi_da\": \"20000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B cam kết tối đa 22 triệu",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/bids",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMuaB}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người mua B. B cam kết tối đa 22 triệu. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gia_toi_da\": \"22000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mua ngay khi còn hiệu lực",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/buy-now",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Mua ngay khi còn hiệu lực. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.don_hang.id != null) pm.collectionVariables.set('donHangId', String(duLieu.don_hang.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Người bán đề nghị hủy",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auctions/{{yeuCauHuyId}}/cancellation-requests",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Người bán đề nghị hủy. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ly_do\": \"Lý do xin hủy thử nghiệm\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('yeuCauHuyId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đọc bước giá đang cấu hình",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/bid-increments",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Công khai. Đọc bước giá đang cấu hình. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Danh sách đang theo dõi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/watchlist",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Danh sách đang theo dõi. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Theo dõi phiên",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/watchlist/{{phienId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Theo dõi phiên. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bỏ theo dõi phiên",
+          "request": {
+            "method": "DELETE",
+            "url": "{{diaChiGoc}}/watchlist/{{phienId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Bỏ theo dõi phiên. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem phiên",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/auctions",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Admin xem phiên. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem yêu cầu hủy",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/cancellation-requests",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Admin xem yêu cầu hủy. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin duyệt yêu cầu hủy",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/admin/cancellation-requests/{{yeuCauHuyId}}/review",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Admin duyệt yêu cầu hủy. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trang_thai\": \"DA_DUYET\",\n  \"ghi_chu_duyet\": \"Kết quả xem xét thử nghiệm\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05. Đơn hàng, thanh toán và đề nghị mua tiếp",
+      "item": [
+        {
+          "name": "Đơn của tôi; chọn ID đơn cần thao tác",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/orders",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Đơn của tôi; chọn ID đơn cần thao tác. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết đơn và tiền đang giữ",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Chi tiết đơn và tiền đang giữ. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chọn địa chỉ trước thanh toán",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/address",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Chọn địa chỉ trước thanh toán. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dia_chi_id\": \"{{diaChiId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Thanh toán mô phỏng; số tiền do server tính",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/payments/simulate",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Thanh toán mô phỏng; số tiền do server tính. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Người bán xác nhận đã gửi hàng",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/shipping",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Người bán xác nhận đã gửi hàng. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"don_vi_van_chuyen\": \"Đơn vị thử nghiệm\",\n  \"ma_van_don\": \"THU-NGHIEM-{{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Người mua xác nhận hàng đã giao",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/delivered",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Người mua xác nhận hàng đã giao. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Người mua nhận hàng tốt và giải ngân",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/confirm",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Người mua nhận hàng tốt và giải ngân. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đề nghị mua tiếp từ đơn hủy do không thanh toán",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/second-chance",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Đề nghị mua tiếp từ đơn hủy do không thanh toán. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('deNghiId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Các đề nghị liên quan đến tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/second-chances",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Các đề nghị liên quan đến tôi. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết đề nghị mua tiếp",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/second-chances/{{deNghiId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Chi tiết đề nghị mua tiếp. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Người nhận chấp nhận; đổi false để từ chối",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/second-chances/{{deNghiId}}/respond",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Người nhận chấp nhận; đổi false để từ chối. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chap_nhan\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.don_hang.id != null) pm.collectionVariables.set('donHangId', String(duLieu.don_hang.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem đơn hàng",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/orders",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Admin xem đơn hàng. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06. Tranh chấp và đánh giá",
+      "item": [
+        {
+          "name": "Mở tranh chấp trong thời gian kiểm tra",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/disputes",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Mở tranh chấp trong thời gian kiểm tra. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ly_do\": \"KHONG_DUNG_MO_TA\",\n  \"mo_ta\": \"Mô tả vấn đề của đơn thử nghiệm\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('tranhChapId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tranh chấp liên quan đến tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/disputes",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Tranh chấp liên quan đến tôi. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết tranh chấp và bằng chứng",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/disputes/{{tranhChapId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Chi tiết tranh chấp và bằng chứng. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Người bán phản hồi tranh chấp",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/disputes/{{tranhChapId}}/response",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Người bán phản hồi tranh chấp. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phan_hoi_nguoi_ban\": \"Phản hồi và giải thích của người bán\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gắn bằng chứng đã tải lên",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/disputes/{{tranhChapId}}/evidence",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Gắn bằng chứng đã tải lên. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"duong_dan_tep\": \"{{tepBangChung}}\",\n  \"mo_ta\": \"Ảnh hoặc tài liệu chứng minh\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem tranh chấp",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/disputes",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Admin xem tranh chấp. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin tiếp nhận tranh chấp",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/disputes/{{tranhChapId}}/take",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Admin tiếp nhận tranh chấp. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin hoàn một phần tiền mô phỏng",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/disputes/{{tranhChapId}}/resolve",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Admin hoàn một phần tiền mô phỏng. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ket_qua\": \"NGUOI_MUA\",\n  \"so_tien_hoan\": \"1000000\",\n  \"ket_qua_xu_ly\": \"Hoàn một phần theo bằng chứng thử nghiệm\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đánh giá bên còn lại sau hoàn thành",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/reviews",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Đánh giá bên còn lại sau hoàn thành. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"so_sao\": 5,\n  \"nhan_xet\": \"Nhận xét thử nghiệm\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đánh giá công khai của người dùng",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/users/{{nguoiDungId}}/reviews",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Công khai. Đánh giá công khai của người dùng. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07. Thông báo, vi phạm và quản trị",
+      "item": [
+        {
+          "name": "Thông báo của tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/notifications",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Thông báo của tôi. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Số thông báo chưa đọc",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/notifications/unread-count",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Số thông báo chưa đọc. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đánh dấu tất cả đã đọc",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/notifications/read-all",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Đánh dấu tất cả đã đọc. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đánh dấu một thông báo đã đọc",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/notifications/{{thongBaoId}}/read",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Đánh dấu một thông báo đã đọc. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Vi phạm của tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/violations/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Vi phạm của tôi. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem vi phạm",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/violations",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Admin xem vi phạm. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin ghi nhận vi phạm",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/violations",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Admin ghi nhận vi phạm. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nguoi_dung_id\": \"{{nguoiDungId}}\",\n  \"loai_vi_pham\": \"KHAC\",\n  \"mo_ta\": \"Mô tả vi phạm thử nghiệm\",\n  \"diem_vi_pham\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('viPhamId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xác nhận vi phạm",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/admin/violations/{{viPhamId}}/review",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Admin xác nhận vi phạm. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trang_thai\": \"DA_XAC_NHAN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Thống kê quản trị",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/statistics",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Thống kê quản trị. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Nhật ký hoạt động",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/activity-logs",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Nhật ký hoạt động. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Trạng thái tác vụ tự động",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/jobs",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Trạng thái tác vụ tự động. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đọc cấu hình nghiệp vụ",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/config",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "QUAN_TRI. Đọc cấu hình nghiệp vụ. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cập nhật một cấu hình nghiệp vụ",
+          "request": {
+            "method": "PUT",
+            "url": "{{diaChiGoc}}/admin/config/{{khoaCauHinh}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Cập nhật một cấu hình nghiệp vụ. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gia_tri_cau_hinh\": 48\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Thay bộ bước giá đang hoạt động",
+          "request": {
+            "method": "PUT",
+            "url": "{{diaChiGoc}}/admin/bid-increments",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "QUAN_TRI. Thay bộ bước giá đang hoạt động. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"buoc_gia\": [\n    {\n      \"gia_tu\": \"0\",\n      \"gia_den\": \"999999.99\",\n      \"muc_tang_gia\": \"50000\"\n    },\n    {\n      \"gia_tu\": \"1000000\",\n      \"gia_den\": \"9999999.99\",\n      \"muc_tang_gia\": \"100000\"\n    },\n    {\n      \"gia_tu\": \"10000000\",\n      \"gia_den\": \"49999999.99\",\n      \"muc_tang_gia\": \"200000\"\n    },\n    {\n      \"gia_tu\": \"50000000\",\n      \"gia_den\": null,\n      \"muc_tang_gia\": \"500000\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08. Tải và đọc tệp",
+      "item": [
+        {
+          "name": "Tải đúng một tệp; chọn nhóm và tệp trong Body",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/uploads/{{nhomTep}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Tải đúng một tệp; chọn nhóm và tệp trong Body. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.duong_dan != null) pm.collectionVariables.set('tepVuaTai', String(duLieu.duong_dan));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đọc tệp theo nhóm, chủ sở hữu và tên",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/uploads/files/{{nhomTep}}/{{chuTep}}/{{tenTep}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Đọc tệp theo nhóm, chủ sở hữu và tên. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.variables.set('batDauISO', new Date().toISOString());",
+          "pm.variables.set('ketThucISO', new Date(Date.now() + 120000).toISOString());"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "diaChiGoc",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "matKhauMau",
+      "value": "123456",
+      "type": "string"
+    },
+    {
+      "key": "matKhauDangKy",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "khoaCauHinh",
+      "value": "PAYMENT_DEADLINE_HOURS",
+      "type": "string"
+    },
+    {
+      "key": "nhomTep",
+      "value": "product",
+      "type": "string"
+    },
+    {
+      "key": "maNguoiMua",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "maNguoiMuaA",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "maNguoiMuaB",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "maNguoiBan",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "maQuanTri",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "anhSanPham",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tepBangChung",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "anhMatTruoc",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "anhMatSau",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "anhSelfie",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nguoiDungId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "diaChiId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "xacMinhId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "danhMucId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sanPhamId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "anhId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "thuocTinhId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "phienId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "donHangId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "yeuCauHuyId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "deNghiId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tranhChapId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "thongBaoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "viPhamId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tepVuaTai",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "chuTep",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tenTep",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
