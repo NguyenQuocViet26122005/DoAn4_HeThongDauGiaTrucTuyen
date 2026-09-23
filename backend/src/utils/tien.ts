@@ -1,6 +1,6 @@
-const { baoDam } = require('./loi');
+import { baoDam } from './loi';
 const GIOI_HAN_TIEN = 999999999999999n;
-function donViTienNho(giaTri, nhan = 'Số tiền') {
+function donViTienNho(giaTri: unknown, nhan = 'Số tiền') {
   baoDam(['number', 'string'].includes(typeof giaTri), 400, `${nhan} không hợp lệ`);
   const giaTriTho = String(giaTri);
   baoDam(
@@ -13,7 +13,7 @@ function donViTienNho(giaTri, nhan = 'Số tiền') {
   baoDam(ketQua <= GIOI_HAN_TIEN, 400, `${nhan} vượt giới hạn`);
   return ketQua;
 }
-function chuoiTien(giaTri) {
+function chuoiTien(giaTri: bigint) {
   baoDam(
     typeof giaTri === 'bigint' && giaTri >= 0n && giaTri <= GIOI_HAN_TIEN,
     400,
@@ -21,6 +21,6 @@ function chuoiTien(giaTri) {
   );
   return `${giaTri / 100n}.${String(giaTri % 100n).padStart(2, '0')}`;
 }
-const nhoHon = (a, b) => (a < b ? a : b);
-const lonHon = (a, b) => (a > b ? a : b);
-module.exports = { donViTienNho, chuoiTien, nhoHon, lonHon, GIOI_HAN_TIEN };
+const nhoHon = (a: bigint, b: bigint) => (a < b ? a : b);
+const lonHon = (a: bigint, b: bigint) => (a > b ? a : b);
+export = { donViTienNho, chuoiTien, nhoHon, lonHon, GIOI_HAN_TIEN };

@@ -1,5 +1,5 @@
-const { cauHinh } = require('../config/moi-truong');
-const { baoDam } = require('./loi');
+import { cauHinh } from '../config/moi-truong';
+import { baoDam } from './loi';
 function doiThanhNgay(giaTri) {
   if (giaTri instanceof Date) return giaTri;
   return new Date(
@@ -27,4 +27,4 @@ const congGiay = (giaTri, soGiay) =>
   ngaySQL(new Date(doiThanhNgay(giaTri).getTime() + soGiay * 1000));
 const daHetHan = (hanChot, thoiGianHienTai) =>
   hanChot != null && doiThanhNgay(hanChot).getTime() <= doiThanhNgay(thoiGianHienTai).getTime();
-module.exports = { doiThanhNgay, ngaySQL, kiemTraNgayNhap, congGiay, daHetHan };
+export = { doiThanhNgay, ngaySQL, kiemTraNgayNhap, congGiay, daHetHan };

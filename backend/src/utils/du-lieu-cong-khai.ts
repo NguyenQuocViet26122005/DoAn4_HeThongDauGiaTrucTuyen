@@ -1,4 +1,5 @@
-const { baoDam } = require('./loi');
+import type { NguoiDungDangNhap, BanGhiSQL } from '../types/nghiep-vu';
+import { baoDam } from './loi';
 function chonTruong(nguon, cacKhoa) {
   return Object.fromEntries(
     cacKhoa.filter((k) => nguon[k] !== undefined).map((k) => [k, nguon[k]]),
@@ -20,6 +21,7 @@ const truongPhienCongKhai = [
   'san_pham_id',
   'gia_khoi_diem',
   'gia_mua_ngay',
+  'phi_van_chuyen',
   'cho_phep_mua_ngay',
   'gia_hien_tai',
   'thoi_gian_bat_dau',
@@ -36,8 +38,8 @@ const truongPhienCongKhai = [
   'nguoi_ban_id',
   'anh_chinh',
 ];
-function nguoiDungAnToan(banGhi) {
-  return chonTruong(banGhi, truongNguoiDung);
+function nguoiDungAnToan(banGhi: BanGhiSQL): NguoiDungDangNhap {
+  return chonTruong(banGhi, truongNguoiDung) as NguoiDungDangNhap;
 }
 function phienCongKhai(banGhi) {
   return {
@@ -46,7 +48,7 @@ function phienCongKhai(banGhi) {
   };
 }
 // Lớp bảo vệ đầu ra: chặn trường bí mật kể cả khi controller vô tình trả nhầm.
-function kiemTraDuLieuCongKhai(giaTri) {
+function kiemTraDuLieuCongKhai(giaTri: unknown): void {
   if (Array.isArray(giaTri)) return giaTri.forEach(kiemTraDuLieuCongKhai);
   if (!giaTri || typeof giaTri !== 'object') return;
   for (const [khoa, phanTu] of Object.entries(giaTri)) {
@@ -66,4 +68,4 @@ function kiemTraDuLieuCongKhai(giaTri) {
     kiemTraDuLieuCongKhai(phanTu);
   }
 }
-module.exports = { chonTruong, nguoiDungAnToan, phienCongKhai, kiemTraDuLieuCongKhai };
+export = { chonTruong, nguoiDungAnToan, phienCongKhai, kiemTraDuLieuCongKhai };
