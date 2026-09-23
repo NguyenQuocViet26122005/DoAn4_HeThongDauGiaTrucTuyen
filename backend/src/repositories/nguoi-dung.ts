@@ -1,5 +1,5 @@
-const coSoDuLieu = require('./ket-noi');
-const khoBanGhi = require('./ban-ghi');
+import coSoDuLieu = require('./ket-noi');
+import khoBanGhi = require('./ban-ghi');
 const layTheoId = (id, khoaDuLieu = false) => khoBanGhi.layTheoId('nguoi_dung', id, khoaDuLieu);
 const timTheoEmail = (thuDienTu) =>
   coSoDuLieu.layMot('SELECT * FROM nguoi_dung WHERE email = ?', [thuDienTu]);
@@ -19,7 +19,7 @@ const boDiaChiMacDinh = (nguoiDungId) =>
   ]);
 const coCamKet = (nguoiDungId) =>
   coSoDuLieu.layMot(
-    `SELECT m.id FROM muc_gia_toi_da m JOIN phien_dau_gia a ON a.id = m.phien_dau_gia_id WHERE m.nguoi_tra_gia_id = ? AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG') LIMIT 1`,
+    `SELECT m.id FROM tham_gia_phien m JOIN phien_dau_gia a ON a.id = m.phien_dau_gia_id WHERE m.nguoi_dung_id = ? AND m.gia_toi_da IS NOT NULL AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG') LIMIT 1`,
     [nguoiDungId],
   );
 const cacHoSoXacMinh = (nguoiDungId) =>
@@ -45,7 +45,7 @@ const danhSachChoXacMinh = ({ limit: gioiHan, offset: viTriBatDau }, trangThai) 
      LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
     [trangThai],
   );
-module.exports = {
+export = {
   layTheoId,
   timTheoEmail,
   danhSachDiaChi,

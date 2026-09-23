@@ -1,6 +1,6 @@
-const coSoDuLieu = require('./ket-noi');
-const khoBanGhi = require('./ban-ghi');
-const cacDonHang = require('./don-hang');
+import coSoDuLieu = require('./ket-noi');
+import khoBanGhi = require('./ban-ghi');
+import cacDonHang = require('./don-hang');
 async function khoaTranhChap(id) {
   const banDau = await khoBanGhi.layTheoId('tranh_chap', id);
   if (!banDau) return null;
@@ -8,7 +8,7 @@ async function khoaTranhChap(id) {
   return { dispute: await khoBanGhi.layTheoId('tranh_chap', id, true), order: donHang };
 }
 const bangChung = (id) =>
-  coSoDuLieu.truyVan('SELECT * FROM bang_chung_tranh_chap WHERE tranh_chap_id=? ORDER BY id', [id]);
+  coSoDuLieu.truyVan(`SELECT id,tranh_chap_id,nguoi_tai_len_id,duong_dan_tep,loai_noi_dung AS loai_bang_chung,mo_ta,ngay_tao FROM tep_dinh_kem WHERE loai_tep='BANG_CHUNG_TRANH_CHAP' AND tranh_chap_id=? ORDER BY id`, [id]);
 const cacTranhChap = (nguoiDung, { limit: gioiHan, offset: viTriBatDau }, quanTri = false) =>
   coSoDuLieu.truyVan(
     `SELECT t.* FROM tranh_chap t
@@ -89,7 +89,7 @@ async function thongKe() {
       'SELECT trang_thai,COUNT(*) AS so_luong,COALESCE(SUM(so_tien),0) AS tong_tien FROM thanh_toan GROUP BY trang_thai',
     ),
     coSoDuLieu.truyVan(
-      'SELECT trang_thai,COALESCE(SUM(so_tien),0) AS tong_tien FROM giu_tien_trung_gian GROUP BY trang_thai',
+      'SELECT trang_thai_giu_tien AS trang_thai,COALESCE(SUM(so_tien_da_thu),0) AS tong_tien,COALESCE(SUM(so_tien_dang_giu),0) AS dang_giu FROM don_hang GROUP BY trang_thai_giu_tien',
     ),
     coSoDuLieu.truyVan(
       'SELECT trang_thai,COUNT(*) AS so_luong FROM tranh_chap GROUP BY trang_thai',
@@ -105,7 +105,7 @@ async function thongKe() {
     tranh_chap: cacTranhChap,
   };
 }
-module.exports = {
+export = {
   khoaTranhChap,
   bangChung,
   cacTranhChap,

@@ -1,5 +1,5 @@
-const mysql = require('mysql2/promise');
-const { cauHinh } = require('./moi-truong');
+import mysql = require('mysql2/promise');
+import { cauHinh } from './moi-truong';
 const nhomKetNoi = mysql.createPool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT || 3306),
@@ -17,4 +17,4 @@ const nhomKetNoi = mysql.createPool({
   bigNumberStrings: true,
   multipleStatements: false,
 });
-module.exports = nhomKetNoi;
+export = nhomKetNoi;

@@ -1,8 +1,9 @@
-const { AsyncLocalStorage: LuuTruNguCanh } = require('node:async_hooks');
-const nhomKetNoi = require('../config/co-so-du-lieu');
-const { cauHinh } = require('../config/moi-truong');
-const { LoiUngDung } = require('../utils/loi');
-const nguCanh = new LuuTruNguCanh();
+import type { NguCanhGiaoDich, BanGhiSQL } from '../types/nghiep-vu';
+import { AsyncLocalStorage as LuuTruNguCanh } from 'node:async_hooks';
+import nhomKetNoi = require('../config/co-so-du-lieu');
+import { cauHinh } from '../config/moi-truong';
+import { LoiUngDung } from '../utils/loi';
+const nguCanh = new LuuTruNguCanh<NguCanhGiaoDich>();
 async function layKetNoi() {
   const ketNoi = await nhomKetNoi.getConnection();
   try {
@@ -13,30 +14,30 @@ async function layKetNoi() {
     throw loi;
   }
 }
-async function truyVan(sql, cacGiaTri = []) {
+async function truyVan<T = BanGhiSQL[]>(sql: string, cacGiaTri: unknown[] = []): Promise<T> {
   const hienTai = nguCanh.getStore();
   const ketNoi = hienTai?.connection || (await layKetNoi());
   try {
-    const [cacBanGhi] = await ketNoi.execute(sql, cacGiaTri);
-    return cacBanGhi;
+    const [cacBanGhi] = await ketNoi.execute(sql, cacGiaTri as import('mysql2').ExecuteValues);
+    return cacBanGhi as T;
   } finally {
     if (!hienTai) ketNoi.release();
   }
 }
-async function layMot(sql, cacGiaTri = []) {
-  return (await truyVan(sql, cacGiaTri))[0] || null;
+async function layMot<T = BanGhiSQL>(sql: string, cacGiaTri: unknown[] = []): Promise<T | null> {
+  return (await truyVan<T[]>(sql, cacGiaTri))[0] || null;
 }
 async function thoiGianHienTai() {
   // Schema lưu DATETIME theo giây. Không đưa mili giây vào vì MySQL có thể
   // làm tròn sang giây tiếp theo, khiến lượt hợp lệ bị tính là sau khi đóng phiên.
   return (await layMot('SELECT CURRENT_TIMESTAMP AS now')).now;
 }
-async function giaoDich(congViec) {
+async function giaoDich<T>(congViec: () => Promise<T>): Promise<T> {
   if (nguCanh.getStore()) return congViec();
   // Khi xung đột khóa, chạy lại toàn bộ transaction để giữ các thay đổi nhất quán.
   for (let lanThu = 0; lanThu < 3; lanThu++) {
     const ketNoi = await layKetNoi();
-    const trangThaiXuLy = { connection: ketNoi, events: [] };
+    const trangThaiXuLy: NguCanhGiaoDich = { connection: ketNoi, events: [] };
     try {
       await ketNoi.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
       await ketNoi.beginTransaction();
@@ -62,9 +63,9 @@ async function giaoDich(congViec) {
     }
   }
 }
-function sauKhiCommit(congViec) {
+function sauKhiCommit(congViec: () => unknown | Promise<unknown>) {
   const trangThaiXuLy = nguCanh.getStore();
   if (trangThaiXuLy) trangThaiXuLy.events.push(congViec);
   else return congViec();
 }
-module.exports = { truyVan, layMot, thoiGianHienTai, giaoDich, sauKhiCommit, nhomKetNoi };
+export = { truyVan, layMot, thoiGianHienTai, giaoDich, sauKhiCommit, nhomKetNoi };

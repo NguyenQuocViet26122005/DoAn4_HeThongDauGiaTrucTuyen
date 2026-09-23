@@ -1,6 +1,7 @@
-const coSoDuLieu = require('./ket-noi');
-const khoBanGhi = require('./ban-ghi');
-const cacPhienDauGia = require('./dau-gia');
+import type { NguoiDungDangNhap } from '../types/nghiep-vu';
+import coSoDuLieu = require('./ket-noi');
+import khoBanGhi = require('./ban-ghi');
+import cacPhienDauGia = require('./dau-gia');
 async function khoaDuLieu(id) {
   const banDau = await khoBanGhi.layTheoId('don_hang', id);
   if (!banDau) return null;
@@ -18,10 +19,10 @@ const cacThanhToan = (id) =>
   coSoDuLieu.truyVan('SELECT * FROM thanh_toan WHERE don_hang_id=? ORDER BY id DESC', [id]);
 const tienTrungGian = (id, khoaDuLieu = false) =>
   coSoDuLieu.layMot(
-    `SELECT * FROM giu_tien_trung_gian WHERE don_hang_id=?${khoaDuLieu ? ' FOR UPDATE' : ''}`,
+    `SELECT id,id AS don_hang_id,so_tien_da_thu AS so_tien,trang_thai_giu_tien AS trang_thai,so_tien_da_hoan,so_tien_da_giai_ngan,so_tien_dang_giu,ngay_bat_dau_giu,ngay_giai_ngan,ngay_hoan_tien,ghi_chu_giu_tien AS ghi_chu FROM don_hang WHERE id=?${khoaDuLieu ? ' FOR UPDATE' : ''}`,
     [id],
   );
-const vanChuyen = (id) => coSoDuLieu.layMot('SELECT * FROM van_chuyen WHERE don_hang_id=?', [id]);
+const vanChuyen = (id) => coSoDuLieu.layMot('SELECT id,id AS don_hang_id,don_vi_van_chuyen,ma_van_don,trang_thai_van_chuyen AS trang_thai,ngay_gui_hang,ngay_giao_van_chuyen AS ngay_giao_hang FROM don_hang WHERE id=? AND trang_thai_van_chuyen IS NOT NULL', [id]);
 const cacTranhChap = (id) =>
   coSoDuLieu.truyVan('SELECT * FROM tranh_chap WHERE don_hang_id=? ORDER BY id DESC', [id]);
 const tranhChapDangMo = (id) =>
@@ -29,7 +30,7 @@ const tranhChapDangMo = (id) =>
     "SELECT id FROM tranh_chap WHERE don_hang_id=? AND trang_thai IN ('DANG_MO','NGUOI_BAN_DA_PHAN_HOI','QUAN_TRI_DANG_XU_LY') LIMIT 1",
     [id],
   );
-function danhSach(nguoiDung, { limit: gioiHan, offset: viTriBatDau }, phamVi = 'mine') {
+function danhSach(nguoiDung: NguoiDungDangNhap, { limit: gioiHan, offset: viTriBatDau }, phamVi = 'mine') {
   const dieuKien = phamVi === 'admin' ? '1=1' : '(d.nguoi_mua_id=? OR d.nguoi_ban_id=?)';
   return coSoDuLieu.truyVan(
     `SELECT d.*, p.tieu_de, a.ly_do_ket_thuc
@@ -46,7 +47,7 @@ const denHan = () =>
   coSoDuLieu.truyVan(
     `SELECT d.id FROM don_hang d
      WHERE (d.trang_thai='CHO_THANH_TOAN' AND d.han_thanh_toan<=NOW())
-        OR (d.trang_thai IN ('DA_GIAO','DANG_KIEM_TRA') AND d.han_kiem_tra<=NOW())
+        OR (d.trang_thai IN ('DA_GIAO','DANG_KIEM_TRA') AND d.han_kiem_tra<=NOW() AND d.can_admin_xu_ly=0)
         OR (d.trang_thai IN ('DA_THANH_TOAN','CHO_GUI_HANG')
             AND d.han_nguoi_ban_gui_hang<=NOW()
             AND NOT EXISTS (
@@ -132,7 +133,7 @@ const giaCongKhaiCuoi = (phienDauGiaId, nguoiDungId) =>
      ORDER BY b.ngay_tao DESC,b.id DESC LIMIT 1`,
     [phienDauGiaId, nguoiDungId],
   );
-module.exports = {
+export = {
   khoaDuLieu,
   donDangXuLyCuaPhien,
   donHangCuaPhien,
