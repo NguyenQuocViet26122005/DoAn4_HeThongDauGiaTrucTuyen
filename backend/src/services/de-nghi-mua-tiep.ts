@@ -1,16 +1,18 @@
-const coSoDuLieu = require('../repositories/ket-noi');
-const khoBanGhi = require('../repositories/ban-ghi');
-const khoDuLieu = require('../repositories/don-hang');
-const cacPhienDauGia = require('../repositories/dau-gia');
-const cacNguoiDung = require('../repositories/nguoi-dung');
-const cauHinhNghiepVu = require('./cau-hinh');
-const cacDonHang = require('./don-hang');
-const { ghiNhatKy, taoThongBao } = require('./nhat-ky-thong-bao');
-const kiemTra = require('../validators/du-lieu-dau-vao');
-const { baoDam, batBuocTonTai, cungId } = require('../utils/loi');
-const { donViTienNho } = require('../utils/tien');
-const thoiGian = require('../utils/thoi-gian');
-async function deNghiNguoiTiepTheoDaKhoa(phienDauGia, banGoc) {
+import type { NguoiDungDangNhap } from '../types/nghiep-vu';
+import { phanHoiDeNghiSchema } from '../validations/don-hang.schema';
+import coSoDuLieu = require('../repositories/ket-noi');
+import khoBanGhi = require('../repositories/ban-ghi');
+import khoDuLieu = require('../repositories/don-hang');
+import cacPhienDauGia = require('../repositories/dau-gia');
+import cacNguoiDung = require('../repositories/nguoi-dung');
+import cauHinhNghiepVu = require('./cau-hinh');
+import cacDonHang = require('./don-hang');
+import { ghiNhatKy, taoThongBao } from './nhat-ky-thong-bao';
+import kiemTra = require('../validations/du-lieu-dau-vao');
+import { baoDam, batBuocTonTai, cungId } from '../utils/loi';
+import { donViTienNho } from '../utils/tien';
+import thoiGian = require('../utils/thoi-gian');
+async function deNghiNguoiTiepTheoDaKhoa(phienDauGia, banGoc, nguoiYeuCauId) {
   if (
     phienDauGia.trang_thai !== 'DA_KET_THUC' ||
     banGoc.trang_thai !== 'DA_HUY' ||
@@ -40,12 +42,14 @@ async function deNghiNguoiTiepTheoDaKhoa(phienDauGia, banGoc) {
     don_hang_goc_id: banGoc.id,
     nguoi_tra_gia_id: ungVien.nguoi_tra_gia_id,
     gia_de_nghi: ungVien.so_tien,
+    luot_tra_gia_nguon_id: ungVien.id,
+    nguoi_yeu_cau_id: nguoiYeuCauId,
     het_han_luc: thoiGian.congGiay(
       await coSoDuLieu.thoiGianHienTai(),
       (await cauHinhNghiepVu.docSoCauHinh('SECOND_CHANCE_EXPIRE_HOURS')) * 3600,
     ),
   });
-  await ghiNhatKy(null, 'TAO_SECOND_CHANCE', 'de_nghi_mua_tiep_theo', id, {
+  await ghiNhatKy(nguoiYeuCauId, 'TAO_SECOND_CHANCE', 'de_nghi_mua_tiep_theo', id, {
     luot_tra_gia_cong_khai_id: ungVien.id,
   });
   await taoThongBao(
@@ -57,13 +61,13 @@ async function deNghiNguoiTiepTheoDaKhoa(phienDauGia, banGoc) {
   );
   return khoBanGhi.layTheoId('de_nghi_mua_tiep_theo', id);
 }
-async function tao(nguoiDung, donHangId) {
+async function tao(nguoiDung: NguoiDungDangNhap, donHangId) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.khoaDuLieu(kiemTra.id(donHangId)));
     baoDam(
-      nguoiDung.vai_tro === 'QUAN_TRI' || cungId(nguoiDung.id, banGhi.nguoi_ban_id),
+      cungId(nguoiDung.id, banGhi.nguoi_ban_id),
       403,
-      'Chỉ người bán hoặc Admin được tạo đề nghị',
+      'Chỉ người bán được tạo đề nghị',
     );
     baoDam(
       banGhi.trang_thai === 'DA_HUY' && banGhi.ly_do_huy === 'KHONG_THANH_TOAN',
@@ -73,12 +77,13 @@ async function tao(nguoiDung, donHangId) {
     const deNghi = await deNghiNguoiTiepTheoDaKhoa(
       await cacPhienDauGia.layTheoId(banGhi.phien_dau_gia_id),
       banGhi,
+      nguoiDung.id,
     );
     baoDam(deNghi, 409, 'Không có ứng viên phù hợp hoặc đã có đơn/đề nghị đang xử lý');
     return deNghi;
   });
 }
-async function chiTiet(nguoiDung, id) {
+async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
   const banGhi = batBuocTonTai(await khoBanGhi.layTheoId('de_nghi_mua_tiep_theo', kiemTra.id(id)));
   const phienDauGia = batBuocTonTai(await cacPhienDauGia.layTheoId(banGhi.phien_dau_gia_id));
   baoDam(
@@ -90,8 +95,8 @@ async function chiTiet(nguoiDung, id) {
   );
   return banGhi;
 }
-async function phanHoiDeNghi(nguoiDung, id, dauVao) {
-  kiemTra.kiemTraNoiDung(dauVao, ['chap_nhan']);
+async function phanHoiDeNghi(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
+  const dauVao = kiemTra.docSchema(phanHoiDeNghiSchema, duLieuNhap);
   const chapNhan = kiemTra.giaTriDungSai(dauVao.chap_nhan, 'Chấp nhận');
   return coSoDuLieu.giaoDich(async () => {
     const banDau = batBuocTonTai(
@@ -174,7 +179,7 @@ async function phanHoiDeNghi(nguoiDung, id, dauVao) {
       'de_nghi_mua_tiep_theo',
       id,
     );
-    if (!chapNhan) await deNghiNguoiTiepTheoDaKhoa(phienDauGia, banGoc);
+
     return { de_nghi: await khoBanGhi.layTheoId('de_nghi_mua_tiep_theo', id), don_hang: donHang };
   });
 }
@@ -193,10 +198,7 @@ async function xuLyHetHan(id) {
       return;
     await khoBanGhi.capNhat('de_nghi_mua_tiep_theo', id, { trang_thai: 'HET_HAN' });
     await ghiNhatKy(null, 'HET_HAN_SECOND_CHANCE', 'de_nghi_mua_tiep_theo', id);
-    await deNghiNguoiTiepTheoDaKhoa(
-      phienDauGia,
-      batBuocTonTai(await khoBanGhi.layTheoId('don_hang', banGhi.don_hang_goc_id)),
-    );
+
   });
 }
-module.exports = { deNghiNguoiTiepTheoDaKhoa, tao, chiTiet, phanHoiDeNghi, xuLyHetHan };
+export = { tao, chiTiet, phanHoiDeNghi, xuLyHetHan };

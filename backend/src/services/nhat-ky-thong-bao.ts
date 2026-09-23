@@ -1,7 +1,7 @@
-const khoBanGhi = require('../repositories/ban-ghi');
-const khoDuLieu = require('../repositories/he-thong');
-const cacSuKien = require('../sockets/su-kien');
-const { kiemTraDuLieuCongKhai } = require('../utils/du-lieu-cong-khai');
+import khoBanGhi = require('../repositories/ban-ghi');
+import khoDuLieu = require('../repositories/he-thong');
+import cacSuKien = require('../sockets/su-kien');
+import { kiemTraDuLieuCongKhai } from '../utils/du-lieu-cong-khai';
 async function ghiNhatKy(nguoiThucHienId, hanhDong, doiTuong, doiTuongId, duLieu = null) {
   kiemTraDuLieuCongKhai(duLieu);
   return khoBanGhi.them('nhat_ky_hoat_dong', {
@@ -28,4 +28,4 @@ async function thongBaoMotLan(nguoiDungId, loai, tieuDe, noiDung, lienKet) {
   if (await khoDuLieu.thongBaoDaCo(nguoiDungId, loai, lienKet)) return;
   return taoThongBao(nguoiDungId, loai, tieuDe, noiDung, lienKet);
 }
-module.exports = { ghiNhatKy, taoThongBao, thongBaoMotLan };
+export = { ghiNhatKy, taoThongBao, thongBaoMotLan };

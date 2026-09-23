@@ -1,8 +1,9 @@
-const { donViTienNho, nhoHon, lonHon } = require('../utils/tien');
-const { baoDam, cungId } = require('../utils/loi');
-const { buocGiaTaiMuc } = require('./cau-hinh');
+import type { PhienDauGia, MucCamKet, DinhDanh, TienNhap, BuocGia, LuotGiaTinhToan } from '../types/nghiep-vu';
+import { donViTienNho, nhoHon, lonHon } from '../utils/tien';
+import { baoDam, cungId } from '../utils/loi';
+import { buocGiaTaiMuc } from './cau-hinh';
 // Hàm chỉ tính toán. Service giữ khóa phiên và ghi toàn bộ kết quả trong transaction.
-function tinhKetQuaDauGia(phienDauGia, cacMucToiDa, nguoiTraGiaId, mucToiDaMoi, cacBuocGia) {
+function tinhKetQuaDauGia(phienDauGia: PhienDauGia, cacMucToiDa: MucCamKet[], nguoiTraGiaId: DinhDanh, mucToiDaMoi: TienNhap, cacBuocGia: BuocGia[]) {
   const mucToiDa = donViTienNho(mucToiDaMoi);
   const hienTai = donViTienNho(phienDauGia.gia_hien_tai);
   const batDau = donViTienNho(phienDauGia.gia_khoi_diem);
@@ -43,9 +44,9 @@ function tinhKetQuaDauGia(phienDauGia, cacMucToiDa, nguoiTraGiaId, mucToiDaMoi, 
     cungId(x.nguoi_tra_gia_id, phienDauGia.nguoi_dan_dau_id),
   );
   baoDam(dauTien || nguoiDanDauCu, 409, 'Thiếu mức giá của người dẫn đầu, cần quản trị kiểm tra');
-  let nguoiThangId,
-    gia,
-    cacLuotGiaCongKhai = [];
+  let nguoiThangId: string;
+  let gia: bigint;
+  const cacLuotGiaCongKhai: LuotGiaTinhToan[] = [];
   if (dauTien) {
     nguoiThangId = String(nguoiTraGiaId);
     gia = lonHon(batDau, 1n);
@@ -97,7 +98,7 @@ function tinhKetQuaDauGia(phienDauGia, cacMucToiDa, nguoiTraGiaId, mucToiDaMoi, 
     validPublicBid: true,
   };
 }
-function choPhepMuaNgay(phienDauGia) {
+function choPhepMuaNgay(phienDauGia: PhienDauGia) {
   return (
     Boolean(phienDauGia.cho_phep_mua_ngay) &&
     phienDauGia.gia_mua_ngay != null &&
@@ -106,4 +107,4 @@ function choPhepMuaNgay(phienDauGia) {
       : Number(phienDauGia.tong_luot_tra_gia) === 0)
   );
 }
-module.exports = { tinhKetQuaDauGia, choPhepMuaNgay };
+export = { tinhKetQuaDauGia, choPhepMuaNgay };

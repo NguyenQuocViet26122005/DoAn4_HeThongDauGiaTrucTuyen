@@ -1,10 +1,11 @@
-const tepTin = require('node:fs/promises');
-const duongDan = require('node:path');
-const { randomUUID: taoMaNgauNhien } = require('node:crypto');
-const { cauHinh } = require('../config/moi-truong');
-const kiemTra = require('../validators/du-lieu-dau-vao');
-const { baoDam, cungId } = require('../utils/loi');
-const khoDuLieu = require('../repositories/he-thong');
+import type { NguoiDungDangNhap } from '../types/nghiep-vu';
+import tepTin = require('node:fs/promises');
+import duongDan = require('node:path');
+import { randomUUID as taoMaNgauNhien } from 'node:crypto';
+import { cauHinh } from '../config/moi-truong';
+import kiemTra = require('../validations/du-lieu-dau-vao');
+import { baoDam, cungId } from '../utils/loi';
+import khoDuLieu = require('../repositories/he-thong');
 const cacNhom = ['avatar', 'product', 'verification', 'evidence'];
 function nhanDangLoaiTep(boDem) {
   if (
@@ -33,7 +34,7 @@ function viTriTep(nhom, chuSoHuu, ten) {
     absolute: duongDan.join(cauHinh.uploadRoot, nhom, String(chuSoHuu), ten),
   };
 }
-async function luu(nguoiDung, nhom, tep) {
+async function luu(nguoiDung: NguoiDungDangNhap, nhom, tep) {
   kiemTra.giaTriLuaChon(nhom, cacNhom, 'Nhóm tệp');
   baoDam(tep, 400, 'Cần gửi tệp ở trường file');
   if (nhom === 'product')
@@ -61,7 +62,7 @@ async function kiemTraTepSoHuu(giaTri, nhom, nguoiDungId) {
   }
   return dich;
 }
-async function taiTep(nguoiDung, nhom, chuSoHuu, ten) {
+async function taiTep(nguoiDung: NguoiDungDangNhap, nhom, chuSoHuu, ten) {
   const dich = viTriTep(nhom, chuSoHuu, ten);
   if (['verification', 'evidence'].includes(nhom)) {
     baoDam(nguoiDung, 401, 'Vui lòng đăng nhập để xem tệp');
@@ -79,4 +80,4 @@ async function taiTep(nguoiDung, nhom, chuSoHuu, ten) {
   }
   return dich;
 }
-module.exports = { luu, kiemTraTepSoHuu, taiTep, nhanDangLoaiTep };
+export = { luu, kiemTraTepSoHuu, taiTep, nhanDangLoaiTep };

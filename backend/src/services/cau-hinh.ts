@@ -1,10 +1,12 @@
-const coSoDuLieu = require('../repositories/ket-noi');
-const khoBanGhi = require('../repositories/ban-ghi');
-const khoDuLieu = require('../repositories/he-thong');
-const { baoDam } = require('../utils/loi');
-const { donViTienNho, GIOI_HAN_TIEN } = require('../utils/tien');
-const kiemTra = require('../validators/du-lieu-dau-vao');
-const { ghiNhatKy } = require('./nhat-ky-thong-bao');
+import type { BuocGia } from '../types/nghiep-vu';
+import type { NguoiDungDangNhap } from '../types/nghiep-vu';
+import coSoDuLieu = require('../repositories/ket-noi');
+import khoBanGhi = require('../repositories/ban-ghi');
+import khoDuLieu = require('../repositories/he-thong');
+import { baoDam } from '../utils/loi';
+import { donViTienNho, GIOI_HAN_TIEN } from '../utils/tien';
+import kiemTra = require('../validations/du-lieu-dau-vao');
+import { ghiNhatKy } from './nhat-ky-thong-bao';
 const giaTriMacDinh = {
   PAYMENT_DEADLINE_HOURS: 48,
   SELLER_SHIP_DEADLINE_DAYS: 3,
@@ -12,7 +14,7 @@ const giaTriMacDinh = {
   ANTI_SNIPE_THRESHOLD_SECONDS: 60,
   ANTI_SNIPE_EXTENSION_SECONDS: 90,
   SECOND_CHANCE_EXPIRE_HOURS: 24,
-  MAX_CONFIRMED_VIOLATION_POINTS: 3,
+  BUYER_NON_RECEIPT_DAYS: 7,
 };
 async function docSoCauHinh(khoa) {
   baoDam(Object.hasOwn(giaTriMacDinh, khoa), 500, 'Cấu hình nghiệp vụ không được hỗ trợ');
@@ -25,7 +27,7 @@ async function docSoCauHinh(khoa) {
   );
   return giaTri;
 }
-function buocGiaTaiMuc(gia, cacBanGhi) {
+function buocGiaTaiMuc(gia: bigint, cacBanGhi: BuocGia[]) {
   const cacKhoangKhop = cacBanGhi.filter(
     (banGhi) =>
       banGhi.dang_hoat_dong &&
@@ -37,7 +39,7 @@ function buocGiaTaiMuc(gia, cacBanGhi) {
   baoDam(buocGia > 0n, 409, 'Bước giá không hợp lệ');
   return buocGia;
 }
-async function luu(quanTri, khoa, dauVao) {
+async function luu(quanTri: NguoiDungDangNhap, khoa, dauVao) {
   baoDam(Object.hasOwn(giaTriMacDinh, khoa), 400, 'Khóa cấu hình không được hỗ trợ');
   kiemTra.kiemTraNoiDung(dauVao, ['gia_tri_cau_hinh']);
   const giaTri = kiemTra.soNguyen(dauVao.gia_tri_cau_hinh, 'Giá trị cấu hình', 1, 87600);
@@ -58,7 +60,7 @@ async function luu(quanTri, khoa, dauVao) {
     return khoDuLieu.cauHinh(khoa);
   });
 }
-async function thayBoBuocGia(quanTri, dauVao) {
+async function thayBoBuocGia(quanTri: NguoiDungDangNhap, dauVao) {
   kiemTra.kiemTraNoiDung(dauVao, ['buoc_gia']);
   baoDam(
     Array.isArray(dauVao.buoc_gia) && dauVao.buoc_gia.length > 0 && dauVao.buoc_gia.length <= 50,
@@ -71,7 +73,7 @@ async function thayBoBuocGia(quanTri, dauVao) {
       return {
         gia_tu: kiemTra.kiemTraTien(x.gia_tu, 'Giá từ'),
         gia_den: x.gia_den == null ? null : kiemTra.kiemTraTien(x.gia_den, 'Giá đến'),
-        muc_tang_gia: kiemTra.kiemTraTien(x.muc_tang_gia, 'Bước giá', true),
+        muc_tang_gia: kiemTra.tienVietNam(x.muc_tang_gia, 'Bước giá', true),
         dang_hoat_dong: 1,
       };
     })
@@ -103,10 +105,11 @@ async function thayBoBuocGia(quanTri, dauVao) {
   );
   return coSoDuLieu.giaoDich(async () => {
     await khoDuLieu.khoaCauHinh();
-    await khoDuLieu.tatBuocGiaCu();
-    for (const banGhi of duLieu) await khoBanGhi.them('buoc_gia', banGhi);
-    await ghiNhatKy(quanTri.id, 'DOI_BUOC_GIA', 'buoc_gia', null, { so_khoang: duLieu.length });
+    const dangDung = await coSoDuLieu.layMot("SELECT id FROM phien_dau_gia WHERE trang_thai IN ('DA_LEN_LICH','HOAT_DONG') LIMIT 1");
+    baoDam(!dangDung,409,'Không đổi bước giá khi còn phiên chờ hoặc đang hoạt động');
+    await khoDuLieu.luuBoBuocGia(duLieu,quanTri.id);
+    await ghiNhatKy(quanTri.id, 'DOI_BUOC_GIA', 'cau_hinh_he_thong', null, { so_khoang: duLieu.length });
     return khoDuLieu.cacBuocGia();
   });
 }
-module.exports = { docSoCauHinh, buocGiaTaiMuc, luu, thayBoBuocGia };
+export = { docSoCauHinh, buocGiaTaiMuc, luu, thayBoBuocGia };

@@ -1,35 +1,32 @@
-const coSoDuLieu = require('../repositories/ket-noi');
-const khoBanGhi = require('../repositories/ban-ghi');
-const khoDuLieu = require('../repositories/dau-gia');
-const heThong = require('../repositories/he-thong');
-const cacNguoiDung = require('../repositories/nguoi-dung');
-const cauHinhNghiepVu = require('./cau-hinh');
-const danhMucSanPham = require('./danh-muc-san-pham');
-const boTinhGia = require('./tinh-gia-tu-dong');
-const { ghiNhatKy, taoThongBao, thongBaoMotLan } = require('./nhat-ky-thong-bao');
-const cacSuKien = require('../sockets/su-kien');
-const kiemTra = require('../validators/du-lieu-dau-vao');
-const { baoDam, batBuocTonTai, cungId } = require('../utils/loi');
-const { donViTienNho, chuoiTien } = require('../utils/tien');
-const thoiGian = require('../utils/thoi-gian');
-const { phienCongKhai } = require('../utils/du-lieu-cong-khai');
-async function tao(nguoiDung, dauVao) {
-  kiemTra.kiemTraNoiDung(dauVao, [
-    'san_pham_id',
-    'gia_khoi_diem',
-    'gia_san',
-    'gia_mua_ngay',
-    'thoi_gian_bat_dau',
-    'thoi_gian_ket_thuc',
-  ]);
+import type { NguoiDungDangNhap } from '../types/nghiep-vu';
+import { taoPhienSchema, datGiaSchema, huyPhienSchema, duyetHuySchema } from '../validations/dau-gia.schema';
+import type { BoLocDanhSach, TruyVanDanhSach, DuLieuGhi } from '../types/nghiep-vu';
+import coSoDuLieu = require('../repositories/ket-noi');
+import khoBanGhi = require('../repositories/ban-ghi');
+import khoDuLieu = require('../repositories/dau-gia');
+import heThong = require('../repositories/he-thong');
+import cacNguoiDung = require('../repositories/nguoi-dung');
+import cauHinhNghiepVu = require('./cau-hinh');
+import danhMucSanPham = require('./danh-muc-san-pham');
+import boTinhGia = require('./tinh-gia-tu-dong');
+import { ghiNhatKy, taoThongBao, thongBaoMotLan } from './nhat-ky-thong-bao';
+import cacSuKien = require('../sockets/su-kien');
+import kiemTra = require('../validations/du-lieu-dau-vao');
+import { baoDam, batBuocTonTai, cungId } from '../utils/loi';
+import { donViTienNho, chuoiTien } from '../utils/tien';
+import thoiGian = require('../utils/thoi-gian');
+import { phienCongKhai } from '../utils/du-lieu-cong-khai';
+async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
+  const dauVao = kiemTra.docSchema(taoPhienSchema, duLieuNhap);
   const duLieu = {
     san_pham_id: kiemTra.id(dauVao.san_pham_id),
-    gia_khoi_diem: kiemTra.kiemTraTien(dauVao.gia_khoi_diem, 'Giá khởi điểm', true),
-    gia_san: dauVao.gia_san == null ? null : kiemTra.kiemTraTien(dauVao.gia_san, 'Giá sàn', true),
+    phi_van_chuyen: kiemTra.tienVietNam(dauVao.phi_van_chuyen ?? 0, 'Phí vận chuyển'),
+    gia_khoi_diem: kiemTra.tienVietNam(dauVao.gia_khoi_diem, 'Giá khởi điểm', true),
+    gia_san: dauVao.gia_san == null ? null : kiemTra.tienVietNam(dauVao.gia_san, 'Giá sàn', true),
     gia_mua_ngay:
       dauVao.gia_mua_ngay == null
         ? null
-        : kiemTra.kiemTraTien(dauVao.gia_mua_ngay, 'Giá mua ngay', true),
+        : kiemTra.tienVietNam(dauVao.gia_mua_ngay, 'Giá mua ngay', true),
     thoi_gian_bat_dau: thoiGian.kiemTraNgayNhap(dauVao.thoi_gian_bat_dau, 'Bắt đầu'),
     thoi_gian_ket_thuc: thoiGian.kiemTraNgayNhap(dauVao.thoi_gian_ket_thuc, 'Kết thúc'),
   };
@@ -51,6 +48,7 @@ async function tao(nguoiDung, dauVao) {
     'Kết thúc phải sau bắt đầu',
   );
   return coSoDuLieu.giaoDich(async () => {
+    await heThong.khoaCauHinh();
     await danhMucSanPham.kiemTraNguoiBan(nguoiDung);
     const sanPham = batBuocTonTai(await khoBanGhi.layTheoId('san_pham', duLieu.san_pham_id, true));
     baoDam(cungId(sanPham.nguoi_ban_id, nguoiDung.id), 403, 'Sản phẩm không thuộc tài khoản');
@@ -109,7 +107,7 @@ async function layPhienDangChay(id) {
   baoDam(banGhi.trang_thai_duyet === 'DA_DUYET', 409, 'Sản phẩm không đủ điều kiện đấu giá');
   return { row: banGhi, now: thoiGianHienTai };
 }
-async function kiemTraNguoiMua(nguoiDung, banGhi) {
+async function kiemTraNguoiMua(nguoiDung: NguoiDungDangNhap, banGhi) {
   const taiKhoan = batBuocTonTai(await cacNguoiDung.layTheoId(nguoiDung.id, true));
   baoDam(
     taiKhoan.vai_tro === 'NGUOI_DUNG' && taiKhoan.trang_thai_tai_khoan === 'HOAT_DONG',
@@ -125,9 +123,9 @@ async function kiemTraNguoiMua(nguoiDung, banGhi) {
   baoDam(diaChi, 409, 'Cần thêm địa chỉ giao hàng trước khi tham gia');
   return diaChi;
 }
-async function datGia(nguoiDung, id, dauVao) {
-  kiemTra.kiemTraNoiDung(dauVao, ['gia_toi_da']);
-  const tranGia = kiemTra.kiemTraTien(dauVao.gia_toi_da, 'Mức giá tối đa', true);
+async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
+  const dauVao = kiemTra.docSchema(datGiaSchema, duLieuNhap);
+  const tranGia = kiemTra.tienVietNam(dauVao.gia_toi_da, 'Mức giá tối đa', true);
   return coSoDuLieu.giaoDich(async () => {
     const { row: banGhi, now: thoiGianHienTai } = await layPhienDangChay(id);
     await kiemTraNguoiMua(nguoiDung, banGhi);
@@ -139,19 +137,11 @@ async function datGia(nguoiDung, id, dauVao) {
       tranGia,
       await heThong.cacBuocGia(),
     );
-    const banCu = cacMucToiDa.find((x) => cungId(x.nguoi_tra_gia_id, nguoiDung.id));
-    if (banCu)
-      await khoBanGhi.capNhat('muc_gia_toi_da', banCu.id, {
-        gia_toi_da: tranGia,
-        thoi_gian_dat_gia_toi_da: thoiGianHienTai,
-      });
-    else
-      await khoBanGhi.them('muc_gia_toi_da', {
-        phien_dau_gia_id: id,
-        nguoi_tra_gia_id: nguoiDung.id,
-        gia_toi_da: tranGia,
-        thoi_gian_dat_gia_toi_da: thoiGianHienTai,
-      });
+    await coSoDuLieu.truyVan(
+      `INSERT INTO tham_gia_phien (phien_dau_gia_id,nguoi_dung_id,gia_toi_da,thoi_gian_dat_gia_toi_da)
+       VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE gia_toi_da=VALUES(gia_toi_da),thoi_gian_dat_gia_toi_da=VALUES(thoi_gian_dat_gia_toi_da)`,
+      [id,nguoiDung.id,tranGia,thoiGianHienTai],
+    );
     let luotTraGiaCuoiId = null;
     for (const phanTu of ketQua.publicBids)
       luotTraGiaCuoiId = await khoBanGhi.them('luot_tra_gia', {
@@ -162,7 +152,7 @@ async function datGia(nguoiDung, id, dauVao) {
         ngay_tao: thoiGianHienTai,
       });
     const daDatGiaSan = banGhi.gia_san == null || ketQua.price >= donViTienNho(banGhi.gia_san);
-    const thayDoi = {
+    const thayDoi: DuLieuGhi = {
       gia_hien_tai: chuoiTien(ketQua.price),
       nguoi_dan_dau_id: ketQua.winnerId,
       dat_gia_san: daDatGiaSan ? 1 : 0,
@@ -185,12 +175,16 @@ async function datGia(nguoiDung, id, dauVao) {
         banGhi.so_giay_gia_han,
       );
       thayDoi.so_lan_gia_han = Number(banGhi.so_lan_gia_han) + 1;
-      await khoBanGhi.them('gia_han_phien_dau_gia', {
+      await khoBanGhi.them('nhat_ky_hoat_dong', {
+        nguoi_thuc_hien_id: nguoiDung.id,
+        hanh_dong: 'GIA_HAN_PHIEN',
+        loai_doi_tuong: 'phien_dau_gia',
+        doi_tuong_id: id,
         phien_dau_gia_id: id,
-        luot_tra_gia_kich_hoat_id: luotTraGiaCuoiId,
-        thoi_gian_ket_thuc_cu: banGhi.thoi_gian_ket_thuc,
+        luot_tra_gia_id: luotTraGiaCuoiId,
+        du_lieu_moi: JSON.stringify({ thoi_gian_ket_thuc_cu: banGhi.thoi_gian_ket_thuc,
         thoi_gian_ket_thuc_moi: thayDoi.thoi_gian_ket_thuc,
-        so_giay_them: banGhi.so_giay_gia_han,
+        so_giay_them: banGhi.so_giay_gia_han }),
       });
     }
     await khoBanGhi.capNhat('phien_dau_gia', id, thayDoi);
@@ -231,7 +225,7 @@ async function datGia(nguoiDung, id, dauVao) {
     };
   });
 }
-async function muaNgay(nguoiDung, id, dauVao = {}) {
+async function muaNgay(nguoiDung: NguoiDungDangNhap, id, dauVao = {}) {
   kiemTra.kiemTraNoiDung(dauVao, []);
   return coSoDuLieu.giaoDich(async () => {
     const { row: banGhi, now: thoiGianHienTai } = await layPhienDangChay(id);
@@ -326,8 +320,8 @@ async function xuLyDenHan(id) {
     return phienCongKhai(daCapNhat);
   });
 }
-async function guiYeuCauHuy(nguoiDung, id, dauVao) {
-  kiemTra.kiemTraNoiDung(dauVao, ['ly_do']);
+async function guiYeuCauHuy(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
+  const dauVao = kiemTra.docSchema(huyPhienSchema, duLieuNhap);
   const lyDo = kiemTra.chuoi(dauVao.ly_do, 'Lý do', 1000);
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id), true));
@@ -339,25 +333,27 @@ async function guiYeuCauHuy(nguoiDung, id, dauVao) {
       'Phiên đã kết thúc',
     );
     baoDam(!(await khoDuLieu.yeuCauHuyDangCho(id)), 409, 'Đã có yêu cầu hủy đang chờ');
-    const yeuCauId = await khoBanGhi.them('yeu_cau_huy_phien', {
+    const yeuCauId = await khoBanGhi.them('yeu_cau_xu_ly', {
+      loai_yeu_cau: 'HUY_PHIEN',
       phien_dau_gia_id: id,
       nguoi_yeu_cau_id: nguoiDung.id,
       ly_do: lyDo,
     });
     await ghiNhatKy(nguoiDung.id, 'YEU_CAU_HUY_PHIEN', 'phien_dau_gia', id);
-    return khoBanGhi.layTheoId('yeu_cau_huy_phien', yeuCauId);
+    return khoBanGhi.layTheoId('yeu_cau_xu_ly', yeuCauId);
   });
 }
-async function duyetHuyPhien(quanTri, yeuCauId, dauVao) {
-  kiemTra.kiemTraNoiDung(dauVao, ['trang_thai', 'ghi_chu_duyet']);
+async function duyetHuyPhien(quanTri: NguoiDungDangNhap, yeuCauId, duLieuNhap: unknown) {
+  const dauVao = kiemTra.docSchema(duyetHuySchema, duLieuNhap);
   const trangThai = kiemTra.giaTriLuaChon(dauVao.trang_thai, ['DA_DUYET', 'TU_CHOI'], 'Trạng thái');
   const ghiChu = kiemTra.chuoi(dauVao.ghi_chu_duyet, 'Ghi chú duyệt', 1000);
   return coSoDuLieu.giaoDich(async () => {
     const banDau = batBuocTonTai(
-      await khoBanGhi.layTheoId('yeu_cau_huy_phien', kiemTra.id(yeuCauId)),
+      await khoBanGhi.layTheoId('yeu_cau_xu_ly', kiemTra.id(yeuCauId)),
     );
+    baoDam(banDau.loai_yeu_cau === 'HUY_PHIEN', 404, 'Không tìm thấy yêu cầu hủy phiên');
     const banGhi = batBuocTonTai(await khoDuLieu.layTheoId(banDau.phien_dau_gia_id, true));
-    const yeuCauHuy = batBuocTonTai(await khoBanGhi.layTheoId('yeu_cau_huy_phien', yeuCauId, true));
+    const yeuCauHuy = batBuocTonTai(await khoBanGhi.layTheoId('yeu_cau_xu_ly', yeuCauId, true));
     baoDam(yeuCauHuy.trang_thai === 'CHO_XU_LY', 409, 'Yêu cầu đã xử lý');
     if (trangThai === 'DA_DUYET') {
       baoDam(
@@ -381,7 +377,7 @@ async function duyetHuyPhien(quanTri, yeuCauId, dauVao) {
         );
       cacSuKien.phienDauGia(await khoDuLieu.layTheoId(banGhi.id), 'auction:ended');
     }
-    await khoBanGhi.capNhat('yeu_cau_huy_phien', yeuCauId, {
+    await khoBanGhi.capNhat('yeu_cau_xu_ly', yeuCauId, {
       trang_thai: trangThai,
       nguoi_duyet_id: quanTri.id,
       ghi_chu_duyet: ghiChu,
@@ -397,11 +393,11 @@ async function duyetHuyPhien(quanTri, yeuCauId, dauVao) {
       ghiChu,
       `/auctions/${banGhi.id}`,
     );
-    return khoBanGhi.layTheoId('yeu_cau_huy_phien', yeuCauId);
+    return khoBanGhi.layTheoId('yeu_cau_xu_ly', yeuCauId);
   });
 }
-async function danhSach(nguoiDung, truyVan = {}, phamVi = 'public') {
-  const boLoc = {
+async function danhSach(nguoiDung: NguoiDungDangNhap, truyVan: TruyVanDanhSach = {}, phamVi = 'public') {
+  const boLoc: BoLocDanhSach = {
     search: truyVan.q ? kiemTra.chuoi(truyVan.q, 'Tìm kiếm', 100) : undefined,
     status: truyVan.trang_thai
       ? kiemTra.giaTriLuaChon(
@@ -424,7 +420,7 @@ async function lichSu(id, truyVan) {
   batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id)));
   return khoDuLieu.lichSu(id, kiemTra.phanTrang(truyVan));
 }
-async function theoDoi(nguoiDung, id, bat) {
+async function theoDoi(nguoiDung: NguoiDungDangNhap, id, bat) {
   batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id)));
   return bat
     ? khoDuLieu.theoDoi(nguoiDung.id, id).then(() => ({ dang_theo_doi: true }))
@@ -438,7 +434,7 @@ async function nhacPhienSapKetThuc(id) {
       !banGhi ||
       banGhi.trang_thai !== 'HOAT_DONG' ||
       thoiGian.daHetHan(banGhi.thoi_gian_ket_thuc, thoiGianHienTai) ||
-      thoiGian.doiThanhNgay(banGhi.thoi_gian_ket_thuc) - thoiGian.doiThanhNgay(thoiGianHienTai) >
+      thoiGian.doiThanhNgay(banGhi.thoi_gian_ket_thuc).getTime() - thoiGian.doiThanhNgay(thoiGianHienTai).getTime() >
         600000
     )
       return;
@@ -456,7 +452,7 @@ async function nhacPhienSapKetThuc(id) {
       );
   });
 }
-module.exports = {
+export = {
   tao,
   datGia,
   muaNgay,
