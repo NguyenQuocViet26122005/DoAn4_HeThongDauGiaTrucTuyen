@@ -1,9 +1,9 @@
-const http = require('node:http');
-const { Server: MayChuSocket } = require('socket.io');
-const { cauHinh, kiemTraMoiTruong } = require('./config/moi-truong');
-const ungDung = require('./ung-dung');
-const coSoDuLieu = require('./repositories/ket-noi');
-const cacSuKien = require('./sockets/su-kien');
+import http = require('node:http');
+import { Server as MayChuSocket } from 'socket.io';
+import { cauHinh, kiemTraMoiTruong } from './config/moi-truong';
+import ungDung = require('./ung-dung');
+import coSoDuLieu = require('./repositories/ket-noi');
+import cacSuKien = require('./sockets/su-kien');
 async function khoiDongMayChu() {
   kiemTraMoiTruong();
   await coSoDuLieu.layMot('SELECT 1 AS ok');
@@ -13,7 +13,7 @@ async function khoiDongMayChu() {
     maxHttpBufferSize: 16384,
   });
   require('./sockets/ket-noi').khoiTao(io);
-  await new Promise((giaiQuyet, tuChoi) => {
+  await new Promise<void>((giaiQuyet, tuChoi) => {
     mayChu.once('error', tuChoi);
     mayChu.listen(cauHinh.port, giaiQuyet);
   });
@@ -24,8 +24,8 @@ async function khoiDongMayChu() {
     if (dangDung) return;
     dangDung = true;
     await dungTacVu();
-    await new Promise((giaiQuyet) => io.close(giaiQuyet));
-    if (mayChu.listening) await new Promise((giaiQuyet) => mayChu.close(giaiQuyet));
+    await new Promise<void>((giaiQuyet) => io.close(() => giaiQuyet()));
+    if (mayChu.listening) await new Promise<void>((giaiQuyet) => mayChu.close(() => giaiQuyet()));
     await coSoDuLieu.nhomKetNoi.end();
   };
   for (const tinHieu of ['SIGINT', 'SIGTERM'])
@@ -48,4 +48,4 @@ if (require.main === module)
     await coSoDuLieu.nhomKetNoi.end();
     process.exitCode = 1;
   });
-module.exports = { khoiDongMayChu };
+export = { khoiDongMayChu };

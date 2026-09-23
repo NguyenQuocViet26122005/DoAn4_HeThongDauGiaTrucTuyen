@@ -1,9 +1,9 @@
-const cacPhienDauGia = require('../repositories/dau-gia');
-const cacDonHang = require('../repositories/don-hang');
-const dichVuDauGia = require('../services/dau-gia');
-const dichVuDonHang = require('../services/don-hang');
-const cacDeNghi = require('../services/de-nghi-mua-tiep');
-const { cauHinh } = require('../config/moi-truong');
+import cacPhienDauGia = require('../repositories/dau-gia');
+import cacDonHang = require('../repositories/don-hang');
+import dichVuDauGia = require('../services/dau-gia');
+import dichVuDonHang = require('../services/don-hang');
+import cacDeNghi = require('../services/de-nghi-mua-tiep');
+import { cauHinh } from '../config/moi-truong';
 let dangChay = false;
 let lanChayCuoi = null;
 async function chayMotLuot() {
@@ -12,13 +12,12 @@ async function chayMotLuot() {
   let daXuLy = 0,
     thatBai = 0;
   try {
-    for (const [timDuLieu, congViec] of [
+    const cacCongViec: Array<[() => Promise<import('../types/nghiep-vu').BanGhiSQL[]>, (id: string) => Promise<unknown>]> = [
       [cacPhienDauGia.denHan, dichVuDauGia.xuLyDenHan],
       [cacDonHang.denHan, dichVuDonHang.xuLyDenHan],
       [cacDonHang.deNghiDenHan, cacDeNghi.xuLyHetHan],
-      [cacPhienDauGia.sapKetThuc, dichVuDauGia.nhacPhienSapKetThuc],
-      [cacDonHang.canNhacNho, dichVuDonHang.nhacThanhToan],
-    ]) {
+    ];
+    for (const [timDuLieu, congViec] of cacCongViec) {
       let cacBanGhi;
       try {
         cacBanGhi = await timDuLieu();
@@ -62,4 +61,4 @@ const trangThai = () => ({
   lastRun: lanChayCuoi,
   interval_ms: cauHinh.jobIntervalMs,
 });
-module.exports = { batDau, chayMotLuot, trangThai };
+export = { batDau, chayMotLuot, trangThai };

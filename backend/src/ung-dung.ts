@@ -1,9 +1,9 @@
-const express = require('express');
-const cors = require('cors');
-const { cauHinh } = require('./config/moi-truong');
-const coSoDuLieu = require('./repositories/ket-noi');
-const { LoiUngDung } = require('./utils/loi');
-const { khongTimThay, xuLyLoi } = require('./middlewares/xu-ly-loi');
+import express = require('express');
+import cors = require('cors');
+import { cauHinh } from './config/moi-truong';
+import coSoDuLieu = require('./repositories/ket-noi');
+import { LoiUngDung } from './utils/loi';
+import { khongTimThay, xuLyLoi } from './middlewares/xu-ly-loi';
 const ungDung = express();
 ungDung.disable('x-powered-by');
 ungDung.use(
@@ -57,4 +57,4 @@ ungDung.get(
 );
 ungDung.use(khongTimThay);
 ungDung.use(xuLyLoi);
-module.exports = ungDung;
+export = ungDung;

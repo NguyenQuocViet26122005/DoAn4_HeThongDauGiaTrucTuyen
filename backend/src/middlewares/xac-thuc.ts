@@ -1,8 +1,9 @@
-const jwt = require('jsonwebtoken');
-const { cauHinh } = require('../config/moi-truong');
-const cacNguoiDung = require('../repositories/nguoi-dung');
-const { baoDam, LoiUngDung } = require('../utils/loi');
-const { nguoiDungAnToan } = require('../utils/du-lieu-cong-khai');
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
+import jwt = require('jsonwebtoken');
+import { cauHinh } from '../config/moi-truong';
+import cacNguoiDung = require('../repositories/nguoi-dung');
+import { baoDam, LoiUngDung } from '../utils/loi';
+import { nguoiDungAnToan } from '../utils/du-lieu-cong-khai';
 async function xacThucToken(maTruyCap) {
   baoDam(typeof maTruyCap === 'string' && maTruyCap.length <= 4096, 401, 'Vui lòng đăng nhập');
   let noiDungToken;
@@ -29,7 +30,7 @@ async function xacThucToken(maTruyCap) {
   );
   return nguoiDungAnToan(nguoiDung);
 }
-function yeuCauDangNhap(khongBatBuoc = false) {
+function yeuCauDangNhap(khongBatBuoc = false): RequestHandler {
   return async (yeuCau, phanHoi, tiepTheo) => {
     try {
       const tieuDeHTTP = yeuCau.headers.authorization;
@@ -46,7 +47,7 @@ function yeuCauDangNhap(khongBatBuoc = false) {
     }
   };
 }
-function quanTri(yeuCau, phanHoi, tiepTheo) {
+function quanTri(yeuCau: Request, phanHoi: Response, tiepTheo: NextFunction) {
   try {
     baoDam(yeuCau.user?.vai_tro === 'QUAN_TRI', 403, 'Chỉ quản trị viên được thực hiện');
     tiepTheo();
@@ -54,7 +55,7 @@ function quanTri(yeuCau, phanHoi, tiepTheo) {
     tiepTheo(e);
   }
 }
-function nguoiBan(yeuCau, phanHoi, tiepTheo) {
+function nguoiBan(yeuCau: Request, phanHoi: Response, tiepTheo: NextFunction) {
   try {
     baoDam(
       yeuCau.user?.vai_tro === 'NGUOI_DUNG' && yeuCau.user.trang_thai_nguoi_ban === 'DA_XAC_MINH',
@@ -66,4 +67,4 @@ function nguoiBan(yeuCau, phanHoi, tiepTheo) {
     tiepTheo(e);
   }
 }
-module.exports = { yeuCauDangNhap, quanTri, nguoiBan, xacThucToken };
+export = { yeuCauDangNhap, quanTri, nguoiBan, xacThucToken };

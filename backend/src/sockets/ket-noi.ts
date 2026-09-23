@@ -1,8 +1,8 @@
-const { xacThucToken } = require('../middlewares/xac-thuc');
-const kiemTra = require('../validators/du-lieu-dau-vao');
-const { baoDam } = require('../utils/loi');
-const cacPhienDauGia = require('../services/dau-gia');
-const cacSuKien = require('./su-kien');
+import { xacThucToken } from '../middlewares/xac-thuc';
+import kiemTra = require('../validations/du-lieu-dau-vao');
+import { baoDam } from '../utils/loi';
+import cacPhienDauGia = require('../services/dau-gia');
+import cacSuKien = require('./su-kien');
 function khoiTao(io) {
   cacSuKien.ganMayChu(io);
   io.use(async (ketNoiSocket, tiepTheo) => {
@@ -75,4 +75,4 @@ function khoiTao(io) {
     });
   });
 }
-module.exports = { khoiTao };
+export = { khoiTao };

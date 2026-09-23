@@ -1,6 +1,7 @@
-const { LoiUngDung } = require('../utils/loi');
-function gioiHanYeuCau({ limit: gioiHan, windowMs: cuaSoMiliGiay }) {
-  const cacBoDem = new Map();
+import type { RequestHandler } from 'express';
+import { LoiUngDung } from '../utils/loi';
+function gioiHanYeuCau({ limit: gioiHan, windowMs: cuaSoMiliGiay }: {limit: number; windowMs: number}): RequestHandler {
+  const cacBoDem = new Map<string, {count:number; reset:number}>();
   const donDep = setInterval(() => {
     for (const [khoa, giaTri] of cacBoDem) if (giaTri.reset <= Date.now()) cacBoDem.delete(khoa);
   }, cuaSoMiliGiay);
@@ -20,4 +21,4 @@ function gioiHanYeuCau({ limit: gioiHan, windowMs: cuaSoMiliGiay }) {
     tiepTheo();
   };
 }
-module.exports = gioiHanYeuCau;
+export = gioiHanYeuCau;

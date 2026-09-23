@@ -1,4 +1,4 @@
-const { LoiUngDung } = require('../utils/loi');
+import { LoiUngDung } from '../utils/loi';
 function khongTimThay(yeuCau, phanHoi, tiepTheo) {
   tiepTheo(new LoiUngDung(404, 'API không tồn tại'));
 }
@@ -38,4 +38,4 @@ function xuLyLoi(loi, yeuCau, phanHoi, tiepTheo) {
     console.error('Request failed', { method: yeuCau.method, code: loi.code || loi.name });
   phanHoi.status(trangThai).json({ success: false, message: thongDiep });
 }
-module.exports = { khongTimThay, xuLyLoi };
+export = { khongTimThay, xuLyLoi };
