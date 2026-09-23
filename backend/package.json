@@ -2,17 +2,22 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Backend hệ thống đấu giá trực tuyến - Đồ án 4",
-  "main": "src/may-chu.js",
+  "main": "dist/may-chu.js",
   "scripts": {
     "test": "node --test --test-isolation=none tests/*.test.js",
-    "check": "node scripts/kiem-tra.js",
+    "check": "tsc --noEmit -p tsconfig.json",
     "format": "prettier --write src scripts tests docs HUONG-DAN.md package.json .prettierrc.json",
     "format:check": "prettier --check src scripts tests docs HUONG-DAN.md package.json .prettierrc.json",
-    "test:integration": "node --test --test-isolation=none tests/integration/*.test.js",
-    "test:api": "node --test --test-isolation=none tests/integration/api-day-du.test.js",
-    "dev": "nodemon src/may-chu.js",
-    "start": "node src/may-chu.js",
-    "check:schema": "node scripts/kiem-tra-cau-truc.js"
+    "test:integration": "node scripts/chay-kiem-thu-tich-hop.js",
+    "test:api": "node scripts/chay-kiem-thu-tich-hop.js --api",
+    "dev": "tsx watch src/may-chu.ts",
+    "start": "node dist/may-chu.js",
+    "check:schema": "node scripts/kiem-tra-cau-truc.js",
+    "build": "tsc -p tsconfig.json",
+    "pretest": "npm run build",
+    "pretest:integration": "npm run build",
+    "pretest:api": "npm run build",
+    "precheck:schema": "npm run build"
   },
   "keywords": [],
   "author": "",
@@ -26,10 +31,19 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.3.0",
     "mysql2": "^3.24.4",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^26.6.2",
     "nodemon": "^3.1.14",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }
