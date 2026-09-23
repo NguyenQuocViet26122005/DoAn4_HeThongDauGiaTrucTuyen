@@ -102,9 +102,10 @@ function duLieuDiaChi(dauVao) {
     la_mac_dinh: kiemTra.giaTriDungSai(dauVao.la_mac_dinh ?? false, 'Địa chỉ mặc định'),
   };
 }
-async function luuDiaChi(nguoiDung, id, dauVao) {
+async function luuDiaChi(nguoiDung, idCanSua, dauVao) {
   const duLieu = duLieuDiaChi(dauVao);
   return coSoDuLieu.giaoDich(async () => {
+    let id = idCanSua;
     await cacNguoiDung.layTheoId(nguoiDung.id, true);
     if (id)
       baoDam(

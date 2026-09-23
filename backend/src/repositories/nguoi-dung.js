@@ -28,12 +28,21 @@ const cacHoSoXacMinh = (nguoiDungId) =>
   ]);
 const danhSach = ({ limit: gioiHan, offset: viTriBatDau }, timKiem = '') =>
   coSoDuLieu.truyVan(
-    `SELECT id,ho_ten,email,so_dien_thoai,anh_dai_dien,vai_tro,trang_thai_nguoi_ban,trang_thai_tai_khoan,ngay_tao FROM nguoi_dung WHERE ho_ten LIKE ? OR email LIKE ? ORDER BY id DESC LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
+    `SELECT id, ho_ten, email, so_dien_thoai, anh_dai_dien, vai_tro,
+            trang_thai_nguoi_ban, trang_thai_tai_khoan, ngay_tao
+     FROM nguoi_dung
+     WHERE ho_ten LIKE ? OR email LIKE ?
+     ORDER BY id DESC
+     LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
     [`%${timKiem}%`, `%${timKiem}%`],
   );
 const danhSachChoXacMinh = ({ limit: gioiHan, offset: viTriBatDau }, trangThai) =>
   coSoDuLieu.truyVan(
-    `SELECT x.*, n.ho_ten, n.email FROM xac_minh_nguoi_ban x JOIN nguoi_dung n ON n.id = x.nguoi_dung_id WHERE x.trang_thai = ? ORDER BY x.id LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
+    `SELECT x.*, n.ho_ten, n.email FROM xac_minh_nguoi_ban x
+     JOIN nguoi_dung n ON n.id=x.nguoi_dung_id
+     WHERE x.trang_thai=?
+     ORDER BY x.id
+     LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
     [trangThai],
   );
 module.exports = {
