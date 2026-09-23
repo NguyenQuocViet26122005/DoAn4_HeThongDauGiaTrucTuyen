@@ -1,10 +1,10 @@
-const xuLyHTTP = require('./xu-ly-http');
-const dichVu = require('../services/dau-gia');
-const khoDuLieu = require('../repositories/dau-gia');
-const kiemTra = require('../validators/du-lieu-dau-vao');
-const cauHinhNghiepVu = require('../services/cau-hinh');
-const heThong = require('../repositories/he-thong');
-module.exports = {
+import xuLyHTTP = require('./xu-ly-http');
+import dichVu = require('../services/dau-gia');
+import khoDuLieu = require('../repositories/dau-gia');
+import kiemTra = require('../validations/du-lieu-dau-vao');
+import cauHinhNghiepVu = require('../services/cau-hinh');
+import heThong = require('../repositories/he-thong');
+export = {
   danhSach: xuLyHTTP((yeuCau) => dichVu.danhSach(yeuCau.user, yeuCau.query)),
   cuaToi: xuLyHTTP((yeuCau) => dichVu.danhSach(yeuCau.user, yeuCau.query, 'mine')),
   phienDaThamGia: xuLyHTTP((yeuCau) => dichVu.danhSach(yeuCau.user, yeuCau.query, 'bids')),

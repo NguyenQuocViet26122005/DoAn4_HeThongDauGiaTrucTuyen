@@ -1,8 +1,8 @@
-const xuLyHTTP = require('./xu-ly-http');
-const dichVu = require('../services/nguoi-dung');
-const khoDuLieu = require('../repositories/nguoi-dung');
-const kiemTra = require('../validators/du-lieu-dau-vao');
-module.exports = {
+import xuLyHTTP = require('./xu-ly-http');
+import dichVu = require('../services/nguoi-dung');
+import khoDuLieu = require('../repositories/nguoi-dung');
+import kiemTra = require('../validations/du-lieu-dau-vao');
+export = {
   dangKy: xuLyHTTP((yeuCau) => dichVu.dangKy(yeuCau.body), { status: 201 }),
   dangNhap: xuLyHTTP((yeuCau) => dichVu.dangNhap(yeuCau.body)),
   hoSo: xuLyHTTP((yeuCau) => dichVu.hoSo(yeuCau.user)),

@@ -1,6 +1,6 @@
-const { Router: TaoBoDinhTuyen } = require('express');
-const dieuKhien = require('../controllers/danh-muc-san-pham');
-const { yeuCauDangNhap, quanTri, nguoiBan } = require('../middlewares/xac-thuc');
+import { Router as TaoBoDinhTuyen } from 'express';
+import dieuKhien = require('../controllers/danh-muc-san-pham');
+import { yeuCauDangNhap, quanTri, nguoiBan } from '../middlewares/xac-thuc';
 const boDinhTuyen = TaoBoDinhTuyen();
 boDinhTuyen.get('/categories', dieuKhien.danhSachDanhMuc);
 boDinhTuyen.get('/categories/:id/attributes', dieuKhien.danhSachThuocTinh);
@@ -29,4 +29,4 @@ boDinhTuyen.put(
 );
 boDinhTuyen.get('/admin/products', yeuCauDangNhap(), quanTri, dieuKhien.sanPhamQuanTri);
 boDinhTuyen.patch('/admin/products/:id/review', yeuCauDangNhap(), quanTri, dieuKhien.duyet);
-module.exports = boDinhTuyen;
+export = boDinhTuyen;

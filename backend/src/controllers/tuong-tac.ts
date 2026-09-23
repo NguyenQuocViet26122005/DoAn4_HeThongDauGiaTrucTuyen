@@ -1,9 +1,9 @@
-const xuLyHTTP = require('./xu-ly-http');
-const dichVu = require('../services/tuong-tac');
-const cacTranhChap = require('../services/tranh-chap');
-const khoDuLieu = require('../repositories/tuong-tac');
-const kiemTra = require('../validators/du-lieu-dau-vao');
-module.exports = {
+import xuLyHTTP = require('./xu-ly-http');
+import dichVu = require('../services/tuong-tac');
+import cacTranhChap = require('../services/tranh-chap');
+import khoDuLieu = require('../repositories/tuong-tac');
+import kiemTra = require('../validations/du-lieu-dau-vao');
+export = {
   cacTranhChap: xuLyHTTP((yeuCau) =>
     khoDuLieu.cacTranhChap(yeuCau.user, kiemTra.phanTrang(yeuCau.query)),
   ),

@@ -1,6 +1,6 @@
-const { Router: TaoBoDinhTuyen } = require('express');
-const dieuKhien = require('../controllers/tuong-tac');
-const { yeuCauDangNhap, quanTri } = require('../middlewares/xac-thuc');
+import { Router as TaoBoDinhTuyen } from 'express';
+import dieuKhien = require('../controllers/tuong-tac');
+import { yeuCauDangNhap, quanTri } from '../middlewares/xac-thuc';
 const boDinhTuyen = TaoBoDinhTuyen();
 boDinhTuyen.get('/users/:id/reviews', dieuKhien.cacDanhGia);
 boDinhTuyen.use(
@@ -36,4 +36,4 @@ boDinhTuyen.post('/admin/violations', quanTri, dieuKhien.taoViPham);
 boDinhTuyen.patch('/admin/violations/:id/review', quanTri, dieuKhien.duyetViPham);
 boDinhTuyen.get('/admin/statistics', quanTri, dieuKhien.thongKe);
 boDinhTuyen.get('/admin/activity-logs', quanTri, dieuKhien.nhatKy);
-module.exports = boDinhTuyen;
+export = boDinhTuyen;

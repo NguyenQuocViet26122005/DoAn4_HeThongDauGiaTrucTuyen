@@ -1,7 +1,7 @@
-const { Router: TaoBoDinhTuyen } = require('express');
-const dieuKhien = require('../controllers/nguoi-dung');
-const { yeuCauDangNhap, quanTri } = require('../middlewares/xac-thuc');
-const gioiHanYeuCau = require('../middlewares/gioi-han-yeu-cau');
+import { Router as TaoBoDinhTuyen } from 'express';
+import dieuKhien = require('../controllers/nguoi-dung');
+import { yeuCauDangNhap, quanTri } from '../middlewares/xac-thuc';
+import gioiHanYeuCau = require('../middlewares/gioi-han-yeu-cau');
 const boDinhTuyen = TaoBoDinhTuyen();
 const gioiHanDangNhap = gioiHanYeuCau({ limit: 20, windowMs: 15 * 60 * 1000 });
 boDinhTuyen.post('/auth/register', gioiHanDangNhap, dieuKhien.dangKy);
@@ -33,4 +33,4 @@ boDinhTuyen.patch(
   quanTri,
   dieuKhien.duyetXacMinh,
 );
-module.exports = boDinhTuyen;
+export = boDinhTuyen;

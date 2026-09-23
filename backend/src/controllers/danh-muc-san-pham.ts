@@ -1,8 +1,8 @@
-const xuLyHTTP = require('./xu-ly-http');
-const dichVu = require('../services/danh-muc-san-pham');
-const khoDuLieu = require('../repositories/danh-muc-san-pham');
-const kiemTra = require('../validators/du-lieu-dau-vao');
-module.exports = {
+import xuLyHTTP = require('./xu-ly-http');
+import dichVu = require('../services/danh-muc-san-pham');
+import khoDuLieu = require('../repositories/danh-muc-san-pham');
+import kiemTra = require('../validations/du-lieu-dau-vao');
+export = {
   danhSachDanhMuc: xuLyHTTP(() => khoDuLieu.danhSachDanhMuc()),
   danhMucQuanTri: xuLyHTTP(() => khoDuLieu.danhSachDanhMuc(true)),
   danhSachThuocTinh: xuLyHTTP((yeuCau) =>

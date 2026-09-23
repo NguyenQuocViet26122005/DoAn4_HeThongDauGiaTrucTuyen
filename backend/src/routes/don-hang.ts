@@ -1,6 +1,6 @@
-const { Router: TaoBoDinhTuyen } = require('express');
-const dieuKhien = require('../controllers/don-hang');
-const { yeuCauDangNhap, quanTri } = require('../middlewares/xac-thuc');
+import { Router as TaoBoDinhTuyen } from 'express';
+import dieuKhien = require('../controllers/don-hang');
+import { yeuCauDangNhap, quanTri } from '../middlewares/xac-thuc';
 const boDinhTuyen = TaoBoDinhTuyen();
 boDinhTuyen.use(['/orders', '/second-chances', '/admin/orders'], yeuCauDangNhap());
 boDinhTuyen.get('/orders', dieuKhien.danhSach);
@@ -15,4 +15,4 @@ boDinhTuyen.get('/second-chances', dieuKhien.cacDeNghi);
 boDinhTuyen.get('/second-chances/:id', dieuKhien.chiTietDeNghi);
 boDinhTuyen.post('/second-chances/:id/respond', dieuKhien.phanHoiDeNghi);
 boDinhTuyen.get('/admin/orders', quanTri, dieuKhien.danhSachQuanTri);
-module.exports = boDinhTuyen;
+export = boDinhTuyen;

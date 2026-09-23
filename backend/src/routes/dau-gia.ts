@@ -1,7 +1,7 @@
-const { Router: TaoBoDinhTuyen } = require('express');
-const dieuKhien = require('../controllers/dau-gia');
-const { yeuCauDangNhap, quanTri, nguoiBan } = require('../middlewares/xac-thuc');
-const gioiHanYeuCau = require('../middlewares/gioi-han-yeu-cau');
+import { Router as TaoBoDinhTuyen } from 'express';
+import dieuKhien = require('../controllers/dau-gia');
+import { yeuCauDangNhap, quanTri, nguoiBan } from '../middlewares/xac-thuc';
+import gioiHanYeuCau = require('../middlewares/gioi-han-yeu-cau');
 const boDinhTuyen = TaoBoDinhTuyen();
 const gioiHanDatGia = gioiHanYeuCau({ limit: 60, windowMs: 60000 });
 boDinhTuyen.get('/auctions', dieuKhien.danhSach);
@@ -38,4 +38,4 @@ boDinhTuyen.patch(
 boDinhTuyen.get('/admin/config', yeuCauDangNhap(), quanTri, dieuKhien.danhSachCauHinh);
 boDinhTuyen.put('/admin/config/:key', yeuCauDangNhap(), quanTri, dieuKhien.luuCauHinh);
 boDinhTuyen.put('/admin/bid-increments', yeuCauDangNhap(), quanTri, dieuKhien.luuBuocGia);
-module.exports = boDinhTuyen;
+export = boDinhTuyen;

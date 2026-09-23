@@ -1,9 +1,9 @@
-const { Router: TaoBoDinhTuyen } = require('express');
-const multer = require('multer');
-const { yeuCauDangNhap } = require('../middlewares/xac-thuc');
-const dichVu = require('../services/tai-tep');
-const xuLyHTTP = require('../controllers/xu-ly-http');
-const gioiHanYeuCau = require('../middlewares/gioi-han-yeu-cau');
+import { Router as TaoBoDinhTuyen } from 'express';
+import multer = require('multer');
+import { yeuCauDangNhap } from '../middlewares/xac-thuc';
+import dichVu = require('../services/tai-tep');
+import xuLyHTTP = require('../controllers/xu-ly-http');
+import gioiHanYeuCau = require('../middlewares/gioi-han-yeu-cau');
 const boDinhTuyen = TaoBoDinhTuyen();
 const taiLen = multer({
   storage: multer.memoryStorage(),
@@ -41,4 +41,4 @@ boDinhTuyen.get(
     }
   },
 );
-module.exports = boDinhTuyen;
+export = boDinhTuyen;
