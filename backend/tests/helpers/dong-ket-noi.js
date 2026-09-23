@@ -1,4 +1,4 @@
-const nhomKetNoi = require('../../src/config/co-so-du-lieu');
+const nhomKetNoi = require('../../dist/config/co-so-du-lieu');
 
 let tacVuDong;
 

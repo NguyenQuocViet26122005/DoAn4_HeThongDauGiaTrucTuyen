@@ -1,10 +1,10 @@
 const { randomUUID: taoMaNgauNhien } = require('node:crypto');
 const bcrypt = require('bcrypt');
-const coSoDuLieu = require('../../src/repositories/ket-noi');
-const khoBanGhi = require('../../src/repositories/ban-ghi');
-const cacNguoiDung = require('../../src/repositories/nguoi-dung');
-const { nguoiDungAnToan } = require('../../src/utils/du-lieu-cong-khai');
-const thoiGian = require('../../src/utils/thoi-gian');
+const coSoDuLieu = require('../../dist/repositories/ket-noi');
+const khoBanGhi = require('../../dist/repositories/ban-ghi');
+const cacNguoiDung = require('../../dist/repositories/nguoi-dung');
+const { nguoiDungAnToan } = require('../../dist/utils/du-lieu-cong-khai');
+const thoiGian = require('../../dist/utils/thoi-gian');
 
 async function taoDuLieuKiemThu() {
   const tienTo = `test-${taoMaNgauNhien()}`;

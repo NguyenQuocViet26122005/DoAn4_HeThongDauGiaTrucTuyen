@@ -2,22 +2,22 @@ const { test: kiemThu, after: sauKhi } = require('node:test');
 const xacNhan = require('node:assert/strict');
 const http = require('node:http');
 const { randomUUID: taoMaNgauNhien } = require('node:crypto');
-const coSoDuLieu = require('../../src/repositories/ket-noi');
-const khoBanGhi = require('../../src/repositories/ban-ghi');
-const khoPhienDauGia = require('../../src/repositories/dau-gia');
-const khoDonHang = require('../../src/repositories/don-hang');
-const khoTuongTac = require('../../src/repositories/tuong-tac');
-const cacNguoiDung = require('../../src/services/nguoi-dung');
-const danhMucSanPham = require('../../src/services/danh-muc-san-pham');
-const cacPhienDauGia = require('../../src/services/dau-gia');
-const cacDonHang = require('../../src/services/don-hang');
-const cacTranhChap = require('../../src/services/tranh-chap');
-const tuongTac = require('../../src/services/tuong-tac');
-const cacDeNghi = require('../../src/services/de-nghi-mua-tiep');
-const { xacThucToken } = require('../../src/middlewares/xac-thuc');
-const { donViTienNho } = require('../../src/utils/tien');
-const { kiemTraDuLieuCongKhai } = require('../../src/utils/du-lieu-cong-khai');
-const thoiGian = require('../../src/utils/thoi-gian');
+const coSoDuLieu = require('../../dist/repositories/ket-noi');
+const khoBanGhi = require('../../dist/repositories/ban-ghi');
+const khoPhienDauGia = require('../../dist/repositories/dau-gia');
+const khoDonHang = require('../../dist/repositories/don-hang');
+const khoTuongTac = require('../../dist/repositories/tuong-tac');
+const cacNguoiDung = require('../../dist/services/nguoi-dung');
+const danhMucSanPham = require('../../dist/services/danh-muc-san-pham');
+const cacPhienDauGia = require('../../dist/services/dau-gia');
+const cacDonHang = require('../../dist/services/don-hang');
+const cacTranhChap = require('../../dist/services/tranh-chap');
+const tuongTac = require('../../dist/services/tuong-tac');
+const cacDeNghi = require('../../dist/services/de-nghi-mua-tiep');
+const { xacThucToken } = require('../../dist/middlewares/xac-thuc');
+const { donViTienNho } = require('../../dist/utils/tien');
+const { kiemTraDuLieuCongKhai } = require('../../dist/utils/du-lieu-cong-khai');
+const thoiGian = require('../../dist/utils/thoi-gian');
 const { taoDuLieuKiemThu, sanPham, phienDauGia, hoanTac } = require('../helpers/du-lieu-mau');
 
 async function nguoiThang(duLieuKiemThu) {
@@ -70,7 +70,7 @@ kiemThu('MySQL: toàn bộ kiểm thử nghiệp vụ được rollback', async 
           email: duLieuKiemThu.a.email,
           mat_khau: duLieuKiemThu.password,
         });
-        const mayChu = http.createServer(require('../../src/ung-dung'));
+        const mayChu = http.createServer(require('../../dist/ung-dung'));
         await new Promise((giaiQuyet) => mayChu.listen(0, '127.0.0.1', giaiQuyet));
         try {
           const diaChiGoc = `http://127.0.0.1:${mayChu.address().port}/api`;
@@ -100,7 +100,7 @@ kiemThu('MySQL: toàn bộ kiểm thử nghiệp vụ được rollback', async 
         const duLieuKiemThu = await taoDuLieuKiemThu();
         const id = await phienDauGia(duLieuKiemThu);
         await cacPhienDauGia.datGia(duLieuKiemThu.a, id, { gia_toi_da: '22000000' });
-        const diaChi = await require('../../src/repositories/nguoi-dung').diaChiMacDinh(
+        const diaChi = await require('../../dist/repositories/nguoi-dung').diaChiMacDinh(
           duLieuKiemThu.a.id,
         );
         await xacNhan.rejects(cacNguoiDung.xoaDiaChi(duLieuKiemThu.b, diaChi.id), { status: 403 });
@@ -294,7 +294,7 @@ kiemThu('MySQL: toàn bộ kiểm thử nghiệp vụ được rollback', async 
       }),
   );
 
-  await boKiemThu.test('Tranh chấp giữ tiền, chặn tự giải ngân và hoàn tiền một phần', async () =>
+  await boKiemThu.test('Tranh chấp giữ tiền, chặn tự giải ngân và từ chối hoàn một phần và hoàn toàn bộ', async () =>
     hoanTac(async () => {
       const duLieuKiemThu = await taoDuLieuKiemThu();
       const donHang = await nguoiThang(duLieuKiemThu);
@@ -320,13 +320,14 @@ kiemThu('MySQL: toàn bộ kiểm thử nghiệp vụ được rollback', async 
         phan_hoi_nguoi_ban: 'Phản hồi kiểm thử',
       });
       await cacTranhChap.tiepNhan(duLieuKiemThu.admin, tranhChap.id);
+      await xacNhan.rejects(cacTranhChap.giaiQuyet(duLieuKiemThu.admin, tranhChap.id, {
+        ket_qua: 'NGUOI_MUA', so_tien_hoan: '1000000', ket_qua_xu_ly: 'Không cho phép hoàn một phần',
+      }), {status:400});
       await cacTranhChap.giaiQuyet(duLieuKiemThu.admin, tranhChap.id, {
-        ket_qua: 'NGUOI_MUA',
-        so_tien_hoan: '1000000',
-        ket_qua_xu_ly: 'Hoàn một phần theo kiểm thử',
+        ket_qua: 'NGUOI_MUA', so_tien_hoan: donHang.tong_tien, ket_qua_xu_ly: 'Hoàn toàn bộ theo kiểm thử',
       });
-      xacNhan.equal((await khoDonHang.tienTrungGian(donHang.id)).trang_thai, 'HOAN_TIEN_MOT_PHAN');
-      xacNhan.equal((await khoBanGhi.layTheoId('don_hang', donHang.id)).trang_thai, 'HOAN_THANH');
+      xacNhan.equal((await khoDonHang.tienTrungGian(donHang.id)).trang_thai, 'DA_HOAN_TIEN');
+      xacNhan.equal((await khoBanGhi.layTheoId('don_hang', donHang.id)).trang_thai, 'DA_HUY');
       await xacNhan.rejects(
         cacTranhChap.giaiQuyet(duLieuKiemThu.admin, tranhChap.id, {
           ket_qua: 'NGUOI_BAN',
@@ -397,7 +398,8 @@ kiemThu('MySQL: toàn bộ kiểm thử nghiệp vụ được rollback', async 
         await cacDonHang.xuLyDenHan(donHang.id);
         await cacDonHang.xuLyDenHan(donHang.id);
         xacNhan.ok(await khoDonHang.viPhamCuaDon(donHang.id, 'KHONG_THANH_TOAN'));
-        const deNghi = await khoDonHang.deNghiDangCho(id);
+        xacNhan.equal(await khoDonHang.deNghiDangCho(id), null);
+        const deNghi = await cacDeNghi.tao(duLieuKiemThu.seller, donHang.id);
         xacNhan.equal(deNghi.gia_de_nghi, '19800000.00');
         xacNhan.equal(String(deNghi.nguoi_tra_gia_id), duLieuKiemThu.a.id);
         await cacDeNghi.phanHoiDeNghi(duLieuKiemThu.a, deNghi.id, { chap_nhan: true });

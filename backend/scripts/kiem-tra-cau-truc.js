@@ -1,6 +1,6 @@
 const tepTin = require('node:fs');
 const duongDan = require('node:path');
-const coSoDuLieu = require('../src/repositories/ket-noi');
+const coSoDuLieu = require('../dist/repositories/ket-noi');
 
 async function kiemTraCauTruc() {
   const sql = tepTin.readFileSync(
@@ -18,6 +18,7 @@ async function kiemTraCauTruc() {
     mongDoi.set(ketQuaKhop[1], cacCot);
   }
 
+  if (mongDoi.size !== 19) throw new Error('SQL chuẩn phải có 19 bảng');
   const thucTe = await coSoDuLieu.truyVan(`
     SELECT TABLE_NAME AS table_name, COLUMN_NAME AS column_name
     FROM information_schema.COLUMNS
@@ -37,17 +38,18 @@ async function kiemTraCauTruc() {
     FROM information_schema.TABLES
     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'
   `);
+  const bangDu = thongTinBoMay.filter(b => !mongDoi.has(b.table_name));
   const boMayKhongHoTro = thongTinBoMay.filter(
     (banGhi) => mongDoi.has(banGhi.table_name) && banGhi.engine !== 'InnoDB',
   );
   console.log(
     JSON.stringify(
-      { expectedTables: mongDoi.size, missingColumns: conThieu, unsafeEngines: boMayKhongHoTro },
+      { expectedTables: mongDoi.size, actualTables: thongTinBoMay.length, extraTables: bangDu, missingColumns: conThieu, unsafeEngines: boMayKhongHoTro },
       null,
       2,
     ),
   );
-  if (conThieu.length || boMayKhongHoTro.length) process.exitCode = 1;
+  if (conThieu.length || boMayKhongHoTro.length || bangDu.length || thongTinBoMay.length !== 19) process.exitCode = 1;
 }
 
 if (require.main === module) {

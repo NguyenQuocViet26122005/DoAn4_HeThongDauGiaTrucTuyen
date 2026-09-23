@@ -2,15 +2,15 @@ const { test: kiemThu, after: sauKhi } = require('node:test');
 const xacNhan = require('node:assert/strict');
 const http = require('node:http');
 const { Server: MayChuSocket } = require('socket.io');
-const coSoDuLieu = require('../../src/repositories/ket-noi');
-const khoBanGhi = require('../../src/repositories/ban-ghi');
-const khoPhien = require('../../src/repositories/dau-gia');
-const khoDon = require('../../src/repositories/don-hang');
-const dauGia = require('../../src/services/dau-gia');
-const donHang = require('../../src/services/don-hang');
-const tranhChap = require('../../src/services/tranh-chap');
-const thoiGian = require('../../src/utils/thoi-gian');
-const { kiemTraDuLieuCongKhai } = require('../../src/utils/du-lieu-cong-khai');
+const coSoDuLieu = require('../../dist/repositories/ket-noi');
+const khoBanGhi = require('../../dist/repositories/ban-ghi');
+const khoPhien = require('../../dist/repositories/dau-gia');
+const khoDon = require('../../dist/repositories/don-hang');
+const dauGia = require('../../dist/services/dau-gia');
+const donHang = require('../../dist/services/don-hang');
+const tranhChap = require('../../dist/services/tranh-chap');
+const thoiGian = require('../../dist/utils/thoi-gian');
+const { kiemTraDuLieuCongKhai } = require('../../dist/utils/du-lieu-cong-khai');
 const { taoDuLieuKiemThu, phienDauGia } = require('../helpers/du-lieu-mau');
 
 // Kiểm thử đồng thời cần các kết nối nhìn thấy cùng dữ liệu đã commit.
@@ -35,15 +35,13 @@ async function donDuLieuKiemThu(duLieu) {
     ]);
     for (const banGhi of cacDon) {
       await coSoDuLieu.truyVan(
-        'DELETE b FROM bang_chung_tranh_chap b JOIN tranh_chap t ON t.id=b.tranh_chap_id WHERE t.don_hang_id=?',
+        'DELETE b FROM tep_dinh_kem b JOIN tranh_chap t ON t.id=b.tranh_chap_id WHERE t.don_hang_id=?',
         [banGhi.id],
       );
       for (const bang of [
         'danh_gia',
         'tranh_chap',
-        'giu_tien_trung_gian',
         'thanh_toan',
-        'van_chuyen',
       ]) {
         await coSoDuLieu.truyVan(`DELETE FROM ${bang} WHERE don_hang_id=?`, [banGhi.id]);
       }
@@ -59,11 +57,10 @@ async function donDuLieuKiemThu(duLieu) {
       ]);
       await coSoDuLieu.truyVan('DELETE FROM don_hang WHERE phien_dau_gia_id=?', [banGhi.id]);
       for (const bang of [
-        'yeu_cau_huy_phien',
-        'gia_han_phien_dau_gia',
+        'yeu_cau_xu_ly',
+        'nhat_ky_hoat_dong',
         'luot_tra_gia',
-        'muc_gia_toi_da',
-        'danh_sach_theo_doi',
+        'tham_gia_phien',
       ]) {
         await coSoDuLieu.truyVan(`DELETE FROM ${bang} WHERE phien_dau_gia_id=?`, [banGhi.id]);
       }
@@ -108,9 +105,9 @@ function taoKhachSocket(cong) {
 
 kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán và Socket.IO', async () => {
   const duLieu = await coSoDuLieu.giaoDich(taoDuLieuKiemThu);
-  const mayChu = http.createServer(require('../../src/ung-dung'));
+  const mayChu = http.createServer(require('../../dist/ung-dung'));
   const io = new MayChuSocket(mayChu);
-  require('../../src/sockets/ket-noi').khoiTao(io);
+  require('../../dist/sockets/ket-noi').khoiTao(io);
   await new Promise((xong) => mayChu.listen(0, '127.0.0.1', xong));
   let khach;
   try {
@@ -131,7 +128,7 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
     const phien = await khoPhien.layTheoId(phienId);
     const mucDauTien = (
       await coSoDuLieu.truyVan(
-        'SELECT nguoi_tra_gia_id FROM muc_gia_toi_da WHERE phien_dau_gia_id=? ORDER BY id LIMIT 1',
+        'SELECT nguoi_dung_id AS nguoi_tra_gia_id FROM tham_gia_phien WHERE phien_dau_gia_id=? AND gia_toi_da IS NOT NULL ORDER BY thoi_gian_dat_gia_toi_da,id LIMIT 1',
         [phienId],
       )
     )[0];

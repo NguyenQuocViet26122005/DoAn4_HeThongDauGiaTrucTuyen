@@ -3,9 +3,9 @@ const xacNhan = require('node:assert/strict');
 const http = require('node:http');
 const tepTin = require('node:fs/promises');
 const duongDan = require('node:path');
-const coSoDuLieu = require('../../src/repositories/ket-noi');
-const nguoiDung = require('../../src/services/nguoi-dung');
-const { cauHinh } = require('../../src/config/moi-truong');
+const coSoDuLieu = require('../../dist/repositories/ket-noi');
+const nguoiDung = require('../../dist/services/nguoi-dung');
+const { cauHinh } = require('../../dist/config/moi-truong');
 const { taoDuLieuKiemThu, hoanTac } = require('../helpers/du-lieu-mau');
 
 kiemThu('HTTP và Multer: xác minh, duyệt sản phẩm, tệp riêng tư và tạo phiên', async () => {
@@ -22,7 +22,7 @@ kiemThu('HTTP và Multer: xác minh, duyệt sản phẩm, tệp riêng tư và 
       const maQuanTri = (
         await nguoiDung.dangNhap({ email: duLieu.admin.email, mat_khau: duLieu.password })
       ).token;
-      const mayChu = http.createServer(require('../../src/ung-dung'));
+      const mayChu = http.createServer(require('../../dist/ung-dung'));
       await new Promise((xong) => mayChu.listen(0, '127.0.0.1', xong));
       const diaChi = `http://127.0.0.1:${mayChu.address().port}`;
 

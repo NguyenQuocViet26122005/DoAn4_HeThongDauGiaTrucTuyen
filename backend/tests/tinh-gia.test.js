@@ -1,9 +1,9 @@
 const { test: kiemThu, after: sauKhi } = require('node:test');
 const xacNhan = require('node:assert/strict');
-const { tinhKetQuaDauGia, choPhepMuaNgay } = require('../src/services/tinh-gia-tu-dong');
-const { donViTienNho, chuoiTien } = require('../src/utils/tien');
-const { kiemTraDuLieuCongKhai } = require('../src/utils/du-lieu-cong-khai');
-const { buocGiaTaiMuc } = require('../src/services/cau-hinh');
+const { tinhKetQuaDauGia, choPhepMuaNgay } = require('../dist/services/tinh-gia-tu-dong');
+const { donViTienNho, chuoiTien } = require('../dist/utils/tien');
+const { kiemTraDuLieuCongKhai } = require('../dist/utils/du-lieu-cong-khai');
+const { buocGiaTaiMuc } = require('../dist/services/cau-hinh');
 const { dongKetNoiMotLan } = require('./helpers/dong-ket-noi');
 
 const cacBuocGia = [

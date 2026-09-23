@@ -1,14 +1,14 @@
 const { test: kiemThu, after: sauKhi } = require('node:test');
 const xacNhan = require('node:assert/strict');
-const coSoDuLieu = require('../../src/repositories/ket-noi');
-const khoBanGhi = require('../../src/repositories/ban-ghi');
-const khoDonHang = require('../../src/repositories/don-hang');
-const cacPhienDauGia = require('../../src/services/dau-gia');
-const cacDonHang = require('../../src/services/don-hang');
-const cacTranhChap = require('../../src/services/tranh-chap');
-const cacDeNghi = require('../../src/services/de-nghi-mua-tiep');
-const lichChay = require('../../src/jobs/lich-chay');
-const thoiGian = require('../../src/utils/thoi-gian');
+const coSoDuLieu = require('../../dist/repositories/ket-noi');
+const khoBanGhi = require('../../dist/repositories/ban-ghi');
+const khoDonHang = require('../../dist/repositories/don-hang');
+const cacPhienDauGia = require('../../dist/services/dau-gia');
+const cacDonHang = require('../../dist/services/don-hang');
+const cacTranhChap = require('../../dist/services/tranh-chap');
+const cacDeNghi = require('../../dist/services/de-nghi-mua-tiep');
+const lichChay = require('../../dist/jobs/lich-chay');
+const thoiGian = require('../../dist/utils/thoi-gian');
 const { taoDuLieuKiemThu, phienDauGia, hoanTac } = require('../helpers/du-lieu-mau');
 
 kiemThu(
@@ -68,7 +68,7 @@ kiemThu(
 );
 
 kiemThu(
-  'Second Chance: bỏ lượt ngoài giờ, chuyển người khi từ chối/hết hạn và giữ giá sàn',
+  'Second Chance: bỏ lượt ngoài giờ, người bán chủ động chọn lượt tiếp sau từ chối/hết hạn và giữ giá sàn',
   async () =>
     hoanTac(async () => {
       const duLieu = await taoDuLieuKiemThu();
@@ -91,11 +91,14 @@ kiemThu(
         han_thanh_toan: thoiGian.congGiay(hienTai, -1),
       });
       await cacDonHang.xuLyDenHan(donHang.id);
-      const deNghiDau = await khoDonHang.deNghiDangCho(phienId);
+      xacNhan.equal(await khoDonHang.deNghiDangCho(phienId), null);
+      await xacNhan.rejects(cacDeNghi.tao(duLieu.admin, donHang.id), {status:403});
+      const deNghiDau = await cacDeNghi.tao(duLieu.seller, donHang.id);
       xacNhan.equal(String(deNghiDau.nguoi_tra_gia_id), duLieu.outsider.id);
       xacNhan.equal(deNghiDau.gia_de_nghi, '21000000.00');
       await cacDeNghi.phanHoiDeNghi(duLieu.outsider, deNghiDau.id, { chap_nhan: false });
-      const deNghiSau = await khoDonHang.deNghiDangCho(phienId);
+      xacNhan.equal(await khoDonHang.deNghiDangCho(phienId), null);
+      const deNghiSau = await cacDeNghi.tao(duLieu.seller, donHang.id);
       xacNhan.equal(String(deNghiSau.nguoi_tra_gia_id), duLieu.b.id);
       xacNhan.equal(deNghiSau.gia_de_nghi, '20000000.00');
       await khoBanGhi.capNhat('de_nghi_mua_tiep_theo', deNghiSau.id, {
@@ -121,12 +124,13 @@ kiemThu(
         han_thanh_toan: thoiGian.congGiay(hienTai, -1),
       });
       await cacDonHang.xuLyDenHan(donCoSan.id);
+      await xacNhan.rejects(cacDeNghi.tao(duLieu.seller, donCoSan.id), {status:409});
       xacNhan.equal(await khoDonHang.deNghiDangCho(phienCoSan), null);
     }),
 );
 
 kiemThu(
-  'Bộ lập lịch quét MySQL, nhắc hạn và ghi vi phạm gửi hàng một lần; toàn bộ rollback',
+  'Bộ lập lịch quét MySQL, không nhắc nhiều mốc hạn và ghi vi phạm gửi hàng một lần; toàn bộ rollback',
   async () =>
     hoanTac(async () => {
       const duLieu = await taoDuLieuKiemThu();
@@ -173,7 +177,7 @@ kiemThu(
             [duLieu.b.id],
           )
         ).so_luong,
-        '1',
+        '0',
       );
     }),
 );

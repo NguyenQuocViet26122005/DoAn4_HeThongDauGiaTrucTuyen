@@ -1,9 +1,9 @@
 const { test: kiemThu, before: truocKhi, after: sauKhi } = require('node:test');
 const xacNhan = require('node:assert/strict');
 const http = require('node:http');
-const ungDung = require('../src/ung-dung');
+const ungDung = require('../dist/ung-dung');
 const { dongKetNoiMotLan } = require('./helpers/dong-ket-noi');
-const { nhanDangLoaiTep } = require('../src/services/tai-tep');
+const { nhanDangLoaiTep } = require('../dist/services/tai-tep');
 let mayChu;
 let diaChiGoc;
 

@@ -3,13 +3,13 @@ const xacNhan = require('node:assert/strict');
 const http = require('node:http');
 const tepTin = require('node:fs/promises');
 const duongDan = require('node:path');
-const coSoDuLieu = require('../../src/repositories/ket-noi');
-const khoBanGhi = require('../../src/repositories/ban-ghi');
-const khoDonHang = require('../../src/repositories/don-hang');
-const dauGia = require('../../src/services/dau-gia');
-const thoiGian = require('../../src/utils/thoi-gian');
-const { cauHinh } = require('../../src/config/moi-truong');
-const { kiemTraDuLieuCongKhai } = require('../../src/utils/du-lieu-cong-khai');
+const coSoDuLieu = require('../../dist/repositories/ket-noi');
+const khoBanGhi = require('../../dist/repositories/ban-ghi');
+const khoDonHang = require('../../dist/repositories/don-hang');
+const dauGia = require('../../dist/services/dau-gia');
+const thoiGian = require('../../dist/utils/thoi-gian');
+const { cauHinh } = require('../../dist/config/moi-truong');
+const { kiemTraDuLieuCongKhai } = require('../../dist/utils/du-lieu-cong-khai');
 const { taoDuLieuKiemThu, hoanTac } = require('../helpers/du-lieu-mau');
 
 // Đối chiếu với route thật để không nhầm số lần gọi HTTP với số API đã kiểm tra.
@@ -49,7 +49,7 @@ kiemThu(
       await hoanTac(async () => {
         const duLieu = await taoDuLieuKiemThu();
         const ma = {};
-        const mayChu = http.createServer(require('../../src/ung-dung'));
+        const mayChu = http.createServer(require('../../dist/ung-dung'));
         await new Promise((xong) => mayChu.listen(0, '127.0.0.1', xong));
         const diaChiGoc = `http://127.0.0.1:${mayChu.address().port}`;
 
@@ -425,7 +425,7 @@ kiemThu(
           );
 
           await boKiemThu.test(
-            'Mua ngay, tranh chấp, bằng chứng và hoàn tiền một phần',
+            'Mua ngay, tranh chấp, bằng chứng riêng tư và hoàn tiền toàn bộ',
             async () => {
               const phienMuaNgay = await taoPhienMoi();
               donTranhChap = (await gui('POST', `/auctions/${phienMuaNgay.id}/buy-now`, 'a', {}))
@@ -464,19 +464,19 @@ kiemThu(
               await gui('POST', `/admin/disputes/${tc.id}/take`, 'admin', {});
               const nd = {
                 ket_qua: 'NGUOI_MUA',
-                so_tien_hoan: '1000000',
-                ket_qua_xu_ly: 'Hoàn một phần',
+                so_tien_hoan: donTranhChap.tong_tien,
+                ket_qua_xu_ly: 'Hoàn toàn bộ',
               };
               await gui('POST', `/admin/disputes/${tc.id}/resolve`, 'a', nd, 403);
               await gui('POST', `/admin/disputes/${tc.id}/resolve`, 'admin', nd);
               await gui('POST', `/admin/disputes/${tc.id}/resolve`, 'admin', nd, 409);
               xacNhan.equal(
                 (await gui('GET', `/disputes/${tc.id}`, 'a')).so_tien_hoan,
-                '1000000.00',
+                donTranhChap.tong_tien,
               );
               xacNhan.equal(
                 (await gui('GET', `/orders/${donTranhChap.id}`, 'a')).giu_tien.trang_thai,
-                'HOAN_TIEN_MOT_PHAN',
+                'DA_HOAN_TIEN',
               );
             },
           );
@@ -556,6 +556,12 @@ kiemThu(
                 gia_tri_cau_hinh: 48,
               });
               const cacBuoc = await gui('GET', '/bid-increments');
+              // Các phiên kiểm thử đã chốt/hủy; chỉ phiên tạo bởi bài này được đóng trước khi đổi cấu hình.
+              const dangMo = await coSoDuLieu.truyVan("SELECT a.id FROM phien_dau_gia a JOIN san_pham p ON p.id=a.san_pham_id WHERE p.nguoi_ban_id=? AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG')",[duLieu.seller.id]);
+              if (dangMo.length) {
+                await gui('PUT', '/admin/bid-increments', 'admin', {buoc_gia:cacBuoc.map(({gia_tu,gia_den,muc_tang_gia})=>({gia_tu,gia_den,muc_tang_gia}))},409);
+                for (const p of dangMo) await chotPhien(p.id);
+              }
               await gui('PUT', '/admin/bid-increments', 'admin', {
                 buoc_gia: cacBuoc.map(({ gia_tu, gia_den, muc_tang_gia }) => ({
                   gia_tu,
