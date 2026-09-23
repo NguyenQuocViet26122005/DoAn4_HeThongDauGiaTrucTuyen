@@ -1,0 +1,238 @@
+<mxfile host="app.diagrams.net" modified="2026-09-23T00:00:00.000Z" agent="DoAn4" version="24.7.17"><diagram id="01-tai-khoan" name="Tài khoản"><mxGraphModel dx="1300" dy="1000" grid="1" page="1" pageScale="1" pageWidth="960" pageHeight="760"><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="nguoi_dung" value="nguoi_dung
+id
+
+Vai trò, trạng thái và tài khoản" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="50" y="250" width="340" height="245" as="geometry"/></mxCell><mxCell id="xac_minh_nguoi_ban" value="xac_minh_nguoi_ban
+id
+nguoi_dung_id
+nguoi_duyet_id
+trang_thai
+
+Hồ sơ riêng tư, Admin xét duyệt" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="570" y="60" width="340" height="245" as="geometry"/></mxCell><mxCell id="dia_chi_nguoi_dung" value="dia_chi_nguoi_dung
+id
+nguoi_dung_id
+
+Sổ địa chỉ của người dùng" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="570" y="470" width="340" height="245" as="geometry"/></mxCell><mxCell id="e0" value="nguoi_dung_id
+nguoi_duyet_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="xac_minh_nguoi_ban" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e1" value="nguoi_dung_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="dia_chi_nguoi_dung" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell></root></mxGraphModel></diagram><diagram id="02-san-pham" name="Danh mục và sản phẩm"><mxGraphModel dx="1300" dy="1000" grid="1" page="1" pageScale="1" pageWidth="960" pageHeight="780"><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="danh_muc" value="danh_muc
+id
+danh_muc_cha_id
+cau_hinh_thuoc_tinh
+
+Thuộc tính mẫu lưu bằng JSON" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="50" y="70" width="340" height="245" as="geometry"/></mxCell><mxCell id="nguoi_dung" value="nguoi_dung
+[THAM CHIẾU]
+id
+
+Vai trò, trạng thái và tài khoản" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="50" y="470" width="340" height="245" as="geometry"/></mxCell><mxCell id="san_pham" value="san_pham
+id
+nguoi_ban_id
+danh_muc_id
+nguoi_duyet_id
+thuoc_tinh_json
+trang_thai_duyet
+
+Thông tin và snapshot thuộc tính" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="570" y="260" width="340" height="245" as="geometry"/></mxCell><mxCell id="e0" value="danh_muc_cha_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="danh_muc" target="danh_muc"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e1" value="nguoi_ban_id
+nguoi_duyet_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="san_pham" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e2" value="danh_muc_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="san_pham" target="danh_muc"><mxGeometry relative="1" as="geometry"/></mxCell></root></mxGraphModel></diagram><diagram id="03-dau-gia" name="Đấu giá"><mxGraphModel dx="1300" dy="1000" grid="1" page="1" pageScale="1" pageWidth="1310" pageHeight="1020"><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="nguoi_dung" value="nguoi_dung
+[THAM CHIẾU]
+id
+
+Vai trò, trạng thái và tài khoản" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="40" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="san_pham" value="san_pham
+[THAM CHIẾU]
+id
+nguoi_ban_id
+danh_muc_id
+nguoi_duyet_id
+thuoc_tinh_json
+trang_thai_duyet
+
+Thông tin và snapshot thuộc tính" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="510" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="phien_dau_gia" value="phien_dau_gia
+id
+san_pham_id
+nguoi_dan_dau_id
+gia_hien_tai
+thoi_gian_ket_thuc
+
+Giá công khai, thời gian, phí" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="510" y="370" width="340" height="245" as="geometry"/></mxCell><mxCell id="tham_gia_phien" value="tham_gia_phien
+id
+phien_dau_gia_id
+nguoi_dung_id
+dang_theo_doi
+gia_toi_da
+thoi_gian_dat_gia_toi_da
+
+RIÊNG TƯ: theo dõi và cam kết" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="40" y="720" width="340" height="245" as="geometry"/></mxCell><mxCell id="luot_tra_gia" value="luot_tra_gia
+id
+phien_dau_gia_id
+nguoi_tra_gia_id
+
+Lịch sử giá công khai" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="930" y="720" width="340" height="245" as="geometry"/></mxCell><mxCell id="e0" value="san_pham_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="phien_dau_gia" target="san_pham"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e1" value="nguoi_dan_dau_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="phien_dau_gia" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e2" value="phien_dau_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="tham_gia_phien" target="phien_dau_gia"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e3" value="nguoi_dung_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="tham_gia_phien" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e4" value="phien_dau_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="luot_tra_gia" target="phien_dau_gia"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e5" value="nguoi_tra_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="luot_tra_gia" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell></root></mxGraphModel></diagram><diagram id="04-giao-dich" name="Đơn hàng và thanh toán"><mxGraphModel dx="1300" dy="1000" grid="1" page="1" pageScale="1" pageWidth="1310" pageHeight="1090"><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="nguoi_dung" value="nguoi_dung
+[THAM CHIẾU]
+id
+
+Vai trò, trạng thái và tài khoản" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="40" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="phien_dau_gia" value="phien_dau_gia
+[THAM CHIẾU]
+id
+san_pham_id
+nguoi_dan_dau_id
+gia_hien_tai
+thoi_gian_ket_thuc
+
+Giá công khai, thời gian, phí" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="490" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="luot_tra_gia" value="luot_tra_gia
+[THAM CHIẾU]
+id
+phien_dau_gia_id
+nguoi_tra_gia_id
+
+Lịch sử giá công khai" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="930" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="don_hang" value="don_hang
+id
+phien_dau_gia_id
+nguoi_mua_id
+nguoi_ban_id
+tong_tien
+trang_thai_giu_tien
+
+Gộp giữ tiền và vận chuyển" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="60" y="420" width="340" height="245" as="geometry"/></mxCell><mxCell id="thanh_toan" value="thanh_toan
+id
+don_hang_id
+so_tien
+trang_thai
+
+Từng lần thử / giao dịch mô phỏng" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="60" y="790" width="340" height="245" as="geometry"/></mxCell><mxCell id="de_nghi_mua_tiep_theo" value="de_nghi_mua_tiep_theo
+id
+phien_dau_gia_id
+don_hang_goc_id
+nguoi_tra_gia_id
+don_hang_moi_id
+luot_tra_gia_nguon_id
+
+Giá lấy từ lượt trả công khai" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="700" y="610" width="340" height="245" as="geometry"/></mxCell><mxCell id="e0" value="phien_dau_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="don_hang" target="phien_dau_gia"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e1" value="nguoi_mua_id
+nguoi_ban_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="don_hang" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e2" value="don_hang_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="thanh_toan" target="don_hang"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e3" value="phien_dau_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="de_nghi_mua_tiep_theo" target="phien_dau_gia"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e4" value="don_hang_goc_id
+don_hang_moi_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="de_nghi_mua_tiep_theo" target="don_hang"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e5" value="nguoi_tra_gia_id
+nguoi_yeu_cau_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="de_nghi_mua_tiep_theo" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e6" value="luot_tra_gia_nguon_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="de_nghi_mua_tiep_theo" target="luot_tra_gia"><mxGeometry relative="1" as="geometry"/></mxCell></root></mxGraphModel></diagram><diagram id="05-hau-mai" name="Tranh chấp, tệp và đánh giá"><mxGraphModel dx="1300" dy="1000" grid="1" page="1" pageScale="1" pageWidth="1310" pageHeight="1080"><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="nguoi_dung" value="nguoi_dung
+[THAM CHIẾU]
+id
+
+Vai trò, trạng thái và tài khoản" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="40" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="don_hang" value="don_hang
+[THAM CHIẾU]
+id
+phien_dau_gia_id
+nguoi_mua_id
+nguoi_ban_id
+tong_tien
+trang_thai_giu_tien
+
+Gộp giữ tiền và vận chuyển" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="490" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="san_pham" value="san_pham
+[THAM CHIẾU]
+id
+nguoi_ban_id
+danh_muc_id
+nguoi_duyet_id
+thuoc_tinh_json
+trang_thai_duyet
+
+Thông tin và snapshot thuộc tính" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="930" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="tranh_chap" value="tranh_chap
+id
+don_hang_id
+nguoi_mo_id
+nguoi_xu_ly_id
+trang_thai
+
+Admin chọn một kết quả cuối" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="490" y="400" width="340" height="245" as="geometry"/></mxCell><mxCell id="tep_dinh_kem" value="tep_dinh_kem
+id
+san_pham_id
+tranh_chap_id
+nguoi_tai_len_id
+loai_tep
+
+Ảnh công khai / bằng chứng riêng" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="930" y="780" width="340" height="245" as="geometry"/></mxCell><mxCell id="danh_gia" value="danh_gia
+id
+don_hang_id
+nguoi_danh_gia_id
+nguoi_duoc_danh_gia_id
+
+Đánh giá hai bên theo đơn" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="40" y="780" width="340" height="245" as="geometry"/></mxCell><mxCell id="e0" value="don_hang_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="tranh_chap" target="don_hang"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e1" value="nguoi_mo_id
+nguoi_xu_ly_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="tranh_chap" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e2" value="san_pham_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="tep_dinh_kem" target="san_pham"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e3" value="tranh_chap_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="tep_dinh_kem" target="tranh_chap"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e4" value="nguoi_tai_len_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="tep_dinh_kem" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e5" value="don_hang_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="danh_gia" target="don_hang"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e6" value="nguoi_danh_gia_id
+nguoi_duoc_danh_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="danh_gia" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell></root></mxGraphModel></diagram><diagram id="06-yeu-cau" name="Yêu cầu và vi phạm"><mxGraphModel dx="1300" dy="1000" grid="1" page="1" pageScale="1" pageWidth="1270" pageHeight="1080"><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="nguoi_dung" value="nguoi_dung
+[THAM CHIẾU]
+id
+
+Vai trò, trạng thái và tài khoản" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="30" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="san_pham" value="san_pham
+[THAM CHIẾU]
+id
+nguoi_ban_id
+danh_muc_id
+nguoi_duyet_id
+thuoc_tinh_json
+trang_thai_duyet
+
+Thông tin và snapshot thuộc tính" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="460" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="phien_dau_gia" value="phien_dau_gia
+[THAM CHIẾU]
+id
+san_pham_id
+nguoi_dan_dau_id
+gia_hien_tai
+thoi_gian_ket_thuc
+
+Giá công khai, thời gian, phí" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="890" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="yeu_cau_xu_ly" value="yeu_cau_xu_ly
+id
+phien_dau_gia_id
+san_pham_id
+nguoi_yeu_cau_id
+nguoi_duyet_id
+trang_thai
+
+Hủy phiên hoặc báo cáo sản phẩm" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="460" y="420" width="340" height="245" as="geometry"/></mxCell><mxCell id="don_hang" value="don_hang
+[THAM CHIẾU]
+id
+phien_dau_gia_id
+nguoi_mua_id
+nguoi_ban_id
+tong_tien
+trang_thai_giu_tien
+
+Gộp giữ tiền và vận chuyển" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="30" y="770" width="340" height="245" as="geometry"/></mxCell><mxCell id="vi_pham" value="vi_pham
+id
+nguoi_dung_id
+phien_dau_gia_id
+don_hang_id
+nguoi_tao_id
+nguoi_xu_ly_id
+
+Admin xét, không tự tăng mức phạt" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="890" y="770" width="340" height="245" as="geometry"/></mxCell><mxCell id="e0" value="phien_dau_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="yeu_cau_xu_ly" target="phien_dau_gia"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e1" value="san_pham_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="yeu_cau_xu_ly" target="san_pham"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e2" value="nguoi_yeu_cau_id
+nguoi_duyet_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="yeu_cau_xu_ly" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e3" value="nguoi_dung_id
+nguoi_tao_id
+nguoi_xu_ly_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="vi_pham" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e4" value="phien_dau_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="vi_pham" target="phien_dau_gia"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e5" value="don_hang_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="vi_pham" target="don_hang"><mxGeometry relative="1" as="geometry"/></mxCell></root></mxGraphModel></diagram><diagram id="07-ho-tro" name="Thông báo, cấu hình và nhật ký"><mxGraphModel dx="1300" dy="1000" grid="1" page="1" pageScale="1" pageWidth="1270" pageHeight="1100"><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="nguoi_dung" value="nguoi_dung
+[THAM CHIẾU]
+id
+
+Vai trò, trạng thái và tài khoản" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="30" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="phien_dau_gia" value="phien_dau_gia
+[THAM CHIẾU]
+id
+san_pham_id
+nguoi_dan_dau_id
+gia_hien_tai
+thoi_gian_ket_thuc
+
+Giá công khai, thời gian, phí" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="460" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="luot_tra_gia" value="luot_tra_gia
+[THAM CHIẾU]
+id
+phien_dau_gia_id
+nguoi_tra_gia_id
+
+Lịch sử giá công khai" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f5f5f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="890" y="50" width="340" height="245" as="geometry"/></mxCell><mxCell id="thong_bao" value="thong_bao
+id
+nguoi_dung_id
+
+Thông báo trong website" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="30" y="420" width="340" height="245" as="geometry"/></mxCell><mxCell id="cau_hinh_he_thong" value="cau_hinh_he_thong
+id
+nguoi_cap_nhat_id
+khoa_cau_hinh
+gia_tri_cau_hinh
+
+Thời hạn và bộ bước giá JSON" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="30" y="780" width="340" height="245" as="geometry"/></mxCell><mxCell id="nhat_ky_hoat_dong" value="nhat_ky_hoat_dong
+id
+nguoi_thuc_hien_id
+phien_dau_gia_id
+luot_tra_gia_id
+hanh_dong
+du_lieu_moi
+
+Dấu vết, gồm từng lần gia hạn" style="rounded=1;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacing=14;fontFamily=Helvetica;fontSize=14;fillColor=#f0f7f5;strokeColor=#9aaea8;" vertex="1" parent="1"><mxGeometry x="750" y="590" width="340" height="245" as="geometry"/></mxCell><mxCell id="e0" value="nguoi_dung_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="thong_bao" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e1" value="nguoi_cap_nhat_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="cau_hinh_he_thong" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e2" value="nguoi_thuc_hien_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="nhat_ky_hoat_dong" target="nguoi_dung"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e3" value="phien_dau_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="nhat_ky_hoat_dong" target="phien_dau_gia"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="e4" value="luot_tra_gia_id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=0;endArrow=ERone;startArrow=ERmany;fontSize=10;fontColor=#536761;strokeColor=#81938c;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="nhat_ky_hoat_dong" target="luot_tra_gia"><mxGeometry relative="1" as="geometry"/></mxCell></root></mxGraphModel></diagram></mxfile>

@@ -1,0 +1,28 @@
+erDiagram
+    nguoi_dung {
+        bigint id PK
+    }
+    san_pham {
+        bigint id PK
+    }
+    phien_dau_gia {
+        bigint id PK
+    }
+    yeu_cau_xu_ly {
+        bigint id PK
+    }
+    don_hang {
+        bigint id PK
+    }
+    vi_pham {
+        bigint id PK
+    }
+    phien_dau_gia ||--o{ yeu_cau_xu_ly : "phien_dau_gia_id"
+    san_pham ||--o{ yeu_cau_xu_ly : "san_pham_id"
+    nguoi_dung ||--o{ yeu_cau_xu_ly : "nguoi_yeu_cau_id"
+    nguoi_dung ||--o{ yeu_cau_xu_ly : "nguoi_duyet_id"
+    nguoi_dung ||--o{ vi_pham : "nguoi_dung_id"
+    phien_dau_gia ||--o{ vi_pham : "phien_dau_gia_id"
+    don_hang ||--o{ vi_pham : "don_hang_id"
+    nguoi_dung ||--o{ vi_pham : "nguoi_tao_id"
+    nguoi_dung ||--o{ vi_pham : "nguoi_xu_ly_id"

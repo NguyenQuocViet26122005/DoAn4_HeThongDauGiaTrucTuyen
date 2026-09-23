@@ -1,0 +1,244 @@
+{
+  "thoi_diem": "2026-09-23T11:41:05.934Z",
+  "mysql": "8.0.46",
+  "database_thiet_ke": "doan4_daugia_thiet_ke_19",
+  "so_bang": 19,
+  "so_khoa_ngoai": 46,
+  "so_trigger": 6,
+  "so_view": 2,
+  "so_ca_dat": 29,
+  "cac_ca": [
+    {
+      "ten": "JSON thuộc tính đúng kiểu và giữ snapshot",
+      "dat": true
+    },
+    {
+      "ten": "Chặn kiểu JSON thuộc tính sai",
+      "dat": true
+    },
+    {
+      "ten": "Chặn cấu hình JSON hỏng",
+      "dat": true
+    },
+    {
+      "ten": "Theo dõi không tạo cam kết",
+      "dat": true
+    },
+    {
+      "ten": "Bỏ theo dõi giữ nguyên trần và thời điểm ưu tiên",
+      "dat": true
+    },
+    {
+      "ten": "Chặn tham gia trùng người/phiên",
+      "dat": true
+    },
+    {
+      "ten": "Chặn người bán đặt trần",
+      "dat": true
+    },
+    {
+      "ten": "Người bán có thể theo dõi nhưng không đổi thành đặt trần",
+      "dat": true
+    },
+    {
+      "ten": "Chặn người bán tự trả giá công khai",
+      "dat": true
+    },
+    {
+      "ten": "Chặn đổi lượt công khai sang người bán",
+      "dat": true
+    },
+    {
+      "ten": "Chặn khóa ngoại mồ côi",
+      "dat": true
+    },
+    {
+      "ten": "Chặn cam kết thiếu thời điểm",
+      "dat": true
+    },
+    {
+      "ten": "Chặn tổng đơn sai",
+      "dat": true
+    },
+    {
+      "ten": "Một đơn còn nghĩa vụ trên mỗi phiên",
+      "dat": true
+    },
+    {
+      "ten": "Giữ tiền và hoàn toàn bộ cân bằng",
+      "dat": true
+    },
+    {
+      "ten": "Giải ngân toàn bộ cân bằng",
+      "dat": true
+    },
+    {
+      "ten": "Chặn hoàn vượt số đã thu",
+      "dat": true
+    },
+    {
+      "ten": "Chặn hoàn một phần cho giao dịch mới",
+      "dat": true
+    },
+    {
+      "ten": "Tiếp nhận hoàn một phần lịch sử khi có cờ rõ ràng",
+      "dat": true
+    },
+    {
+      "ten": "Thanh toán thất bại không chiếm suất thu, chặn hai lần thu",
+      "dat": true
+    },
+    {
+      "ten": "Chặn gửi lại khóa thanh toán",
+      "dat": true
+    },
+    {
+      "ten": "Một tranh chấp đang mở trên mỗi đơn",
+      "dat": true
+    },
+    {
+      "ten": "Tệp gắn đúng sản phẩm hoặc tranh chấp",
+      "dat": true
+    },
+    {
+      "ten": "Yêu cầu xử lý đúng loại, chống hủy trùng đang mở",
+      "dat": true
+    },
+    {
+      "ten": "Báo cáo chống trùng theo người/sản phẩm, cho gửi lại sau kết luận",
+      "dat": true
+    },
+    {
+      "ten": "Second Chance khớp giá công khai, chặn hai đề nghị đang chờ",
+      "dat": true
+    },
+    {
+      "ten": "Chặn dùng giá tối đa thay giá công khai",
+      "dat": true
+    },
+    {
+      "ten": "Thông báo chống trùng sự kiện",
+      "dat": true
+    },
+    {
+      "ten": "Gia hạn lưu có cấu trúc và FK",
+      "dat": true
+    }
+  ],
+  "du_lieu_kiem_thu": "ROLLBACK",
+  "nguon_khong_doi_ve_cau_truc_va_so_dong": true,
+  "nguon": {
+    "so_bang": 27,
+    "dem_dong": [
+      {
+        "bang": "bang_chung_tranh_chap",
+        "so_dong": "2"
+      },
+      {
+        "bang": "buoc_gia",
+        "so_dong": "4"
+      },
+      {
+        "bang": "cau_hinh_he_thong",
+        "so_dong": "7"
+      },
+      {
+        "bang": "danh_gia",
+        "so_dong": "2"
+      },
+      {
+        "bang": "danh_muc",
+        "so_dong": "12"
+      },
+      {
+        "bang": "danh_sach_theo_doi",
+        "so_dong": "4"
+      },
+      {
+        "bang": "de_nghi_mua_tiep_theo",
+        "so_dong": "1"
+      },
+      {
+        "bang": "dia_chi_nguoi_dung",
+        "so_dong": "2"
+      },
+      {
+        "bang": "don_hang",
+        "so_dong": "3"
+      },
+      {
+        "bang": "gia_han_phien_dau_gia",
+        "so_dong": "1"
+      },
+      {
+        "bang": "gia_tri_thuoc_tinh_san_pham",
+        "so_dong": "20"
+      },
+      {
+        "bang": "giu_tien_trung_gian",
+        "so_dong": "2"
+      },
+      {
+        "bang": "hinh_anh_san_pham",
+        "so_dong": "9"
+      },
+      {
+        "bang": "luot_tra_gia",
+        "so_dong": "12"
+      },
+      {
+        "bang": "muc_gia_toi_da",
+        "so_dong": "10"
+      },
+      {
+        "bang": "nguoi_dung",
+        "so_dong": "6"
+      },
+      {
+        "bang": "nhat_ky_hoat_dong",
+        "so_dong": "3"
+      },
+      {
+        "bang": "phien_dau_gia",
+        "so_dong": "7"
+      },
+      {
+        "bang": "san_pham",
+        "so_dong": "8"
+      },
+      {
+        "bang": "thanh_toan",
+        "so_dong": "3"
+      },
+      {
+        "bang": "thong_bao",
+        "so_dong": "4"
+      },
+      {
+        "bang": "thuoc_tinh_danh_muc",
+        "so_dong": "18"
+      },
+      {
+        "bang": "tranh_chap",
+        "so_dong": "1"
+      },
+      {
+        "bang": "van_chuyen",
+        "so_dong": "2"
+      },
+      {
+        "bang": "vi_pham",
+        "so_dong": "1"
+      },
+      {
+        "bang": "xac_minh_nguoi_ban",
+        "so_dong": "3"
+      },
+      {
+        "bang": "yeu_cau_huy_phien",
+        "so_dong": "1"
+      }
+    ],
+    "ma_cau_truc": "402023dd8b4144a69df2820de20a4fd2e05c4c6a4beafa7db3a266876647883e"
+  }
+}

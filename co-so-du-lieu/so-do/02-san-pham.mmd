@@ -1,0 +1,14 @@
+erDiagram
+    danh_muc {
+        bigint id PK
+    }
+    nguoi_dung {
+        bigint id PK
+    }
+    san_pham {
+        bigint id PK
+    }
+    danh_muc ||--o{ danh_muc : "danh_muc_cha_id"
+    nguoi_dung ||--o{ san_pham : "nguoi_ban_id"
+    danh_muc ||--o{ san_pham : "danh_muc_id"
+    nguoi_dung ||--o{ san_pham : "nguoi_duyet_id"

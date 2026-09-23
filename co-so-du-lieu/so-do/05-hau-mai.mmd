@@ -1,0 +1,28 @@
+erDiagram
+    nguoi_dung {
+        bigint id PK
+    }
+    don_hang {
+        bigint id PK
+    }
+    san_pham {
+        bigint id PK
+    }
+    tranh_chap {
+        bigint id PK
+    }
+    tep_dinh_kem {
+        bigint id PK
+    }
+    danh_gia {
+        bigint id PK
+    }
+    don_hang ||--o{ tranh_chap : "don_hang_id"
+    nguoi_dung ||--o{ tranh_chap : "nguoi_mo_id"
+    nguoi_dung ||--o{ tranh_chap : "nguoi_xu_ly_id"
+    san_pham ||--o{ tep_dinh_kem : "san_pham_id"
+    tranh_chap ||--o{ tep_dinh_kem : "tranh_chap_id"
+    nguoi_dung ||--o{ tep_dinh_kem : "nguoi_tai_len_id"
+    don_hang ||--o{ danh_gia : "don_hang_id"
+    nguoi_dung ||--o{ danh_gia : "nguoi_danh_gia_id"
+    nguoi_dung ||--o{ danh_gia : "nguoi_duoc_danh_gia_id"

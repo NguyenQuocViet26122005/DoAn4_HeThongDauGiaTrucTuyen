@@ -1,0 +1,13 @@
+erDiagram
+    nguoi_dung {
+        bigint id PK
+    }
+    xac_minh_nguoi_ban {
+        bigint id PK
+    }
+    dia_chi_nguoi_dung {
+        bigint id PK
+    }
+    nguoi_dung ||--o{ xac_minh_nguoi_ban : "nguoi_dung_id"
+    nguoi_dung ||--o{ xac_minh_nguoi_ban : "nguoi_duyet_id"
+    nguoi_dung ||--o{ dia_chi_nguoi_dung : "nguoi_dung_id"

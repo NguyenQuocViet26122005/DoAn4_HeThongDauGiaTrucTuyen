@@ -1,0 +1,22 @@
+erDiagram
+    nguoi_dung {
+        bigint id PK
+    }
+    san_pham {
+        bigint id PK
+    }
+    phien_dau_gia {
+        bigint id PK
+    }
+    tham_gia_phien {
+        bigint id PK
+    }
+    luot_tra_gia {
+        bigint id PK
+    }
+    san_pham ||--o{ phien_dau_gia : "san_pham_id"
+    nguoi_dung ||--o{ phien_dau_gia : "nguoi_dan_dau_id"
+    phien_dau_gia ||--o{ tham_gia_phien : "phien_dau_gia_id"
+    nguoi_dung ||--o{ tham_gia_phien : "nguoi_dung_id"
+    phien_dau_gia ||--o{ luot_tra_gia : "phien_dau_gia_id"
+    nguoi_dung ||--o{ luot_tra_gia : "nguoi_tra_gia_id"

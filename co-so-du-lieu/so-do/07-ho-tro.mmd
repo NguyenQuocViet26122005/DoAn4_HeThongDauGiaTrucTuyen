@@ -1,0 +1,24 @@
+erDiagram
+    nguoi_dung {
+        bigint id PK
+    }
+    phien_dau_gia {
+        bigint id PK
+    }
+    luot_tra_gia {
+        bigint id PK
+    }
+    thong_bao {
+        bigint id PK
+    }
+    cau_hinh_he_thong {
+        bigint id PK
+    }
+    nhat_ky_hoat_dong {
+        bigint id PK
+    }
+    nguoi_dung ||--o{ thong_bao : "nguoi_dung_id"
+    nguoi_dung ||--o{ cau_hinh_he_thong : "nguoi_cap_nhat_id"
+    nguoi_dung ||--o{ nhat_ky_hoat_dong : "nguoi_thuc_hien_id"
+    phien_dau_gia ||--o{ nhat_ky_hoat_dong : "phien_dau_gia_id"
+    luot_tra_gia ||--o{ nhat_ky_hoat_dong : "luot_tra_gia_id"

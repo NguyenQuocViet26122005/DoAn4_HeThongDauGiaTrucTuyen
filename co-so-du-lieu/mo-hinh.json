@@ -1,0 +1,1750 @@
+[
+  {
+    "id": "01-tai-khoan",
+    "ten": "Tài khoản",
+    "bang": [
+      {
+        "ten": "nguoi_dung",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "ho_ten",
+            "kieu": "VARCHAR",
+            "moTa": "(100) NOT NULL,"
+          },
+          {
+            "ten": "email",
+            "kieu": "VARCHAR",
+            "moTa": "(150) NOT NULL UNIQUE,"
+          },
+          {
+            "ten": "mat_khau_bam",
+            "kieu": "VARCHAR",
+            "moTa": "(255) NOT NULL,"
+          },
+          {
+            "ten": "so_dien_thoai",
+            "kieu": "VARCHAR",
+            "moTa": "(20) UNIQUE,"
+          },
+          {
+            "ten": "anh_dai_dien",
+            "kieu": "VARCHAR",
+            "moTa": "(255),"
+          },
+          {
+            "ten": "vai_tro",
+            "kieu": "ENUM",
+            "moTa": "('NGUOI_DUNG', 'QUAN_TRI') NOT NULL DEFAULT 'NGUOI_DUNG',"
+          },
+          {
+            "ten": "trang_thai_nguoi_ban",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "trang_thai_tai_khoan",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "ngay_xac_minh_email",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "lan_dang_nhap_cuoi",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": []
+      },
+      {
+        "ten": "xac_minh_nguoi_ban",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "nguoi_dung_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "loai_giay_to",
+            "kieu": "ENUM",
+            "moTa": "('CCCD', 'HO_CHIEU', 'KHAC') NOT NULL DEFAULT 'CCCD',"
+          },
+          {
+            "ten": "so_giay_to",
+            "kieu": "VARCHAR",
+            "moTa": "(50) NOT NULL,"
+          },
+          {
+            "ten": "anh_mat_truoc",
+            "kieu": "VARCHAR",
+            "moTa": "(255),"
+          },
+          {
+            "ten": "anh_mat_sau",
+            "kieu": "VARCHAR",
+            "moTa": "(255),"
+          },
+          {
+            "ten": "anh_selfie",
+            "kieu": "VARCHAR",
+            "moTa": "(255),"
+          },
+          {
+            "ten": "ten_ngan_hang",
+            "kieu": "VARCHAR",
+            "moTa": "(100),"
+          },
+          {
+            "ten": "so_tai_khoan",
+            "kieu": "VARCHAR",
+            "moTa": "(50),"
+          },
+          {
+            "ten": "chu_tai_khoan",
+            "kieu": "VARCHAR",
+            "moTa": "(100),"
+          },
+          {
+            "ten": "trang_thai",
+            "kieu": "ENUM",
+            "moTa": "('CHO_XU_LY', 'DA_XAC_MINH', 'TU_CHOI') NOT NULL DEFAULT 'CHO_XU_LY',"
+          },
+          {
+            "ten": "ly_do_tu_choi",
+            "kieu": "VARCHAR",
+            "moTa": "(500),"
+          },
+          {
+            "ten": "ngay_gui_ho_so",
+            "kieu": "DATETIME",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_duyet",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "nguoi_duyet_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "nguoi_dung_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_duyet_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "dia_chi_nguoi_dung",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "nguoi_dung_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "ten_nguoi_nhan",
+            "kieu": "VARCHAR",
+            "moTa": "(100) NOT NULL,"
+          },
+          {
+            "ten": "sdt_nguoi_nhan",
+            "kieu": "VARCHAR",
+            "moTa": "(20) NOT NULL,"
+          },
+          {
+            "ten": "tinh_thanh",
+            "kieu": "VARCHAR",
+            "moTa": "(100) NOT NULL,"
+          },
+          {
+            "ten": "quan_huyen",
+            "kieu": "VARCHAR",
+            "moTa": "(100) NOT NULL,"
+          },
+          {
+            "ten": "phuong_xa",
+            "kieu": "VARCHAR",
+            "moTa": "(100) NOT NULL,"
+          },
+          {
+            "ten": "dia_chi_chi_tiet",
+            "kieu": "VARCHAR",
+            "moTa": "(255) NOT NULL,"
+          },
+          {
+            "ten": "la_mac_dinh",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "nguoi_dung_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "02-san-pham",
+    "ten": "Danh mục và sản phẩm",
+    "bang": [
+      {
+        "ten": "danh_muc",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "danh_muc_cha_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ten",
+            "kieu": "VARCHAR",
+            "moTa": "(120) NOT NULL,"
+          },
+          {
+            "ten": "duong_dan",
+            "kieu": "VARCHAR",
+            "moTa": "(150) NOT NULL UNIQUE,"
+          },
+          {
+            "ten": "mo_ta",
+            "kieu": "VARCHAR",
+            "moTa": "(500),"
+          },
+          {
+            "ten": "duong_dan_anh",
+            "kieu": "VARCHAR",
+            "moTa": "(255),"
+          },
+          {
+            "ten": "dang_hoat_dong",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 1,"
+          },
+          {
+            "ten": "thu_tu",
+            "kieu": "INT",
+            "moTa": "NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "cau_hinh_thuoc_tinh",
+            "kieu": "JSON",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "danh_muc_cha_id",
+            "bangCha": "danh_muc",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "san_pham",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "nguoi_ban_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "danh_muc_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "tieu_de",
+            "kieu": "VARCHAR",
+            "moTa": "(200) NOT NULL,"
+          },
+          {
+            "ten": "duong_dan",
+            "kieu": "VARCHAR",
+            "moTa": "(220) NOT NULL UNIQUE,"
+          },
+          {
+            "ten": "mo_ta",
+            "kieu": "TEXT",
+            "moTa": "NOT NULL,"
+          },
+          {
+            "ten": "tinh_trang_san_pham",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "thuong_hieu",
+            "kieu": "VARCHAR",
+            "moTa": "(100),"
+          },
+          {
+            "ten": "trang_thai_duyet",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "ly_do_tu_choi",
+            "kieu": "VARCHAR",
+            "moTa": "(500),"
+          },
+          {
+            "ten": "nguoi_duyet_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ngay_duyet",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "thuoc_tinh_json",
+            "kieu": "JSON",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "nguoi_ban_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "danh_muc_id",
+            "bangCha": "danh_muc",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_duyet_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "03-dau-gia",
+    "ten": "Đấu giá",
+    "bang": [
+      {
+        "ten": "phien_dau_gia",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "san_pham_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "gia_khoi_diem",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL,"
+          },
+          {
+            "ten": "gia_san",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NULL,"
+          },
+          {
+            "ten": "gia_mua_ngay",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NULL,"
+          },
+          {
+            "ten": "cho_phep_mua_ngay",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "gia_hien_tai",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL,"
+          },
+          {
+            "ten": "nguoi_dan_dau_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "thoi_gian_bat_dau",
+            "kieu": "DATETIME",
+            "moTa": "NOT NULL,"
+          },
+          {
+            "ten": "thoi_gian_ket_thuc_goc",
+            "kieu": "DATETIME",
+            "moTa": "NOT NULL,"
+          },
+          {
+            "ten": "thoi_gian_ket_thuc",
+            "kieu": "DATETIME",
+            "moTa": "NOT NULL,"
+          },
+          {
+            "ten": "trang_thai",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "ly_do_ket_thuc",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "dat_gia_san",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "bat_chong_phut_chot",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 1,"
+          },
+          {
+            "ten": "nguong_phut_chot_giay",
+            "kieu": "INT",
+            "moTa": "NOT NULL DEFAULT 60,"
+          },
+          {
+            "ten": "so_giay_gia_han",
+            "kieu": "INT",
+            "moTa": "NOT NULL DEFAULT 90,"
+          },
+          {
+            "ten": "so_lan_gia_han",
+            "kieu": "INT",
+            "moTa": "NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "tong_luot_tra_gia",
+            "kieu": "INT",
+            "moTa": "NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "phi_van_chuyen",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "san_pham_id",
+            "bangCha": "san_pham",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_dan_dau_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "tham_gia_phien",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "phien_dau_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguoi_dung_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "dang_theo_doi",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "gia_toi_da",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NULL,"
+          },
+          {
+            "ten": "thoi_gian_dat_gia_toi_da",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_theo_doi",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "phien_dau_gia_id",
+            "bangCha": "phien_dau_gia",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_dung_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "luot_tra_gia",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "phien_dau_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguoi_tra_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "so_tien",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL,"
+          },
+          {
+            "ten": "loai_tra_gia",
+            "kieu": "ENUM",
+            "moTa": "('TRUC_TIEP', 'TU_DONG') NOT NULL DEFAULT 'TRUC_TIEP',"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "DATETIME",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "phien_dau_gia_id",
+            "bangCha": "phien_dau_gia",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_tra_gia_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "04-giao-dich",
+    "ten": "Đơn hàng và thanh toán",
+    "bang": [
+      {
+        "ten": "don_hang",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "ma_don_hang",
+            "kieu": "VARCHAR",
+            "moTa": "(30) NOT NULL UNIQUE,"
+          },
+          {
+            "ten": "phien_dau_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguoi_mua_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguoi_ban_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguon_don",
+            "kieu": "ENUM",
+            "moTa": "('THANG_DAU_GIA', 'DE_NGHI_TIEP_THEO') NOT NULL DEFAULT 'THANG_DAU_GIA',"
+          },
+          {
+            "ten": "gia_san_pham",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL,"
+          },
+          {
+            "ten": "phi_van_chuyen",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "tong_tien",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL,"
+          },
+          {
+            "ten": "trang_thai",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "han_thanh_toan",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "han_nguoi_ban_gui_hang",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_giao_hang",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "han_kiem_tra",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_hoan_thanh",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_huy",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ly_do_huy",
+            "kieu": "VARCHAR",
+            "moTa": "(500),"
+          },
+          {
+            "ten": "ten_nguoi_nhan",
+            "kieu": "VARCHAR",
+            "moTa": "(100) NOT NULL,"
+          },
+          {
+            "ten": "sdt_nguoi_nhan",
+            "kieu": "VARCHAR",
+            "moTa": "(20) NOT NULL,"
+          },
+          {
+            "ten": "dia_chi_giao_hang",
+            "kieu": "VARCHAR",
+            "moTa": "(500) NOT NULL,"
+          },
+          {
+            "ten": "trang_thai_giu_tien",
+            "kieu": "ENUM",
+            "moTa": "('CHO_GIU_TIEN','DANG_GIU','DA_GIAI_NGAN','DA_HOAN_TIEN','HOAN_TIEN_MOT_PHAN')"
+          },
+          {
+            "ten": "so_tien_da_thu",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "so_tien_da_hoan",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "so_tien_da_giai_ngan",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "so_tien_dang_giu",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) GENERATED ALWAYS AS"
+          },
+          {
+            "ten": "ngay_bat_dau_giu",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_giai_ngan",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_hoan_tien",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ghi_chu_giu_tien",
+            "kieu": "VARCHAR",
+            "moTa": "(500),"
+          },
+          {
+            "ten": "du_lieu_lich_su",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "don_vi_van_chuyen",
+            "kieu": "VARCHAR",
+            "moTa": "(100),"
+          },
+          {
+            "ten": "ma_van_don",
+            "kieu": "VARCHAR",
+            "moTa": "(100),"
+          },
+          {
+            "ten": "trang_thai_van_chuyen",
+            "kieu": "ENUM",
+            "moTa": "('CHO_XU_LY','DA_LAY_HANG','DANG_VAN_CHUYEN','DA_GIAO','THAT_BAI','DA_HOAN_TRA') NULL,"
+          },
+          {
+            "ten": "ngay_gui_hang",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_giao_van_chuyen",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "moc_khieu_nai_chua_nhan",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "can_admin_xu_ly",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "ly_do_can_xu_ly",
+            "kieu": "VARCHAR",
+            "moTa": "(500),"
+          },
+          {
+            "ten": "giu_tien_id_cu",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL UNIQUE,"
+          },
+          {
+            "ten": "giu_tien_ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "giu_tien_ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "van_chuyen_id_cu",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL UNIQUE,"
+          },
+          {
+            "ten": "van_chuyen_ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "van_chuyen_ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "phien_con_nghia_vu",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED GENERATED ALWAYS AS"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "phien_dau_gia_id",
+            "bangCha": "phien_dau_gia",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_mua_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_ban_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "thanh_toan",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "don_hang_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "phuong_thuc_thanh_toan",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "so_tien",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL,"
+          },
+          {
+            "ten": "trang_thai",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "ma_giao_dich",
+            "kieu": "VARCHAR",
+            "moTa": "(100) UNIQUE,"
+          },
+          {
+            "ten": "ngay_thanh_toan",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_het_han",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "khoa_yeu_cau",
+            "kieu": "VARCHAR",
+            "moTa": "(64) CHARACTER SET ascii COLLATE ascii_bin NULL UNIQUE,"
+          },
+          {
+            "ten": "don_da_thu_tien",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED GENERATED ALWAYS AS"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "don_hang_id",
+            "bangCha": "don_hang",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "de_nghi_mua_tiep_theo",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "phien_dau_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "don_hang_goc_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguoi_tra_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "gia_de_nghi",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL,"
+          },
+          {
+            "ten": "trang_thai",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "het_han_luc",
+            "kieu": "DATETIME",
+            "moTa": "NOT NULL,"
+          },
+          {
+            "ten": "ngay_phan_hoi",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "don_hang_moi_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "phien_dang_de_nghi",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED GENERATED ALWAYS AS"
+          },
+          {
+            "ten": "luot_tra_gia_nguon_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguoi_yeu_cau_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "phien_dau_gia_id",
+            "bangCha": "phien_dau_gia",
+            "cotCha": "id"
+          },
+          {
+            "cot": "don_hang_goc_id",
+            "bangCha": "don_hang",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_tra_gia_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "don_hang_moi_id",
+            "bangCha": "don_hang",
+            "cotCha": "id"
+          },
+          {
+            "cot": "luot_tra_gia_nguon_id",
+            "bangCha": "luot_tra_gia",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_yeu_cau_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "05-hau-mai",
+    "ten": "Tranh chấp và tệp",
+    "bang": [
+      {
+        "ten": "tranh_chap",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "don_hang_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguoi_mo_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "ly_do",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "mo_ta",
+            "kieu": "TEXT",
+            "moTa": "NOT NULL,"
+          },
+          {
+            "ten": "trang_thai",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "phan_hoi_nguoi_ban",
+            "kieu": "TEXT",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ket_qua_xu_ly",
+            "kieu": "TEXT",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "so_tien_hoan",
+            "kieu": "DECIMAL",
+            "moTa": "(15,2) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "nguoi_xu_ly_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ngay_mo",
+            "kieu": "DATETIME",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_giai_quyet",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "don_dang_tranh_chap",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED GENERATED ALWAYS AS"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "don_hang_id",
+            "bangCha": "don_hang",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_mo_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_xu_ly_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "tep_dinh_kem",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "loai_tep",
+            "kieu": "ENUM",
+            "moTa": "('ANH_SAN_PHAM','BANG_CHUNG_TRANH_CHAP') NOT NULL,"
+          },
+          {
+            "ten": "san_pham_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "tranh_chap_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "nguoi_tai_len_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "duong_dan_tep",
+            "kieu": "VARCHAR",
+            "moTa": "(255) NOT NULL,"
+          },
+          {
+            "ten": "loai_noi_dung",
+            "kieu": "ENUM",
+            "moTa": "('HINH_ANH','VIDEO','TAI_LIEU','KHAC') NOT NULL DEFAULT 'HINH_ANH',"
+          },
+          {
+            "ten": "la_anh_chinh",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "thu_tu",
+            "kieu": "INT",
+            "moTa": "NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "mo_ta",
+            "kieu": "VARCHAR",
+            "moTa": "(500),"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "san_pham_anh_chinh",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED GENERATED ALWAYS AS"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "san_pham_id",
+            "bangCha": "san_pham",
+            "cotCha": "id"
+          },
+          {
+            "cot": "tranh_chap_id",
+            "bangCha": "tranh_chap",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_tai_len_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "danh_gia",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "don_hang_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguoi_danh_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nguoi_duoc_danh_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "so_sao",
+            "kieu": "TINYINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "nhan_xet",
+            "kieu": "VARCHAR",
+            "moTa": "(1000),"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "don_hang_id",
+            "bangCha": "don_hang",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_danh_gia_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_duoc_danh_gia_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "06-quan-tri",
+    "ten": "Quản trị và thông báo",
+    "bang": [
+      {
+        "ten": "yeu_cau_xu_ly",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "loai_yeu_cau",
+            "kieu": "ENUM",
+            "moTa": "('HUY_PHIEN','BAO_CAO_SAN_PHAM') NOT NULL,"
+          },
+          {
+            "ten": "phien_dau_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "san_pham_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "nguoi_yeu_cau_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "ma_ly_do",
+            "kieu": "VARCHAR",
+            "moTa": "(50),"
+          },
+          {
+            "ten": "ly_do",
+            "kieu": "VARCHAR",
+            "moTa": "(1000) NOT NULL,"
+          },
+          {
+            "ten": "trang_thai",
+            "kieu": "ENUM",
+            "moTa": "('CHO_XU_LY','DANG_XU_LY','DA_DUYET','TU_CHOI','CO_CO_SO','KHONG_CO_CO_SO')"
+          },
+          {
+            "ten": "nguoi_duyet_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ghi_chu_duyet",
+            "kieu": "VARCHAR",
+            "moTa": "(1000),"
+          },
+          {
+            "ten": "ngay_duyet",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "phien_huy_dang_mo",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED GENERATED ALWAYS AS"
+          },
+          {
+            "ten": "san_pham_bao_cao_dang_mo",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED GENERATED ALWAYS AS"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "phien_dau_gia_id",
+            "bangCha": "phien_dau_gia",
+            "cotCha": "id"
+          },
+          {
+            "cot": "san_pham_id",
+            "bangCha": "san_pham",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_yeu_cau_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_duyet_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "vi_pham",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "nguoi_dung_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "phien_dau_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "don_hang_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "loai_vi_pham",
+            "kieu": "ENUM",
+            "moTa": "("
+          },
+          {
+            "ten": "mo_ta",
+            "kieu": "VARCHAR",
+            "moTa": "(1000) NOT NULL,"
+          },
+          {
+            "ten": "diem_vi_pham",
+            "kieu": "INT",
+            "moTa": "NOT NULL DEFAULT 1,"
+          },
+          {
+            "ten": "trang_thai",
+            "kieu": "ENUM",
+            "moTa": "('DANG_MO', 'DA_XAC_NHAN', 'DA_HUY') NOT NULL DEFAULT 'DANG_MO',"
+          },
+          {
+            "ten": "nguoi_tao_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ngay_xac_nhan",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "hinh_thuc_xu_ly",
+            "kieu": "ENUM",
+            "moTa": "('CHUA_XU_LY','CANH_CAO','TAM_NGUNG','KHOA_TAI_KHOAN','KHONG_VI_PHAM') NOT NULL DEFAULT 'CHUA_XU_LY',"
+          },
+          {
+            "ten": "ly_do_xu_ly",
+            "kieu": "VARCHAR",
+            "moTa": "(1000),"
+          },
+          {
+            "ten": "nguoi_xu_ly_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ngay_xu_ly",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "nguoi_dung_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "phien_dau_gia_id",
+            "bangCha": "phien_dau_gia",
+            "cotCha": "id"
+          },
+          {
+            "cot": "don_hang_id",
+            "bangCha": "don_hang",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_tao_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "nguoi_xu_ly_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "thong_bao",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "nguoi_dung_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NOT NULL,"
+          },
+          {
+            "ten": "loai",
+            "kieu": "VARCHAR",
+            "moTa": "(50) NOT NULL,"
+          },
+          {
+            "ten": "tieu_de",
+            "kieu": "VARCHAR",
+            "moTa": "(200) NOT NULL,"
+          },
+          {
+            "ten": "noi_dung",
+            "kieu": "VARCHAR",
+            "moTa": "(1000) NOT NULL,"
+          },
+          {
+            "ten": "duong_dan_lien_ket",
+            "kieu": "VARCHAR",
+            "moTa": "(255),"
+          },
+          {
+            "ten": "da_doc",
+            "kieu": "TINYINT",
+            "moTa": "(1) NOT NULL DEFAULT 0,"
+          },
+          {
+            "ten": "ngay_doc",
+            "kieu": "DATETIME",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "khoa_su_kien",
+            "kieu": "VARCHAR",
+            "moTa": "(160) CHARACTER SET ascii COLLATE ascii_bin NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "nguoi_dung_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "cau_hinh_he_thong",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "khoa_cau_hinh",
+            "kieu": "VARCHAR",
+            "moTa": "(100) NOT NULL UNIQUE,"
+          },
+          {
+            "ten": "gia_tri_cau_hinh",
+            "kieu": "TEXT",
+            "moTa": "NOT NULL,"
+          },
+          {
+            "ten": "kieu_du_lieu",
+            "kieu": "ENUM",
+            "moTa": "('CHUOI', 'SO', 'DUNG_SAI', 'JSON') NOT NULL DEFAULT 'CHUOI',"
+          },
+          {
+            "ten": "mo_ta",
+            "kieu": "VARCHAR",
+            "moTa": "(500),"
+          },
+          {
+            "ten": "nguoi_cap_nhat_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          },
+          {
+            "ten": "ngay_cap_nhat",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "nguoi_cap_nhat_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          }
+        ]
+      },
+      {
+        "ten": "nhat_ky_hoat_dong",
+        "cot": [
+          {
+            "ten": "id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED AUTO_INCREMENT PRIMARY KEY,"
+          },
+          {
+            "ten": "nguoi_thuc_hien_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "hanh_dong",
+            "kieu": "VARCHAR",
+            "moTa": "(100) NOT NULL,"
+          },
+          {
+            "ten": "loai_doi_tuong",
+            "kieu": "VARCHAR",
+            "moTa": "(100) NOT NULL,"
+          },
+          {
+            "ten": "doi_tuong_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "du_lieu_cu",
+            "kieu": "JSON",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "du_lieu_moi",
+            "kieu": "JSON",
+            "moTa": "NULL,"
+          },
+          {
+            "ten": "dia_chi_ip",
+            "kieu": "VARCHAR",
+            "moTa": "(45),"
+          },
+          {
+            "ten": "trinh_duyet_thiet_bi",
+            "kieu": "VARCHAR",
+            "moTa": "(500),"
+          },
+          {
+            "ten": "phien_dau_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "luot_tra_gia_id",
+            "kieu": "BIGINT",
+            "moTa": "UNSIGNED NULL,"
+          },
+          {
+            "ten": "ngay_tao",
+            "kieu": "TIMESTAMP",
+            "moTa": "NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+          }
+        ],
+        "lienKet": [
+          {
+            "cot": "nguoi_thuc_hien_id",
+            "bangCha": "nguoi_dung",
+            "cotCha": "id"
+          },
+          {
+            "cot": "phien_dau_gia_id",
+            "bangCha": "phien_dau_gia",
+            "cotCha": "id"
+          },
+          {
+            "cot": "luot_tra_gia_id",
+            "bangCha": "luot_tra_gia",
+            "cotCha": "id"
+          }
+        ]
+      }
+    ]
+  }
+]

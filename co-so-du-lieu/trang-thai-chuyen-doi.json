@@ -1,0 +1,227 @@
+{
+  "giai_doan": "DA_AP_DUNG",
+  "nguon": "doan4_daugia",
+  "dich": "doan4_daugia_thiet_ke_19",
+  "backup": "doan4_daugia_sao_luu_20260923070110",
+  "thu_tu_bang_cu": [
+    "nguoi_dung",
+    "xac_minh_nguoi_ban",
+    "dia_chi_nguoi_dung",
+    "danh_muc",
+    "thuoc_tinh_danh_muc",
+    "san_pham",
+    "hinh_anh_san_pham",
+    "gia_tri_thuoc_tinh_san_pham",
+    "buoc_gia",
+    "phien_dau_gia",
+    "muc_gia_toi_da",
+    "luot_tra_gia",
+    "gia_han_phien_dau_gia",
+    "yeu_cau_huy_phien",
+    "don_hang",
+    "thanh_toan",
+    "giu_tien_trung_gian",
+    "van_chuyen",
+    "tranh_chap",
+    "bang_chung_tranh_chap",
+    "danh_gia",
+    "danh_sach_theo_doi",
+    "thong_bao",
+    "vi_pham",
+    "de_nghi_mua_tiep_theo",
+    "cau_hinh_he_thong",
+    "nhat_ky_hoat_dong"
+  ],
+  "dau_van_nguon": {
+    "bang_chung_tranh_chap": {
+      "so_dong": 2,
+      "ma": "18c9572735d13b2f1e11436089747f30eecb84eac0db694541a16800544b3223"
+    },
+    "buoc_gia": {
+      "so_dong": 4,
+      "ma": "5f9c10aa858a18080dce29fcf40c2d01e2d8a7483d72bc736fa5c9ad7c44718b"
+    },
+    "cau_hinh_he_thong": {
+      "so_dong": 7,
+      "ma": "b2e420d17b0a7cea6faed018b2a8fa7a6e497e69243f84f807c5bab97f2abbf2"
+    },
+    "danh_gia": {
+      "so_dong": 2,
+      "ma": "95cb5b5237478c88f32c810f0236e09b9af3fcc7a4a826e0053fb6cd8fdda9dc"
+    },
+    "danh_muc": {
+      "so_dong": 12,
+      "ma": "0f15a912c92e93445397c80f503403a794d1c8ba09a6ec5fad27be2534a3fd2a"
+    },
+    "danh_sach_theo_doi": {
+      "so_dong": 4,
+      "ma": "3e05f7ffd3109f45c4b509632284cf9cc2e4b661743b7ac7cca7e7ed70126dc7"
+    },
+    "de_nghi_mua_tiep_theo": {
+      "so_dong": 1,
+      "ma": "bbc0c3e2313e48e64101b0356afe68cc8a464ea2210ae43a28cef89431d4e535"
+    },
+    "dia_chi_nguoi_dung": {
+      "so_dong": 2,
+      "ma": "7e37773f3925dc78aefa592c0fee6b070680465efb36cae4ae376b2d93bec971"
+    },
+    "don_hang": {
+      "so_dong": 3,
+      "ma": "567b40e8def31236655426f374b5b8daf13b700b256b09b0e18d88b5da7002fd"
+    },
+    "gia_han_phien_dau_gia": {
+      "so_dong": 1,
+      "ma": "dfa273b474dbf0b1d1acca331a0211770b06c21a05b817909eaabedfda013905"
+    },
+    "gia_tri_thuoc_tinh_san_pham": {
+      "so_dong": 20,
+      "ma": "64b77e5de8bb025e900f64c776e0f48779941043dac2e7f29095e4bd4978566b"
+    },
+    "giu_tien_trung_gian": {
+      "so_dong": 2,
+      "ma": "75cf94495c51a6099eb431b20427701e821e2c6acec93cbf5ef54680e4331363"
+    },
+    "hinh_anh_san_pham": {
+      "so_dong": 9,
+      "ma": "9decf9a1071a156563511c35ec1537c9bdd6e8e1ed8bddebd18986346d7a08d6"
+    },
+    "luot_tra_gia": {
+      "so_dong": 12,
+      "ma": "dad3994d9c9ba02967508d7e4ca583b3e93e464ff3111e85705935cfe610d3c0"
+    },
+    "muc_gia_toi_da": {
+      "so_dong": 10,
+      "ma": "e4bb28f0aa70953202c7a6dffd2b01095948f9f42b101f5043c6bf8169830e4b"
+    },
+    "nguoi_dung": {
+      "so_dong": 6,
+      "ma": "a042d36c6c35880f7395f1eca9348b690348f29c40696a6efd7f1b35e58fcca3"
+    },
+    "nhat_ky_hoat_dong": {
+      "so_dong": 3,
+      "ma": "bfaa6c9ac8cfb19ff7e8d592b68ecbaa41e225c0b5b54cafacc01b1c3419f0d4"
+    },
+    "phien_dau_gia": {
+      "so_dong": 7,
+      "ma": "0749cded3067c7ae8be2cef5a02c4298bbcb34c1efa5806ee9b84a6fbeee45c1"
+    },
+    "san_pham": {
+      "so_dong": 8,
+      "ma": "54abfeed5f7a197dbc5a8570cbdae91c268270e27708114c692a565a9f38afb8"
+    },
+    "thanh_toan": {
+      "so_dong": 3,
+      "ma": "bfb8bdf65e4cbfcf556d17de192473bd68e3c7b7be4ee60420ebb23d058cff42"
+    },
+    "thong_bao": {
+      "so_dong": 4,
+      "ma": "f3d66b5d35fea206d3d52a0f5d2e22bc1c615668b4ba202cd4d7d8eaf0e5b1cf"
+    },
+    "thuoc_tinh_danh_muc": {
+      "so_dong": 18,
+      "ma": "cfac1a1007a1eb405d817158856e2646b08f71c13cf631be8b7a2e6d20e99385"
+    },
+    "tranh_chap": {
+      "so_dong": 1,
+      "ma": "00aef3b9ba4e9c89903fb95794c2b39d279413e98e86a49e0b4874f989aa1093"
+    },
+    "van_chuyen": {
+      "so_dong": 2,
+      "ma": "0568e39b5c6988eae6338cb61db6ba990dfbd303cb3c168a935a0bfbea936942"
+    },
+    "vi_pham": {
+      "so_dong": 1,
+      "ma": "04ae433c90ddd5061a4dc0e7d40b86b4bbb83c3455b87330444c1e468b17baf6"
+    },
+    "xac_minh_nguoi_ban": {
+      "so_dong": 3,
+      "ma": "10ff25953fee6cec9ae6cc16228f2ecd33f7bad7cd2daaee06c462284f87dcc0"
+    },
+    "yeu_cau_huy_phien": {
+      "so_dong": 1,
+      "ma": "f0f0403474b17c1aa38ab4ca4e549ef1ac12d05f048e1155aa4a384f7651d021"
+    }
+  },
+  "ngay_tao": "2026-09-23T07:01:12.667Z",
+  "dich_sau_chuyen": {
+    "cau_hinh_he_thong": {
+      "so_dong": 9,
+      "ma": "e2def9192b6f89e6820cd61e5036bb103d1585801cced018b376aa28c2851ebe"
+    },
+    "danh_gia": {
+      "so_dong": 2,
+      "ma": "95cb5b5237478c88f32c810f0236e09b9af3fcc7a4a826e0053fb6cd8fdda9dc"
+    },
+    "danh_muc": {
+      "so_dong": 12,
+      "ma": "6d76ad27b5ee0b3fcb4b21214dde523e930b9445d1b9a2310c26d6c9cad483a2"
+    },
+    "de_nghi_mua_tiep_theo": {
+      "so_dong": 1,
+      "ma": "f56bee5ed988c372003b43b41f0b07c302f8c9ea15a3189a7ca2d82a6b115738"
+    },
+    "dia_chi_nguoi_dung": {
+      "so_dong": 2,
+      "ma": "7e37773f3925dc78aefa592c0fee6b070680465efb36cae4ae376b2d93bec971"
+    },
+    "don_hang": {
+      "so_dong": 3,
+      "ma": "36ec87660fd13caf0eefcae915017e03b769b7660d5716f0d9ec0f15b1ac7036"
+    },
+    "luot_tra_gia": {
+      "so_dong": 12,
+      "ma": "dad3994d9c9ba02967508d7e4ca583b3e93e464ff3111e85705935cfe610d3c0"
+    },
+    "nguoi_dung": {
+      "so_dong": 6,
+      "ma": "a042d36c6c35880f7395f1eca9348b690348f29c40696a6efd7f1b35e58fcca3"
+    },
+    "nhat_ky_hoat_dong": {
+      "so_dong": 4,
+      "ma": "53f364906dff5b9f23b774a2534897260344e28c7e43e3107e668b88400f511a"
+    },
+    "phien_dau_gia": {
+      "so_dong": 7,
+      "ma": "d910e49ac2d72942056c53838881324b399616c1e4f0d31a1f2838a99f0bd96e"
+    },
+    "san_pham": {
+      "so_dong": 8,
+      "ma": "2a5d04cf7811dd57ce3aaacb30592730dcaaa6bd68bde257b8411b20f847a4e4"
+    },
+    "tep_dinh_kem": {
+      "so_dong": 11,
+      "ma": "8acb0bdac0eb8dcfc965e35731ca17fa17c02ea9ba8cb5ea182b0bee0ce58cd4"
+    },
+    "tham_gia_phien": {
+      "so_dong": 12,
+      "ma": "85f180225ce93ec0862c283af9575c35452c06ae8b2cb6498fe30bff87c3ade3"
+    },
+    "thanh_toan": {
+      "so_dong": 3,
+      "ma": "ec252ee5d68a810b01f633a5c7cbd40fa13680622b7fa1052600f6731a608e6f"
+    },
+    "thong_bao": {
+      "so_dong": 4,
+      "ma": "fb010a319c8a4b696eb7110970bbef3e48fd4abbe92d0110d57a8369ceffb4ba"
+    },
+    "tranh_chap": {
+      "so_dong": 1,
+      "ma": "00aef3b9ba4e9c89903fb95794c2b39d279413e98e86a49e0b4874f989aa1093"
+    },
+    "vi_pham": {
+      "so_dong": 1,
+      "ma": "6e6059b524d048de8da6de7358825c80a974f3b3b9eaf118054d59011b5369c0"
+    },
+    "xac_minh_nguoi_ban": {
+      "so_dong": 3,
+      "ma": "10ff25953fee6cec9ae6cc16228f2ecd33f7bad7cd2daaee06c462284f87dcc0"
+    },
+    "yeu_cau_xu_ly": {
+      "so_dong": 1,
+      "ma": "15786cce8e350fd2034ecc605cc20aeb121f026e0d9e7bee05e41baa56b65586"
+    }
+  },
+  "anh_id_bang_chung_cong_them": "9",
+  "ngay_chuyen_thu": "2026-09-23T07:01:50.396Z",
+  "ngay_ap_dung": "2026-09-23T11:41:16.711Z"
+}

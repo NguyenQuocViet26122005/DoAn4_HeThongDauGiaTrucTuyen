@@ -1,14 +1,11 @@
--- KHỞI TẠO MỚI: 19 bảng. Chỉ chạy khi doan4_daugia chưa tồn tại.
--- Nếu database đã có, lệnh CREATE DATABASE dừng; không ghi đè dữ liệu.
--- Dữ liệu hiện hữu chuyển bằng công cụ có sao lưu, không chạy lại file này.
 -- ĐỒ ÁN 4: THIẾT KẾ 19 BẢNG, NGHIỆP VỤ 2.1
 -- MySQL 8.0.16 trở lên; đã kiểm thử thực tế theo báo cáo kèm theo.
 -- Database thiết kế riêng. KHÔNG thay DB_NAME của backend đang chạy.
 -- Không xóa/ghi đè database cũ; chạy lại khi đã có database này sẽ báo lỗi.
 -- Chạy nguyên tệp bằng Workbench. Không bỏ qua lỗi hoặc dùng tùy chọn --force.
 -- Không chứa tài khoản, mật khẩu hoặc dữ liệu người dùng mẫu.
-CREATE DATABASE doan4_daugia CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE doan4_daugia;
+CREATE DATABASE doan4_daugia_thiet_ke_19 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE doan4_daugia_thiet_ke_19;
 SET NAMES utf8mb4;
 SET time_zone = '+07:00';
 
@@ -1009,24 +1006,3 @@ JOIN nguoi_dung nm ON nm.id = o.nguoi_mua_id
 JOIN nguoi_dung nb ON nb.id = o.nguoi_ban_id
 JOIN phien_dau_gia a ON a.id = o.phien_dau_gia_id
 JOIN san_pham p ON p.id = a.san_pham_id;
-
--- Chỉ dữ liệu cấu hình công khai, không tạo tài khoản/mật khẩu mẫu.
--- Chạy sau 01-tao-csdl-19-bang.sql trên database thiết kế mới.
-USE doan4_daugia;
-
-INSERT INTO cau_hinh_he_thong (khoa_cau_hinh, gia_tri_cau_hinh, kieu_du_lieu, mo_ta) VALUES
-('PAYMENT_DEADLINE_HOURS', '48', 'SO', 'Hạn thanh toán mô phỏng, tính bằng giờ'),
-('SELLER_SHIP_DEADLINE_DAYS', '3', 'SO', 'Hạn khai báo gửi hàng, tính bằng ngày 24 giờ'),
-('BUYER_INSPECTION_DAYS', '3', 'SO', 'Thời gian kiểm tra kể từ xác nhận nhận hàng'),
-('ANTI_SNIPE_THRESHOLD_SECONDS', '60', 'SO', 'Cửa sổ nhận giá kích hoạt gia hạn'),
-('ANTI_SNIPE_EXTENSION_SECONDS', '90', 'SO', 'Cộng thêm vào giờ kết thúc hiện tại'),
-('SECOND_CHANCE_EXPIRE_HOURS', '24', 'SO', 'Hạn phản hồi đề nghị do người bán yêu cầu'),
-('BUYER_NON_RECEIPT_DAYS', '7', 'SO', 'Mốc khiếu nại chưa nhận tính từ khai báo gửi'),
-('BUOC_GIA', '[{"gia_tu":"0.00","gia_den":"999999.99","muc_tang_gia":"10000.00"},{"gia_tu":"1000000.00","gia_den":"9999999.99","muc_tang_gia":"100000.00"},{"gia_tu":"10000000.00","gia_den":"99999999.99","muc_tang_gia":"500000.00"},{"gia_tu":"100000000.00","gia_den":null,"muc_tang_gia":"1000000.00"}]', 'JSON', 'Bộ bước giá minh họa. Backend kiểm tra khoảng liên tục và khóa khi có phiên chờ/hoạt động');
-
-INSERT INTO danh_muc (ten, duong_dan, cau_hinh_thuoc_tinh, thu_tu) VALUES
-('Điện tử', 'dien-tu', '[{"khoa":"thuong_hieu","ten":"Thương hiệu","kieu":"VAN_BAN","bat_buoc":true},{"khoa":"dung_luong","ten":"Dung lượng","kieu":"SO","don_vi":"GB","bat_buoc":false}]', 1),
-('Đồng hồ', 'dong-ho', '[{"khoa":"loai_may","ten":"Loại máy","kieu":"LUA_CHON","lua_chon":["Cơ","Quartz","Thông minh"],"bat_buoc":true}]', 2),
-('Thời trang', 'thoi-trang', NULL, 3),
-('Đồ sưu tầm', 'do-suu-tam', NULL, 4),
-('Gia dụng', 'gia-dung', NULL, 5);

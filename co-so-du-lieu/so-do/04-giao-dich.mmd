@@ -1,0 +1,29 @@
+erDiagram
+    nguoi_dung {
+        bigint id PK
+    }
+    phien_dau_gia {
+        bigint id PK
+    }
+    luot_tra_gia {
+        bigint id PK
+    }
+    don_hang {
+        bigint id PK
+    }
+    thanh_toan {
+        bigint id PK
+    }
+    de_nghi_mua_tiep_theo {
+        bigint id PK
+    }
+    phien_dau_gia ||--o{ don_hang : "phien_dau_gia_id"
+    nguoi_dung ||--o{ don_hang : "nguoi_mua_id"
+    nguoi_dung ||--o{ don_hang : "nguoi_ban_id"
+    don_hang ||--o{ thanh_toan : "don_hang_id"
+    phien_dau_gia ||--o{ de_nghi_mua_tiep_theo : "phien_dau_gia_id"
+    don_hang ||--o{ de_nghi_mua_tiep_theo : "don_hang_goc_id"
+    nguoi_dung ||--o{ de_nghi_mua_tiep_theo : "nguoi_tra_gia_id"
+    don_hang ||--o{ de_nghi_mua_tiep_theo : "don_hang_moi_id"
+    luot_tra_gia ||--o{ de_nghi_mua_tiep_theo : "luot_tra_gia_nguon_id"
+    nguoi_dung ||--o{ de_nghi_mua_tiep_theo : "nguoi_yeu_cau_id"
