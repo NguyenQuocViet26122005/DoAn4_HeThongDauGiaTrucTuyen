@@ -1,6 +1,6 @@
 # Backend — Đồ án 4: Hệ thống đấu giá trực tuyến
 
-Backend Express/CommonJS dùng MySQL 8 `doan4_daugia`, bám 27 bảng hiện có. Mã nguồn chia theo Route → Controller → Service → Repository → MySQL. Tên tệp, hàm và biến nghiệp vụ dùng tiếng Việt không dấu; chú thích và thông báo dùng tiếng Việt có dấu. Tên thư mục kiến trúc, cú pháp JavaScript, API thư viện và hợp đồng HTTP/Socket.IO giữ quy ước kỹ thuật đang dùng.
+Backend Express/CommonJS dùng MySQL 8 `doan4_daugia`, đã đồng bộ cấu trúc 19 bảng. Mã nguồn chia theo Route → Controller → Service → Repository → MySQL. Tên tệp, hàm và biến nghiệp vụ dùng tiếng Việt không dấu; chú thích và thông báo dùng tiếng Việt có dấu. Tên thư mục kiến trúc, cú pháp JavaScript, API thư viện và hợp đồng HTTP/Socket.IO giữ quy ước kỹ thuật đang dùng.
 
 ## Chạy trên máy hiện tại
 
@@ -23,7 +23,7 @@ npm run dev
 - `DB_TIMEZONE`: mặc định `+07:00`, cần khớp cách hiểu thời gian DATETIME hiện có.
 - `JOBS_ENABLED`: mặc định bật; đặt `false` khi muốn tạm dừng tác vụ tự động lúc kiểm tra dữ liệu.
 
-Các lệnh trên không tạo lại database, không chạy tệp SQL gốc và không thay schema. Không nhập lại toàn bộ SQL gốc vào database đang sử dụng: tệp đó có phần tạo lại database.
+Các lệnh trên không tạo lại database, không chạy tệp SQL gốc và không thay schema. File SQL gốc hiện là bản khởi tạo 19 bảng cho database chưa tồn tại. Database trên máy đã chuyển xong; không cần chạy lại SQL. Xem `../co-so-du-lieu/HUONG-DAN-CSDL.md` để tra sơ đồ và bản sao.
 
 Kiểm tra `GET http://localhost:5000/api/health`: phải trả HTTP 200 và `data.database = "connected"`.
 
@@ -42,7 +42,7 @@ Kiểm tra `GET http://localhost:5000/api/health`: phải trả HTTP 200 và `da
 - Phiên đấu giá, bước giá từ MySQL, đấu giá tự động, ưu tiên người đặt trước, chống đặt giá phút chót, giá sàn, mua ngay, yêu cầu hủy, theo dõi và Socket.IO.
 - Chốt phiên, tạo đơn, thanh toán mô phỏng, giữ tiền trung gian, gửi/giao hàng, kiểm tra hàng, giải ngân, tranh chấp và hoàn tiền.
 - Second Chance theo giá trả công khai hợp lệ, đánh giá hai chiều, vi phạm, thông báo, thống kê và nhật ký quản trị.
-- Tác vụ định kỳ mở/đóng phiên, xử lý hạn thanh toán/đề nghị/kiểm tra hàng, ghi nhận gửi hàng muộn và nhắc hạn.
+- Tác vụ định kỳ mở/đóng phiên, xử lý hạn thanh toán/đề nghị/kiểm tra hàng, ghi nhận gửi hàng muộn.
 - Tải ảnh/tài liệu bằng Multer, kiểm tra quyền sở hữu và quyền đọc giấy tờ/bằng chứng.
 
 Mức giá tối đa được lưu riêng để tính đấu giá. API và Socket.IO không trả trường này; nhật ký mới không ghi mức tối đa hoặc mật khẩu.
@@ -60,9 +60,9 @@ npm run test:integration
 npm run format:check
 ```
 
-`check` kiểm tra cú pháp và đường dẫn require. `npm test` kiểm tra bộ tính giá và các phản hồi HTTP cơ bản. `check:schema` chỉ đọc cấu trúc MySQL, đối chiếu các cột đang được sử dụng và kiểm tra InnoDB. Kiểm thử tích hợp cần MySQL và cấu hình JWT hiện có.
+`check` kiểm tra cú pháp và đường dẫn require. `npm test` kiểm tra bộ tính giá và các phản hồi HTTP cơ bản. `check:schema` chỉ đọc cấu trúc MySQL, đối chiếu các cột đang được sử dụng và kiểm tra InnoDB. Kiểm thử tích hợp cần MySQL và cấu hình JWT hiện có. Các lệnh `test:api` và `test:integration` tự chọn database riêng `doan4_daugia_kiem_thu_19`, tắt jobs nền và không sửa `.env`. Database kiểm thử đã tạo trên máy; máy khác tạo bằng `node co-so-du-lieu/cong-cu/tao-csdl-kiem-thu.cjs` từ thư mục gốc sau khi có database thiết kế.
 
-Kết quả ngày 12/09/2026: 17 kiểm thử đơn vị/HTTP và 27 kiểm thử tích hợp đạt. Bộ tích hợp gồm các giao dịch được rollback, kiểm thử HTTP tải tệp và nhiều kết nối MySQL thật cùng thao tác. Ca nhiều kết nối tạo dữ liệu riêng có UUID, commit để các kết nối nhìn thấy nhau, rồi dọn đúng các bản ghi kiểm thử. Tệp tải lên trong kiểm thử cũng được dọn. Các dữ liệu mẫu có sẵn không bị xóa/reset; số tự tăng có thể có khoảng trống sau kiểm thử.
+Kết quả ngày 23/09/2026 trên cấu trúc 19 bảng: 17 kiểm thử đơn vị/HTTP và 30 kiểm thử tích hợp đạt. Bộ tích hợp gồm các giao dịch được rollback, kiểm thử HTTP tải tệp và nhiều kết nối MySQL thật cùng thao tác. Ca nhiều kết nối tạo dữ liệu riêng có UUID, commit để các kết nối nhìn thấy nhau, rồi dọn đúng các bản ghi kiểm thử. Tệp tải lên trong kiểm thử cũng được dọn. Các dữ liệu mẫu có sẵn không bị xóa/reset; số tự tăng có thể có khoảng trống sau kiểm thử.
 
 Riêng `npm run test:api` gửi 155 yêu cầu HTTP đến ứng dụng Express trên một cổng kiểm thử riêng: đủ 86/86 API có ít nhất một trường hợp thành công và 28 yêu cầu sai trả đúng mã lỗi mong đợi. Bộ test đối chiếu đường dẫn với route trong mã nguồn, kiểm tra dữ liệu phản hồi, phân quyền, bí mật đầu ra và các chuyển trạng thái nghiệp vụ. Kết quả này không thay thế kiểm thử tải hoặc chứng minh mọi tổ hợp đầu vào đều đúng. Tất cả thay đổi dữ liệu của bộ test API, kể cả cấu hình nghiệp vụ, nằm trong transaction được rollback; tệp tải lên được dọn sau đó.
 
@@ -78,7 +78,7 @@ Sử dụng `npm run format` để định dạng mã nguồn và tài liệu: t
 
 ## Các giới hạn cần biết
 
-Thanh toán và giải ngân là mô phỏng; phí vận chuyển hiện bằng 0. Chưa tích hợp đơn vị vận chuyển, cổng thanh toán thật, email/SMS, khôi phục mật khẩu hoặc refresh token. Frontend vẫn cần triển khai giao diện và kết nối các API này.
+Thanh toán và giải ngân là mô phỏng; phí vận chuyển cố định được công bố từ phiên và chụp sang đơn. Chưa tích hợp đơn vị vận chuyển, cổng thanh toán thật, email/SMS, khôi phục mật khẩu hoặc refresh token. Frontend vẫn cần triển khai giao diện và kết nối các API này.
 
 Tác vụ chạy mỗi 60 giây và bắt đầu sau chu kỳ đầu tiên, nên chuyển trạng thái hiển thị có thể chậm khoảng một phút. API đặt giá/thanh toán vẫn tự kiểm tra giờ và trạng thái khi nhận yêu cầu.
 

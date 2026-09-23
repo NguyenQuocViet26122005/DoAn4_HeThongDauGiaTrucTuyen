@@ -1,16 +1,19 @@
 # ĐỒ ÁN 4 — XÂY DỰNG HỆ THỐNG ĐẤU GIÁ TRỰC TUYẾN
 
-**Tài liệu đặc tả nghiệp vụ, công nghệ và phạm vi triển khai**  
-**Phiên bản:** 2.0 — Đặc tả đề xuất để làm chuẩn triển khai  
-**Ngày lập:** 22/09/2026  
-**Project:** `DOAN4_HeThonDauGia`  
-**Cơ sở dữ liệu:** `doan4_daugia`
+**Tài liệu đặc tả nghiệp vụ, công nghệ và phạm vi triển khai**
 
-> Tài liệu này mô tả đầy đủ nghiệp vụ dự kiến của bản đồ án và phân biệt với chức năng đang có trong code. Phiên bản 2.0 bổ sung giao nhận, trả hàng, hồ sơ uy tín, báo cáo sản phẩm và đăng lại; giữ nguyên yêu cầu bảo mật mức tối đa và giá Second Chance từ lượt trả công khai. Các thời hạn mới là giá trị thiết kế đề xuất cho đồ án, không phải quy định sao chép từ một sàn khác. Viết lại tài liệu chưa phải là thực hiện các thay đổi trên code hoặc MySQL.
+- **Phiên bản:** 2.2 — Phạm vi thu gọn, CSDL 19 bảng đã áp dụng
+- **Ngày cập nhật:** 23/09/2026
+- **Project:** `DOAN4_HeThonDauGia`
+- **Cơ sở dữ liệu:** `doan4_daugia`
 
-**Thay đổi chính so với bản 1.0:** chốt phương án phí vận chuyển và tiền nguyên VND; bổ sung xử lý người bán không gửi/chưa nhận hàng; tách quyết định cho trả hàng khỏi thời điểm hoàn tiền; xác định cách xử lý khi một bên không hợp tác; công khai uy tín người bán đúng vai trò; thêm báo cáo cần xác minh; quy định đăng lại và nhắc hạn. Rút giá, đặt cọc, hạ giá sàn và đề nghị bán dưới sàn được để ngoài bản đầu.
+> Người dùng đã đồng ý thu gọn nghiệp vụ trong cuộc trao đổi ngày 23/09/2026. Bản này thay thế phạm vi mở rộng của bản 2.0: giữ luồng đấu giá đến hoàn tất giao dịch, giảm quy trình phụ. CSDL chính và backend đã chuyển sang cấu trúc 19 bảng. Tài liệu vẫn mô tả cả phần cần triển khai tiếp, gồm giao diện, báo cáo sản phẩm và đăng lại sau Second Chance.
 
-**Lưu ý về số bảng:** phương án gộp hai bảng một-một tạo nền 25 bảng vẫn được giữ làm cơ sở. Chức năng báo cáo sản phẩm có vòng đời riêng nên bản này đề xuất thêm một bảng, thành **26 bảng ở thiết kế đích**. Đây là đề xuất cần duyệt ở bước SQL, không phải thay đổi đã áp dụng hoặc âm thầm thay quyết định trước của người dùng.
+**Sáu quyết định đã thống nhất:** thanh toán chỉ mô phỏng thành công/thất bại; vận chuyển cập nhật thủ công; tranh chấp do Admin quyết định hoàn toàn bộ hoặc giải ngân toàn bộ; vi phạm do Admin xét và quyết định cảnh cáo/khóa; thông báo chỉ trong website, chưa xây nhiều mốc nhắc; Second Chance do người bán chủ động yêu cầu từng lần, không tự gửi nối tiếp.
+
+**Để sau:** hoàn tiền một phần, quy trình trả hàng nhiều giai đoạn, tính điểm/tăng mức phạt tự động, email/SMS, lịch nhắc nhiều mốc và tích hợp thanh toán/vận chuyển thật. Các nghiệp vụ quan trọng về bảo mật mức tối đa, thứ tự ưu tiên, bước giá, gia hạn và bảo toàn tiền vẫn giữ.
+
+**CSDL đã chốt và áp dụng:** 19 bảng, 46 khóa ngoại, 6 trigger và 2 view. Đã chuyển dữ liệu cũ có sao lưu và đối chiếu. Xem [hướng dẫn CSDL](co-so-du-lieu/HUONG-DAN-CSDL.md) để tra phép gộp và cách tạo diagram theo nhóm.
 
 ## Mục lục
 
@@ -65,7 +68,7 @@ Xây dựng website giúp người bán đưa sản phẩm lên đấu giá và 
 
 Bản đồ án sử dụng thanh toán mô phỏng, quản lý vận chuyển thủ công và một backend chính. Tiền trong hệ thống là dữ liệu mô phỏng, không thu tiền thật hoặc chuyển tiền ngân hàng thật.
 
-Một phiên đấu giá bán một sản phẩm. Bản đầu thực hiện giao hàng nội địa Việt Nam, một lượt giao đi và tối đa một lượt trả lại được phê duyệt trong cùng đơn. Không xây dựng giỏ hàng nhiều sản phẩm, chia nhiều kiện, đổi hàng, giao quốc tế, tự đến nhận hoặc bán nhiều số lượng trong cùng phiên.
+Một phiên đấu giá bán một sản phẩm, giao hàng nội địa Việt Nam và ghi nhận một lượt giao đi. Bản đầu không xây dựng quy trình gửi trả trên website, giỏ hàng nhiều sản phẩm, chia nhiều kiện, đổi hàng, giao quốc tế, tự đến nhận hoặc bán nhiều số lượng trong cùng phiên. Tình huống cần trả hàng được Admin xem xét thủ công theo bằng chứng trong tranh chấp; xem NV-40.
 
 Nền tảng không thu phí người mua, phí người bán hoặc phí đăng phiên trong bản đầu. Tổng thanh toán bằng giá sản phẩm cộng phí vận chuyển đã công bố. Dashboard dùng tên **giá trị giao dịch mô phỏng**, không gọi toàn bộ tiền đơn hàng là doanh thu nền tảng. Chính sách kiểm duyệt có thể giới hạn danh mục nào được giao dịch trong bản đầu; giao diện đa danh mục không có nghĩa mọi loại hàng đều mặc nhiên được phép bán.
 
@@ -79,31 +82,21 @@ Giao diện tham khảo tông đen–vàng do người dùng cung cấp. Tên hi
 - Frontend đã khởi tạo bằng React + TypeScript + Vite, đã cài các thư viện nêu ở mục 3.
 - Đã bắt đầu soạn một số thành phần giao diện và lớp kết nối API. Các trang chưa được tích hợp và nghiệm thu thành một ứng dụng hoàn chỉnh; màn hình khởi động hiện vẫn thuộc bộ khung Vite.
 - Backend đã có các module tài khoản, xác minh, sản phẩm, đấu giá, đơn hàng, thanh toán mô phỏng, tranh chấp, thông báo, quản trị và bộ kiểm thử. Backend không còn chỉ ở mức khởi tạo như mô tả ban đầu.
-- Lần kiểm tra MySQL ngày 22/09/2026 ghi nhận **8.0.46**, database `doan4_daugia` có **27 bảng InnoDB, 49 khóa ngoại, 2 view và 2 trigger**. Đây là hiện trạng đã kiểm tra, không phải cấu trúc đích của bản 2.0.
+- Lần kiểm tra MySQL ngày 22/09/2026 ghi nhận **8.0.46**, database `doan4_daugia` có **27 bảng InnoDB, 49 khóa ngoại, 2 view và 2 trigger**. Đây là hiện trạng đã kiểm tra, không phải kết quả chuyển đổi schema theo tài liệu này.
 - Chưa thực hiện thay đổi cấu trúc hoặc chuyển dữ liệu trên MySQL khi viết lại tài liệu.
 
 ### 2.2. Hướng cơ sở dữ liệu đã chọn
 
-Người dùng đã chọn hướng **25 bảng**:
-
-- Gộp thông tin `van_chuyen` vào `don_hang`.
-- Gộp thông tin `giu_tien_trung_gian` vào `don_hang`.
-- Giữ các bảng còn lại và các quan hệ nghiệp vụ quan trọng.
-
-Hướng gộp này áp dụng cho phạm vi 1.0. Sau khi bổ sung báo cáo sản phẩm ở bản 2.0, đề xuất dữ liệu là **25 bảng nền + 1 bảng báo cáo = 26 bảng**, chi tiết tại mục 21. Không ép báo cáo chưa xác minh vào bảng vi phạm hoặc nhật ký chỉ để giữ đúng con số 25.
-
-Database đang chạy vẫn theo cấu trúc 27 bảng đã kiểm tra. Phần sửa code gộp bảng trước đó đã được rút lại; backend hiện chưa triển khai cấu trúc mới.
-
-Giảm số bảng giúp cách trình bày gọn hơn, nhưng không tự chứng minh hệ thống chạy nhanh hơn. Tối ưu hiệu năng cần dựa vào truy vấn, chỉ mục, dữ liệu và kết quả đo.
+Ngày 23/09/2026, người dùng đã đồng ý thay SQL/CSDL và đồng bộ backend sang **19 bảng**. CSDL chính `doan4_daugia` đã chuyển xong; dữ liệu cũ được sao lưu và 11 nhóm gộp được đối chiếu. Số bảng được giảm bằng cách gộp các quan hệ một-một, dùng tệp/yêu cầu có phân loại và chuyển thuộc tính/cấu hình sang JSON; không bỏ lịch sử giá công khai hoặc trộn mức tối đa vào đầu ra công khai.
 
 ### 2.3. Cách hiểu tài liệu
 
-- **Quy tắc của bản 2.0:** hành vi đích để lập trình và nghiệm thu sau khi tài liệu được duyệt. Các quy tắc mới có quyết định cụ thể thay cho các câu hỏi mở của bản 1.0.
-- **Hiện trạng/khác biệt:** cách code đang hoạt động; phải sửa nếu chưa phù hợp với quy tắc đích. Không dùng mô tả hiện trạng để bỏ qua một yêu cầu mới.
-- **Ngoài bản đầu:** chức năng nâng cao chủ động chưa làm, không hiển thị trên giao diện như thể đã có.
-- **Cần duyệt trước triển khai:** phạm vi tài liệu, thời hạn cấu hình mới và bản thiết kế/chuyển đổi SQL; không yêu cầu xin phép lại cho từng file sau khi phạm vi tương ứng đã được đồng ý.
+- **Phạm vi 2.1 đã thống nhất:** chuẩn nghiệp vụ sau khi thu gọn; không cần duyệt lại sáu quyết định nêu ở đầu tài liệu.
+- **Hiện trạng/khác biệt:** chức năng đang có và phần cần sửa, không phải tất cả yêu cầu đích đã được lập trình.
+- **Ngoài bản đầu:** không nằm trong tiêu chí nghiệm thu, không dựng nút giả hoặc API như thể đã hỗ trợ.
+- **Bước SQL riêng:** cần có thiết kế và phương án chuyển đổi cụ thể trước khi thay MySQL đang dùng; đồng ý phạm vi nghiệp vụ không phải đồng ý xóa dữ liệu.
 
-Các mã `NV-01` đến `NV-35` được giữ để đối chiếu tài liệu trước; nghiệp vụ bổ sung dùng `NV-36` trở đi.
+Giữ mã NV-01 đến NV-42 để đối chiếu. NV-40 được chuyển sang phần mở rộng; các quy tắc khác được sửa đồng bộ với phạm vi mới. Thời hạn mặc định là lựa chọn cho đồ án, không phải chính sách của một sàn khác.
 
 ## 3. Công nghệ sử dụng
 
@@ -240,19 +233,21 @@ Người dùng có tài khoản hoạt động được quản lý hồ sơ, đ�
 
 Là `NGUOI_DUNG` có `trang_thai_nguoi_ban = DA_XAC_MINH` và tài khoản còn hoạt động.
 
-Ngoài quyền người mua, được quản lý sản phẩm của mình, gửi sản phẩm để duyệt, tạo phiên, yêu cầu hủy phiên, quản lý đơn bán, khai báo vận chuyển, cung cấp hướng dẫn nhận hàng trả, phản hồi tranh chấp và đề nghị mua tiếp theo khi đủ điều kiện.
+Ngoài quyền người mua, được quản lý sản phẩm của mình, gửi sản phẩm để duyệt, tạo phiên, yêu cầu hủy phiên, quản lý đơn bán, khai báo vận chuyển, phản hồi tranh chấp và đề nghị mua tiếp theo khi đủ điều kiện.
 
 Không được đấu giá hoặc Mua ngay sản phẩm do chính mình bán. Không được tự duyệt sản phẩm, tự xác minh mình hoặc tự giải quyết tranh chấp.
 
 ### 5.4. Quản trị viên — `QUAN_TRI`
 
-Được quản lý danh mục, duyệt hồ sơ người bán, duyệt sản phẩm, xét yêu cầu hủy, tiếp nhận báo cáo, theo dõi đơn/tranh chấp/trả hàng, xử lý hoàn tiền mô phỏng, xem xét vi phạm, thay đổi trạng thái tài khoản, cấu hình nghiệp vụ và xem nhật ký. Các quyết định ảnh hưởng đến hàng hoặc tiền cần có lý do và dấu vết; không được thay bằng việc sửa trực tiếp dữ liệu trong MySQL.
+Được quản lý danh mục, duyệt hồ sơ người bán, duyệt sản phẩm, xét yêu cầu hủy, tiếp nhận báo cáo, theo dõi đơn và tranh chấp, xử lý hoàn tiền mô phỏng, xem xét vi phạm, thay đổi trạng thái tài khoản, cấu hình nghiệp vụ và xem nhật ký. Các quyết định ảnh hưởng đến hàng hoặc tiền cần có lý do và dấu vết; không được thay bằng việc sửa trực tiếp dữ liệu trong MySQL.
 
 Trong phạm vi hiện tại, Admin không tham gia đấu giá như người mua. API không cung cấp mức giá tối đa bí mật cho Admin. Việc người vận hành MySQL có quyền kỹ thuật đọc dữ liệu là vấn đề quản lý quyền máy chủ, không phải quyền của tài khoản Admin trên website.
 
 ### 5.5. Tác vụ hệ thống
 
-Tự mở/kết thúc phiên đến hạn, tạo đơn, xử lý quá hạn thanh toán, chuyển đề nghị mua tiếp, xử lý đơn quá hạn gửi chưa ghi nhận giao đi, nhắc hạn, theo dõi các hạn giao/nhận trả và hoàn tất đơn đủ điều kiện. Các vụ việc cần đánh giá bằng chứng chuyển vào hàng đợi Admin; job không tự suy luận bên nào nói đúng chỉ vì một bên không bấm nút.
+Tự mở/kết thúc phiên đến hạn, tạo đơn, hủy đơn chưa thanh toán khi hết hạn, đánh dấu đề nghị hết hạn và hoàn tất đơn hết thời gian kiểm tra nếu đủ điều kiện. Quá hạn gửi hàng chỉ ghi nhận để Admin xét, không tự kết luận lỗi hoặc hoàn tiền.
+
+Không tự tạo/chuyển tiếp Second Chance; không tự tăng mức phạt; không chạy quy trình trả hàng hoặc nhiều mốc nhắc. Các sự kiện thay đổi trạng thái vẫn tạo thông báo trong website.
 
 ## 6. Thuật ngữ nghiệp vụ
 
@@ -268,9 +263,7 @@ Tự mở/kết thúc phiên đến hạn, tạo đơn, xử lý quá hạn than
 - **Lượt trả giá công khai:** giá được ghi vào lịch sử công khai, có thể là lượt trực tiếp hoặc phản hồi tự động.
 - **Giữ tiền trung gian:** giữ số tiền mô phỏng trong hệ thống cho đến khi giao dịch đủ điều kiện giải ngân hoặc hoàn tiền.
 - **Second Chance:** đề nghị mua cho người trả giá hợp lệ tiếp theo khi đơn trước bị hủy do không thanh toán.
-- **Ngày giao dự kiến:** mốc công bố khi gửi hàng để xét chậm giao; không phải bằng chứng đã giao.
 - **Báo cáo sản phẩm:** phản ánh chưa được xác minh, cần được Admin kiểm tra; không đồng nghĩa một vi phạm đã được xác nhận.
-- **Quyết định cho trả hàng:** chấp thuận một quy trình gửi trả, chưa có nghĩa tiền đã được hoàn.
 - **Số tiền còn giữ:** phần tiền đã thu mô phỏng chưa được hoàn hoặc giải ngân; phải tính chính xác để ngăn xử lý vượt tiền.
 
 ## 7. Tài khoản, đăng nhập và địa chỉ
@@ -377,7 +370,7 @@ Luồng báo cáo:
 2. Mỗi người chỉ có một báo cáo đang mở cho cùng sản phẩm; các yêu cầu lặp không tạo nhiều bản ghi giống nhau. Có giới hạn tần suất.
 3. Lưu người báo cáo, sản phẩm, phiên liên quan nếu có, thời gian và trạng thái `CHO_XU_LY`.
 4. Admin tiếp nhận thành `DANG_XU_LY`, kiểm tra dữ liệu và kết luận `CO_CO_SO` hoặc `KHONG_CO_CO_SO`, kèm lý do và thời gian.
-5. Báo cáo có cơ sở có thể dẫn đến ngừng đăng mới, hủy phiên còn mở hoặc tạo vụ việc xử lý đơn đã có; không tự động tạo điểm vi phạm chỉ vì có nhiều người báo cáo.
+5. Báo cáo có cơ sở có thể dẫn đến ngừng đăng mới, hủy phiên còn mở hoặc tạo vụ việc xử lý đơn đã có; không tự xác nhận vi phạm hoặc khóa tài khoản chỉ vì có nhiều người báo cáo.
 
 Bản đầu nhận mô tả văn bản và tham chiếu nội dung/ảnh đã có trên sản phẩm. Upload tài liệu bổ sung riêng cho báo cáo chưa nằm trong bản đầu; không lách quyền bằng cách dùng một tệp bằng chứng của tranh chấp khác.
 
@@ -404,7 +397,7 @@ Khi tạo phiên, chụp cấu hình gia hạn đang áp dụng vào phiên. Adm
 
 Trạng thái phiên gồm `DA_LEN_LICH`, `HOAT_DONG`, `DA_KET_THUC`, `THAT_BAI`, `DA_HUY`.
 
-Cách xử lý hiện có không cung cấp chỉnh sửa tùy ý giá/thời gian phiên sau khi tạo. Bản 2.0 giữ nguyên nguyên tắc khóa điều kiện phiên, bao gồm phí vận chuyển; muốn hủy phải qua luồng yêu cầu và xét duyệt. Hạ giá sàn trong phiên chưa thuộc bản đầu.
+Cách xử lý hiện có không cung cấp chỉnh sửa tùy ý giá/thời gian phiên sau khi tạo. Bản 2.1 giữ nguyên nguyên tắc khóa điều kiện phiên, bao gồm phí vận chuyển; muốn hủy phải qua luồng yêu cầu và xét duyệt. Hạ giá sàn trong phiên chưa thuộc bản đầu.
 
 ### NV-37. Phí vận chuyển và tổng chi phí
 
@@ -433,7 +426,7 @@ Người dùng nhập **mức tối đa sẵn sàng trả**. Hệ thống tự t
 
 ### NV-09. Giữ kín mức tối đa
 
-Mức tối đa được lưu riêng trong `muc_gia_toi_da` và chỉ được backend đọc để tính đấu giá.
+Mức tối đa được lưu riêng tư tại `tham_gia_phien.gia_toi_da` và chỉ được backend đọc để tính đấu giá.
 
 - Không có API đọc mức tối đa cho người khác, người bán hoặc Admin; hợp đồng hiện có cũng không có API đọc lại trần của chính mình.
 - Không phát mức tối đa qua Socket.IO.
@@ -445,7 +438,7 @@ Một lượt công khai đôi khi bằng mức tối đa đã dùng hết; đi�
 
 ### NV-10. Nguyên tắc tính giá
 
-1. Không có giá sàn và chưa có ai trả giá: người hợp lệ đầu tiên dẫn đầu tại giá khởi điểm. Bản 2.0 yêu cầu giá khởi điểm ít nhất 1 VND và sử dụng tiền nguyên VND. Backend hiện còn nhánh xử lý giá khởi điểm 0 thành 0,01; đây là khác biệt cần sửa cho giao dịch mới, không được lặng lẽ làm tròn dữ liệu cũ.
+1. Không có giá sàn và chưa có ai trả giá: người hợp lệ đầu tiên dẫn đầu tại giá khởi điểm. Bản 2.1 yêu cầu giá khởi điểm ít nhất 1 VND và sử dụng tiền nguyên VND. Backend hiện còn nhánh xử lý giá khởi điểm 0 thành 0,01; đây là khác biệt cần sửa cho giao dịch mới, không được lặng lẽ làm tròn dữ liệu cũ.
 2. Người mới tham gia phải đáp ứng mức tối thiểu theo giá hiện tại và bước giá.
 3. Nếu trần người mới cao hơn trần người đang dẫn đầu, người mới dẫn đầu với giá đủ để vượt đối thủ nhưng không quá trần của mình.
 4. Nếu trần người mới thấp hơn, người dẫn đầu được tự động bảo vệ giá trong giới hạn đã cam kết.
@@ -531,186 +524,148 @@ Việc hủy phiên đã kết thúc, đã thanh toán hoặc đã giao dịch p
 
 ### NV-17. Tạo đơn
 
-Đơn được tạo khi thắng đấu giá, Mua ngay hoặc chấp nhận Second Chance. Nội dung gồm mã đơn, phiên, người mua, người bán, nguồn đơn, giá sản phẩm, phương thức/phí vận chuyển đã công bố, tổng tiền, bản chụp địa chỉ và các thời hạn.
+Đơn được tạo khi thắng đấu giá, Mua ngay hoặc chấp nhận Second Chance. Lưu mã đơn, phiên, người mua/người bán, nguồn đơn, giá sản phẩm, phí vận chuyển đã công bố, tổng tiền, bản chụp địa chỉ và các thời hạn.
 
-Mỗi phiên chỉ có tối đa một đơn đang được xử lý. Có thể có nhiều đơn lịch sử trong cùng phiên khi đơn trước đã hủy và phát sinh Second Chance.
-
-Luồng đích của bản 2.0; các nhánh xử lý chưa nhận/trả hàng chưa được xem là đã có trong backend:
+Mỗi phiên chỉ có tối đa một đơn đang xử lý. Nhiều đơn lịch sử được giữ nếu đơn trước đã hủy và có Second Chance hợp lệ. Luồng dưới đây là thiết kế đích, không phải mọi nhánh đều đã có trong backend:
 
 ```mermaid
 flowchart LR
-    A[Chờ thanh toán] -->|Thanh toán mô phỏng| B[Chờ gửi hàng]
-    B -->|Người bán khai báo gửi| C[Đã gửi hàng]
+    A[Chờ thanh toán] -->|Thanh toán mô phỏng thành công| B[Chờ gửi hàng]
+    A -->|Thất bại, còn hạn được thử lại| A
+    A -->|Hết hạn chưa thanh toán| G[Đã hủy]
+    B -->|Người bán nhập vận đơn| C[Đã gửi hàng]
     C -->|Người mua hoặc Admin xác nhận giao| D[Đang kiểm tra]
-    D -->|Xác nhận tốt hoặc hết hạn hợp lệ| E[Hoàn thành]
-    D -->|Mở tranh chấp đúng hạn| F[Đang tranh chấp]
-    F -->|Giải ngân hoặc hoàn một phần| E
-    F -->|Hoàn toàn bộ| G[Đã hủy]
-    A -->|Hết hạn chưa trả| G
-    B -->|Quá hạn gửi và đủ điều kiện hoàn| G
-    C -->|Khiếu nại chưa nhận| F
+    D -->|Xác nhận tốt hoặc hết hạn hợp lệ| E[Hoàn thành và giải ngân]
+    B -->|Admin tiếp nhận quá hạn gửi| F[Đang tranh chấp, giữ tiền]
+    C -->|Khiếu nại chưa nhận đủ điều kiện| F
+    D -->|Mở tranh chấp đúng hạn| F
+    F -->|Admin quyết định cho người bán| E
+    F -->|Admin quyết định hoàn toàn bộ| G
 ```
+
+Khi có tranh chấp hoặc vụ việc cần Admin xử lý, không chạy nhánh hoàn tất tự động. Không thêm trạng thái trả hàng nhiều bước hoặc nhánh hoàn một phần cho giao dịch mới.
 
 ### NV-18. Thanh toán
 
-1. Người mua mở đơn còn hạn thanh toán.
-2. Giao diện hiển thị tổng tiền, người nhận và nhãn rõ **thanh toán mô phỏng**.
-3. Người mua xác nhận thanh toán.
-4. Backend kiểm tra quyền, trạng thái và thời hạn, lấy tổng tiền từ đơn đã khóa.
-5. Ghi giao dịch thanh toán thành công và chuyển toàn bộ giá sản phẩm cộng phí vận chuyển sang trạng thái đang giữ.
-6. Chuyển đơn sang chờ gửi hàng, xác định hạn gửi và thông báo cho người bán.
+1. Người mua mở đơn còn hạn, xem tổng tiền và địa chỉ nhận.
+2. Giao diện ghi rõ **thanh toán mô phỏng**, cho phép thử kết quả thành công hoặc thất bại để trình diễn; không nhập thông tin thẻ/ngân hàng thật.
+3. Backend kiểm tra người mua, trạng thái và thời hạn; lấy tổng tiền từ đơn đã khóa, không từ client.
+4. Thành công: ghi nhận lần thu mô phỏng, giữ toàn bộ giá sản phẩm cộng phí vận chuyển, chuyển đơn sang chờ gửi và chụp hạn gửi.
+5. Thất bại: lưu lần thử thất bại, không thu/giữ tiền, đơn tiếp tục chờ thanh toán và được thử lại nếu còn hạn. Lần thử lại không kéo dài hạn.
 
-Gửi lại yêu cầu thanh toán đã thành công không được tạo lần thu hoặc giữ tiền trùng. Nếu người dùng sửa số tiền trên trình duyệt, backend không chấp nhận số tiền đó làm nguồn quyết định.
+Gửi lại một thao tác đã xử lý không tạo trùng lần thu/giữ tiền; các lần thử thực sự khác nhau có lịch sử riêng. Giao diện không thể gửi kết quả thất bại để đảo một lần thanh toán đã thành công. Quy tắc khóa/chống trùng và định danh thao tác được chốt trong hợp đồng API khi triển khai.
 
-Hạn mặc định trong code là **48 giờ** từ thời điểm tạo đơn. Giá trị cấu hình hợp lệ trong MySQL được ưu tiên nếu đã tồn tại.
+Hạn mặc định là **48 giờ** từ lúc tạo đơn; cấu hình hợp lệ trong MySQL được ưu tiên. Không có cổng thanh toán, ví, rút tiền hoặc tiền thật. Hành vi mô phỏng thất bại là yêu cầu đích, cần đối chiếu/bổ sung API hiện tại.
 
 ### NV-19. Quá hạn thanh toán
 
-Đơn chưa thanh toán và hết hạn bị hủy với lý do không thanh toán; ghi nhận vi phạm một lần và gửi thông báo. Nếu đủ điều kiện, tạo đề nghị mua cho ứng viên tiếp theo theo mục 17.
+Đơn chưa thanh toán khi hết hạn bị hủy với lý do không thanh toán; ghi nhận vi phạm chờ xét một lần và thông báo cho hai bên. **Không tự tạo Second Chance.** Người bán có thể chủ động yêu cầu theo mục 17.
 
-**Khác biệt hiện tại:** backend đang tạo đơn mới với phí vận chuyển bằng 0. Bản 2.0 phải lấy phí đã chụp của phiên theo NV-37. Dữ liệu mẫu cũ có thể có phí khác 0; việc chuyển đổi phải giữ số tiền lịch sử, không tự tính lại từ một cấu hình mới.
+API phải từ chối thanh toán quá hạn dù job chưa quét. Thanh toán và hủy quá hạn dùng cùng khóa để chỉ có một kết quả hợp lệ.
+
+**Khác biệt hiện tại:** backend còn tự tạo Second Chance sau hủy vì không thanh toán và tạo đơn mới với phí vận chuyển bằng 0. Cần sửa theo phạm vi mới và NV-37. Số tiền của dữ liệu cũ được giữ nguyên, không tính lại theo cấu hình mới.
 
 ## 15. Giữ tiền, vận chuyển và kiểm tra hàng
 
 ### NV-20. Giữ tiền trung gian
 
-Thanh toán thành công chưa có nghĩa tiền được giao ngay cho người bán. Tiền được giữ cho đến khi người mua xác nhận hoặc hết hạn kiểm tra hợp lệ, hoặc Admin có quyết định tranh chấp.
+Thanh toán thành công chưa giao tiền ngay cho người bán. Tiền được giữ cho đến khi người mua xác nhận hàng tốt, hết thời gian kiểm tra hợp lệ hoặc Admin ra quyết định tranh chấp.
 
-Các trạng thái nghiệp vụ gồm chờ giữ, đang giữ, đã giải ngân, đã hoàn tiền và hoàn một phần. Không được giải ngân hai lần hoặc vừa hoàn toàn bộ vừa giải ngân toàn bộ. Khi đã cho trả hàng nhưng chưa đủ điều kiện quyết toán, tiền vẫn đang giữ.
+Giao dịch mới chỉ dùng các trạng thái nghiệp vụ: chờ giữ, đang giữ, đã giải ngân, đã hoàn toàn bộ. Chỉ có **một lần quyết toán cuối: hoàn toàn bộ hoặc giải ngân toàn bộ**. Không hỗ trợ hoàn một phần, nhiều đợt hoàn hoặc xử lý vượt số tiền đã thu.
 
-Thông tin giữ tiền dự kiến chuyển vào nhóm cột của `don_hang`; việc gộp bảng không loại bỏ nghiệp vụ này. Bảng `thanh_toan` tiếp tục giữ lịch sử thanh toán riêng. Cấu trúc mới cần lưu được số tiền hoàn và số tiền giải ngân bằng trường tiền có kiểu rõ ràng, không chỉ giấu trong một ghi chú văn bản.
+Quy tắc đối soát: **tổng đã thu = tiền còn giữ + tổng đã hoàn + tổng đã giải ngân**; các khoản đều không âm. Thao tác lặp không làm thay đổi tổng tiền sau quyết toán.
 
-Quy tắc đối soát cho một đơn: **tổng tiền đã thu = tiền còn giữ + tổng đã hoàn + tổng đã giải ngân**. Cả ba phần không âm. Bản đầu xử lý một lần quyết toán cuối: giải ngân toàn bộ, hoàn toàn bộ hoặc hoàn một phần và giải ngân phần còn lại. Không thực hiện nhiều đợt hoàn rải rác hoặc tự phát sinh khoản hoàn lớn hơn số tiền đã thu.
+Thông tin giữ tiền có thể gộp vào đơn theo bản SQL sẽ chốt; lịch sử thanh toán vẫn giữ riêng. Số tiền hoàn/giải ngân phải lưu bằng trường tiền rõ ràng, không chỉ bằng ghi chú. Dữ liệu cũ có hoàn một phần vẫn phải đọc/đối soát được; không xóa hoặc đổi lịch sử chỉ vì phạm vi mới đã bỏ thao tác này.
 
 ### NV-21. Gửi và giao hàng
 
-- Chỉ người bán của đơn được khai báo đơn vị vận chuyển, mã vận đơn và ngày giao dự kiến; Admin chỉ ghi nhận thay khi có lý do/bằng chứng trong vụ việc đang xử lý.
-- Chỉ gửi hàng khi đơn đã thanh toán và tiền đang được giữ.
-- Hạn gửi mặc định 3 ngày từ lúc thanh toán thành công.
-- Ngày giao dự kiến phải sau thời điểm gửi được ghi nhận và không quá 7 ngày kể từ mốc đó theo cấu hình bản đầu. Người bán không được tự kéo dài ngày dự kiến sau khi đã gửi; sửa sai cần Admin ghi rõ lý do và thông báo hai bên.
-- Thời điểm gửi được máy chủ ghi nhận khi nhận khai báo hợp lệ, không tin một ngày quá khứ do client tự nhập để vượt hạn. Mã vận đơn là thông tin khai báo, không tự chứng minh hàng đã gửi/đã giao vì chưa có tích hợp hãng vận chuyển.
-- Người mua hoặc Admin được xác nhận hàng đã giao trong luồng hiện có.
-- Người bán không được tự khởi động thời hạn kiểm tra hàng bằng việc đánh dấu người mua đã nhận.
+- Người bán của đơn nhập đơn vị vận chuyển và mã vận đơn sau khi đã thanh toán, tiền đang giữ; thời điểm khai báo do máy chủ ghi.
+- Hạn gửi mặc định 3 ngày từ thanh toán thành công. Quá hạn mà chưa ghi nhận gửi chuyển theo NV-38; không cho khai báo muộn để tự vượt vụ việc đang chờ Admin.
+- Người mua bấm **Đã nhận hàng** để bắt đầu thời gian kiểm tra. Đây chưa phải xác nhận hàng tốt và chưa giải ngân.
+- Admin chỉ xác nhận giao thay khi có bằng chứng và lý do. Thời hạn kiểm tra tính từ lần xác nhận hợp lệ trên hệ thống, không hồi tố khiến người mua mất thời gian phản hồi.
+- Người bán không được tự xác nhận người mua đã nhận. Mã vận đơn không chứng minh đã gửi/đã giao.
 
-Website chỉ theo dõi thông tin do các bên cập nhật. Chưa gọi API vận chuyển thật hoặc tự xác minh vị trí kiện hàng.
+Không tích hợp API theo dõi vận chuyển, không nhập nhiều mốc hành trình, không bắt buộc người bán cập nhật ngày giao dự kiến. Website chỉ quản lý thông tin khai báo và xác nhận thủ công.
 
 ### NV-38. Người bán không gửi hàng đúng hạn
 
-Khi hết hạn gửi, nếu hệ thống chưa ghi nhận gửi hàng hợp lệ, đơn vẫn chờ gửi, tiền đang giữ và không có vụ việc/cờ cần Admin xử lý:
+Khi quá hạn gửi mà chưa ghi nhận gửi, hệ thống ghi nhận chậm gửi một lần để Admin xét và thông báo trong website. Tiền tiếp tục được giữ; **không tự hủy/hoàn tiền hoặc khóa người bán** chỉ vì thiếu thao tác khai báo.
 
-1. Khóa phiên và đơn; kiểm tra lại điều kiện, thời gian tại MySQL.
-2. Hủy đơn với lý do `NGUOI_BAN_KHONG_GUI_HANG`.
-3. Hoàn toàn bộ giá sản phẩm và phí vận chuyển đã thu mô phỏng cho người mua.
-4. Ghi vi phạm đang chờ xét cho người bán một lần; Admin xác nhận hoặc hủy vi phạm sau đó.
-5. Thông báo hai bên, lưu nhật ký và không tạo Second Chance cho lỗi của người bán.
+Admin kiểm tra phản hồi và bằng chứng, sau đó:
 
-Sau hạn, API khai báo gửi hàng thông thường phải từ chối, ngay cả khi job chưa quét đến. Gửi hàng và xử lý quá hạn dùng chung khóa để không thể cùng hoàn tiền rồi chuyển lại đơn sang đã gửi.
+- Ghi nhận đã gửi nếu có căn cứ; hoặc cho thêm hạn kèm lý do, lưu mốc cũ/mới.
+- Mở vụ việc tranh chấp với đúng người khởi tạo là Admin, rồi quyết định hoàn toàn bộ hoặc giải ngân theo điều kiện tại NV-24. Không giả người mua gửi yêu cầu.
 
-Nếu có bằng chứng hàng đã gửi nhưng khai báo chậm, hoặc đơn đang được Admin tiếp quản, chuyển xem xét bằng chứng; không tự coi thiếu thao tác trên website là chứng minh chắc chắn hàng chưa rời người bán. Đơn đã hoàn tiền không được tự mở lại hoặc thu lại tiền người mua chỉ bằng một mã vận đơn nhập muộn. Khi job gặp cờ cần Admin xử lý, giữ tiền và đưa vào hàng đợi quá hạn, không bỏ qua âm thầm.
+Khai báo gửi sau hạn qua API thông thường bị từ chối; Admin xử lý ngoại lệ qua thao tác có nhật ký. Quyết định và khai báo gửi dùng cùng khóa phiên/đơn. Không tạo Second Chance cho đơn hủy do lỗi giao hàng. Danh sách đơn quá hạn nằm trong quản lý đơn, không cần một module nhắc việc nhiều bước.
 
-**Khác biệt hiện tại:** code mới chỉ ghi nhận giao hàng muộn. Tự hủy/hoàn tiền có điều kiện và ngăn khai báo muộn theo quy tắc trên phải được bổ sung.
+### NV-39. Chưa nhận hàng sau thời gian chờ
 
-### NV-39. Chưa nhận hàng và quá ngày giao dự kiến
+Bản thu gọn không yêu cầu ngày giao dự kiến. Dùng một mốc đơn giản: **sau 7 ngày kể từ thời điểm ghi nhận gửi**, nếu chưa xác nhận nhận hàng và tiền vẫn giữ, người mua được mở tranh chấp chưa nhận hàng. Mốc này là mặc định đề xuất cho đồ án và được lưu khi khai báo gửi.
 
-Người mua được mở tranh chấp `CHUA_NHAN_HANG` khi đơn đã gửi nhưng chưa xác nhận giao và đã qua **ngày giao dự kiến + 48 giờ chờ**. Không bắt người mua đánh dấu đã nhận rồi mới được khiếu nại.
+Không bắt người mua bấm đã nhận rồi mới được khiếu nại. Admin có thể tiếp nhận sớm hơn nếu có bằng chứng rủi ro rõ ràng. Khi một bên không hợp tác hoặc tài khoản bị khóa, Admin xử lý từ danh sách đơn; không tự xác nhận giao hoặc giải ngân vì người mua im lặng.
 
-Sau mốc này, hệ thống nhắc người mua và tạo việc cần kiểm tra trong khu vực Admin, kể cả người mua chưa mở yêu cầu. Admin kiểm tra bằng chứng, yêu cầu phản hồi hoặc mở vụ việc hỗ trợ cho đơn; tiền vẫn giữ. Không tự xác nhận nhận hàng hay giải ngân chỉ vì người mua im lặng.
-
-Nếu có rủi ro rõ ràng như vận đơn giả hoặc sản phẩm bị xác định vi phạm, Admin có thể tiếp nhận vụ việc trước mốc thông thường dựa trên bằng chứng và lý do. Không tự chuyển mọi báo cáo chưa xác minh thành tranh chấp đã có kết luận.
-
-Các hướng xử lý: ghi nhận đã giao khi có bằng chứng hợp lệ; tiếp tục chờ có mốc mới do Admin quyết định; hoặc hoàn toàn bộ khi kết luận không giao/mất hàng. Mọi thay đổi thời hạn phải lưu mốc cũ, mốc mới, lý do và thông báo, không để người bán liên tục dời ngày để né khiếu nại.
-
-Khi Admin xác nhận giao dựa trên bằng chứng, thời gian kiểm tra của người mua bắt đầu từ thời điểm xác nhận hợp lệ trên hệ thống, không bị truy hồi về một ngày quá khứ khiến người mua mất cửa sổ phản hồi.
+Không có job tự hoàn tiền do quá 7 ngày. Người mua gửi yêu cầu; Admin kiểm tra và quyết định theo mục 16. Backend hiện chỉ nhận tranh chấp ở giai đoạn kiểm tra hàng, nên nhánh trước xác nhận giao còn phải bổ sung.
 
 ### NV-22. Kiểm tra và hoàn tất
 
-Thời gian kiểm tra mặc định 3 ngày từ lúc xác nhận đã giao. Giao diện cần thông báo ngay khi bắt đầu thời hạn. Người mua có thể xác nhận hàng phù hợp hoặc mở tranh chấp khi còn hạn.
+Thời gian kiểm tra mặc định **3 ngày** từ xác nhận đã giao hợp lệ. Giao diện hiển thị hạn; người mua có thể bấm **Hàng phù hợp / Hoàn tất** để giải ngân sớm hoặc mở tranh chấp khi còn hạn.
 
-Nếu người mua xác nhận hàng tốt, hệ thống hoàn thành đơn và giải ngân. Nếu hết hạn kiểm tra mà không có tranh chấp đang mở, tác vụ hệ thống được hoàn thành đơn theo cùng quy tắc.
+Hết hạn kiểm tra, job chỉ hoàn thành/giải ngân nếu đơn và tiền đúng trạng thái, không có tranh chấp hoặc cờ cần Admin xử lý, và các tài khoản không có tình trạng khóa cần tiếp quản. Không lấy thời gian gửi hàng làm thời gian bắt đầu kiểm tra.
 
-Hệ thống không được tự giải ngân đơn đang tranh chấp, đang trả hàng hoặc có cờ cần Admin xử lý. Mốc kiểm tra cũ không tiếp tục kích hoạt giải ngân sau khi mở tranh chấp; khi xử lý xong phải đi theo quyết định cuối hoặc một mốc mới được ghi nhận rõ. Thời hạn đã lưu trên đơn không tự thay đổi chỉ vì Admin sửa cấu hình chung sau đó.
+Mở tranh chấp khóa đơn, giữ tiền và ngăn giải ngân tự động theo hạn cũ. Sau tranh chấp đi theo quyết định cuối của Admin. Cấu hình mới không sửa hồi tố hạn đã lưu.
 
 ## 16. Tranh chấp và hoàn tiền
 
 ### NV-23. Mở và xử lý tranh chấp
 
-Một đơn chỉ có một tranh chấp đang mở tại một thời điểm và chỉ xử lý hoàn/giải ngân khi tiền còn được giữ. Bản 2.0 nhận yêu cầu ở hai giai đoạn:
+Một đơn chỉ có một tranh chấp đang mở tại một thời điểm. Chỉ xử lý tiền khi còn đang giữ. Người mua được mở:
 
-- **Trước xác nhận giao:** lý do `CHUA_NHAN_HANG`, theo điều kiện quá ngày giao dự kiến tại NV-39.
-- **Sau xác nhận giao:** trong thời hạn kiểm tra, với lý do không đúng mô tả, hỏng hóc, nghi hàng giả, chưa nhận thực tế dù hệ thống ghi đã giao, hoặc lý do khác có mô tả/bằng chứng.
+- Trước xác nhận giao: chưa nhận hàng theo điều kiện NV-39.
+- Sau xác nhận giao: còn thời gian kiểm tra và có lý do như không đúng mô tả, hư hỏng hoặc chưa nhận thực tế.
 
-Ngoài các trường hợp người mua tự mở đúng điều kiện, Admin có thể tiếp nhận vụ việc cho đơn khi có báo cáo đã được thẩm định hoặc tài khoản liên quan bị khóa. Phải lưu người khởi tạo thực tế và lý do; không ghi giả rằng người mua đã tự gửi yêu cầu.
+Admin được mở vụ việc khi quá hạn gửi, có bằng chứng cần can thiệp hoặc tài khoản liên quan bị khóa; phải ghi đúng người khởi tạo và lý do.
 
-**Khác biệt hiện tại:** backend chỉ mở sau bước giao trong thời gian kiểm tra. Nhánh trước giao, quyền tiếp nhận có lý do của Admin và quy trình trả hàng là phần phải bổ sung.
+Luồng đơn giản:
 
-Quy trình:
+1. Người mua gửi lý do, mô tả và bằng chứng; hoặc Admin tiếp nhận có căn cứ.
+2. Đơn chuyển đang tranh chấp, tiền tiếp tục giữ, dừng hoàn tất tự động.
+3. Người bán phản hồi; các bên bổ sung bằng chứng theo quyền.
+4. Admin xem xét và chọn **hoàn toàn bộ cho người mua** hoặc **giải ngân toàn bộ cho người bán**, kèm lý do.
+5. Backend kiểm tra điều kiện và cập nhật tranh chấp, thanh toán, tiền giữ, đơn trong một transaction; lưu nhật ký và thông báo sau commit.
 
-1. Người mua chọn lý do, mô tả vấn đề và gửi yêu cầu.
-2. Đơn chuyển đang tranh chấp; giữ nguyên tiền trung gian.
-3. Các bên cung cấp bằng chứng; người bán gửi phản hồi.
-4. Admin tiếp nhận, kiểm tra thông tin và ra quyết định kèm giải thích.
-5. Admin chọn phương án giải quyết. Nếu yêu cầu trả hàng, lưu quyết định có điều kiện, tiếp tục giữ tiền và chạy NV-40; chưa ghi “đã hoàn tiền”.
-6. Khi đủ điều kiện quyết toán, backend kiểm tra số tiền hoàn và cập nhật tiền/trạng thái trong cùng transaction.
-7. Lưu quyết định, người xử lý, bằng chứng, thời gian và gửi thông báo. Quyết định đã quyết toán không được sửa để thực hiện lại dòng tiền.
+Trạng thái nghiệp vụ chỉ cần chờ xử lý, đang xử lý, đã giải quyết; không tạo chuỗi trạng thái gửi trả. Admin có thể giữ vụ việc đang xử lý để chờ bằng chứng, không tự xử thắng/thua vì một bên chưa trả lời. Giới hạn hiện có tối đa 30 bằng chứng; chỉ hai bên có quyền và Admin được xem.
 
-Bằng chứng chỉ cho các bên có quyền và Admin xem, không đưa vào thư viện ảnh công khai. Giới hạn hiện có tối đa 30 bằng chứng một tranh chấp.
+Backend hiện có luồng tranh chấp sau giao; quyền tiếp nhận của Admin và nhánh chưa nhận cần bổ sung. Quyết định đã quyết toán không được sửa để thu/hoàn/giải ngân lần nữa.
 
 ### NV-24. Các kết quả xử lý tiền
 
-**Quyết định cho người bán:** số tiền hoàn bằng 0, giải ngân số tiền đang giữ và hoàn thành đơn, sau khi Admin xác định người bán đã đáp ứng nghĩa vụ giao dịch. Không dùng phương án này chỉ vì người bán im lặng hoặc người mua đang trong hạn gửi trả.
+**Giải ngân toàn bộ cho người bán:** Admin xác định người bán đã đáp ứng nghĩa vụ dựa trên bằng chứng; tiền hoàn bằng 0, chuyển toàn bộ tiền còn giữ cho người bán mô phỏng và hoàn thành đơn.
 
-**Hoàn toàn bộ cho người mua:** hoàn toàn bộ giá sản phẩm và phí vận chuyển đã thu của đơn, đơn chuyển đã hủy và thanh toán được đánh dấu đã hoàn tiền. Với hàng chưa giao/mất hàng, không phát sinh yêu cầu người mua trả một món hàng chưa nhận. Với hàng đã nhận, thông thường phải hoàn tất quy trình trả hàng trước; Admin chỉ miễn trả khi có quyết định riêng và bằng chứng phù hợp.
+**Hoàn toàn bộ cho người mua:** hoàn toàn bộ giá sản phẩm và phí vận chuyển đã thu, đơn chuyển đã hủy, tiền giữ và giao dịch thanh toán thành công liên quan được ghi nhận đã hoàn. Các lần thanh toán thất bại vẫn giữ trạng thái lịch sử thất bại.
 
-**Hoàn một phần, người mua giữ hàng:** số tiền hoàn nguyên VND lớn hơn 0, nhỏ hơn số tiền đang giữ; phần còn lại giải ngân cho người bán, đơn hoàn thành. Admin ghi rõ số tiền và giải thích phần bồi hoàn; không cộng thêm một khoản phí ngoài tổng đang giữ. Ghi số tiền hoàn/giải ngân bằng dữ liệu tiền có thể đối soát. Lịch sử thanh toán vẫn phản ánh lần thu ban đầu và kết quả quyết toán tương ứng, không sửa giá đã thu ban đầu thành giá mới.
+Backend tự lấy số tiền từ đơn/thanh toán đã khóa, không cho người dùng thường hoặc Admin tùy ý nhập một khoản hoàn một phần cho giao dịch mới. Không dùng một mã vận đơn hoặc lời khai chưa được kiểm tra làm điều kiện tự quyết toán.
 
-Mọi trường hợp đều là mô phỏng. Chỉ Admin được quyết định kết quả; người mua/người bán không tự gửi một trạng thái “đã hoàn tiền” để kết thúc giao dịch.
+Nếu cần xử lý hàng đã nhận, Admin xem xét bằng chứng và việc trả hàng thủ công theo NV-40 trước khi quyết định cuối. Không tự coi việc người mua chọn lý do là căn cứ hoàn tiền. Đây là mô phỏng phục vụ đồ án, không phải hệ thống xử lý tiền/giao nhận thật hoàn chỉnh.
+
+**Khác biệt hiện tại:** backend còn hỗ trợ hoàn một phần. Khi triển khai phải chặn thao tác này cả API lẫn giao diện; vẫn bảo toàn và hiển thị đúng lịch sử cũ.
 
 ### NV-40. Trả hàng sau tranh chấp
 
-Bản đầu hỗ trợ một lần trả hàng được phê duyệt cho một đơn trong cùng vụ việc. Không xây dựng đổi sản phẩm hoặc trả do tự đổi ý; các trường hợp mới ngoài phạm vi này cần được thiết kế riêng.
+**Để sau, không thuộc tiêu chí nghiệm thu bản đầu.** Không làm màn hình hướng dẫn trả, vận đơn trả, nhận hàng trả, kiểm tra hàng trả hoặc các job/thời hạn riêng cho từng bước. Không hỗ trợ hoàn tiền một phần.
 
-Trạng thái trả hàng nằm ở quy trình tranh chấp; **đơn giữ `DANG_TRANH_CHAP` và tiền giữ `DANG_GIU`** cho đến khi quyết toán. Các trạng thái nghiệp vụ dưới đây là thiết kế đích, chưa phải enum đã có trong MySQL:
+Nếu một tình huống trình diễn cần trả hàng trước khi hoàn tiền, Admin ghi nhận cách xử lý và bằng chứng trong tranh chấp hiện có; quá trình giao nhận trả được xử lý thủ công ngoài workflow của website. Vụ việc và tiền vẫn giữ đến khi Admin có đủ căn cứ ra quyết định cuối. Đây là giới hạn đã biết, không quảng bá thành dịch vụ trả hàng tự động.
 
-```mermaid
-flowchart LR
-    A[Chờ hướng dẫn trả] --> B[Chờ gửi trả]
-    B --> C[Đang gửi trả]
-    C --> D[Chờ kiểm tra hàng trả]
-    D --> E[Hoàn tất trả và hoàn tiền]
-    A -->|Không phản hồi đúng hạn| X[Cần Admin xử lý]
-    B -->|Chưa gửi đúng hạn| X
-    C -->|Quá hạn hoặc tranh cãi giao nhận| X
-    D -->|Có phản đối kèm bằng chứng| X
-    X -->|Quyết định dựa trên bằng chứng| E
-```
-
-Nút “Cần Admin xử lý” cũng có thể kết thúc theo hướng từ chối yêu cầu và giải ngân hoặc đưa trở lại một bước có hạn mới; sơ đồ chỉ thể hiện nhánh hoàn tiền để dễ đọc. Kết quả thực tế phải theo hồ sơ, không mặc định hoàn khi phát sinh trễ.
-
-Mã dự kiến: `CHO_HUONG_DAN_TRA`, `CHO_GUI_TRA`, `DANG_GUI_TRA`, `CHO_KIEM_TRA_HANG_TRA`, `CAN_ADMIN_XU_LY`, `HOAN_TAT`, `KHONG_CHAP_NHAN`. `HOAN_TAT` chỉ dùng khi việc trả/quyết toán theo kết quả cho người mua đã hoàn thành; `KHONG_CHAP_NHAN` ghi nhận kết thúc theo quyết định từ chối yêu cầu. Các đường chuyển phải được giới hạn theo người thực hiện và điều kiện, không nhận mã trạng thái tùy ý từ client.
-
-**Bước 1 — Chấp thuận và hướng dẫn:** Admin quyết định cần trả hàng. Người bán có 48 giờ để cung cấp địa chỉ nhận trả, người nhận và phương án vận chuyển đã thanh toán/thu xếp phí. Lưu bản chụp hướng dẫn; không tự dùng địa chỉ giao hàng của người mua làm địa chỉ trả. Nếu người bán không hợp tác, chuyển Admin, không bắt đầu đếm hạn gửi của người mua khi chưa có hướng dẫn dùng được.
-
-**Bước 2 — Người mua gửi trả:** từ khi nhận hướng dẫn hợp lệ, người mua có 3 ngày gửi hàng, nhập đơn vị vận chuyển/mã vận đơn và tải bằng chứng. Hệ thống ghi thời điểm gửi, ngày nhận trả dự kiến không quá 7 ngày theo cấu hình. Không chấp nhận chỉ bấm “đã trả” rồi hoàn tiền ngay.
-
-**Bước 3 — Nhận hàng trả:** người bán xác nhận đã nhận hoặc Admin xác định đã giao dựa trên bằng chứng. Nếu quá ngày nhận trả dự kiến + 48 giờ mà chưa có xác nhận, chuyển hàng đợi Admin. Người bán không thể giữ tiền vô thời hạn bằng cách không bấm xác nhận, nhưng hệ thống cũng không tự coi một mã vận đơn là bằng chứng đã nhận.
-
-**Bước 4 — Kiểm tra hàng trả:** từ xác nhận nhận trả hợp lệ, người bán có 48 giờ phản hồi nếu sai hàng, thiếu hàng hoặc phát sinh hư hỏng. Phản hồi cần bằng chứng và giữ tiền chờ Admin. Nếu người bán đồng ý hoặc hết 48 giờ không phản đối, hệ thống hoàn toàn bộ theo quyết định đã chấp thuận, với kiểm tra khóa/chống xử lý trùng.
-
-**Bước 5 — Ngoại lệ:** người mua không gửi đúng hạn, thất lạc hàng trả, tranh cãi tình trạng hoặc người bán từ chối nhận đều chuyển Admin. Không tự giải ngân vì một bên chậm bấm nút khi đã có khiếu nại hợp lệ. Admin quyết định dựa trên bằng chứng, có thể đặt hạn mới hoặc quyết toán; lý do phải được lưu và thông báo.
-
-**Phí gửi trả:** trong các yêu cầu trả hàng do sai/hỏng/không đúng mô tả được chấp thuận ở bản đầu, người bán chịu trách nhiệm thu xếp và trả trước phí gửi trả. Hệ thống ghi trách nhiệm này trong quyết định; không trừ vào khoản hoàn của người mua và không tự hoàn vượt số tiền đơn đang giữ. Bản đầu không có ví, đối soát hãng vận chuyển hoặc thanh toán thêm phí gửi trả qua website.
-
-**Miễn trả:** Admin có thể quyết định không cần trả khi hồ sơ cho thấy không phù hợp/không cần thiết, kèm lý do và bằng chứng. Không tự miễn trả chỉ vì người mua chọn nhãn “hàng giả”, và không đưa hướng dẫn vận chuyển/tiêu hủy hàng nguy hiểm vào một nút tự động.
-
-Mục tiêu nội bộ là Admin phản hồi bước cần xử lý trong 48 giờ; quá mốc thì nhắc và hiển thị quá hạn quản trị. Đây là mục tiêu vận hành, không phải cam kết phần mềm tự xử thắng/thua khi Admin chưa xử lý.
+Chỉ xây quy trình trả hàng nhiều bước khi bổ sung phạm vi sau này. Không thêm các cột/trạng thái trả hàng vào SQL chỉ để phục vụ yêu cầu đã được hoãn.
 
 ## 17. Đề nghị mua tiếp theo — Second Chance
 
 ### NV-25. Điều kiện tạo đề nghị
 
-Chỉ áp dụng khi phiên đã kết thúc thành công nhưng đơn trước bị hủy do người thắng không thanh toán. Không dùng cho mọi loại hủy, ví dụ hủy sau khi hoàn tiền tranh chấp.
+Chỉ áp dụng khi phiên đã kết thúc thành công nhưng đơn trước bị hủy do không thanh toán. Không dùng khi chưa đạt sàn, lỗi người bán hoặc hoàn tiền tranh chấp.
 
-Không tạo khi phiên đang có một đơn xử lý hoặc một đề nghị chờ phản hồi. Người bán phải còn hoạt động và đủ điều kiện bán.
+**Người bán chủ động bấm yêu cầu gửi đề nghị mỗi lần.** Hệ thống kiểm tra và tự chọn ứng viên/giá hợp lệ theo NV-26; người bán không tự chỉ định người quen hoặc nhập giá khác. Admin không tự gửi thay trong luồng thông thường của bản đầu.
+
+Không tạo khi có đơn đang xử lý hoặc đề nghị đang chờ; người bán phải hoạt động và đủ điều kiện bán. Hủy đơn vì không thanh toán chỉ làm xuất hiện lựa chọn yêu cầu, không tự gửi đề nghị.
 
 ### NV-26. Chọn ứng viên và xác định giá
 
@@ -726,34 +681,25 @@ Ví dụ: sau khi người thắng không thanh toán, B có giá công khai h�
 
 ### NV-27. Phản hồi và hết hạn
 
-Chỉ người nhận được chấp nhận hoặc từ chối. Trước khi chấp nhận, backend kiểm tra lại thời hạn, giá công khai, tài khoản, địa chỉ và khả năng tạo đơn.
+Chỉ người nhận được chấp nhận hoặc từ chối. Backend kiểm tra lại thời hạn, giá công khai, tài khoản, địa chỉ và khả năng tạo đơn trước khi chấp nhận.
 
-Chấp nhận tạo đơn mới với đúng giá đề nghị. Chấp nhận lặp lại không tạo đơn trùng. Từ chối hoặc hết hạn chuyển sang ứng viên tiếp theo nếu có; không có ai phù hợp thì dừng.
+Chấp nhận tạo đúng một đơn tại giá đề nghị cộng phí vận chuyển đã công bố. Chấp nhận lặp không tạo trùng. Hạn phản hồi mặc định 24 giờ; các trạng thái gồm chờ xử lý, đã chấp nhận, từ chối, hết hạn.
 
-Hạn phản hồi mặc định 24 giờ. Trạng thái đề nghị: chờ xử lý, đã chấp nhận, từ chối, hết hạn.
+**Từ chối/hết hạn chỉ kết thúc đề nghị hiện tại, không tự tạo đề nghị mới.** Nếu còn ứng viên, người bán phải bấm yêu cầu thêm lần nữa. Nếu đơn từ đề nghị cũng không thanh toán, vẫn cần thao tác chủ động mới của người bán. Không ép người bán gửi hết danh sách ứng viên.
 
-Second Chance khi **chưa đạt giá sàn** chưa thuộc bản đầu. Không nới điều kiện hiện có thành tự động bán dưới sàn, không tạo một đơn gốc giả chỉ để đáp ứng liên kết dữ liệu. Nếu làm sau này, cần một loại đề nghị riêng ghi nhận người bán chủ động chấp nhận giá dưới sàn và người mua tự nguyện đồng ý.
+Job chỉ đánh dấu hết hạn và thông báo. API chấp nhận phải từ chối khi quá hạn dù job chưa quét. Tạo đề nghị/chấp nhận dùng khóa chống hai đơn hoặc hai đề nghị chờ cùng lúc.
+
+Backend hiện tự chuyển tiếp sau từ chối/hết hạn và sau quá hạn thanh toán; cần bỏ cả ba điểm tự tạo này khi triển khai. Giữ lịch sử đề nghị cũ và không đọc mức tối đa để chọn giá.
 
 ### NV-41. Đăng lại sản phẩm
 
-Đăng lại là tạo **một phiên mới có ID và điều kiện mới**, không sửa ngày rồi mở lại phiên cũ. Lịch sử phiên, lượt giá, cam kết và đề nghị trước được giữ nguyên; không sao chép trần bí mật, lượt giá hoặc nghĩa vụ thanh toán sang phiên mới.
+Tạo phiên mới có ID mới, không đổi ngày để mở lại phiên cũ và không sao chép lượt trả, trần bí mật hoặc đề nghị. Người bán thao tác chủ động, không tự đăng lại khi đề nghị hết hạn.
 
-Đủ điều kiện khi đồng thời đáp ứng:
+Điều kiện: người bán hoạt động/đã xác minh, sản phẩm còn được duyệt, không bị chặn; không có phiên chờ/hoạt động khác, đơn đang xử lý, tiền còn giữ, tranh chấp hoặc đề nghị chờ phản hồi. Phiên trước phải thất bại/hủy hợp lệ, hoặc mọi đơn đều hủy do không thanh toán. Đơn đã bán thành công hoặc hủy sau giao hàng/tranh chấp không thuộc luồng đăng lại đơn giản này.
 
-- Chủ sản phẩm vẫn là người bán đã xác minh, tài khoản hoạt động; sản phẩm còn được duyệt và không bị chặn do kiểm duyệt.
-- Không có phiên mới khác đang chờ/hoạt động cho sản phẩm.
-- Không có đơn đang xử lý, tiền còn giữ, tranh chấp hoặc trả hàng chưa kết thúc của sản phẩm.
-- Không có Second Chance chờ phản hồi hoặc tác vụ chuẩn bị tạo đề nghị chưa được xử lý trong cùng luồng khóa.
-- Phiên trước đã thất bại/hủy hợp lệ; hoặc đã kết thúc nhưng tất cả đơn liên quan đều hủy do không thanh toán và chuỗi Second Chance đã kết thúc, không còn ứng viên cần xử lý.
-- Sản phẩm chưa có giao dịch bán hoàn tất. Đơn hoàn một phần vẫn là giao dịch đã hoàn thành, không phải hàng tự động được đăng lại.
+Người bán có thể dừng gửi Second Chance rồi chọn đăng lại khi không còn đề nghị/đơn đang xử lý, dù còn ứng viên chưa được mời. Khi đã tạo phiên mới, chặn tạo Second Chance cho phiên cũ của cùng sản phẩm; hai thao tác phải dùng khóa chung để không bán trùng.
 
-Sản phẩm từng bị dừng vì nghi gian lận/hàng không phù hợp không tự được đăng lại. Admin phải xử lý nguyên nhân và xác nhận lại điều kiện. Đơn hủy do lỗi giao hàng hoặc hoàn tiền tranh chấp cũng không thuộc nhánh đăng lại tự động của bản đầu.
-
-Nếu thông tin món hàng không đổi, có thể dùng sản phẩm đã duyệt để tạo phiên mới. Nếu phải sửa nội dung quan trọng, tạo bản nháp mới liên kết nguồn qua nhật ký để duyệt lại, không sửa mô tả của sản phẩm đang được dùng trong lịch sử giao dịch. Việc tạo bản nháp mới không được dùng để né lệnh chặn kiểm duyệt.
-
-Khi đăng lại có thể đặt giá khởi điểm/sàn/Mua ngay và phí khác cho **phiên mới**; người mua phải xem và cam kết lại. Có thể thông báo cho người từng theo dõi, nhưng không tự đăng ký họ tham gia hoặc chuyển họ thành người dẫn đầu.
-
-Điều kiện đăng lại và tạo Second Chance phải kiểm tra trong cùng cơ chế khóa sản phẩm/phiên liên quan để tránh bán trùng. Backend hiện chặn rộng các sản phẩm đã có phiên kết thúc thành công; phải cập nhật theo điều kiện nghĩa vụ còn tồn tại, không chỉ bỏ toàn bộ điều kiện chặn.
+Sửa thông tin quan trọng cần bản nháp và duyệt lại, không viết đè mô tả lịch sử hoặc né lệnh chặn. Backend hiện chặn rộng sản phẩm từng có phiên thành công; việc cho đăng lại có điều kiện cần được bổ sung, không chỉ bỏ kiểm tra đang có.
 
 ## 18. Đánh giá, vi phạm và thông báo
 
@@ -775,11 +721,11 @@ Không công khai email đăng nhập, địa chỉ riêng, số điện thoại
 
 ### NV-29. Vi phạm
 
-Loại vi phạm gồm không thanh toán, giao hàng muộn, tự đấu giá, gian lận, lạm dụng và loại khác. Mỗi bản ghi có người vi phạm, đối tượng liên quan nếu có, mô tả, điểm và trạng thái.
+Ghi nhận hành vi như không thanh toán, chậm/không giao hàng, gian lận, lạm dụng; lưu người liên quan, phiên/đơn nếu có, mô tả, trạng thái và quyết định xử lý.
 
-Quá hạn thanh toán/gửi hàng được hệ thống ghi nhận; Admin xác nhận hoặc hủy vi phạm. Tổng điểm tính từ các vi phạm đã xác nhận.
+Quá hạn thanh toán/gửi hàng có thể tự tạo bản ghi **chờ xét** một lần. Admin kiểm tra, xác nhận hoặc bác bỏ; nếu xác nhận thì quyết định cảnh cáo, tạm ngưng hoặc khóa tài khoản kèm lý do. Một báo cáo sản phẩm chưa xác minh không tự trở thành vi phạm.
 
-Ngưỡng mặc định là 3 điểm để gợi ý xem xét khóa. Backend hiện **không tự khóa tài khoản chỉ vì đạt ngưỡng**; Admin quyết định trạng thái tài khoản qua chức năng quản lý người dùng.
+**Không xây tính điểm và tự tăng mức phạt trong bản đầu.** Backend đang có điểm và ngưỡng gợi ý xem xét khóa nhưng không tự khóa. Khi điều chỉnh giữ dữ liệu lịch sử, ngừng dùng tổng điểm làm điều kiện quyết định mới; giao diện tập trung sự việc và kết quả Admin xét. Khóa tài khoản còn giao dịch phải tuân thủ NV-02.
 
 ### NV-30. Theo dõi phiên
 
@@ -787,25 +733,15 @@ Người dùng thêm/bỏ theo dõi một phiên và xem danh sách trong tài k
 
 ### NV-31. Thông báo
 
-Thông báo gồm kết quả xét duyệt, diễn biến đấu giá liên quan, phiên sắp kết thúc, có đơn cần thanh toán, hạn thanh toán, cập nhật giao hàng, tranh chấp, đề nghị mua tiếp và hoàn thành đơn.
+Chỉ dùng thông báo trong website và Socket.IO vào phòng riêng. Gửi khi có kết quả duyệt, bị vượt giá/kết quả phiên, đơn cần thanh toán, kết quả thanh toán, ghi nhận gửi/nhận hàng, tranh chấp/quyết định, đề nghị mua tiếp hoặc đối tượng thực sự chuyển quá hạn.
 
-Người dùng chỉ xem và đánh dấu thông báo của mình. Có số lượng chưa đọc, đánh dấu từng thông báo hoặc tất cả. Liên kết trong thông báo phải dẫn đến màn hình có thật và vẫn kiểm tra quyền khi mở.
+Người dùng chỉ xem và đánh dấu thông báo của mình; có số chưa đọc. Liên kết dẫn đến màn hình có thật và vẫn kiểm tra quyền.
 
-Không gửi trùng một thông báo nhắc hạn cho cùng người nhận, đối tượng và mốc nhắc. Thông báo trong website và Socket.IO thuộc phạm vi hiện tại; email/SMS là phần mở rộng.
+**Không xây lịch nhắc nhiều mốc trước hạn, email hoặc SMS.** Hạn thanh toán, gửi hàng, kiểm tra và đề nghị vẫn hiển thị rõ trên màn hình. Tác vụ xử lý hết hạn vẫn hoạt động; bỏ nhắc trước hạn không có nghĩa bỏ kiểm tra thời gian.
 
-Lịch nhắc của bản 2.0:
+Một sự kiện nghiệp vụ cho một người nhận chỉ tạo một thông báo; bảo vệ chống trùng bằng dữ liệu/transaction, không chỉ bộ nhớ. Kết nối lại hoặc chạy lại job không tạo lại bản ghi hay xử lý lại tiền.
 
-- **Thanh toán:** ngay khi tạo đơn, trước hạn 24 giờ, trước hạn 6 giờ, và khi đơn thực sự bị xử lý quá hạn.
-- **Gửi hàng:** ngay sau thanh toán thành công, trước hạn gửi 24 giờ, và khi quá hạn được chuyển hủy/hoàn hoặc cần Admin xử lý.
-- **Chưa nhận:** nhắc khi qua ngày giao dự kiến và khi qua thêm khoảng chờ để được mở tranh chấp; không đồng nghĩa xác nhận đã giao.
-- **Kiểm tra hàng:** ngay lúc bắt đầu, trước hạn 24 giờ, và khi hoàn tất/được chuyển xử lý theo trạng thái thực tế.
-- **Second Chance:** ngay khi tạo, trước hạn 6 giờ, và khi được xử lý hết hạn.
-- **Trả hàng:** lúc nhận quyết định/hướng dẫn, trước hạn gửi trả 24 giờ, các mốc nhận/kiểm tra hàng trả và khi cần Admin xử lý.
-- **Hàng đợi Admin:** thông báo có vụ việc mới; nhắc khi vượt mục tiêu phản hồi 48 giờ, không gửi lặp ở mỗi vòng quét.
-
-Các mốc dựa trên thời hạn đã chụp của từng đối tượng. Nếu cấu hình cho khoảng thời gian ngắn hơn một mốc nhắc, bỏ mốc nằm trước lúc bắt đầu. Nếu máy chủ ngừng lâu và bỏ lỡ nhiều mốc, gửi mốc còn phù hợp gần hạn nhất thay vì dồn nhiều thông báo cùng nội dung; đối tượng đã kết thúc thì không gửi nhắc thanh toán/gửi hàng cũ.
-
-Chống trùng cần được bảo vệ bằng khóa/ràng buộc dữ liệu phù hợp, không chỉ cờ trong bộ nhớ tiến trình. Thông báo có thể gửi lại qua Socket sau mất mạng, nhưng bản ghi thông báo và việc xử lý tiền không được tạo lại.
+Backend đã có một số nhắc sắp kết thúc phiên/sắp hết hạn trả tiền. Chúng không còn là phần bắt buộc; khi chuẩn hóa luồng bản đầu cần tắt lịch nhắc trước hạn để thống nhất phạm vi.
 
 ## 19. Quản trị và cấu hình hệ thống
 
@@ -819,7 +755,7 @@ Admin cần có các màn hình:
 - Sản phẩm: kiểm tra mô tả, ảnh, thuộc tính, điều kiện mặt hàng và xét duyệt; tiếp nhận báo cáo trong hàng đợi riêng.
 - Phiên: xem hoạt động, lịch sử công khai và xử lý yêu cầu hủy.
 - Danh mục và thuộc tính: tạo/cập nhật dữ liệu cấu hình sản phẩm.
-- Đơn hàng, tranh chấp, trả hàng và vi phạm: theo dõi thời hạn, bằng chứng, tiền còn giữ và xử lý đúng quyền; có danh sách vụ việc chậm xử lý và các đơn có tài khoản bị khóa.
+- Đơn hàng, tranh chấp và vi phạm: theo dõi thời hạn, bằng chứng, tiền còn giữ và xử lý đúng quyền; có danh sách vụ việc chậm xử lý và các đơn có tài khoản bị khóa.
 - Cấu hình, nhật ký và tình trạng tác vụ tự động.
 
 Thống kê phải tách: tổng giá trị đơn tạo, tổng đã thu mô phỏng, đang giữ, đã hoàn và đã giải ngân. Chỉ tính trạng thái phù hợp, không cộng một lần thanh toán hai lần vì gửi lặp hoặc vì join nhiều bằng chứng/ảnh.
@@ -828,30 +764,19 @@ Nhãn **giá trị giao dịch hoàn thành** cần nêu rõ quy ước là tổ
 
 ### NV-33. Cấu hình thời hạn
 
-Giá trị mặc định trong backend khi chưa có bản ghi cấu hình:
+Các mặc định của bản đầu, phần lớn đã có trong backend:
 
 - `PAYMENT_DEADLINE_HOURS`: 48 giờ thanh toán.
 - `SELLER_SHIP_DEADLINE_DAYS`: 3 ngày gửi hàng.
-- `BUYER_INSPECTION_DAYS`: 3 ngày kiểm tra hàng.
-- `ANTI_SNIPE_THRESHOLD_SECONDS`: ngưỡng 60 giây cuối.
-- `ANTI_SNIPE_EXTENSION_SECONDS`: gia hạn thêm 90 giây.
+- `BUYER_INSPECTION_DAYS`: 3 ngày kiểm tra từ xác nhận nhận hàng hợp lệ.
+- `ANTI_SNIPE_THRESHOLD_SECONDS`: 60 giây cuối.
+- `ANTI_SNIPE_EXTENSION_SECONDS`: thêm 90 giây từ giờ kết thúc cũ.
 - `SECOND_CHANCE_EXPIRE_HOURS`: 24 giờ phản hồi đề nghị.
-- `MAX_CONFIRMED_VIOLATION_POINTS`: 3 điểm để xem xét khóa.
+- `BUYER_NON_RECEIPT_DAYS`: đã triển khai, 7 ngày từ khai báo gửi để người mua được mở tranh chấp chưa nhận.
 
-Nếu MySQL đã có cấu hình hợp lệ thì sử dụng cấu hình đó. Đầu vào cấu hình phải có giới hạn; không chấp nhận số âm, số không hợp lệ hoặc khóa tùy ý.
+Không bổ sung bộ cấu hình ngày giao dự kiến, các giai đoạn trả hàng và lịch nhắc nhiều mốc của bản 2.0. Khóa điểm vi phạm `MAX_CONFIRMED_VIOLATION_POINTS` hiện có không dùng để quyết định xử phạt trong phạm vi đích; không tự xóa dữ liệu cấu hình cũ khi chỉ sửa tài liệu.
 
-Các cấu hình **mới được đề xuất, chưa có sẵn trong backend**:
-
-- `DELIVERY_MAX_DAYS`: 7 ngày là khoảng tối đa cho ngày giao dự kiến tính từ lúc ghi nhận gửi.
-- `DELIVERY_OVERDUE_GRACE_HOURS`: 48 giờ chờ sau ngày giao dự kiến trước điều kiện mở tranh chấp chưa nhận thông thường.
-- `RETURN_INSTRUCTIONS_HOURS`: 48 giờ người bán cung cấp hướng dẫn trả sau quyết định.
-- `RETURN_SHIP_DEADLINE_DAYS`: 3 ngày người mua gửi trả từ khi có hướng dẫn hợp lệ.
-- `RETURN_DELIVERY_MAX_DAYS`: 7 ngày tối đa cho ngày nhận trả dự kiến tính từ lúc ghi nhận gửi trả.
-- `RETURN_DELIVERY_GRACE_HOURS`: 48 giờ chờ sau ngày nhận trả dự kiến trước khi đưa vụ việc chậm nhận trả tới Admin.
-- `RETURN_INSPECTION_HOURS`: 48 giờ người bán kiểm tra sau khi nhận hàng trả được xác nhận.
-- `ADMIN_REVIEW_TARGET_HOURS`: 48 giờ là mục tiêu nhắc việc cho quản trị; không tự làm mất quyền hoặc quyết toán tiền khi vượt mốc.
-
-Một “ngày” trong bản đầu là 24 giờ liên tục, bao gồm cuối tuần; không gọi là ngày làm việc. Các giá trị mới được chụp tại lúc bắt đầu bước tương ứng. Admin sửa cấu hình chung chỉ áp dụng cho bước bắt đầu sau thay đổi; gia hạn một vụ việc cụ thể cần thao tác riêng có nhật ký. Các mốc 7 ngày/48 giờ là lựa chọn cho phạm vi đồ án nội địa, không phải tuyên bố về thời gian cam kết của hãng vận chuyển.
+Một ngày là 24 giờ liên tục. Nếu MySQL có cấu hình hợp lệ thì sử dụng giá trị đó; không nhận số âm/khóa tùy ý. Chụp hạn khi bắt đầu bước; sửa cấu hình không thay hạn cũ. Admin gia hạn một vụ việc cần lý do, lưu mốc cũ/mới và thông báo. Mốc 7 ngày là lựa chọn riêng cho đồ án, không phải cam kết của đơn vị vận chuyển.
 
 ### NV-34. Bước giá
 
@@ -863,9 +788,9 @@ Không hard-code một bước giá duy nhất cho mọi sản phẩm. Backend �
 
 ### NV-35. Nhật ký
 
-Ghi các hành động quan trọng như duyệt hồ sơ, duyệt sản phẩm, xử lý báo cáo, tạo/chốt/hủy/đăng lại phiên, thanh toán, hoàn tiền/giải ngân, tiếp quản đơn, quyết định trả hàng, thay mốc thời gian và thay cấu hình.
+Ghi các hành động duyệt hồ sơ/sản phẩm, xử lý báo cáo, tạo/chốt/hủy/đăng lại phiên, người bán yêu cầu Second Chance, thanh toán, hoàn toàn bộ/giải ngân, xử lý tranh chấp/vi phạm, đổi trạng thái tài khoản và cấu hình.
 
-Nhật ký giúp truy vết người thực hiện, loại hành động, đối tượng và thời gian. Không ghi mật khẩu, khóa JWT, token hoặc mức giá tối đa bí mật.
+Lưu người thực hiện, đối tượng, hành động, thời gian và lý do khi cần. Phân biệt người bán chủ động yêu cầu với job hệ thống; không ghi Admin/người mua là tác giả của hành động họ không làm. Không ghi mật khẩu, token, khóa JWT hoặc mức tối đa bí mật.
 
 ## 20. Các màn hình cần hoàn thiện
 
@@ -880,11 +805,13 @@ Nhật ký giúp truy vết người thực hiện, loại hành động, đối
 
 ### 20.2. Khu vực tài khoản
 
-Hồ sơ, ảnh đại diện, sổ địa chỉ, danh sách theo dõi, phiên đã tham gia, đơn mua, chi tiết đơn, đề nghị mua tiếp, thông báo, tranh chấp, hướng dẫn/trạng thái gửi trả, báo cáo đã gửi, vi phạm và đăng ký xác minh người bán. Chi tiết đơn phải hiển thị từng hạn và khoản tiền; không chỉ có một nhãn “đang xử lý” cho cả quá trình.
+Hồ sơ, ảnh đại diện, sổ địa chỉ, danh sách theo dõi, phiên đã tham gia, đơn mua, chi tiết đơn, đề nghị mua tiếp, thông báo, tranh chấp và bằng chứng, báo cáo đã gửi, vi phạm và đăng ký xác minh người bán. Chi tiết đơn phải hiển thị từng hạn và khoản tiền; không chỉ có một nhãn “đang xử lý” cho cả quá trình.
 
 ### 20.3. Khu vực người bán
 
-Danh sách sản phẩm, tạo/sửa nháp, quản lý ảnh và thuộc tính, gửi duyệt, xem lý do từ chối, tạo phiên/phí vận chuyển từ sản phẩm đã duyệt, theo dõi phiên của mình, yêu cầu hủy, đăng lại khi đủ điều kiện, đơn bán, cập nhật ngày giao dự kiến và xử lý tranh chấp/trả hàng. Nút đăng lại phải giải thích vì sao chưa được phép nếu còn nghĩa vụ.
+Danh sách sản phẩm, tạo/sửa nháp, ảnh và thuộc tính, gửi duyệt, xem lý do từ chối, tạo phiên/phí vận chuyển, theo dõi phiên, yêu cầu hủy, đăng lại đủ điều kiện, đơn bán, nhập đơn vị vận chuyển/mã vận đơn và phản hồi tranh chấp.
+
+Có nút **Gửi đề nghị cho người đủ điều kiện tiếp theo** sau đơn không thanh toán; không cho nhập giá hoặc chọn ứng viên tùy ý. Không có màn hình nhận hàng trả hoặc thiết lập tự động gửi Second Chance nối tiếp.
 
 ### 20.4. Khu vực quản trị
 
@@ -903,122 +830,75 @@ Các màn hình nêu tại mục 19; có kiểm soát quyền trên đường d�
 
 ## 21. Thiết kế dữ liệu và phương án số bảng
 
-### 21.1. Nguyên tắc giảm bảng
+### 21.1. Hiện trạng và hướng thiết kế
 
-Chỉ gộp hai quan hệ một-một phù hợp với phạm vi một đơn/một lượt giao đi và một bản ghi giữ tiền. Quy trình trả lại là một nhóm dữ liệu riêng của tranh chấp, không ghi đè vận đơn giao đi. Không chuyển toàn bộ nghiệp vụ sang JSON chỉ để giảm số đường nối.
+Thiết kế hiện hành gồm **19 bảng InnoDB, 46 khóa ngoại, 6 trigger, 2 view**. File SQL gốc đã thay bằng bản khởi tạo an toàn; CSDL chính đã chuyển dữ liệu và backend đã đồng bộ.
 
-Database đã kiểm tra có 27 bảng. Chỉ thực hiện hai phép gộp đã chọn thì còn **25 bảng và 47 khóa ngoại** nếu không thêm/bớt quan hệ khác. Bản 2.0 đề xuất thêm **`bao_cao_san_pham`**, thành **26 bảng**; số khóa ngoại cuối cần tính lại khi chốt SQL. Hai view và hai trigger không được tính là bảng nghiệp vụ.
+- Giữ tiền và vận chuyển vào `don_hang`.
+- Cam kết tối đa và theo dõi vào `tham_gia_phien`; bảo vệ mức tối đa và giữ cam kết khi bỏ theo dõi.
+- Ảnh và bằng chứng vào `tep_dinh_kem`, phân loại, khóa ngoại riêng và kiểm tra quyền.
+- Hủy phiên và cấu trúc hỗ trợ báo cáo vào `yeu_cau_xu_ly`; API báo cáo sẽ làm tiếp.
+- Thuộc tính danh mục/sản phẩm dùng JSON có kiểm tra tại backend.
+- Bước giá dùng khóa `BUOC_GIA` trong cấu hình; lịch sử gia hạn vào nhật ký có khóa ngoại và dữ liệu cũ/mới.
 
-Đây là thay đổi đề xuất của thiết kế, không phải MySQL đã thay đổi. Nếu vẫn yêu cầu đúng 25 bảng, cần chốt lại phạm vi báo cáo hoặc một phương án dữ liệu có đánh giá cụ thể; không tự bỏ lịch sử/khóa ngoại hay gộp báo cáo với vi phạm. Sơ đồ dễ đọc được giải quyết chủ yếu bằng chia theo nghiệp vụ, không chỉ giảm số bảng.
+Mọi bản ghi lịch sử còn sử dụng đều được giữ; bản sao 27 bảng được lưu trước chuyển đổi. Chi tiết: [hướng dẫn CSDL](co-so-du-lieu/HUONG-DAN-CSDL.md).
 
-### 21.2. Nhóm tài khoản — 3 bảng
+### 21.2. Các nhóm dữ liệu phải giữ
 
-1. `nguoi_dung`: tài khoản, thông tin hồ sơ, vai trò, trạng thái tài khoản và trạng thái quyền bán.
-2. `xac_minh_nguoi_ban`: hồ sơ xác minh, giấy tờ, thông tin ngân hàng và kết quả duyệt; giữ riêng do có thông tin nhạy cảm và lịch sử gửi hồ sơ.
-3. `dia_chi_nguoi_dung`: nhiều địa chỉ thuộc một người dùng.
+- **Tài khoản:** người dùng, hồ sơ xác minh, nhiều địa chỉ; giấy tờ riêng tư và lịch sử xét duyệt.
+- **Sản phẩm:** danh mục/thuộc tính, sản phẩm, nhiều ảnh và giá trị thuộc tính; kết quả duyệt/báo cáo cần xác minh.
+- **Đấu giá:** phiên, cấu hình bước giá, mức tối đa riêng tư, lượt giá công khai, từng lần gia hạn và yêu cầu hủy.
+- **Giao dịch:** đơn, lịch sử thanh toán thành công/thất bại, giữ tiền, giao nhận và đề nghị mua tiếp.
+- **Hậu mãi:** tranh chấp, bằng chứng, đánh giá và từng vi phạm/kết quả Admin xử lý.
+- **Hỗ trợ:** theo dõi phiên, thông báo, cấu hình và nhật ký.
 
-### 21.3. Nhóm danh mục và sản phẩm — 5 bảng
+Danh sách này mô tả dữ liệu cần bảo toàn, không yêu cầu mỗi mục phải là một bảng riêng. Tên bảng chính xác đã có trong SQL 19 bảng.
 
-4. `danh_muc`: phân nhóm sản phẩm, quan hệ cha/con và trạng thái sử dụng.
-5. `thuoc_tinh_danh_muc`: định nghĩa thuộc tính cần nhập theo danh mục.
-6. `san_pham`: mô tả món đồ, chủ sở hữu và trạng thái duyệt.
-7. `hinh_anh_san_pham`: nhiều ảnh, ảnh chính và thứ tự hiển thị.
-8. `gia_tri_thuoc_tinh_san_pham`: giá trị của từng thuộc tính trên sản phẩm, có ràng buộc liên kết.
+### 21.3. Những dữ liệu có thể gộp vào đơn
 
-### 21.4. Nhóm đấu giá — 6 bảng
+Giữ tiền: số tiền thu/đang giữ/đã hoàn/đã giải ngân, trạng thái, các mốc thời gian và ghi chú. Vận chuyển: đơn vị, mã vận đơn, trạng thái, thời điểm khai báo gửi/xác nhận nhận và nguồn xác nhận. Chỉ một lượt giao đi của một sản phẩm trong phạm vi này.
 
-9. `buoc_gia`: các khoảng giá và mức tăng do hệ thống cấu hình.
-10. `phien_dau_gia`: giá, thời gian, trạng thái và người dẫn đầu của phiên.
-11. `muc_gia_toi_da`: mức cam kết bí mật theo người/phiên.
-12. `luot_tra_gia`: lịch sử trả giá công khai phục vụ hiển thị và Second Chance.
-13. `gia_han_phien_dau_gia`: lịch sử từng lần gia hạn và lượt kích hoạt.
-14. `yeu_cau_huy_phien`: yêu cầu, lý do và kết quả xét duyệt hủy.
+Giữ ID nguồn để đối chiếu trong quá trình chuyển; phân biệt chưa có thông tin bằng NULL phù hợp, không tạo ngày giả hoặc ghi đè hai mốc khác nghĩa. Phí và địa chỉ chụp vào đơn không bị cấu hình hoặc sổ địa chỉ mới sửa hồi tố.
 
-### 21.5. Nhóm giao dịch — 3 bảng
+Không thêm nhóm cột trả hàng nhiều giai đoạn. Tranh chấp chỉ cần nội dung, phản hồi/bằng chứng, người xử lý, kết quả cuối, số tiền và các mốc xử lý. Vi phạm mới tập trung kết luận/hình thức xử lý, không yêu cầu tính điểm tự động.
 
-15. `don_hang`: đơn mua/bán, bản chụp địa chỉ và phí, tiền, trạng thái, thời hạn; **bổ sung các nhóm cột giữ tiền và vận chuyển giao đi**, các số tiền đã hoàn/giải ngân và trạng thái cần quản trị xử lý phù hợp.
-16. `thanh_toan`: lịch sử các giao dịch/lần xử lý thanh toán của đơn, giữ riêng dù hiện mới mô phỏng.
-17. `de_nghi_mua_tiep_theo`: ứng viên, giá công khai được đề nghị, thời hạn phản hồi và liên kết các đơn liên quan.
+### 21.4. Các dữ liệu không được cắt bỏ vì thu gọn
 
-### 21.6. Nhóm hậu mãi — 4 bảng
+- Mức tối đa không nhập chung với lịch sử giá công khai. API/Socket/nhật ký không lộ trần.
+- Lịch sử các lần thanh toán không bị thay bằng một cờ đã thanh toán trên đơn.
+- Hồ sơ xác minh không trộn vào dữ liệu người dùng công khai.
+- Nhiều ảnh/địa chỉ/bằng chứng không biến thành cột cố định ảnh 1, ảnh 2, ảnh 3.
+- Giữ lịch sử gia hạn, đề nghị, yêu cầu hủy, vi phạm và kết quả tranh chấp.
+- Bản ghi hoàn một phần/điểm vi phạm cũ vẫn đối chiếu được; bỏ thao tác mới không phải xóa dữ liệu cũ.
 
-18. `tranh_chap`: nội dung vụ việc, người khởi tạo thật, phản hồi, trạng thái, quyết định có điều kiện/kết quả cuối và số tiền hoàn; thêm nhóm thông tin một lần trả hàng được phê duyệt.
-19. `bang_chung_tranh_chap`: các tệp, người tải lên và mô tả bằng chứng.
-20. `danh_gia`: đánh giá hai chiều theo đơn đã hoàn tất.
-21. `vi_pham`: hành vi, điểm, đối tượng liên quan và kết quả xét duyệt.
+### 21.5. Trình bày diagram
 
-### 21.7. Nhóm hỗ trợ và quản trị — 5 bảng
-
-22. `danh_sach_theo_doi`: quan hệ người dùng theo dõi phiên.
-23. `thong_bao`: nội dung gửi tới từng tài khoản và trạng thái đọc.
-24. `cau_hinh_he_thong`: thời hạn, ngưỡng và cấu hình nghiệp vụ.
-25. `nhat_ky_hoat_dong`: dấu vết thao tác quản trị và nghiệp vụ.
-26. `bao_cao_san_pham` — **bảng mới đề xuất:** người báo cáo, sản phẩm, phiên liên quan nếu có, lý do, mô tả, trạng thái tiếp nhận/xử lý, người xử lý, kết luận và thời gian. Có kiểm soát một báo cáo đang mở của cùng người/sản phẩm. Không chứa điểm phạt mặc định.
-
-### 21.8. Nội dung chuyển vào đơn hàng
-
-**Nhóm giữ tiền:** cần bảo toàn ID nguồn để đối chiếu, số tiền đã nhận giữ, trạng thái, ngày bắt đầu giữ, ngày giải ngân, ngày hoàn tiền, ghi chú, ngày tạo và ngày cập nhật. Bổ sung trường số tiền đã hoàn/giải ngân để đối soát theo NV-20; không suy diễn một khoản hoàn lịch sử từ ghi chú nếu chưa kiểm chứng.
-
-**Nhóm vận chuyển giao đi:** cần bảo toàn ID nguồn để đối chiếu, đơn vị vận chuyển, mã vận đơn, trạng thái vận chuyển, ngày gửi, ngày giao, ngày tạo và ngày cập nhật. Bổ sung ngày giao dự kiến, mốc được khiếu nại, nguồn xác nhận giao và dấu vết thay thời hạn phù hợp.
-
-Tên cột và cách giữ ID cụ thể cần hoàn thiện trong bản thiết kế SQL sau khi duyệt tài liệu. Không tự gộp hai cột cùng tên nếu chúng có thể mang ý nghĩa/mốc thời gian khác nhau; ví dụ ngày giao lưu ở đơn và ngày giao trong dữ liệu vận chuyển phải được đối chiếu trước.
-
-Đơn chưa có thanh toán/vận chuyển phải phân biệt được với đơn đã tạo thông tin nhưng còn chờ xử lý. Không dùng số 0 hoặc ngày giả để thay mọi giá trị chưa có.
-
-**Phí vận chuyển:** chính sách và số tiền được lưu trên phiên, chụp vào đơn cùng giá sản phẩm. Giá mới không được cập nhật hồi tố vào đơn lịch sử. Có dữ liệu để dựng màn hình tổng trước khi cam kết.
-
-**Nhóm trả hàng trong tranh chấp:** cần lưu trạng thái trả, quyết định cần/miễn trả, địa chỉ nhận trả đã chụp, trách nhiệm phí, hạn cung cấp hướng dẫn, hạn gửi trả, hãng/mã vận đơn trả, ngày gửi/nhận dự kiến, xác nhận nhận trả, hạn kiểm tra, phản đối và kết quả. Bằng chứng dùng `bang_chung_tranh_chap`, phân biệt mục đích khi hiển thị, không làm mất người tải và thời gian. Không tạo thêm bảng trả hàng riêng ở phạm vi một quy trình trả được phê duyệt cho một đơn; nếu mở rộng nhiều kiện/nhiều lần thì phải thiết kế lại.
-
-**Cấu hình, thông báo và kiểm duyệt:** bổ sung các khóa cấu hình mới, nhận diện mốc nhắc để chống trùng và dữ liệu lý do/chặn sản phẩm khi cần. Nhật ký chỉ lưu dấu vết quyết định; trạng thái đang chờ xử lý phải có dữ liệu nghiệp vụ để truy vấn và khóa, không chỉ nằm trong chuỗi log.
-
-Các mã trạng thái trả hàng, trường mới và API bổ sung trong tài liệu đều là thiết kế đích. Không ghi chúng vào câu SQL hiện tại trước khi có migration và code hỗ trợ.
-
-### 21.9. Các bảng không nên gộp
-
-- Không gộp trần bí mật vào bảng lịch sử công khai.
-- Không gộp toàn bộ lịch sử thanh toán vào một trạng thái đơn hàng.
-- Không gộp hồ sơ xác minh và thông tin giấy tờ vào dữ liệu công khai người dùng.
-- Không gộp danh sách ảnh, địa chỉ và bằng chứng thành những cột đánh số cố định như ảnh 1, ảnh 2, ảnh 3.
-- Không xóa lịch sử gia hạn, yêu cầu hủy hoặc đề nghị mua chỉ vì ít dữ liệu mẫu.
-- Không đồng nhất một báo cáo chưa xác minh với một vi phạm đã được kết luận.
-- Không dùng cùng bộ cột vận đơn cho giao đi và gửi trả khiến lần cập nhật sau xóa thông tin lần trước.
-
-### 21.10. Cách trình bày diagram
-
-Nên dựng sơ đồ tổng quan chỉ thể hiện các nhóm nghiệp vụ, sau đó chia ERD chi tiết theo tài khoản, sản phẩm, đấu giá, giao dịch, hậu mãi và hỗ trợ. Một bảng có thể xuất hiện ở nhiều sơ đồ dưới dạng tham chiếu; điều đó không tạo thêm bảng vật lý.
-
-Sơ đồ nghiệp vụ rút gọn sau đây giúp đọc luồng chính, không thay thế ERD có đủ khóa ngoại:
+Một sơ đồ tổng quan và các ERD nhỏ theo tài khoản, sản phẩm, đấu giá, giao dịch và hậu mãi. Bảng tham chiếu có thể xuất hiện ở nhiều hình mà không tạo thêm bảng vật lý.
 
 ```mermaid
 flowchart LR
     ND[Người dùng] --> XM[Xác minh người bán]
-    ND --> SP[Sản phẩm]
+    ND --> SP[Sản phẩm đã duyệt]
     DM[Danh mục và thuộc tính] --> SP
     SP --> P[Phiên đấu giá]
-    P --> G[Trả giá công khai và trần bí mật lưu riêng]
-    P --> D[Đơn hàng: giao nhận và giữ tiền]
+    P --> G[Lượt công khai và trần bí mật lưu riêng]
+    P --> D[Đơn hàng, giao nhận, giữ tiền]
     D --> TT[Lịch sử thanh toán]
-    D --> TC[Tranh chấp, trả hàng và bằng chứng]
+    D --> TC[Tranh chấp và bằng chứng]
     D --> DG[Đánh giá]
-    D --> SC[Đề nghị mua tiếp theo]
-    ND --> BC[Báo cáo cần xác minh]
-    BC --> SP
+    D --> SC[Second Chance do người bán yêu cầu]
 ```
 
-Ít bảng hơn vẫn còn nhiều quan hệ do hệ thống có nhiều tác nhân và lịch sử. Không bỏ khóa ngoại quan trọng chỉ để làm đẹp hình.
+### 21.6. Điều kiện chuyển đổi sau này
 
-### 21.11. Điều kiện trước khi chuyển MySQL
+1. Có thiết kế SQL, chỉ mục/ràng buộc, kế hoạch chuyển dữ liệu và phục hồi cụ thể được thống nhất.
+2. Sao lưu, thử trên bản sao và đối chiếu dữ liệu từng trường trước/sau, không chỉ đếm bảng/dòng.
+3. Cập nhật đồng bộ repository/service/API/tests; khi chuyển chính thức phải kiểm soát tác vụ và lượt ghi đang chạy.
+4. Giữ số tiền, ID đối chiếu, thời gian và trạng thái lịch sử. Dữ liệu thiếu mốc mới không tự bị job quyết toán; cần quy tắc tiếp nhận dữ liệu cũ.
+5. Kiểm tra trần bí mật, giá công khai, thanh toán lặp, hoàn/giải ngân, tranh chấp đồng thời và Second Chance chủ động.
+6. Chỉ loại bảng nguồn khỏi cấu trúc hoạt động khi chuyển đổi đã đạt và có đường phục hồi; không xóa database hoặc chạy lại SQL khởi tạo lên dữ liệu đang dùng.
 
-1. Duyệt phạm vi bản 2.0, số bảng đích và bản SQL chuyển đổi cụ thể; không coi 26 bảng đã được áp dụng chỉ vì xuất hiện trong tài liệu.
-2. Sao lưu và kiểm tra khả năng đọc/phục hồi bản sao; không coi việc đặt tên “backup” là đủ.
-3. Tạm ngưng ghi dữ liệu và tác vụ có thể thay đổi đơn trong lúc chuyển.
-4. Chuyển đầy đủ dữ liệu hai bảng vào đúng đơn và đối chiếu từng trường, không chỉ đếm số dòng. Giữ nguyên trạng thái, tiền và lịch sử cũ. Trường mới thiếu căn cứ phải để trạng thái chờ xác minh/NULL phù hợp; không gán đại một ngày giao dự kiến quá hạn rồi để job tự hoàn tiền dữ liệu cũ.
-5. Cập nhật repository, service, thống kê, dữ liệu khởi tạo và kiểm thử.
-6. Giữ tương thích cấu trúc phản hồi cần thiết, ví dụ chi tiết đơn vẫn có nhóm `giu_tien` và `van_chuyen` nếu frontend đang dùng.
-7. Kiểm thử thanh toán lặp, phí đã chụp, không gửi/chưa nhận hàng, trả hàng, hoàn tiền một phần/toàn bộ, giải ngân và tranh chấp đồng thời. Xác định rõ đơn cũ nào được dùng luồng mới và cần dữ liệu nào trước khi bật các job mới.
-8. Chỉ hoàn tất bỏ hai bảng khỏi cấu trúc hoạt động sau khi chuyển đổi và đối chiếu đạt; giữ bản sao phục hồi.
-
-Không chạy lại tệp SQL khởi tạo lên database đang dùng. Tệp SQL gốc hiện có lệnh tạo lại database; việc cập nhật nó thành bản khởi tạo an toàn thuộc công việc SQL sau khi duyệt, chưa được thực hiện chỉ vì lập tài liệu này.
+Tệp SQL gốc có lệnh tạo lại database. Tài liệu này không thực thi hoặc chỉnh tệp đó; bản SQL an toàn sẽ là công việc tiếp theo sau khi chốt cấu trúc.
 
 ## 22. Giao tiếp API và Socket.IO
 
@@ -1044,7 +924,7 @@ Danh sách dùng phân trang. Hợp đồng hiện tại thường trả mảng 
 
 Chi tiết đường dẫn và JSON được duy trì trong `backend/docs/danh-sach-api.md`; tài liệu nghiệp vụ không thay thế đặc tả từng endpoint.
 
-**API cần bổ sung/cập nhật cho bản 2.0:** phí phiên và tổng đơn; hồ sơ uy tín công khai; tạo/xem/xử lý báo cáo sản phẩm; ngày giao dự kiến; mở tranh chấp trước giao; tiếp quản đơn; quyết định và các bước trả hàng; đăng lại đủ điều kiện; cấu hình/thống kê mới. Đường dẫn và JSON cụ thể sẽ được chốt trong tài liệu API khi triển khai. Không giả định những endpoint này đã tồn tại.
+**API cần bổ sung/cập nhật cho bản 2.1:** phí phiên/tổng đơn; mô phỏng thanh toán thất bại; tranh chấp chưa nhận/tiếp nhận bởi Admin; chỉ hoàn toàn bộ hoặc giải ngân; Second Chance do người bán yêu cầu từng lần; vi phạm do Admin quyết định; thông báo theo sự kiện. Giữ yêu cầu hồ sơ uy tín, báo cáo sản phẩm và đăng lại có điều kiện đã mô tả. Không bổ sung API quy trình trả hàng, hoàn một phần hoặc lịch nhắc nhiều mốc. Đường dẫn/JSON sẽ chốt khi triển khai, không coi endpoint mới đã tồn tại.
 
 Không nhận các trường quản trị như trạng thái quyết toán, người xử lý, tổng tiền hoàn hoặc ngày xác nhận của máy chủ qua API thông thường của người mua/người bán. Trường nào chỉ được đọc phải loại khỏi danh sách đầu vào được phép ghi.
 
@@ -1067,7 +947,7 @@ Thao tác tạo cam kết vẫn gửi qua HTTP có xác thực. Socket giúp c�
 - Không trả `mat_khau_bam`, mật khẩu, khóa bí mật hoặc `gia_toi_da` trong kết quả API/Socket.
 - Không ghép chuỗi dữ liệu người dùng thành SQL; dùng tham số và danh sách cho phép khi cần chọn trường/sắp xếp.
 - Đường dẫn upload phải được kiểm tra quyền sở hữu và loại tệp, không nhận đường dẫn tùy ý để đọc tệp trên máy chủ.
-- Quyền xem bằng chứng trả hàng theo đúng tranh chấp của đơn; không mở công khai chỉ vì cả hai đều là ảnh vận đơn.
+- Quyền xem bằng chứng theo đúng tranh chấp của đơn; không mở công khai chỉ vì cả hai đều là ảnh vận đơn.
 - Báo cáo sản phẩm không công khai người báo cáo và không thể dùng để khóa/hoàn tiền tự động khi chưa xét.
 
 ### 23.2. Tải tệp
@@ -1082,7 +962,7 @@ Không đưa token vào URL công khai để tải giấy tờ. Tệp riêng đ�
 
 Thanh toán, chốt đơn, giải ngân, mở/xử lý tranh chấp và Second Chance phải tuân thủ cùng thứ tự khóa để hạn chế deadlock. Không được có tình huống hai người cùng Mua ngay thành công, hai đơn đang xử lý cho cùng phiên hoặc tiền được xử lý hai lần.
 
-Các nhánh mới cũng phải dùng cùng cơ chế: hết hạn gửi cạnh tranh với khai báo gửi; mở khiếu nại cạnh tranh với xác nhận hoàn tất; quyết toán trả hàng cạnh tranh với phản đối có bằng chứng; đăng lại cạnh tranh với tạo đề nghị; kiểm duyệt phiên cạnh tranh với đặt giá/Mua ngay; khóa tài khoản và chuyển đơn cần quản trị cạnh tranh với job giải ngân. Thứ tự khóa cụ thể phải được thiết kế và kiểm thử, không ghép riêng từng service với thứ tự ngẫu nhiên.
+Các nhánh cùng tuân thủ khóa nhất quán: thanh toán cạnh tranh với hủy quá hạn; khai báo gửi cạnh tranh với Admin xử lý; mở tranh chấp cạnh tranh với hoàn tất/giải ngân; đăng lại cạnh tranh với tạo đề nghị chủ động; duyệt hủy cạnh tranh với đặt giá/Mua ngay; khóa tài khoản cạnh tranh với job giải ngân. Thứ tự khóa phải được thiết kế và kiểm thử chung. Thu gọn nghiệp vụ không bỏ xử lý đồng thời.
 
 Backend hiện thử lại toàn bộ transaction tối đa 3 lần khi gặp deadlock/lock timeout; nếu vẫn thất bại thì trả lỗi xung đột để khách thử lại. Rollback không phát các sự kiện chưa được lưu.
 
@@ -1103,13 +983,19 @@ Thời gian xét hạn lấy từ MySQL. Đầu vào có múi giờ và dữ li�
 
 ### 24.2. Tác vụ định kỳ
 
-Bộ lập lịch hiện chạy mỗi 60 giây, mỗi nhóm xử lý tối đa 100 bản ghi một lượt. Bản 2.0 giữ cơ chế này cho phạm vi một backend nhưng bổ sung các nhóm hạn gửi, chậm giao, hướng dẫn/gửi/nhận/kiểm tra hàng trả, nhắc quản trị và lịch nhắc tại NV-31.
+Giữ bộ lập lịch trong một backend, hiện mỗi 60 giây và tối đa 100 bản ghi mỗi nhóm. Phạm vi đích chỉ gồm:
 
-Không đảm bảo thông báo chốt xuất hiện chính xác từng mili giây tại giờ kết thúc: còn phụ thuộc chu kỳ và tải. Dù job chưa quét, API vẫn phải từ chối giá hoặc thanh toán đã quá hạn.
+- Mở/chốt phiên đến hạn và tạo đơn đủ điều kiện.
+- Hủy đơn hết hạn chưa thanh toán, ghi vi phạm chờ xét và thông báo.
+- Ghi nhận chậm gửi một lần để Admin xét, không tự hoàn tiền.
+- Đánh dấu đề nghị hết hạn; **không tạo đề nghị kế tiếp**.
+- Hoàn tất/giải ngân đơn hết thời gian kiểm tra và đủ mọi điều kiện.
 
-Khi backend dừng, bộ lập lịch trong tiến trình cũng dừng. Chưa có bộ lịch/hàng đợi độc lập hoặc đồng bộ nhiều máy chủ.
+Không thêm job trả hàng, hoàn một phần, nhắc trước hạn nhiều mốc hoặc tự tăng mức phạt. API vẫn tự kiểm tra hạn theo MySQL, không phụ thuộc job đã quét hay chưa.
 
-Một job phải kiểm tra trạng thái và các cờ tranh chấp/cần xử lý trước khi quyết toán. Không chỉ xét ngày rồi cập nhật đơn thành công. Lỗi một bản ghi cần được ghi nhận và tiếp tục các bản khác; khởi động lại không gửi trùng hàng loạt hoặc xử lý lại tiền đã quyết toán. Theo dõi số đơn chậm xử lý, thời điểm quét và lỗi để Admin nhận biết backlog.
+Job phải kiểm tra trạng thái, tranh chấp và cờ cần xử lý/tài khoản bị khóa trước khi quyết toán. Lỗi một bản ghi được ghi nhận, các bản khác vẫn được xử lý. Chạy lại/khởi động lại không tạo trùng thông báo hoặc tiền.
+
+Backend dừng thì lịch trong tiến trình cũng dừng. Chưa có hàng đợi độc lập/máy chủ phân tán. Màn hình Admin hiển thị lần chạy và lỗi để nhận biết việc chưa xử lý; không cam kết chốt thông báo chính xác từng mili giây.
 
 ### 24.3. Hiệu năng
 
@@ -1125,196 +1011,154 @@ Chỉ cấu hình giá trị bí mật trên máy chủ/máy phát triển phù 
 
 ## 25. Kịch bản kiểm thử và nghiệm thu
 
-Các tiêu chí dưới đây là chuẩn kiểm tra cho bản hoàn thiện, không phải tuyên bố tất cả đã được chạy lại ở thời điểm lập tài liệu.
+Các tiêu chí sau dùng cho bản 2.1 sau triển khai; chưa được coi là kết quả đã chạy.
 
-### 25.1. Tài khoản và phân quyền
+### 25.1. Tài khoản, quyền và sản phẩm
 
-- Đăng ký đúng thành công; email trùng, mật khẩu thiếu điều kiện và dữ liệu sai bị từ chối.
-- Đăng nhập đúng nhận phiên hợp lệ; sai mật khẩu, token sai/hết hạn bị từ chối.
-- Người thường không truy cập được API quản trị.
-- Người chưa xác minh không tạo sản phẩm/phiên theo quyền người bán.
-- Khóa tài khoản làm những yêu cầu tiếp theo không còn được chấp nhận theo chính sách khóa.
-- Người ngoài không đọc đơn, giấy tờ hoặc bằng chứng riêng của người khác.
-- Khóa tài khoản giữa đơn có tiền giữ đưa đơn vào diện Admin xử lý; job không tự giải ngân vì mất khả năng phản hồi của một bên.
+- Đăng ký/đăng nhập hợp lệ; chặn email trùng, đầu vào sai, token hết hạn và tài khoản bị khóa.
+- Người chưa xác minh không bán; sản phẩm chưa duyệt/thiếu dữ liệu không được tạo phiên.
+- Chỉ chủ sở hữu được sửa đúng trạng thái; Admin duyệt/từ chối có lý do.
+- Người ngoài không đọc giấy tờ, đơn hoặc bằng chứng; khóa tài khoản có tiền giữ không làm tự giải ngân.
+- Báo cáo sản phẩm chống trùng, giữ kín người gửi; chưa xác minh không tự gây phạt/hủy.
+- Hồ sơ uy tín chỉ tính đánh giá khi tài khoản đóng vai người bán; không tạo điểm giả hoặc nhân số đơn qua join.
 
-### 25.2. Sản phẩm và phiên
+### 25.2. Đấu giá và Mua ngay
 
-- Tạo nháp, thêm ảnh/thuộc tính, gửi duyệt, từ chối và duyệt lại đúng luồng.
-- Sản phẩm thiếu ảnh hoặc thuộc tính bắt buộc không được gửi duyệt.
-- Người không phải chủ sở hữu không chỉnh sửa sản phẩm.
-- Sản phẩm chưa duyệt không được tạo phiên.
-- Giá sàn/giá Mua ngay/thời gian sai bị từ chối.
-- Không tạo phiên thứ hai làm bán trùng sản phẩm.
-- Báo cáo yêu cầu đăng nhập, chống trùng/chống gửi rác và không tự phát sinh điểm vi phạm.
-- Báo cáo chưa xác minh không làm ngừng/hủy giao dịch tự động; quyết định Admin có lý do và quyền phù hợp.
-- Xử lý kiểm duyệt cạnh tranh với đặt giá/Mua ngay không để người dùng chốt phiên vừa bị dừng.
+- Chặn người bán tự đấu giá/Mua ngay, giá sai, phiên hết hạn hoặc sản phẩm không hợp lệ.
+- Giá khởi điểm, bước giá, giá sàn, thứ tự khi trần bằng nhau và phản hồi tự động cho kết quả đúng.
+- Người dẫn đầu chỉ tăng trần không tạo giá/gia hạn giả; giá công khai không vượt cam kết.
+- API công khai/quản trị, lỗi, thông báo và Socket không lộ mức tối đa.
+- Có giá hợp lệ trong 60 giây cuối cộng đúng 90 giây từ giờ kết thúc cũ; một request chỉ gia hạn một lần.
+- Đặt giá/Mua ngay/chốt/hủy đồng thời không tạo hai người thắng hoặc đơn trùng.
+- Không đổi bước giá dùng chung khi có phiên chờ/hoạt động, kể cả thao tác tạo phiên đồng thời.
+- Tiền mới là VND nguyên, từ chối giá khởi điểm 0; không làm tròn tiền lịch sử.
+- Mất/kết nối lại Socket phải tải lại trạng thái chuẩn từ API.
 
-### 25.3. Đấu giá và bảo mật trần
+### 25.3. Thanh toán, vận chuyển và giữ tiền
 
-- Người bán không tự đấu giá hoặc tự Mua ngay.
-- Lượt đầu, người thách đấu thấp hơn/cao hơn và hai trần bằng nhau đều ra kết quả đúng.
-- Người đang dẫn đầu tăng trần không làm phát sinh giá/gia hạn giả.
-- Giá công khai không vượt trần người dẫn đầu.
-- Giá sàn được xử lý đúng; chưa đạt sàn thì không chốt thành công.
-- API công khai, API quản trị, lỗi, thông báo và Socket không xuất trường giá tối đa.
-- Hai người đặt đồng thời không gây mất lượt hoặc ghi đè kết quả sai.
-- Giao dịch mới từ chối giá khởi điểm 0 và tiền lẻ VND; dữ liệu lịch sử không bị làm tròn hoặc thay trần.
-- Không đổi bộ bước giá khi còn phiên chờ/hoạt động; tạo phiên đồng thời với đổi cấu hình không vượt được điều kiện này.
+- Đơn lấy đúng giá công khai/Mua ngay/Second Chance cộng phí đã công bố; client sửa tổng không đổi số phải trả.
+- Mô phỏng thất bại không thu/giữ tiền, được thử lại trong hạn; thành công chỉ giữ tiền một lần.
+- Thử lại không kéo dài hạn; không thể dùng kết quả thất bại để đảo lần thu thành công.
+- Thanh toán cạnh tranh với hủy quá hạn chỉ có một kết quả hợp lệ; hết hạn không thanh toán được dù job chưa chạy.
+- Người bán chỉ nhập vận đơn của đơn được phép, không tự xác nhận người mua đã nhận.
+- Quá hạn gửi chỉ ghi nhận chờ Admin xét, không tự hoàn/khóa; khai báo muộn không vượt quyền xét.
+- Nút đã nhận bắt đầu 3 ngày kiểm tra, chưa giải ngân; nút hàng phù hợp mới hoàn tất sớm.
+- Quá hạn kiểm tra chỉ giải ngân khi không có tranh chấp/cờ cần xử lý; im lặng trước xác nhận nhận hàng không tự giải ngân.
 
-### 25.4. Thời gian và Mua ngay
+### 25.4. Tranh chấp, đánh giá và vi phạm
 
-- Lượt hợp lệ khi còn 60 giây được gia hạn đúng 90 giây từ giờ kết thúc cũ.
-- Lượt ngoài ngưỡng hoặc hết hạn không tạo gia hạn sai.
-- Một request nhiều lượt tự động chỉ gia hạn một lần.
-- Hai người Mua ngay đồng thời chỉ một người có kết quả hợp lệ.
-- Mua ngay cạnh tranh với đặt giá không tạo hai người thắng.
-- Giao diện mất/kết nối lại Socket tải lại đúng trạng thái.
+- Chưa nhận được mở sau mốc 7 ngày từ khai báo gửi; không cần giả xác nhận đã nhận. Admin can thiệp sớm cần căn cứ.
+- Sau xác nhận giao chỉ mở trong thời hạn kiểm tra; mở tranh chấp đồng thời với hoàn tất không được vừa giữ vừa giải ngân.
+- Admin quyết định hoàn toàn bộ hoặc giải ngân toàn bộ; API từ chối hoàn một phần cho giao dịch mới.
+- Hoàn toàn bộ bao gồm phí đã thu; giữ lịch sử các lần thử thanh toán thất bại.
+- Quyết toán lặp chỉ thực hiện một lần; tổng đã thu luôn bằng còn giữ + đã hoàn + đã giải ngân.
+- Đơn đã quyết toán không mở lại để xử lý tiền lần nữa. Bằng chứng và nhật ký ghi đúng tác giả.
+- Chỉ các bên của đơn hoàn thành được đánh giá, mỗi bên một lần.
+- Vi phạm chờ xét không tự khóa tài khoản; Admin xác nhận/bác bỏ, cảnh cáo/khóa có lý do; không tự tăng mức phạt theo điểm.
+- Không có nút/luồng bắt buộc gửi trả, nhận trả, hoàn một phần hoặc lịch nhắc nhiều mốc.
 
-### 25.5. Đơn, giữ tiền và tranh chấp
+### 25.5. Second Chance và đăng lại
 
-- Chốt phiên tạo đúng đơn và đúng giá công khai.
-- Thanh toán lặp không tạo giao dịch/giữ tiền trùng.
-- Hết hạn không thể thanh toán lại đơn đã hủy.
-- Người bán của đơn được khai báo vận chuyển; Admin chỉ ghi nhận thay qua luồng tiếp quản có lý do/bằng chứng.
-- Người bán không tự xác nhận giao để chạy thời hạn kiểm tra.
-- Mở tranh chấp đúng hạn giữ tiền; giải ngân đồng thời không thể cùng thành công trái điều kiện.
-- Hoàn tiền toàn bộ, một phần và giải ngân cho người bán đều bảo toàn số tiền.
-- Người ngoài không đánh giá, đánh giá trùng bị từ chối.
-- Phí được công bố trước cam kết, không sửa giữa phiên và được chụp đúng vào đơn/Second Chance.
-- Tổng tiền bằng giá sản phẩm cộng phí đã chụp; sửa số tiền ở client không đổi tổng backend tính.
-- Quá hạn chưa ghi nhận gửi đúng điều kiện chỉ hoàn toàn bộ một lần; khai báo gửi đồng thời không gây vừa hoàn vừa gửi.
-- Chưa nhận hàng được khiếu nại trước bước xác nhận giao khi qua mốc cho phép; mã vận đơn hoặc người mua im lặng không tự giải ngân.
-- Quyết định cho trả hàng chưa thực hiện hoàn tiền; tiền tiếp tục giữ cho đến mốc quyết toán đủ điều kiện.
-- Hạn gửi trả chỉ bắt đầu khi đã có hướng dẫn hợp lệ; người bán không phản hồi chuyển Admin, không phạt người mua vì chưa thể gửi.
-- Vận đơn trả và địa chỉ nhận trả không ghi đè dữ liệu giao đi.
-- Không tự hoàn chỉ vì người mua nhập mã vận đơn; người bán im lặng sau mốc xác nhận nhận trả/kiểm tra hợp lệ được xử lý đúng chính sách.
-- Phản đối có bằng chứng trước hạn cạnh tranh với job hoàn tiền phải cho đúng một kết quả hợp lệ; có cờ cần xử lý thì không quyết toán tự động.
-- Miễn trả, từ chối trả hoặc đổi thời hạn đều có quyết định và nhật ký; không nhận quyết định tiền từ tài khoản không phải Admin.
-- Sau mọi đường quyết toán, tiền đã thu bằng tiền còn giữ cộng tiền đã hoàn và tiền đã giải ngân; xử lý lặp không thay tổng.
+- Đơn không thanh toán không tự tạo đề nghị; người bán phải chủ động yêu cầu.
+- Chọn ứng viên và giá từ lượt công khai hợp lệ, không đọc trần; người bán không tùy chọn người nhận/giá.
+- Chỉ một đề nghị chờ hoặc một đơn đang xử lý; người ngoài không phản hồi thay.
+- Chấp nhận lặp tạo một đơn; từ chối/hết hạn chỉ kết thúc đề nghị, không tự gửi tiếp.
+- Muốn mời tiếp phải có yêu cầu mới; hết ứng viên trả kết quả rõ, không tạo giá giả.
+- Không áp dụng cho phiên chưa đạt sàn, lỗi người bán hoặc hoàn tiền tranh chấp.
+- Đăng lại tạo ID mới, không sao chép cam kết, chỉ khi hết nghĩa vụ; không bắt buộc mời hết ứng viên.
+- Đăng lại và gửi đề nghị đồng thời không bán trùng; đã đăng lại thì không gửi Second Chance phiên cũ.
 
-### 25.6. Second Chance
+### 25.6. Giao diện, thông báo và dữ liệu
 
-- Chỉ tạo khi đơn gốc không thanh toán và phiên đủ điều kiện.
-- Giá đề nghị bằng giá công khai hợp lệ của ứng viên; truy vấn không lấy trần bí mật.
-- Ứng viên bằng giá được xếp đúng thứ tự.
-- Người không được nhận đề nghị không thể chấp nhận thay.
-- Chấp nhận lặp tạo một đơn; từ chối/hết hạn chuyển đúng ứng viên tiếp theo.
-- Không có ứng viên đủ điều kiện thì dừng, không tạo đề nghị giá giả.
-- Phiên chưa đạt sàn hoặc đơn hủy do lỗi người bán/hoàn tiền tranh chấp không tạo Second Chance trong bản đầu.
-- Đăng lại tạo ID phiên mới, không sao chép lượt/trần/đề nghị từ phiên cũ.
-- Không đăng lại khi còn đơn, tiền giữ, tranh chấp, trả hàng, đề nghị đang xử lý hoặc lệnh chặn kiểm duyệt.
-- Tạo đề nghị và đăng lại đồng thời không dẫn đến hai cam kết bán cùng món hàng.
-- Hết toàn bộ Second Chance do không thanh toán có thể đăng lại khi mọi điều kiện đạt; giao dịch đã hoàn tất không được đăng lại tự động.
+- Hoàn thành luồng người mua/người bán/Admin trên trình duyệt, dùng được ở màn hình nhỏ/lớn.
+- Biểu mẫu có lỗi rõ, chống gửi lặp; xử lý dữ liệu rỗng, ảnh thiếu, API lỗi và token hết hạn.
+- Hiển thị phí/tổng cam kết trước đặt giá; có nhãn mô phỏng, không gọi toàn bộ tiền hàng là doanh thu nền tảng.
+- Thông báo theo sự kiện đúng người nhận, không trùng sau chạy lại job/kết nối lại; không gửi nhiều mốc nhắc trước hạn.
+- Không có nút giả hoặc dữ liệu mẫu giả làm giao dịch thật; build/kiểm tra frontend đạt.
+- Nếu chuyển schema: đối chiếu từng trường, tiền, ID, NULL, thời gian, view/trigger; không xóa lịch sử cũ dù tính năng bị thu gọn.
+- Dữ liệu cũ thiếu mốc mới không tự bị quyết toán; bản ghi hoàn một phần cũ vẫn đọc/đối soát đúng.
 
-### 25.7. Chuyển đổi dữ liệu theo thiết kế đã duyệt
+### 25.7. Kịch bản trình diễn tối thiểu
 
-- Giữ nguyên dữ liệu mẫu, ID cần đối chiếu và các thông tin của hai bảng gộp.
-- So sánh nội dung trước/sau, bao gồm các giá trị NULL, ngày tháng và ghi chú.
-- Backend không còn truy vấn các bảng đã gộp sau khi hoàn tất chuyển đổi.
-- Các kiểm thử thanh toán, vận chuyển, tranh chấp, thống kê và tác vụ tiếp tục đạt.
-- View/trigger đang cần vẫn hoạt động; số bảng và khóa ngoại khớp bản thiết kế đã được duyệt. Không dùng tiêu chí “đúng 25” để bỏ bảng báo cáo cần thiết của phạm vi mới.
-- Đơn cũ thiếu ngày giao dự kiến hoặc dữ liệu hoàn tiền không bị job mới tự quyết toán sai; phải có danh sách đối chiếu và quy tắc tiếp nhận dữ liệu cũ.
-- Hồ sơ uy tín chỉ tổng hợp đánh giá bán hàng; chưa có đánh giá không xuất điểm mặc định và nhiều bản ghi liên quan không nhân số đơn.
-- Thông báo theo từng mốc chỉ có một bản ghi; khởi động lại hoặc bỏ lỡ nhiều mốc không tạo dồn hàng loạt thông báo cũ.
+1. Xác minh người bán → tạo sản phẩm → Admin duyệt → tạo phiên.
+2. Hai người mua đấu giá tự động → thử trần bằng nhau và gia hạn → chốt đúng người/giá.
+3. Thanh toán thất bại rồi thành công → nhập vận đơn → xác nhận nhận → kiểm tra/hoàn tất → đánh giá.
+4. Một đơn khác mở tranh chấp → giữ tiền → Admin hoàn toàn bộ; thử xử lý lặp không hoàn hai lần.
+5. Một đơn quá hạn thanh toán → người bán chủ động gửi Second Chance → người tiếp theo chấp nhận hoặc từ chối; không tự mời thêm.
+6. Ghi nhận vi phạm → Admin xét; thử truy cập chéo tài khoản và kiểm tra API/Socket không lộ trần.
 
-### 25.8. Giao diện
+Dùng dữ liệu kiểm thử riêng và thời hạn kiểm thử có kiểm soát; không đổi lịch sử/tiền hoặc reset database đang dùng để dựng kết quả trình diễn.
 
-- Hoàn thành các luồng người mua, người bán và Admin bằng thao tác thực trên trình duyệt.
-- Hiển thị đúng trên màn hình nhỏ và lớn; không có nút giả hoặc liên kết không dẫn tới chức năng.
-- Build và kiểm tra code frontend đạt.
-- Các biểu mẫu có thông báo lỗi, trạng thái gửi và chống gửi lặp ngoài ý muốn.
-- Dữ liệu rỗng, ảnh thiếu, API lỗi và token hết hạn đều có cách xử lý rõ.
-- Biểu mẫu đặt trần phân biệt giá sản phẩm với phí vận chuyển và hiển thị tổng cam kết trước xác nhận.
-- Các nút chưa nhận hàng, gửi trả, xác nhận nhận trả và phản đối chỉ xuất hiện đúng điều kiện; backend vẫn từ chối khi client gọi trái trạng thái.
-- Thống kê có nhãn mô phỏng, không gọi tiền hàng là doanh thu nền tảng, không lộ người báo cáo hoặc thông tin xác minh riêng tư.
+### 25.8. Bằng chứng kiểm thử ngày 23/09/2026
 
-### 25.9. Bằng chứng kiểm thử đã có trong project
+Đã đạt 17 kiểm thử đơn vị/HTTP, 30 kiểm thử tích hợp trên CSDL 19 bảng riêng; bộ API gồm 155 yêu cầu với trường hợp thành công cho 86 API và 28 phản hồi lỗi đúng mã. Đã kiểm tra bỏ theo dõi giữ cam kết, ưu tiên khi theo dõi trước, thanh toán thất bại/thử lại, hoàn cả phí vận chuyển, khiếu nại chưa nhận và tài khoản bị khóa không tự giải ngân.
 
-Tài liệu backend ghi nhận lần kiểm thử trước gồm 17 kiểm thử đơn vị/HTTP và 27 kiểm thử tích hợp đạt. Bộ API đã gửi 155 yêu cầu, có ít nhất một trường hợp thành công cho 86 cặp phương thức/đường dẫn và 28 yêu cầu sai trả lỗi dự kiến.
-
-Đây là kết quả đã ghi nhận trước đó, không phải kết quả kiểm thử bản 2.0. Giao diện hoàn chỉnh, cấu trúc dữ liệu đích và các nhánh giao nhận/trả hàng/báo cáo mới chưa được nghiệm thu. Sau khi triển khai phải bổ sung ca kiểm thử mới và chạy lại các ca liên quan; không coi số lượng test cũ là bằng chứng cho chức năng mới.
+Có thêm 29 ca kiểm tra ràng buộc SQL và đối chiếu 11 nhóm dữ liệu gộp. Đây là kiểm thử backend/CSDL, chưa thay cho nghiệm thu giao diện hoặc kiểm thử tải.
 
 ## 26. Phạm vi bản đầu, phần nâng cao và việc cần duyệt
 
-### 26.1. Những phần không tự thêm vào phạm vi
+### 26.1. Giữ trong bản đầu
 
-- Thanh toán thật, ví tiền thật, rút tiền ngân hàng và phí nền tảng thực thu.
-- OAuth, OTP, quên mật khẩu qua email, xác minh email tự động.
-- Tích hợp vận chuyển thật, nhiều kiện hoặc nhiều đợt giao cho một đơn.
-- Chat trực tiếp giữa người mua/người bán, ứng dụng di động riêng.
-- Đấu giá có tiền cọc, đấu giá ngược, nhiều đơn vị sản phẩm hoặc nhiều loại tiền tệ.
-- Hệ thống nhiều backend có Redis/hàng đợi dùng chung.
-- Rút/hủy riêng một mức cam kết hoặc một lượt giá khi phiên đang chạy. Trường hợp sai nghiêm trọng được Admin xem xét theo luồng xử lý/hủy phiên hợp lệ, không giảm trần bằng một cập nhật trực tiếp. Hỗ trợ rút giá sau này cần thiết kế lịch sử hiệu lực và tính lại các lượt tự động, không chỉ thêm cờ vào một dòng.
-- Hạ/bỏ giá sàn trong phiên; phiên bản bộ bước giá riêng cho từng phiên.
-- Second Chance khi không đạt sàn, thương lượng dưới sàn hoặc nhiều đề nghị đồng thời cho cùng một món hàng.
-- Đặt cọc mô phỏng/quyền đấu giá giá trị cao. Xác minh người bán không đồng nghĩa xác minh năng lực tài chính người mua; một cờ “đã cọc” cũng không được quảng bá là bảo đảm tiền thật.
-- Tự đến nhận, đổi hàng, nhiều kiện/nhiều lần trả hoặc ví thanh toán phí gửi trả riêng.
+- Tài khoản, phân quyền, địa chỉ, xác minh người bán, danh mục/thuộc tính, duyệt sản phẩm.
+- Giá khởi điểm/sàn/Mua ngay, bước giá, đấu giá tự động, trần bí mật, ưu tiên người đặt trước và gia hạn 60/90 giây.
+- Chốt phiên, tạo đơn, phí công bố trước, hạn thanh toán, mô phỏng thành công/thất bại và giữ tiền.
+- Nhập vận đơn thủ công, xác nhận nhận và thời gian kiểm tra; tranh chấp kèm bằng chứng, Admin hoàn toàn bộ hoặc giải ngân toàn bộ.
+- Theo dõi, thông báo trong website, đánh giá/hồ sơ uy tín, báo cáo cần xét, vi phạm do Admin quyết định.
+- Second Chance chủ động từng lần từ người bán, giá công khai hợp lệ; đăng lại có điều kiện và nhật ký.
 
-Những nội dung này chỉ triển khai khi được bổ sung vào yêu cầu; giao diện không được thể hiện chúng như các tính năng đã có.
+### 26.2. Để sau, không phải yêu cầu nghiệm thu
 
-### 26.2. Chính sách đã được lựa chọn trong bản đề xuất này
+- Quy trình trả hàng nhiều giai đoạn, phí gửi trả, đổi hàng và nhiều kiện/lượt giao.
+- Hoàn tiền một phần, nhiều lần quyết toán, ví tiền/rút tiền/phí nền tảng thật.
+- Tự tăng mức phạt theo điểm; tự mời nối tiếp nhiều ứng viên Second Chance.
+- Nhắc trước hạn nhiều mốc, email/SMS, lịch nhắc việc quản trị riêng.
+- Thanh toán/vận chuyển thật, eKYC, OAuth/OTP và khôi phục mật khẩu qua email.
+- Rút cam kết giá, đặt cọc, thay giá sàn trong phiên, Second Chance dưới sàn, nhiều món/tiền tệ.
+- Chat, ứng dụng di động riêng, Redis/hàng đợi phân tán và nhiều backend.
 
-1. **Giá sàn/Mua ngay:** giữ chính sách ở NV-11/NV-14; không thêm hạ sàn trong phiên.
-2. **Phí:** miễn phí hoặc phí cố định, khóa cùng phiên, chụp vào đơn, hiển thị trước cam kết; không có phí nền tảng.
-3. **Tiền:** giao dịch mới dùng VND nguyên và giá khởi điểm từ 1 VND; giữ nguyên dữ liệu tiền cũ để đối chiếu.
-4. **Không gửi:** quá hạn 3 ngày, nếu chưa ghi nhận gửi hợp lệ và không có vụ việc cần xét thì hủy/hoàn toàn bộ, ghi vi phạm chờ xét cho người bán.
-5. **Chưa nhận:** ngày giao dự kiến nằm trong 7 ngày từ lúc ghi nhận gửi, thêm 48 giờ chờ trước khiếu nại thông thường; không tự giải ngân khi chưa xác nhận giao.
-6. **Trả hàng:** giữ tiền trong suốt quá trình; hướng dẫn trong 48 giờ, gửi trả trong 3 ngày, kiểm tra hàng trả trong 48 giờ sau xác nhận nhận; trễ/tranh cãi chuyển Admin. Người bán chịu việc thu xếp phí gửi trả trong phạm vi tranh chấp được chấp thuận.
-7. **Uy tín:** tổng hợp từ đơn bán/đánh giá thật, phân biệt vai trò, không thêm bảng điểm sao giả định.
-8. **Báo cáo:** yêu cầu đăng nhập, bảo vệ người báo cáo, có hàng đợi xét; không đồng nhất báo cáo với vi phạm.
-9. **Đăng lại:** phiên mới, nghĩa vụ cũ đã kết thúc, không sao chép cam kết và không né lệnh chặn; Second Chance vẫn chỉ cho nhánh không thanh toán.
-10. **Khóa tài khoản:** chặn giao dịch mới, đơn còn tiền chuyển quản trị tiếp nhận và tạm ngưng quyết toán tự động khi cần; không để khóa tài khoản làm mất dấu đơn đang xử lý.
-11. **Bước giá:** chưa làm phiên bản cấu hình; cấm thay bộ dùng chung khi còn phiên chờ/hoạt động.
-12. **Thời gian:** ngày là 24 giờ liên tục; cấu hình mới không sửa hồi tố các hạn đã chụp, mọi gia hạn vụ việc đều có lý do và nhật ký.
+Không triển khai thêm các phần này chỉ vì schema hoặc code cũ còn trường hỗ trợ. Dữ liệu lịch sử vẫn được giữ và đọc đúng.
 
-Các điểm trên là lựa chọn có chủ đích của **bản tài liệu đề xuất**, không còn là câu hỏi nghiệp vụ bỏ ngỏ. Chúng trở thành chuẩn triển khai sau khi người dùng duyệt tài liệu; không được ghi vào báo cáo nghiệm thu là chức năng đã chạy.
+### 26.3. Những quyết định đã thống nhất và còn cần thiết kế
 
-### 26.3. Những việc cần duyệt/chốt ở bước tiếp theo
+Sáu hướng thu gọn đã được người dùng đồng ý; không yêu cầu duyệt lại. Các quy tắc lõi vẫn giữ như tài liệu. Các mặc định 48 giờ thanh toán, 3 ngày gửi, 3 ngày kiểm tra, 24 giờ đề nghị tiếp tục được dùng; mốc chưa nhận 7 ngày là mặc định thiết kế mới tại NV-39.
 
-- Duyệt phạm vi và các giá trị mặc định của bản 2.0; có thể điều chỉnh trước khi bắt đầu triển khai.
-- Duyệt bản thiết kế/chuyển đổi SQL cụ thể, đặc biệt đề xuất 26 bảng thay nền 25 bảng trước đó và cách bảo toàn dữ liệu cũ. Không tự thay MySQL chỉ vì tài liệu được viết xong.
-- Chốt danh mục thực sự cho phép giao dịch và nội dung kiểm duyệt phù hợp khả năng kiểm tra của đồ án.
-- Chốt tên hiển thị/ảnh trang chủ trước khi hoàn thiện giao diện. Đây là quyết định nội dung, không làm thay quy tắc tiền hoặc phân quyền.
+Bước kế tiếp cần bản SQL cụ thể với số bảng, ràng buộc và cách bảo toàn dữ liệu; chưa thay cấu trúc MySQL trong bước tài liệu. Tên thương hiệu/nội dung ảnh có thể hoàn thiện khi làm giao diện, không ảnh hưởng quy tắc tiền/quyền.
 
-### 26.4. Khoảng cách giữa code đang có và bản 2.0
+### 26.4. Khoảng cách với code đang có
 
-**Giữ và kiểm thử hồi quy:** đăng nhập/phân quyền, xác minh, duyệt sản phẩm, trần bí mật, thuật toán giá, gia hạn, Mua ngay, chốt phiên, thanh toán mô phỏng cơ bản, Second Chance từ giá công khai và các kiểm tra đồng thời đã có.
+**Giữ và kiểm thử lại:** đăng nhập/phân quyền, xác minh, duyệt sản phẩm, thuật toán giá, trần bí mật, gia hạn, Mua ngay, chốt phiên, giữ tiền và chọn giá Second Chance từ lịch sử công khai.
 
-**Phải bổ sung hoặc sửa:** phí trên phiên và tổng đơn; tiền nguyên cho giao dịch mới; xử lý không gửi/chưa nhận; ngày giao dự kiến; quy trình trả hàng và quyết toán có điều kiện; tiếp quản khi khóa tài khoản; hồ sơ uy tín; kiểm duyệt/báo cáo; đăng lại; lịch nhắc/chống trùng; hạn chế đổi bước giá; thống kê và cấu hình mới.
+**Sửa để thu gọn:** bỏ tự tạo Second Chance khi đơn không thanh toán, đề nghị bị từ chối hoặc hết hạn; hạn chế thao tác tạo theo người bán chủ động; chặn hoàn một phần mới; bỏ quyết định/gợi ý dựa điểm trong luồng mới; tắt nhắc trước hạn nhiều mốc. Giữ lịch sử cũ.
 
-**Chưa hoàn thiện:** giao diện đủ các vai trò, API mới cho các luồng bổ sung, migration và sơ đồ dữ liệu đích, kiểm thử đầu cuối cho toàn bộ bản 2.0. Không lấy thư viện đã cài hoặc file giao diện nháp làm bằng chứng chức năng đã hoàn thành.
+**Bổ sung để khép kín luồng:** thanh toán mô phỏng thất bại; phí được công bố/chụp; tranh chấp chưa nhận và Admin tiếp nhận quá hạn gửi/đơn bị khóa; tiền nguyên VND; bảo vệ thay bước giá; hồ sơ uy tín, báo cáo và đăng lại đã mô tả.
+
+**Chưa nghiệm thu:** giao diện hoàn chỉnh, schema đích/migration, hợp đồng API đã cập nhật và kiểm thử đầu cuối bản 2.1. Việc đồng ý phạm vi và việc viết tài liệu không chứng minh code đã hoàn thành.
 
 ## 27. Thứ tự triển khai sau khi duyệt tài liệu
 
-### Giai đoạn 1 — Chốt phạm vi
+### Giai đoạn 1 — Hoàn tất tài liệu phạm vi
 
-Rà soát bản 2.0 và các mặc định, duyệt phạm vi tại mục 26, xác định những kịch bản bắt buộc khi bảo vệ. Đầu ra là đặc tả được thống nhất, có điều kiện và ngoại lệ cụ thể.
+Đã thống nhất hướng thu gọn; tài liệu 2.1 là chuẩn công việc tiếp theo. Giữ một đặc tả chính, không để yêu cầu trả hàng nhiều bước/hoàn một phần của bản cũ trở thành việc bắt buộc.
 
-### Giai đoạn 2 — Chốt SQL và sơ đồ
+### Giai đoạn 2 — Thiết kế SQL và sơ đồ
 
-Hoàn thiện thiết kế dữ liệu theo số bảng được duyệt, từ điển dữ liệu, các trạng thái mới, ràng buộc, chỉ mục cần thiết, migration và phương án phục hồi. Làm rõ báo cáo sản phẩm và dữ liệu trả hàng. Chia sơ đồ theo nghiệp vụ để giảm đường nối chồng chéo.
+Chốt số bảng theo mức thay đổi thực tế, lập từ điển dữ liệu, khóa/ràng buộc, chỉ mục, script chuyển đổi và phương án phục hồi. Chia diagram theo nghiệp vụ. Chưa áp dụng migration vào MySQL trước khi bản chuyển đổi cụ thể được thống nhất.
 
-### Giai đoạn 3 — Cập nhật backend theo thiết kế đã chốt
+### Giai đoạn 3 — Chuẩn hóa backend và kiểm thử
 
-Chuẩn bị trên bản sao kiểm thử trước khi chuyển MySQL đang sử dụng. Sau khi bản chuyển đổi cụ thể được duyệt, sao lưu, đối chiếu và cập nhật repository/service cùng dữ liệu khởi tạo. Ưu tiên phí/đơn/không gửi/chưa nhận/trả hàng, rồi hồ sơ/báo cáo/đăng lại và nhắc hạn. Bảo toàn thuật toán đấu giá, phân quyền và hợp đồng API cần giữ tương thích.
+Ưu tiên luồng chính: tài khoản/sản phẩm/phiên → thanh toán thất bại/thành công → giao nhận/giữ tiền → tranh chấp hai kết quả. Điều chỉnh Second Chance chủ động, vi phạm và thông báo. Các API cho thao tác đã bỏ phải từ chối, không chỉ ẩn nút giao diện.
 
-### Giai đoạn 4 — Kiểm thử backend
+Giữ thuật toán đấu giá và kiểm thử đồng thời/bảo mật. Chuyển schema nếu có trên bản sao trước, đối chiếu lịch sử, rồi mới chuyển chính thức có kiểm soát. Không reset dữ liệu mẫu.
 
-Chạy kiểm tra cấu trúc, thuật toán, API, transaction, cạnh tranh đồng thời, thanh toán và tất cả nhánh giao nhận/trả hàng. Bổ sung các ca tại mục 25; kiểm thử dùng dữ liệu riêng có thể dọn/rollback, không reset database mẫu. Kiểm tra tác vụ với dữ liệu cũ trước khi bật xử lý tự động mới.
+### Giai đoạn 4 — Hoàn thiện giao diện
 
-### Giai đoạn 5 — Hoàn thiện giao diện công khai và người mua
+Làm công khai/đăng nhập/khám phá/chi tiết phiên và realtime trước; tiếp đến đơn mua, thanh toán mô phỏng, nhận/kiểm tra hàng, tranh chấp, Second Chance và đánh giá. Sau đó hoàn thiện sản phẩm/phiên/đơn bán và khu vực Admin. Tích hợp hồ sơ uy tín, báo cáo, theo dõi/thông báo theo API thật; không dựng màn hình cho phần đã hoãn.
 
-Xây bố cục, đăng nhập/đăng ký, khám phá, chi tiết phiên có phí, đặt giá realtime, hồ sơ uy tín người bán, theo dõi, hồ sơ và địa chỉ. Tiếp theo đơn mua, thanh toán mô phỏng, chưa nhận/nhận hàng, tranh chấp/trả hàng, báo cáo và Second Chance.
+### Giai đoạn 5 — Nghiệm thu và bảo vệ
 
-### Giai đoạn 6 — Hoàn thiện người bán và Admin
+Chạy các kịch bản mục 25 trên trình duyệt, kiểm tra quyền, tiền, thời gian, desktop/mobile và bản dựng. Hoàn thiện hướng dẫn chạy, bộ API, sơ đồ, dữ liệu trình diễn và giới hạn đã biết.
 
-Làm xác minh, sản phẩm, ảnh, duyệt, tạo/đăng lại phiên, đơn bán, ngày giao dự kiến và nhận hàng trả. Tiếp theo quản trị báo cáo, đơn cần tiếp quản, tranh chấp/trả hàng, cấu hình, vi phạm, thống kê mô phỏng và nhật ký.
-
-### Giai đoạn 7 — Nghiệm thu và chuẩn bị bảo vệ
-
-Chạy toàn bộ luồng bằng trình duyệt trên máy tính và điện thoại. Kiểm tra lỗi, dữ liệu riêng tư và thời gian. Chuẩn bị hướng dẫn chạy, bộ API, sơ đồ, kịch bản trình diễn và danh sách giới hạn còn lại.
-
-**Điều kiện bắt đầu lại:** người dùng rà soát tài liệu và thống nhất phạm vi cần triển khai. Việc tạo tài liệu này không tự kích hoạt thay đổi SQL hoặc lập trình tiếp.
+Lần cập nhật tài liệu này chỉ sửa đặc tả; chưa sửa code hoặc áp dụng SQL. Kết quả kiểm thử triển khai sẽ được ghi khi thực sự chạy, không dùng kết quả cũ thay cho nghiệm thu phạm vi mới.
 
 ## 28. Căn cứ đối chiếu trong project
 
@@ -1346,6 +1190,6 @@ Các nguồn sau dùng để nhận diện tình huống thực tế và đánh 
 - [eBay — Rút lượt giá](https://www.ebay.com/help/buying/bidding/retracting-bid?id=4013): cho thấy đây là ngoại lệ có điều kiện; bản đồ án chủ động để ngoài giai đoạn đầu.
 - [eBay — Second Chance](https://www.ebay.com/help/selling/making-second-chance-offers/listings/selling-auctions?id=4142): có phạm vi rộng hơn bản đồ án, bao gồm chưa đạt giá sàn; bản đầu của project chỉ giữ nhánh người thắng không thanh toán.
 
-Các mốc 48 giờ, 7 ngày, cách chịu phí trả hàng, giới hạn một lượt trả và quyết định không thu phí nền tảng trong tài liệu là **chính sách đề xuất riêng cho đồ án**. Không diễn đạt thành quy định chung của mọi website đấu giá hoặc thành cam kết pháp lý của các nền tảng tham khảo.
+Các nguồn trên đã được đối chiếu khi lập bản 2.0, không kiểm tra lại trong lần thu gọn này. Phạm vi 2.1 không sao chép quy trình trả hàng của các sàn. Thời hạn và quyết định không thu phí nền tảng là **lựa chọn riêng cho đồ án**, không phải quy định chung hoặc cam kết pháp lý của nguồn tham khảo.
 
 Khi chốt hoặc thay đổi nghiệp vụ, cần cập nhật tài liệu này cùng SQL, code và kiểm thử tương ứng để tránh mỗi phần mô tả một cách khác nhau.

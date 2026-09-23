@@ -615,15 +615,14 @@ Quyền: QUAN_TRI.
 {}
 ```
 
-### POST /admin/disputes/:id/resolve — Admin hoàn một phần tiền mô phỏng
+### POST /admin/disputes/:id/resolve — Admin hoàn toàn bộ tiền mô phỏng
 
 Quyền: QUAN_TRI.
 
 ```json
 {
   "ket_qua": "NGUOI_MUA",
-  "so_tien_hoan": "1000000",
-  "ket_qua_xu_ly": "Hoàn một phần theo bằng chứng thử nghiệm"
+  "ket_qua_xu_ly": "Hoàn toàn bộ theo bằng chứng thử nghiệm"
 }
 ```
 

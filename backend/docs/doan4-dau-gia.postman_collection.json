@@ -2908,7 +2908,7 @@
           ]
         },
         {
-          "name": "Admin hoàn một phần tiền mô phỏng",
+          "name": "Admin hoàn toàn bộ tiền mô phỏng",
           "request": {
             "method": "POST",
             "url": "{{diaChiGoc}}/admin/disputes/{{tranhChapId}}/resolve",
@@ -2928,10 +2928,10 @@
                 "value": "application/json"
               }
             ],
-            "description": "QUAN_TRI. Admin hoàn một phần tiền mô phỏng. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "description": "QUAN_TRI. Hoàn toàn bộ số tiền đơn gồm phí vận chuyển; backend tự lấy số tiền đang giữ.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ket_qua\": \"NGUOI_MUA\",\n  \"so_tien_hoan\": \"1000000\",\n  \"ket_qua_xu_ly\": \"Hoàn một phần theo bằng chứng thử nghiệm\"\n}",
+              "raw": "{\n  \"ket_qua\": \"NGUOI_MUA\",\n  \"ket_qua_xu_ly\": \"Hoàn toàn bộ theo bằng chứng thử nghiệm\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

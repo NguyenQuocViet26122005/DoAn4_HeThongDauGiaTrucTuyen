@@ -89,7 +89,7 @@ Avatar tải ở nhóm `avatar`, sau đó cập nhật `/users/me` với `anh_da
 
 Second Chance chỉ có sau khi đơn bị hủy do không thanh toán. Hệ thống tự tìm người phù hợp, dùng giá trả công khai cuối cùng và bỏ qua người chưa đạt sàn. Người được đề nghị xem `/second-chances`, chọn `deNghiId`, rồi chấp nhận hoặc từ chối bằng token của mình.
 
-Để kiểm tra nhanh các hạn 48 giờ/3 ngày/24 giờ mà không sửa dữ liệu mẫu bằng tay, chạy `npm run test:integration` khi dừng backend đang chạy tác vụ. Bộ kiểm thử tạo dữ liệu riêng với các mốc đến hạn, kiểm tra đóng phiên, hủy đơn, Second Chance, nhắc hạn và giải ngân rồi hoàn tác/dọn đúng dữ liệu đó. Không cần nhập lại SQL hoặc đổi cấu hình chung để tăng tốc thử nghiệm.
+Để kiểm tra nhanh các hạn 48 giờ/3 ngày/24 giờ mà không sửa dữ liệu mẫu bằng tay, chạy `npm run test:integration` khi dừng backend đang chạy tác vụ. Bộ kiểm thử tạo dữ liệu riêng với các mốc đến hạn, kiểm tra đóng phiên, hủy đơn, Second Chance chủ động, quá hạn và giải ngân rồi hoàn tác/dọn đúng dữ liệu đó. Không cần nhập lại SQL hoặc đổi cấu hình chung để tăng tốc thử nghiệm.
 
 API `/admin/jobs` chỉ đọc trạng thái, không kích hoạt tác vụ bằng HTTP. Khi chạy backend bình thường, chu kỳ đầu bắt đầu sau 60 giây.
 

@@ -10,7 +10,7 @@ Phiên chỉ được tạo cho sản phẩm đã duyệt, thuộc người bán
 
 ## Giá tối đa bí mật và giá công khai
 
-Người mua gửi `gia_toi_da` qua API POST đặt giá. Hệ thống lưu vào `muc_gia_toi_da`; chỉ các lượt đáp trả công khai được lưu trong `luot_tra_gia`. Không có endpoint đọc mức tối đa, kể cả cho người bán hoặc Admin. API danh sách/chi tiết/lịch sử và sự kiện Socket.IO dùng danh sách trường được phép xuất.
+Người mua gửi `gia_toi_da` qua API POST đặt giá. Hệ thống lưu vào `tham_gia_phien` (chỉ bản ghi có mức cam kết); chỉ các lượt đáp trả công khai được lưu trong `luot_tra_gia`. Không có endpoint đọc mức tối đa, kể cả cho người bán hoặc Admin. API danh sách/chi tiết/lịch sử và sự kiện Socket.IO dùng danh sách trường được phép xuất.
 
 Nếu B vượt mức tối đa của A, giá mới là `min(maxB, maxA + bước giá tại maxA)`. Ví dụ maxA 20 triệu, maxB 22 triệu và bước giá 200 nghìn: B dẫn đầu ở 20,2 triệu. Nếu bằng nhau, giữ người dẫn đầu đã được lưu trước giao dịch mới; cách này xử lý cả hai yêu cầu trong cùng giây và việc nâng mức tối đa.
 
@@ -18,13 +18,13 @@ Nếu người mới đặt thấp hơn, hệ thống ghi lượt của người
 
 Người đầu tiên trả giá khởi điểm; với giá sàn, hệ thống có thể tăng đến `min(mức cam kết, giá sàn)`. Chính sách này cũng áp dụng khi người dẫn đầu nâng mức cam kết để đạt sàn. Nếu đã đạt sàn hoặc không có sàn, việc người dẫn đầu chỉ nâng trần không tăng giá công khai và không tạo gia hạn giả. Mức giá sàn cụ thể không nằm trong dữ liệu phiên công khai, chỉ có `dat_gia_san`.
 
-Bước giá đọc từ bảng `buoc_gia`, kiểm tra khoảng bị thiếu/chồng lấn. Tiền tính bằng BigInt ở đơn vị 1/100, trả ra chuỗi thập phân; không tính tiền bằng số thực JavaScript.
+Bước giá đọc từ JSON tại khóa `BUOC_GIA` trong `cau_hinh_he_thong`, kiểm tra khoảng bị thiếu/chồng lấn. Tiền tính bằng BigInt ở đơn vị 1/100, trả ra chuỗi thập phân; không tính tiền bằng số thực JavaScript.
 
 ## Thời gian và chống đặt giá phút chót
 
 Các mốc thời gian lấy từ MySQL theo giây, tương ứng độ chính xác DATETIME hiện có. Điều này tránh MySQL làm tròn mili giây sang giây kế tiếp khi lưu lượt đặt giá. `DB_TIMEZONE` mặc định `+07:00`; đầu vào ngày tạo phiên bắt buộc có múi giờ.
 
-Khi có lượt giá công khai hợp lệ và `0 < thời gian còn lại <= 60 giây`, cộng 90 giây vào thời gian kết thúc trước đó. Một yêu cầu tạo nhiều lượt đáp trả chỉ gia hạn một lần; các yêu cầu hợp lệ tiếp theo có thể gia hạn nhiều lần. Lịch sử được lưu ở `gia_han_phien_dau_gia`. Giá trị ngưỡng/gia hạn được chụp từ cấu hình hệ thống khi tạo phiên.
+Khi có lượt giá công khai hợp lệ và `0 < thời gian còn lại <= 60 giây`, cộng 90 giây vào thời gian kết thúc trước đó. Một yêu cầu tạo nhiều lượt đáp trả chỉ gia hạn một lần; các yêu cầu hợp lệ tiếp theo có thể gia hạn nhiều lần. Lịch sử được lưu ở `nhat_ky_hoat_dong`, hành động `GIA_HAN_PHIEN`, có khóa ngoại phiên/lượt giá và JSON mốc cũ/mới. Giá trị ngưỡng/gia hạn được chụp từ cấu hình hệ thống khi tạo phiên.
 
 Với giá sàn, Mua ngay còn hiệu lực đến khi đạt sàn. Không có sàn, Mua ngay tắt sau lượt giá hợp lệ đầu tiên. Mua ngay và trả giá dùng cùng khóa phiên, nên chỉ một nhánh phù hợp được thực hiện trước; phiên chốt xong không nhận thêm giá.
 
@@ -56,28 +56,28 @@ Các hạn mặc định nếu chưa có bản ghi cấu hình: thanh toán 48 g
 
 ## Tranh chấp và vi phạm
 
-Người mua mở tranh chấp khi đang kiểm tra hàng và chưa hết hạn. Mở tranh chấp giữ nguyên tiền; việc xác nhận hàng tốt/tự hoàn thành tranh chấp cùng khóa đơn nên không thể vừa giải ngân vừa mở tranh chấp thành công.
+Người mua mở tranh chấp khi đang kiểm tra hàng và chưa hết hạn, hoặc chưa nhận hàng sau mốc 7 ngày từ lúc gửi. Admin có thể tiếp nhận sớm các đơn đã thanh toán còn giữ tiền. Mở tranh chấp giữ nguyên tiền; việc xác nhận hàng tốt/tự hoàn thành tranh chấp cùng khóa đơn nên không thể vừa giải ngân vừa mở tranh chấp thành công.
 
 Admin có thể tiếp nhận, đọc phản hồi và bằng chứng, sau đó quyết định:
 
 - Cho người bán: `ket_qua = NGUOI_BAN`, `so_tien_hoan = 0`; giải ngân và hoàn thành đơn.
 - Hoàn toàn bộ: `NGUOI_MUA`, số tiền hoàn bằng tiền đang giữ; escrow `DA_HOAN_TIEN`, đơn `DA_HUY`, thanh toán `DA_HOAN_TIEN`.
-- Hoàn một phần: `NGUOI_MUA`, số tiền hoàn lớn hơn 0 và nhỏ hơn tiền đang giữ; escrow `HOAN_TIEN_MOT_PHAN`, phần còn lại được xem là đã giải ngân mô phỏng, đơn `HOAN_THANH`. Số tiền hoàn lưu tại tranh chấp; ghi chú escrow và nhật ký ghi số tiền hoàn/giải ngân. Thanh toán giữ bản ghi lịch sử `DA_THANH_TOAN`, vì schema không có trạng thái thanh toán hoàn một phần.
+- Không tạo hoàn tiền một phần mới. Dữ liệu lịch sử cũ vẫn được bảo toàn để đối chiếu.
 
-Người mua/người bán chỉ đánh giá bên còn lại sau khi đơn hoàn thành, mỗi bên một lần, 1–5 sao. Vi phạm là từng bản ghi riêng; quá hạn thanh toán/gửi hàng tự tạo vi phạm đang mở để Admin xét. Tổng điểm đạt ngưỡng chỉ trả cờ `can_xem_xet_khoa`; Admin quyết định khóa/tạm ngưng qua API trạng thái tài khoản.
+Người mua/người bán chỉ đánh giá bên còn lại sau khi đơn hoàn thành, mỗi bên một lần, 1–5 sao. Vi phạm là từng bản ghi riêng; quá hạn thanh toán/gửi hàng tự tạo vi phạm đang mở để Admin xét. Admin chọn `hinh_thuc_xu_ly`: `CANH_CAO`, `TAM_NGUNG`, `KHOA_TAI_KHOAN`; hủy vi phạm dùng `KHONG_VI_PHAM`. Không tính điểm để tự tăng hình phạt.
 
 ## Second Chance
 
-Đơn hết hạn thanh toán bị hủy với lý do `KHONG_THANH_TOAN`, tạo vi phạm một lần. Nếu phù hợp, hệ thống tự tạo đề nghị cho ứng viên tiếp theo; người bán/Admin cũng có API yêu cầu tạo khi chưa có đơn hoặc đề nghị đang chờ.
+Đơn hết hạn thanh toán bị hủy với lý do `KHONG_THANH_TOAN`, tạo vi phạm một lần. Người bán chủ động gọi API tạo đề nghị khi chưa có đơn hoặc đề nghị đang chờ. Job không tự tạo đề nghị; Admin không thay người bán gửi đề nghị.
 
 Ứng viên được xếp theo **lượt trả giá công khai hợp lệ cuối cùng của từng người**, giá giảm dần, rồi thời gian/ID tăng dần. Lượt phải nằm trong thời gian phiên và có số tiền dương. Loại người bán, tài khoản không hoạt động, người đã từng có đơn/đề nghị trong phiên và người chưa đạt sàn. Truy vấn không đọc bảng `muc_gia_toi_da`.
 
-Chấp nhận đề nghị kiểm tra lại quyền, hạn, giá công khai và điều kiện người bán, rồi tạo đơn mới tại chính `gia_de_nghi`. Chấp nhận lặp không tạo trùng đơn. Từ chối hoặc hết hạn chuyển sang người tiếp theo; không có ứng viên phù hợp thì dừng.
+Chấp nhận đề nghị kiểm tra lại quyền, hạn, giá công khai và điều kiện người bán, rồi tạo đơn mới tại chính `gia_de_nghi`. Chấp nhận lặp không tạo trùng đơn. Từ chối hoặc hết hạn chỉ đóng đề nghị hiện tại; người bán phải yêu cầu lại để gửi cho người tiếp theo.
 
 ## Tác vụ và vận hành
 
-Bộ lập lịch chạy mỗi 60 giây, mỗi nhóm lấy tối đa 100 bản ghi: phiên đến giờ, đơn đến hạn, đề nghị hết hạn, phiên sắp kết thúc trong 10 phút, đơn còn tối đa 6 giờ để thanh toán. Những lần nhắc cùng loại/đối tượng không tạo thông báo trùng. Gửi hàng muộn đã ghi nhận được loại khỏi lượt quét sau.
+Bộ lập lịch chạy mỗi 60 giây, mỗi nhóm lấy tối đa 100 bản ghi: phiên đến giờ, đơn đến hạn và đề nghị hết hạn. Không chạy các lịch nhắc nhiều mốc. Những lần nhắc cùng loại/đối tượng không tạo thông báo trùng. Gửi hàng muộn đã ghi nhận được loại khỏi lượt quét sau.
 
 `GET /api/admin/jobs` trả trạng thái bật/tắt, đang chạy, thời gian gần nhất và số bản ghi xử lý/thất bại. Lỗi từng bản ghi được ghi bằng ID/mã lỗi để các bản ghi khác vẫn được xử lý.
 
-Các giới hạn còn lại: giao hàng được cập nhật thủ công, không có theo dõi vận đơn thật; tranh chấp chưa mở trước giai đoạn kiểm tra hàng; chưa có xử lý rút giá đặc biệt bởi Admin; chưa có quy trình đăng bán lại sau khi tất cả Second Chance thất bại; chưa có dọn tệp upload không được gắn vào dữ liệu. Giới hạn request và bộ lập lịch ở trong tiến trình; Socket.IO chưa có adapter chia sẻ giữa nhiều máy chủ. Đây là các phần mở rộng vận hành, không tự thay schema hiện tại để triển khai thêm.
+Các giới hạn còn lại: giao hàng được cập nhật thủ công, không có theo dõi vận đơn thật; chưa có xử lý rút giá đặc biệt bởi Admin; chưa có quy trình đăng bán lại sau khi tất cả Second Chance thất bại; chưa có dọn tệp upload không được gắn vào dữ liệu. Giới hạn request và bộ lập lịch ở trong tiến trình; Socket.IO chưa có adapter chia sẻ giữa nhiều máy chủ. Đây là các phần mở rộng vận hành, cần triển khai riêng khi mở rộng phạm vi.
