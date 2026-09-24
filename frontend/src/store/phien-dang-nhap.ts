@@ -11,6 +11,12 @@ export const usePhienDangNhap = create<PhienDangNhap>((dat) => ({
   nguoiDung: null,
   dangKhoiTao: !!sessionStorage.getItem('lac-viet-token'),
   capNhat: (nguoiDung) => dat({ nguoiDung, dangKhoiTao: false }),
-  dangNhap: (token, nguoiDung) => { sessionStorage.setItem('lac-viet-token', token); dat({ nguoiDung, dangKhoiTao: false }); },
-  dangXuat: () => { sessionStorage.removeItem('lac-viet-token'); dat({ nguoiDung: null, dangKhoiTao: false }); },
+  dangNhap: (token, nguoiDung) => {
+    sessionStorage.setItem('lac-viet-token', token);
+    dat({ nguoiDung, dangKhoiTao: false });
+  },
+  dangXuat: () => {
+    sessionStorage.removeItem('lac-viet-token');
+    dat({ nguoiDung: null, dangKhoiTao: false });
+  },
 }));

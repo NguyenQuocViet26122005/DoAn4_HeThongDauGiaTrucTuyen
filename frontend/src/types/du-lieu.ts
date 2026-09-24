@@ -47,15 +47,21 @@ export interface SanPham {
   thuong_hieu: string | null;
   trang_thai_duyet?: string;
   ly_do_tu_choi?: string;
-  hinh_anh: {id: string; duong_dan_anh: string; la_anh_chinh: number}[];
-  thuoc_tinh: {thuoc_tinh_id: string; ten_thuoc_tinh: string; gia_tri: string; don_vi: string | null}[];
+  hinh_anh: { id: string; duong_dan_anh: string; la_anh_chinh: number }[];
+  thuoc_tinh: {
+    thuoc_tinh_id: string;
+    ten_thuoc_tinh: string;
+    gia_tri: string;
+    don_vi: string | null;
+  }[];
 }
 export interface TruongNhap {
   ten: string;
   nhan: string;
-  loai?: 'text' | 'email' | 'password' | 'textarea' | 'number' | 'select' | 'switch' | 'datetime-local';
+  loai?:
+    'text' | 'email' | 'password' | 'textarea' | 'number' | 'select' | 'switch' | 'datetime-local';
   batBuoc?: boolean;
-  luaChon?: {label: string; value: string | number}[];
+  luaChon?: { label: string; value: string | number }[];
   goiY?: string;
   min?: number;
   max?: number;

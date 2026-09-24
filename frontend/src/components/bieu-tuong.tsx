@@ -1,6 +1,7 @@
 const net: Record<string, string> = {
   tim: 'M21 21l-5-5M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0',
-  timYeu: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',
+  timYeu:
+    'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',
   muiTen: 'M4 12h16m-6-6 6 6-6 6',
   khien: 'M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6l-9-4Zm-4 10 3 3 5-6',
   dongHo: 'M8 2h8l1 5m-9-5L7 7m1 15h8l1-5m-9 5-1-5M12 8v4l3 2M19 12a7 7 0 1 1-14 0 7 7 0 0 1 14 0',
@@ -24,10 +25,39 @@ const net: Record<string, string> = {
   thu: 'M3 5h18v14H3V5Zm0 0 9 8 9-8',
   diaChi: 'M20 9c0 6-8 13-8 13S4 15 4 9a8 8 0 1 1 16 0Zm-5 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
 };
-export function BieuTuong({ten, size = 20}: {ten: string; size?: number}) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={net[ten] || net.kimCuong} /></svg>;
+
+export function BieuTuong({ ten, size = 20 }: { ten: string; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={net[ten] || net.kimCuong} />
+    </svg>
+  );
 }
+
 export function bieuTuongDanhMuc(ten: string) {
   const t = ten.toLowerCase();
-  return t.includes('đồng hồ') ? 'dongHo' : t.includes('điện thoại') ? 'dienThoai' : t.includes('laptop') || t.includes('máy tính') ? 'laptop' : t.includes('âm thanh') ? 'taiNghe' : t.includes('xe') ? 'xe' : t.includes('ảnh') || t.includes('sưu tầm') ? 'mayAnh' : 'kimCuong';
+
+  return t.includes('đồng hồ')
+    ? 'dongHo'
+    : t.includes('điện thoại')
+      ? 'dienThoai'
+      : t.includes('laptop') || t.includes('máy tính')
+        ? 'laptop'
+        : t.includes('âm thanh')
+          ? 'taiNghe'
+          : t.includes('xe')
+            ? 'xe'
+            : t.includes('ảnh') || t.includes('sưu tầm')
+              ? 'mayAnh'
+              : 'kimCuong';
 }

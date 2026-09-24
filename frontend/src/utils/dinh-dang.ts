@@ -1,7 +1,11 @@
-export const tien = (giaTri: unknown) => new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', maximumFractionDigits: 0}).format(Number(giaTri || 0));
+export const tien = (giaTri: unknown) => new Intl.NumberFormat('vi-VN', {
+style: 'currency', currency: 'VND', maximumFractionDigits: 0
+}).format(Number(giaTri || 0));
 export const chuoi = (giaTri: unknown) => giaTri == null ? '' : String(giaTri);
 export const mocThoiGian = (giaTri: unknown) => new Date(chuoi(giaTri).replace(' ', 'T') + (/Z$|[+-]\d\d:\d\d$/.test(chuoi(giaTri)) ? '' : '+07:00')).getTime();
-export const ngayGio = (giaTri: unknown) => giaTri ? new Date(mocThoiGian(giaTri)).toLocaleString('vi-VN', {timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'medium', timeStyle: 'short'}) : 'Chưa cập nhật';
+export const ngayGio = (giaTri: unknown) => giaTri ? new Date(mocThoiGian(giaTri)).toLocaleString('vi-VN', {
+timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'medium', timeStyle: 'short'
+}) : 'Chưa cập nhật';
 export const nhanTrangThai: Record<string, string> = {
   HOAT_DONG: 'Đang diễn ra', DA_LEN_LICH: 'Sắp bắt đầu', DA_KET_THUC: 'Đã kết thúc', THAT_BAI: 'Chưa thành công', DA_HUY: 'Đã hủy',
   BAN_NHAP: 'Bản nháp', CHO_XU_LY: 'Chờ xử lý', DA_DUYET: 'Đã duyệt', TU_CHOI: 'Từ chối', LUU_TRU: 'Lưu trữ',
