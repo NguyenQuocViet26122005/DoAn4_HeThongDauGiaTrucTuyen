@@ -1,10 +1,12 @@
 import type { NguoiDungDangNhap, BanGhiSQL } from '../types/nghiep-vu';
 import { baoDam } from './loi';
+
 function chonTruong(nguon, cacKhoa) {
   return Object.fromEntries(
     cacKhoa.filter((k) => nguon[k] !== undefined).map((k) => [k, nguon[k]]),
   );
 }
+
 const truongNguoiDung = [
   'id',
   'ho_ten',
@@ -38,19 +40,26 @@ const truongPhienCongKhai = [
   'nguoi_ban_id',
   'anh_chinh',
 ];
+
 function nguoiDungAnToan(banGhi: BanGhiSQL): NguoiDungDangNhap {
   return chonTruong(banGhi, truongNguoiDung) as NguoiDungDangNhap;
 }
+
 function phienCongKhai(banGhi) {
   return {
     ...chonTruong(banGhi, truongPhienCongKhai),
     nguoi_dan_dau: banGhi.nguoi_dan_dau_id ? `ND-${banGhi.nguoi_dan_dau_id}` : null,
   };
 }
+
 // Lớp bảo vệ đầu ra: chặn trường bí mật kể cả khi controller vô tình trả nhầm.
 function kiemTraDuLieuCongKhai(giaTri: unknown): void {
-  if (Array.isArray(giaTri)) return giaTri.forEach(kiemTraDuLieuCongKhai);
-  if (!giaTri || typeof giaTri !== 'object') return;
+  if (Array.isArray(giaTri)) {
+    return giaTri.forEach(kiemTraDuLieuCongKhai);
+  }
+  if (!giaTri || typeof giaTri !== 'object') {
+    return;
+  }
   for (const [khoa, phanTu] of Object.entries(giaTri)) {
     baoDam(
       ![
@@ -65,7 +74,14 @@ function kiemTraDuLieuCongKhai(giaTri: unknown): void {
       500,
       'Không thể xuất dữ liệu nhạy cảm',
     );
+
     kiemTraDuLieuCongKhai(phanTu);
   }
 }
-export = { chonTruong, nguoiDungAnToan, phienCongKhai, kiemTraDuLieuCongKhai };
+
+export {
+  chonTruong,
+  nguoiDungAnToan,
+  phienCongKhai,
+  kiemTraDuLieuCongKhai,
+};

@@ -1,11 +1,17 @@
 import { LoiUngDung } from '../utils/loi';
+
 function khongTimThay(yeuCau, phanHoi, tiepTheo) {
   tiepTheo(new LoiUngDung(404, 'API không tồn tại'));
 }
+
 function xuLyLoi(loi, yeuCau, phanHoi, tiepTheo) {
-  if (phanHoi.headersSent) return tiepTheo(loi);
+  if (phanHoi.headersSent) {
+    return tiepTheo(loi);
+  }
+
   let trangThai = loi instanceof LoiUngDung ? loi.status : 500;
   let thongDiep = loi instanceof LoiUngDung ? loi.message : 'Có lỗi máy chủ, vui lòng thử lại';
+
   if (loi.code === 'ER_DUP_ENTRY') {
     trangThai = 409;
     thongDiep = 'Dữ liệu đã tồn tại';
@@ -34,8 +40,10 @@ function xuLyLoi(loi, yeuCau, phanHoi, tiepTheo) {
     trangThai = 400;
     thongDiep = 'Tệp tải lên không hợp lệ';
   }
-  if (trangThai >= 500)
+  if (trangThai >= 500) {
     console.error('Request failed', { method: yeuCau.method, code: loi.code || loi.name });
+  }
   phanHoi.status(trangThai).json({ success: false, message: thongDiep });
 }
-export = { khongTimThay, xuLyLoi };
+
+export { khongTimThay, xuLyLoi };

@@ -2,8 +2,12 @@ import khoBanGhi = require('../repositories/ban-ghi');
 import khoDuLieu = require('../repositories/he-thong');
 import cacSuKien = require('../sockets/su-kien');
 import { kiemTraDuLieuCongKhai } from '../utils/du-lieu-cong-khai';
+
+
 async function ghiNhatKy(nguoiThucHienId, hanhDong, doiTuong, doiTuongId, duLieu = null) {
   kiemTraDuLieuCongKhai(duLieu);
+
+
   return khoBanGhi.them('nhat_ky_hoat_dong', {
     nguoi_thuc_hien_id: nguoiThucHienId || null,
     hanh_dong: hanhDong,
@@ -12,6 +16,8 @@ async function ghiNhatKy(nguoiThucHienId, hanhDong, doiTuong, doiTuongId, duLieu
     du_lieu_moi: duLieu == null ? null : JSON.stringify(duLieu),
   });
 }
+
+
 async function taoThongBao(nguoiDungId, loai, tieuDe, noiDung, lienKet = null) {
   const duLieu = {
     nguoi_dung_id: nguoiDungId,
@@ -20,12 +26,30 @@ async function taoThongBao(nguoiDungId, loai, tieuDe, noiDung, lienKet = null) {
     noi_dung: noiDung,
     duong_dan_lien_ket: lienKet,
   };
+
+
   const id = await khoBanGhi.them('thong_bao', duLieu);
-  cacSuKien.phatSuKien(`user:${nguoiDungId}`, 'notification:new', { id, ...duLieu, da_doc: 0 });
+
+
+  cacSuKien.phatSuKien(`user:${nguoiDungId}`, 'notification:new', {
+ id, ...duLieu, da_doc: 0 
+});
+
+
   return id;
 }
+
+
 async function thongBaoMotLan(nguoiDungId, loai, tieuDe, noiDung, lienKet) {
-  if (await khoDuLieu.thongBaoDaCo(nguoiDungId, loai, lienKet)) return;
+  if (await khoDuLieu.thongBaoDaCo(nguoiDungId, loai, lienKet)) {
+return;
+}
+
+
   return taoThongBao(nguoiDungId, loai, tieuDe, noiDung, lienKet);
 }
-export = { ghiNhatKy, taoThongBao, thongBaoMotLan };
+
+
+export {
+ ghiNhatKy, taoThongBao, thongBaoMotLan 
+};

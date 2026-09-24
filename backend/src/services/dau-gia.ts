@@ -1,5 +1,10 @@
 import type { NguoiDungDangNhap } from '../types/nghiep-vu';
-import { taoPhienSchema, datGiaSchema, huyPhienSchema, duyetHuySchema } from '../validations/dau-gia.schema';
+import {
+  taoPhienSchema,
+  datGiaSchema,
+  huyPhienSchema,
+  duyetHuySchema,
+} from '../validations/dau-gia.schema';
 import type { BoLocDanhSach, TruyVanDanhSach, DuLieuGhi } from '../types/nghiep-vu';
 import coSoDuLieu = require('../repositories/ket-noi');
 import khoBanGhi = require('../repositories/ban-ghi');
@@ -16,6 +21,7 @@ import { baoDam, batBuocTonTai, cungId } from '../utils/loi';
 import { donViTienNho, chuoiTien } from '../utils/tien';
 import thoiGian = require('../utils/thoi-gian');
 import { phienCongKhai } from '../utils/du-lieu-cong-khai';
+
 async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
   const dauVao = kiemTra.docSchema(taoPhienSchema, duLieuNhap);
   const duLieu = {
@@ -30,6 +36,7 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
     thoi_gian_bat_dau: thoiGian.kiemTraNgayNhap(dauVao.thoi_gian_bat_dau, 'Bắt đầu'),
     thoi_gian_ket_thuc: thoiGian.kiemTraNgayNhap(dauVao.thoi_gian_ket_thuc, 'Kết thúc'),
   };
+
   baoDam(
     duLieu.gia_san == null || donViTienNho(duLieu.gia_san) >= donViTienNho(duLieu.gia_khoi_diem),
     400,
@@ -47,10 +54,13 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
     400,
     'Kết thúc phải sau bắt đầu',
   );
+
   return coSoDuLieu.giaoDich(async () => {
     await heThong.khoaCauHinh();
     await danhMucSanPham.kiemTraNguoiBan(nguoiDung);
+
     const sanPham = batBuocTonTai(await khoBanGhi.layTheoId('san_pham', duLieu.san_pham_id, true));
+
     baoDam(cungId(sanPham.nguoi_ban_id, nguoiDung.id), 403, 'Sản phẩm không thuộc tài khoản');
     baoDam(sanPham.trang_thai_duyet === 'DA_DUYET', 409, 'Sản phẩm chưa được duyệt');
     baoDam(
@@ -58,7 +68,9 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
       409,
       'Sản phẩm đã có phiên đang chờ, đang chạy hoặc đã bán',
     );
+
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
+
     baoDam(
       thoiGian.doiThanhNgay(duLieu.thoi_gian_ket_thuc) > thoiGian.doiThanhNgay(thoiGianHienTai),
       400,
@@ -70,7 +82,9 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
       400,
       'Không được lên lịch trong quá khứ',
     );
+
     cauHinhNghiepVu.buocGiaTaiMuc(donViTienNho(duLieu.gia_khoi_diem), await heThong.cacBuocGia());
+
     const id = await khoBanGhi.them('phien_dau_gia', {
       ...duLieu,
       gia_hien_tai: duLieu.gia_khoi_diem,
@@ -82,21 +96,27 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
       nguong_phut_chot_giay: await cauHinhNghiepVu.docSoCauHinh('ANTI_SNIPE_THRESHOLD_SECONDS'),
       so_giay_gia_han: await cauHinhNghiepVu.docSoCauHinh('ANTI_SNIPE_EXTENSION_SECONDS'),
     });
+
     await ghiNhatKy(nguoiDung.id, 'TAO_PHIEN', 'phien_dau_gia', id);
+
     return phienCongKhai(await khoDuLieu.layTheoId(id));
   });
 }
+
 async function layPhienDangChay(id) {
   const banGhi = batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id), true));
   const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
+
   if (
     banGhi.trang_thai === 'DA_LEN_LICH' &&
     thoiGian.daHetHan(banGhi.thoi_gian_bat_dau, thoiGianHienTai) &&
     !thoiGian.daHetHan(banGhi.thoi_gian_ket_thuc, thoiGianHienTai)
   ) {
     await khoBanGhi.capNhat('phien_dau_gia', id, { trang_thai: 'HOAT_DONG' });
+
     banGhi.trang_thai = 'HOAT_DONG';
   }
+
   baoDam(
     banGhi.trang_thai === 'HOAT_DONG' &&
       thoiGian.daHetHan(banGhi.thoi_gian_bat_dau, thoiGianHienTai) &&
@@ -105,10 +125,13 @@ async function layPhienDangChay(id) {
     'Phiên chưa bắt đầu hoặc đã kết thúc',
   );
   baoDam(banGhi.trang_thai_duyet === 'DA_DUYET', 409, 'Sản phẩm không đủ điều kiện đấu giá');
+
   return { row: banGhi, now: thoiGianHienTai };
 }
+
 async function kiemTraNguoiMua(nguoiDung: NguoiDungDangNhap, banGhi) {
   const taiKhoan = batBuocTonTai(await cacNguoiDung.layTheoId(nguoiDung.id, true));
+
   baoDam(
     taiKhoan.vai_tro === 'NGUOI_DUNG' && taiKhoan.trang_thai_tai_khoan === 'HOAT_DONG',
     403,
@@ -119,16 +142,23 @@ async function kiemTraNguoiMua(nguoiDung: NguoiDungDangNhap, banGhi) {
     403,
     'Người bán không được tự đấu giá hoặc mua sản phẩm',
   );
+
   const diaChi = await cacNguoiDung.diaChiMacDinh(nguoiDung.id);
+
   baoDam(diaChi, 409, 'Cần thêm địa chỉ giao hàng trước khi tham gia');
+
   return diaChi;
 }
+
 async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
   const dauVao = kiemTra.docSchema(datGiaSchema, duLieuNhap);
   const tranGia = kiemTra.tienVietNam(dauVao.gia_toi_da, 'Mức giá tối đa', true);
+
   return coSoDuLieu.giaoDich(async () => {
     const { row: banGhi, now: thoiGianHienTai } = await layPhienDangChay(id);
+
     await kiemTraNguoiMua(nguoiDung, banGhi);
+
     const cacMucToiDa = await khoDuLieu.cacMucToiDa(id);
     const ketQua = boTinhGia.tinhKetQuaDauGia(
       banGhi,
@@ -137,13 +167,16 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
       tranGia,
       await heThong.cacBuocGia(),
     );
+
     await coSoDuLieu.truyVan(
       `INSERT INTO tham_gia_phien (phien_dau_gia_id,nguoi_dung_id,gia_toi_da,thoi_gian_dat_gia_toi_da)
        VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE gia_toi_da=VALUES(gia_toi_da),thoi_gian_dat_gia_toi_da=VALUES(thoi_gian_dat_gia_toi_da)`,
-      [id,nguoiDung.id,tranGia,thoiGianHienTai],
+      [id, nguoiDung.id, tranGia, thoiGianHienTai],
     );
+
     let luotTraGiaCuoiId = null;
-    for (const phanTu of ketQua.publicBids)
+
+    for (const phanTu of ketQua.publicBids) {
       luotTraGiaCuoiId = await khoBanGhi.them('luot_tra_gia', {
         phien_dau_gia_id: id,
         nguoi_tra_gia_id: phanTu.bidderId,
@@ -151,6 +184,8 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
         loai_tra_gia: phanTu.type,
         ngay_tao: thoiGianHienTai,
       });
+    }
+
     const daDatGiaSan = banGhi.gia_san == null || ketQua.price >= donViTienNho(banGhi.gia_san);
     const thayDoi: DuLieuGhi = {
       gia_hien_tai: chuoiTien(ketQua.price),
@@ -158,11 +193,15 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
       dat_gia_san: daDatGiaSan ? 1 : 0,
       tong_luot_tra_gia: Number(banGhi.tong_luot_tra_gia) + ketQua.publicBids.length,
     };
-    if (ketQua.validPublicBid && (banGhi.gia_san == null || daDatGiaSan))
+
+    if (ketQua.validPublicBid && (banGhi.gia_san == null || daDatGiaSan)) {
       thayDoi.cho_phep_mua_ngay = 0;
+    }
+
     const conLai =
       thoiGian.doiThanhNgay(banGhi.thoi_gian_ket_thuc).getTime() -
       thoiGian.doiThanhNgay(thoiGianHienTai).getTime();
+
     if (
       ketQua.validPublicBid &&
       banGhi.bat_chong_phut_chot &&
@@ -170,11 +209,13 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
       conLai <= banGhi.nguong_phut_chot_giay * 1000
     ) {
       baoDam(banGhi.so_giay_gia_han > 0, 409, 'Cấu hình gia hạn không hợp lệ');
+
       thayDoi.thoi_gian_ket_thuc = thoiGian.congGiay(
         banGhi.thoi_gian_ket_thuc,
         banGhi.so_giay_gia_han,
       );
       thayDoi.so_lan_gia_han = Number(banGhi.so_lan_gia_han) + 1;
+
       await khoBanGhi.them('nhat_ky_hoat_dong', {
         nguoi_thuc_hien_id: nguoiDung.id,
         hanh_dong: 'GIA_HAN_PHIEN',
@@ -182,16 +223,23 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
         doi_tuong_id: id,
         phien_dau_gia_id: id,
         luot_tra_gia_id: luotTraGiaCuoiId,
-        du_lieu_moi: JSON.stringify({ thoi_gian_ket_thuc_cu: banGhi.thoi_gian_ket_thuc,
-        thoi_gian_ket_thuc_moi: thayDoi.thoi_gian_ket_thuc,
-        so_giay_them: banGhi.so_giay_gia_han }),
+        du_lieu_moi: JSON.stringify({
+          thoi_gian_ket_thuc_cu: banGhi.thoi_gian_ket_thuc,
+          thoi_gian_ket_thuc_moi: thayDoi.thoi_gian_ket_thuc,
+          so_giay_them: banGhi.so_giay_gia_han,
+        }),
       });
     }
+
     await khoBanGhi.capNhat('phien_dau_gia', id, thayDoi);
-    await ghiNhatKy(nguoiDung.id, 'DAT_GIA_TOI_DA', 'phien_dau_gia', id); // Không ghi mức tối đa vào nhật ký.
+
+    await ghiNhatKy(nguoiDung.id, 'DAT_GIA_TOI_DA', 'phien_dau_gia', id);
+
+    // Không ghi mức tối đa vào nhật ký.
     const lienKet = `/auctions/${id}`;
+
     if (ketQua.validPublicBid) {
-      if (banGhi.nguoi_dan_dau_id && !cungId(banGhi.nguoi_dan_dau_id, ketQua.winnerId))
+      if (banGhi.nguoi_dan_dau_id && !cungId(banGhi.nguoi_dan_dau_id, ketQua.winnerId)) {
         await taoThongBao(
           banGhi.nguoi_dan_dau_id,
           'BI_VUOT_GIA',
@@ -199,7 +247,8 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
           'Có người đang dẫn đầu phiên đấu giá.',
           lienKet,
         );
-      if (!cungId(nguoiDung.id, ketQua.winnerId))
+      }
+      if (!cungId(nguoiDung.id, ketQua.winnerId)) {
         await taoThongBao(
           nguoiDung.id,
           'BI_VUOT_GIA',
@@ -207,7 +256,8 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
           'Hệ thống đã có giá trả hợp lệ cao hơn hoặc được ưu tiên trước.',
           lienKet,
         );
-      if (!cungId(banGhi.nguoi_dan_dau_id, ketQua.winnerId))
+      }
+      if (!cungId(banGhi.nguoi_dan_dau_id, ketQua.winnerId)) {
         await taoThongBao(
           ketQua.winnerId,
           'DANG_DAN_DAU',
@@ -215,9 +265,15 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
           'Bạn đang dẫn đầu phiên đấu giá.',
           lienKet,
         );
+      }
     }
+
     const daCapNhat = await khoDuLieu.layTheoId(id);
-    if (ketQua.validPublicBid) cacSuKien.phienDauGia(daCapNhat);
+
+    if (ketQua.validPublicBid) {
+      cacSuKien.phienDauGia(daCapNhat);
+    }
+
     return {
       ...phienCongKhai(daCapNhat),
       ban_dang_dan_dau: cungId(nguoiDung.id, ketQua.winnerId),
@@ -225,12 +281,16 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
     };
   });
 }
+
 async function muaNgay(nguoiDung: NguoiDungDangNhap, id, dauVao = {}) {
   kiemTra.kiemTraNoiDung(dauVao, []);
+
   return coSoDuLieu.giaoDich(async () => {
     const { row: banGhi, now: thoiGianHienTai } = await layPhienDangChay(id);
     const diaChi = await kiemTraNguoiMua(nguoiDung, banGhi);
+
     baoDam(boTinhGia.choPhepMuaNgay(banGhi), 409, 'Mua ngay không còn hiệu lực');
+
     await khoBanGhi.capNhat('phien_dau_gia', id, {
       trang_thai: 'DA_KET_THUC',
       ly_do_ket_thuc: 'MUA_NGAY',
@@ -240,6 +300,7 @@ async function muaNgay(nguoiDung: NguoiDungDangNhap, id, dauVao = {}) {
       cho_phep_mua_ngay: 0,
       thoi_gian_ket_thuc: thoiGian.ngaySQL(thoiGianHienTai),
     });
+
     const daCapNhat = await khoDuLieu.layTheoId(id);
     const donHang = await require('./don-hang').taoDonNguoiThang(
       daCapNhat,
@@ -248,19 +309,25 @@ async function muaNgay(nguoiDung: NguoiDungDangNhap, id, dauVao = {}) {
       'THANG_DAU_GIA',
       diaChi,
     );
+
     await thongBaoKetThuc(daCapNhat);
+
     await ghiNhatKy(nguoiDung.id, 'MUA_NGAY', 'phien_dau_gia', id);
     cacSuKien.phienDauGia(daCapNhat, 'auction:ended');
+
     return { phien: phienCongKhai(daCapNhat), don_hang: donHang };
   });
 }
+
 async function thongBaoKetThuc(banGhi) {
   for (const nguoiNhan of await khoDuLieu.nguoiThamGia(banGhi.id)) {
     if (
       cungId(nguoiNhan.nguoi_tra_gia_id, banGhi.nguoi_dan_dau_id) &&
       banGhi.trang_thai === 'DA_KET_THUC'
-    )
+    ) {
       continue;
+    }
+
     await taoThongBao(
       nguoiNhan.nguoi_tra_gia_id,
       'KET_THUC_PHIEN',
@@ -272,23 +339,34 @@ async function thongBaoKetThuc(banGhi) {
     );
   }
 }
+
 async function xuLyDenHan(id) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id), true));
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
-    if (!['DA_LEN_LICH', 'HOAT_DONG'].includes(banGhi.trang_thai)) return phienCongKhai(banGhi);
-    if (!thoiGian.daHetHan(banGhi.thoi_gian_bat_dau, thoiGianHienTai)) return phienCongKhai(banGhi);
+
+    if (!['DA_LEN_LICH', 'HOAT_DONG'].includes(banGhi.trang_thai)) {
+      return phienCongKhai(banGhi);
+    }
+    if (!thoiGian.daHetHan(banGhi.thoi_gian_bat_dau, thoiGianHienTai)) {
+      return phienCongKhai(banGhi);
+    }
     if (!thoiGian.daHetHan(banGhi.thoi_gian_ket_thuc, thoiGianHienTai)) {
       if (banGhi.trang_thai === 'DA_LEN_LICH') {
         await khoBanGhi.capNhat('phien_dau_gia', id, { trang_thai: 'HOAT_DONG' });
+
         banGhi.trang_thai = 'HOAT_DONG';
+
         cacSuKien.phienDauGia(banGhi, 'auction:started');
         await ghiNhatKy(null, 'MO_PHIEN', 'phien_dau_gia', id);
       }
+
       return phienCongKhai(banGhi);
     }
+
     let trangThai = 'DA_KET_THUC',
       lyDo = 'CO_NGUOI_THANG';
+
     if (!banGhi.nguoi_dan_dau_id || Number(banGhi.tong_luot_tra_gia) === 0) {
       trangThai = 'THAT_BAI';
       lyDo = 'KHONG_CO_TRA_GIA';
@@ -299,32 +377,41 @@ async function xuLyDenHan(id) {
       trangThai = 'THAT_BAI';
       lyDo = 'KHONG_DAT_GIA_SAN';
     }
+
     await khoBanGhi.capNhat('phien_dau_gia', id, {
       trang_thai: trangThai,
       ly_do_ket_thuc: lyDo,
       cho_phep_mua_ngay: 0,
     });
+
     const daCapNhat = await khoDuLieu.layTheoId(id);
-    if (trangThai === 'DA_KET_THUC')
+
+    if (trangThai === 'DA_KET_THUC') {
       await require('./don-hang').taoDonNguoiThang(
         daCapNhat,
         banGhi.nguoi_dan_dau_id,
         banGhi.gia_hien_tai,
       );
+    }
     await thongBaoKetThuc(daCapNhat);
+
     await ghiNhatKy(null, 'KET_THUC_PHIEN', 'phien_dau_gia', id, {
       trang_thai: trangThai,
       ly_do: lyDo,
     });
     cacSuKien.phienDauGia(daCapNhat, 'auction:ended');
+
     return phienCongKhai(daCapNhat);
   });
 }
+
 async function guiYeuCauHuy(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
   const dauVao = kiemTra.docSchema(huyPhienSchema, duLieuNhap);
   const lyDo = kiemTra.chuoi(dauVao.ly_do, 'Lý do', 1000);
+
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id), true));
+
     baoDam(cungId(banGhi.nguoi_ban_id, nguoiDung.id), 403, 'Phiên không thuộc tài khoản');
     baoDam(
       ['DA_LEN_LICH', 'HOAT_DONG'].includes(banGhi.trang_thai) &&
@@ -333,28 +420,35 @@ async function guiYeuCauHuy(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknow
       'Phiên đã kết thúc',
     );
     baoDam(!(await khoDuLieu.yeuCauHuyDangCho(id)), 409, 'Đã có yêu cầu hủy đang chờ');
+
     const yeuCauId = await khoBanGhi.them('yeu_cau_xu_ly', {
       loai_yeu_cau: 'HUY_PHIEN',
       phien_dau_gia_id: id,
       nguoi_yeu_cau_id: nguoiDung.id,
       ly_do: lyDo,
     });
+
     await ghiNhatKy(nguoiDung.id, 'YEU_CAU_HUY_PHIEN', 'phien_dau_gia', id);
+
     return khoBanGhi.layTheoId('yeu_cau_xu_ly', yeuCauId);
   });
 }
+
 async function duyetHuyPhien(quanTri: NguoiDungDangNhap, yeuCauId, duLieuNhap: unknown) {
   const dauVao = kiemTra.docSchema(duyetHuySchema, duLieuNhap);
   const trangThai = kiemTra.giaTriLuaChon(dauVao.trang_thai, ['DA_DUYET', 'TU_CHOI'], 'Trạng thái');
   const ghiChu = kiemTra.chuoi(dauVao.ghi_chu_duyet, 'Ghi chú duyệt', 1000);
+
   return coSoDuLieu.giaoDich(async () => {
-    const banDau = batBuocTonTai(
-      await khoBanGhi.layTheoId('yeu_cau_xu_ly', kiemTra.id(yeuCauId)),
-    );
+    const banDau = batBuocTonTai(await khoBanGhi.layTheoId('yeu_cau_xu_ly', kiemTra.id(yeuCauId)));
+
     baoDam(banDau.loai_yeu_cau === 'HUY_PHIEN', 404, 'Không tìm thấy yêu cầu hủy phiên');
+
     const banGhi = batBuocTonTai(await khoDuLieu.layTheoId(banDau.phien_dau_gia_id, true));
     const yeuCauHuy = batBuocTonTai(await khoBanGhi.layTheoId('yeu_cau_xu_ly', yeuCauId, true));
+
     baoDam(yeuCauHuy.trang_thai === 'CHO_XU_LY', 409, 'Yêu cầu đã xử lý');
+
     if (trangThai === 'DA_DUYET') {
       baoDam(
         ['DA_LEN_LICH', 'HOAT_DONG'].includes(banGhi.trang_thai) &&
@@ -362,12 +456,14 @@ async function duyetHuyPhien(quanTri: NguoiDungDangNhap, yeuCauId, duLieuNhap: u
         409,
         'Phiên đã kết thúc',
       );
+
       await khoBanGhi.capNhat('phien_dau_gia', banGhi.id, {
         trang_thai: 'DA_HUY',
         ly_do_ket_thuc: 'HUY_THEO_YEU_CAU_NGUOI_BAN',
         cho_phep_mua_ngay: 0,
       });
-      for (const p of await khoDuLieu.nguoiThamGia(banGhi.id))
+
+      for (const p of await khoDuLieu.nguoiThamGia(banGhi.id)) {
         await taoThongBao(
           p.nguoi_tra_gia_id,
           'HUY_PHIEN',
@@ -375,14 +471,18 @@ async function duyetHuyPhien(quanTri: NguoiDungDangNhap, yeuCauId, duLieuNhap: u
           ghiChu,
           `/auctions/${banGhi.id}`,
         );
+      }
+
       cacSuKien.phienDauGia(await khoDuLieu.layTheoId(banGhi.id), 'auction:ended');
     }
+
     await khoBanGhi.capNhat('yeu_cau_xu_ly', yeuCauId, {
       trang_thai: trangThai,
       nguoi_duyet_id: quanTri.id,
       ghi_chu_duyet: ghiChu,
       ngay_duyet: await coSoDuLieu.thoiGianHienTai(),
     });
+
     await ghiNhatKy(quanTri.id, 'DUYET_HUY_PHIEN', 'phien_dau_gia', banGhi.id, {
       trang_thai: trangThai,
     });
@@ -393,10 +493,16 @@ async function duyetHuyPhien(quanTri: NguoiDungDangNhap, yeuCauId, duLieuNhap: u
       ghiChu,
       `/auctions/${banGhi.id}`,
     );
+
     return khoBanGhi.layTheoId('yeu_cau_xu_ly', yeuCauId);
   });
 }
-async function danhSach(nguoiDung: NguoiDungDangNhap, truyVan: TruyVanDanhSach = {}, phamVi = 'public') {
+
+async function danhSach(
+  nguoiDung: NguoiDungDangNhap,
+  truyVan: TruyVanDanhSach = {},
+  phamVi = 'public',
+) {
   const boLoc: BoLocDanhSach = {
     search: truyVan.q ? kiemTra.chuoi(truyVan.q, 'Tìm kiếm', 100) : undefined,
     status: truyVan.trang_thai
@@ -408,41 +514,60 @@ async function danhSach(nguoiDung: NguoiDungDangNhap, truyVan: TruyVanDanhSach =
       : undefined,
     categoryId: truyVan.danh_muc_id ? kiemTra.id(truyVan.danh_muc_id) : undefined,
   };
-  if (phamVi === 'mine') boLoc.sellerId = nguoiDung.id;
-  if (phamVi === 'watchlist') boLoc.watcherId = nguoiDung.id;
-  if (phamVi === 'bids') boLoc.bidderId = nguoiDung.id;
+
+  if (phamVi === 'mine') {
+    boLoc.sellerId = nguoiDung.id;
+  }
+  if (phamVi === 'watchlist') {
+    boLoc.watcherId = nguoiDung.id;
+  }
+  if (phamVi === 'bids') {
+    boLoc.bidderId = nguoiDung.id;
+  }
+
   return (await khoDuLieu.danhSach(kiemTra.phanTrang(truyVan), boLoc)).map(phienCongKhai);
 }
+
 async function chiTiet(id) {
   return phienCongKhai(batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id))));
 }
+
 async function lichSu(id, truyVan) {
   batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id)));
+
   return khoDuLieu.lichSu(id, kiemTra.phanTrang(truyVan));
 }
+
 async function theoDoi(nguoiDung: NguoiDungDangNhap, id, bat) {
   batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id)));
+
   return bat
     ? khoDuLieu.theoDoi(nguoiDung.id, id).then(() => ({ dang_theo_doi: true }))
     : khoDuLieu.boTheoDoi(nguoiDung.id, id).then(() => ({ dang_theo_doi: false }));
 }
+
 async function nhacPhienSapKetThuc(id) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = await khoDuLieu.layTheoId(id, true);
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
+
     if (
       !banGhi ||
       banGhi.trang_thai !== 'HOAT_DONG' ||
       thoiGian.daHetHan(banGhi.thoi_gian_ket_thuc, thoiGianHienTai) ||
-      thoiGian.doiThanhNgay(banGhi.thoi_gian_ket_thuc).getTime() - thoiGian.doiThanhNgay(thoiGianHienTai).getTime() >
+      thoiGian.doiThanhNgay(banGhi.thoi_gian_ket_thuc).getTime() -
+        thoiGian.doiThanhNgay(thoiGianHienTai).getTime() >
         600000
-    )
+    ) {
       return;
+    }
+
     const nhungNguoiNhan = new Set([
       ...(await khoDuLieu.nguoiTheoDoi(id)).map((x) => String(x.nguoi_dung_id)),
       ...(await khoDuLieu.nguoiThamGia(id)).map((x) => String(x.nguoi_tra_gia_id)),
     ]);
-    for (const nguoiDungId of nhungNguoiNhan)
+
+    for (const nguoiDungId of nhungNguoiNhan) {
       await thongBaoMotLan(
         nguoiDungId,
         'PHIEN_SAP_KET_THUC',
@@ -450,9 +575,11 @@ async function nhacPhienSapKetThuc(id) {
         'Phiên bạn quan tâm sẽ kết thúc trong khoảng 10 phút.',
         `/auctions/${id}`,
       );
+    }
   });
 }
-export = {
+
+export {
   tao,
   datGia,
   muaNgay,

@@ -6,19 +6,28 @@ import cacDeNghi = require('../services/de-nghi-mua-tiep');
 import { cauHinh } from '../config/moi-truong';
 let dangChay = false;
 let lanChayCuoi = null;
+
 async function chayMotLuot() {
-  if (dangChay) return { skipped: true };
+  if (dangChay) {
+    return { skipped: true };
+  }
   dangChay = true;
+
   let daXuLy = 0,
     thatBai = 0;
+
   try {
-    const cacCongViec: Array<[() => Promise<import('../types/nghiep-vu').BanGhiSQL[]>, (id: string) => Promise<unknown>]> = [
+    const cacCongViec: Array<
+      [() => Promise<import('../types/nghiep-vu').BanGhiSQL[]>, (id: string) => Promise<unknown>]
+    > = [
       [cacPhienDauGia.denHan, dichVuDauGia.xuLyDenHan],
       [cacDonHang.denHan, dichVuDonHang.xuLyDenHan],
       [cacDonHang.deNghiDenHan, cacDeNghi.xuLyHetHan],
     ];
+
     for (const [timDuLieu, congViec] of cacCongViec) {
       let cacBanGhi;
+
       try {
         cacBanGhi = await timDuLieu();
       } catch (loi) {
@@ -36,29 +45,47 @@ async function chayMotLuot() {
         }
       }
     }
-    lanChayCuoi = { time: new Date().toISOString(), processed: daXuLy, failed: thatBai };
+    lanChayCuoi = {
+      time: new Date().toISOString(),
+      processed: daXuLy,
+      failed: thatBai,
+    };
+
     return lanChayCuoi;
   } finally {
     dangChay = false;
   }
 }
+
 function batDau() {
-  if (!cauHinh.jobsEnabled) return async () => {};
+  if (!cauHinh.jobsEnabled) {
+    return async () => {};
+  }
+
   const boHenGio = setInterval(
     () => chayMotLuot().catch(() => console.error('Lỗi chu kỳ tác vụ')),
     cauHinh.jobIntervalMs,
   );
+
   boHenGio.unref();
+
   // Chu kỳ đầu bắt đầu sau một khoảng hẹn; không quét dữ liệu ngay khi vừa khởi động.
   return async () => {
     clearInterval(boHenGio);
-    while (dangChay) await new Promise((giaiQuyet) => setTimeout(giaiQuyet, 25));
+    while (dangChay) {
+      await new Promise((giaiQuyet) => setTimeout(giaiQuyet, 25));
+    }
   };
 }
+
 const trangThai = () => ({
   enabled: cauHinh.jobsEnabled,
   running: dangChay,
   lastRun: lanChayCuoi,
   interval_ms: cauHinh.jobIntervalMs,
 });
-export = { batDau, chayMotLuot, trangThai };
+export {
+  batDau,
+  chayMotLuot,
+  trangThai,
+};

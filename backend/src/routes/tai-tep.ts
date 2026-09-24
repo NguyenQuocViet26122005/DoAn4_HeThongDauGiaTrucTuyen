@@ -8,7 +8,12 @@ const boDinhTuyen = TaoBoDinhTuyen();
 const taiLen = multer({
   storage: multer.memoryStorage(),
   // Busboy phát partsLimit khi chạm ngưỡng; files/fields vẫn khóa đúng một tệp.
-  limits: { fileSize: 10 * 1024 * 1024, files: 1, fields: 0, parts: 2 },
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+    files: 1,
+    fields: 0,
+    parts: 2,
+  },
 });
 boDinhTuyen.post(
   '/uploads/:kind',
@@ -28,13 +33,16 @@ boDinhTuyen.get(
         yeuCau.params.owner,
         yeuCau.params.name,
       );
+
       phanHoi.set({
         'X-Content-Type-Options': 'nosniff',
         'Content-Security-Policy': "default-src 'none'; sandbox",
         'Cache-Control': 'private, no-store',
       });
       phanHoi.sendFile(dich.absolute, { dotfiles: 'deny' }, (loi) => {
-        if (loi) tiepTheo(loi);
+        if (loi) {
+          tiepTheo(loi);
+        }
       });
     } catch (loi) {
       tiepTheo(loi);

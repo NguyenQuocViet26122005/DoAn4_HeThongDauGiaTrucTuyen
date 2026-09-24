@@ -1,14 +1,24 @@
 import coSoDuLieu = require('./ket-noi');
 import khoBanGhi = require('./ban-ghi');
 import cacDonHang = require('./don-hang');
+
 async function khoaTranhChap(id) {
   const banDau = await khoBanGhi.layTheoId('tranh_chap', id);
-  if (!banDau) return null;
+
+  if (!banDau) {
+    return null;
+  }
+
   const donHang = await cacDonHang.khoaDuLieu(banDau.don_hang_id);
+
   return { dispute: await khoBanGhi.layTheoId('tranh_chap', id, true), order: donHang };
 }
+
 const bangChung = (id) =>
-  coSoDuLieu.truyVan(`SELECT id,tranh_chap_id,nguoi_tai_len_id,duong_dan_tep,loai_noi_dung AS loai_bang_chung,mo_ta,ngay_tao FROM tep_dinh_kem WHERE loai_tep='BANG_CHUNG_TRANH_CHAP' AND tranh_chap_id=? ORDER BY id`, [id]);
+  coSoDuLieu.truyVan(
+    `SELECT id,tranh_chap_id,nguoi_tai_len_id,duong_dan_tep,loai_noi_dung AS loai_bang_chung,mo_ta,ngay_tao FROM tep_dinh_kem WHERE loai_tep='BANG_CHUNG_TRANH_CHAP' AND tranh_chap_id=? ORDER BY id`,
+    [id],
+  );
 const cacTranhChap = (nguoiDung, { limit: gioiHan, offset: viTriBatDau }, quanTri = false) =>
   coSoDuLieu.truyVan(
     `SELECT t.* FROM tranh_chap t
@@ -63,6 +73,7 @@ const nhatKy = ({ limit: gioiHan, offset: viTriBatDau }) =>
   coSoDuLieu.truyVan(
     `SELECT id,nguoi_thuc_hien_id,hanh_dong,loai_doi_tuong,doi_tuong_id,ngay_tao FROM nhat_ky_hoat_dong ORDER BY id DESC LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
   );
+
 async function thongKe() {
   const [
     cacNguoiDung,
@@ -95,6 +106,7 @@ async function thongKe() {
       'SELECT trang_thai,COUNT(*) AS so_luong FROM tranh_chap GROUP BY trang_thai',
     ),
   ]);
+
   return {
     nguoi_dung: cacNguoiDung,
     san_pham: cacSanPham,
@@ -105,7 +117,8 @@ async function thongKe() {
     tranh_chap: cacTranhChap,
   };
 }
-export = {
+
+export {
   khoaTranhChap,
   bangChung,
   cacTranhChap,

@@ -2,12 +2,18 @@ import type { NguoiDungDangNhap } from '../types/nghiep-vu';
 import coSoDuLieu = require('./ket-noi');
 import khoBanGhi = require('./ban-ghi');
 import cacPhienDauGia = require('./dau-gia');
+
 async function khoaDuLieu(id) {
   const banDau = await khoBanGhi.layTheoId('don_hang', id);
-  if (!banDau) return null;
+
+  if (!banDau) {
+    return null;
+  }
   await cacPhienDauGia.layTheoId(banDau.phien_dau_gia_id, true);
+
   return khoBanGhi.layTheoId('don_hang', id, true);
 }
+
 const donDangXuLyCuaPhien = (id) =>
   coSoDuLieu.layMot(
     "SELECT * FROM don_hang WHERE phien_dau_gia_id=? AND trang_thai<>'DA_HUY' ORDER BY id DESC LIMIT 1",
@@ -22,7 +28,11 @@ const tienTrungGian = (id, khoaDuLieu = false) =>
     `SELECT id,id AS don_hang_id,so_tien_da_thu AS so_tien,trang_thai_giu_tien AS trang_thai,so_tien_da_hoan,so_tien_da_giai_ngan,so_tien_dang_giu,ngay_bat_dau_giu,ngay_giai_ngan,ngay_hoan_tien,ghi_chu_giu_tien AS ghi_chu FROM don_hang WHERE id=?${khoaDuLieu ? ' FOR UPDATE' : ''}`,
     [id],
   );
-const vanChuyen = (id) => coSoDuLieu.layMot('SELECT id,id AS don_hang_id,don_vi_van_chuyen,ma_van_don,trang_thai_van_chuyen AS trang_thai,ngay_gui_hang,ngay_giao_van_chuyen AS ngay_giao_hang FROM don_hang WHERE id=? AND trang_thai_van_chuyen IS NOT NULL', [id]);
+const vanChuyen = (id) =>
+  coSoDuLieu.layMot(
+    'SELECT id,id AS don_hang_id,don_vi_van_chuyen,ma_van_don,trang_thai_van_chuyen AS trang_thai,ngay_gui_hang,ngay_giao_van_chuyen AS ngay_giao_hang FROM don_hang WHERE id=? AND trang_thai_van_chuyen IS NOT NULL',
+    [id],
+  );
 const cacTranhChap = (id) =>
   coSoDuLieu.truyVan('SELECT * FROM tranh_chap WHERE don_hang_id=? ORDER BY id DESC', [id]);
 const tranhChapDangMo = (id) =>
@@ -30,8 +40,14 @@ const tranhChapDangMo = (id) =>
     "SELECT id FROM tranh_chap WHERE don_hang_id=? AND trang_thai IN ('DANG_MO','NGUOI_BAN_DA_PHAN_HOI','QUAN_TRI_DANG_XU_LY') LIMIT 1",
     [id],
   );
-function danhSach(nguoiDung: NguoiDungDangNhap, { limit: gioiHan, offset: viTriBatDau }, phamVi = 'mine') {
+
+function danhSach(
+  nguoiDung: NguoiDungDangNhap,
+  { limit: gioiHan, offset: viTriBatDau },
+  phamVi = 'mine',
+) {
   const dieuKien = phamVi === 'admin' ? '1=1' : '(d.nguoi_mua_id=? OR d.nguoi_ban_id=?)';
+
   return coSoDuLieu.truyVan(
     `SELECT d.*, p.tieu_de, a.ly_do_ket_thuc
      FROM don_hang d
@@ -43,6 +59,7 @@ function danhSach(nguoiDung: NguoiDungDangNhap, { limit: gioiHan, offset: viTriB
     phamVi === 'admin' ? [] : [nguoiDung.id, nguoiDung.id],
   );
 }
+
 const denHan = () =>
   coSoDuLieu.truyVan(
     `SELECT d.id FROM don_hang d
@@ -133,7 +150,7 @@ const giaCongKhaiCuoi = (phienDauGiaId, nguoiDungId) =>
      ORDER BY b.ngay_tao DESC,b.id DESC LIMIT 1`,
     [phienDauGiaId, nguoiDungId],
   );
-export = {
+export {
   khoaDuLieu,
   donDangXuLyCuaPhien,
   donHangCuaPhien,

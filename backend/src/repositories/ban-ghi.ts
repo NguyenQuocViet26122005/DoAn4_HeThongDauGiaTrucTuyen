@@ -23,34 +23,54 @@ const cacBang = new Set([
   'cau_hinh_he_thong',
   'nhat_ky_hoat_dong',
 ]);
+
 function bang(ten: string) {
-  if (!cacBang.has(ten)) throw new Error('Unknown repository table');
+  if (!cacBang.has(ten)) {
+    throw new Error('Unknown repository table');
+  }
+
   return `\`${ten}\``;
 }
+
 function cacCot(duLieu: DuLieuGhi) {
   const cacKhoa = Object.keys(duLieu);
-  if (!cacKhoa.length || cacKhoa.some((khoa) => !/^[a-z][a-z0-9_]*$/.test(khoa)))
+
+  if (!cacKhoa.length || cacKhoa.some((khoa) => !/^[a-z][a-z0-9_]*$/.test(khoa))) {
     throw new Error('Invalid repository fields');
+  }
+
   return cacKhoa;
 }
+
 async function them(ten: string, duLieu: DuLieuGhi) {
   const cacKhoa = cacCot(duLieu);
   const ketQua = await coSoDuLieu.truyVan<ResultSetHeader>(
     `INSERT INTO ${bang(ten)} (${cacKhoa.map((k) => `\`${k}\``).join(',')}) VALUES (${cacKhoa.map(() => '?').join(',')})`,
     cacKhoa.map((k) => duLieu[k]),
   );
+
   return String(ketQua.insertId);
 }
+
 async function capNhat(ten: string, id: DinhDanh, duLieu: DuLieuGhi) {
   const cacKhoa = cacCot(duLieu);
+
   return coSoDuLieu.truyVan(
     `UPDATE ${bang(ten)} SET ${cacKhoa.map((k) => `\`${k}\` = ?`).join(',')} WHERE id = ?`,
     [...cacKhoa.map((k) => duLieu[k]), id],
   );
 }
+
 const layTheoId = <T = BanGhiSQL>(ten: string, id: DinhDanh, khoaDuLieu = false) =>
-  coSoDuLieu.layMot<T>(`SELECT * FROM ${bang(ten)} WHERE id = ?${khoaDuLieu ? ' FOR UPDATE' : ''}`, [
-    id,
-  ]);
-const xoa = (ten: string, id: DinhDanh) => coSoDuLieu.truyVan(`DELETE FROM ${bang(ten)} WHERE id = ?`, [id]);
-export = { them, capNhat, layTheoId, xoa };
+  coSoDuLieu.layMot<T>(
+    `SELECT * FROM ${bang(ten)} WHERE id = ?${khoaDuLieu ? ' FOR UPDATE' : ''}`,
+    [id],
+  );
+const xoa = (ten: string, id: DinhDanh) =>
+  coSoDuLieu.truyVan(`DELETE FROM ${bang(ten)} WHERE id = ?`, [id]);
+export {
+  them,
+  capNhat,
+  layTheoId,
+  xoa,
+};

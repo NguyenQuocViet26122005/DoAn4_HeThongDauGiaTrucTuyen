@@ -45,7 +45,7 @@ const danhSachChoXacMinh = ({ limit: gioiHan, offset: viTriBatDau }, trangThai) 
      LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
     [trangThai],
   );
-export = {
+export {
   layTheoId,
   timTheoEmail,
   danhSachDiaChi,

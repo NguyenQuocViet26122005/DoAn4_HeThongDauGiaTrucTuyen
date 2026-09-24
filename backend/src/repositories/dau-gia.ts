@@ -31,7 +31,10 @@ const nguoiThamGia = (id) =>
     [id],
   );
 const nguoiTheoDoi = (id) =>
-  coSoDuLieu.truyVan('SELECT nguoi_dung_id FROM tham_gia_phien WHERE phien_dau_gia_id=? AND dang_theo_doi=1', [id]);
+  coSoDuLieu.truyVan(
+    'SELECT nguoi_dung_id FROM tham_gia_phien WHERE phien_dau_gia_id=? AND dang_theo_doi=1',
+    [id],
+  );
 const phienDaCoCuaSanPham = (id) =>
   coSoDuLieu.layMot(
     `SELECT id FROM phien_dau_gia WHERE san_pham_id=? AND trang_thai IN ('DA_LEN_LICH','HOAT_DONG','DA_KET_THUC') LIMIT 1`,
@@ -42,9 +45,11 @@ const yeuCauHuyDangCho = (id) =>
     "SELECT id FROM yeu_cau_xu_ly WHERE loai_yeu_cau='HUY_PHIEN' AND phien_dau_gia_id=? AND trang_thai IN ('CHO_XU_LY','DANG_XU_LY') LIMIT 1",
     [id],
   );
+
 function danhSach({ limit: gioiHan, offset: viTriBatDau }: PhanTrang, boLoc: BoLocDanhSach = {}) {
   const dieuKienLoc = ['p.trang_thai_duyet = ?'];
   const thamSo: unknown[] = ['DA_DUYET'];
+
   if (boLoc.status) {
     dieuKienLoc.push('a.trang_thai=?');
     thamSo.push(boLoc.status);
@@ -73,6 +78,7 @@ function danhSach({ limit: gioiHan, offset: viTriBatDau }: PhanTrang, boLoc: BoL
     );
     thamSo.push(boLoc.bidderId);
   }
+
   return coSoDuLieu.truyVan(
     `SELECT a.*, p.tieu_de, p.duong_dan, p.nguoi_ban_id, c.ten AS ten_danh_muc,
             (SELECT h.duong_dan_tep FROM tep_dinh_kem h
@@ -87,6 +93,7 @@ function danhSach({ limit: gioiHan, offset: viTriBatDau }: PhanTrang, boLoc: BoL
     thamSo,
   );
 }
+
 const theoDoi = (nguoiDungId, id) =>
   coSoDuLieu.truyVan(
     `INSERT INTO tham_gia_phien (nguoi_dung_id,phien_dau_gia_id,dang_theo_doi,ngay_theo_doi) VALUES (?,?,1,NOW())
@@ -121,7 +128,7 @@ const danhSachYeuCauHuy = ({ limit: gioiHan, offset: viTriBatDau }) =>
      ORDER BY y.id DESC
      LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
   );
-export = {
+export {
   layTheoId,
   cacMucToiDa,
   lichSu,

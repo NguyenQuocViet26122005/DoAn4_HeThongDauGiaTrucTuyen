@@ -5,7 +5,11 @@ export type DinhDanh = string | number;
 export type TienNhap = string | number;
 export type BanGhiSQL = RowDataPacket;
 export type DuLieuGhi = Record<string, unknown>;
-export interface PhanTrang { limit: number; offset: number; page?: number; }
+export interface PhanTrang {
+  limit: number;
+  offset: number;
+  page?: number;
+}
 export interface BoLocDanhSach {
   search?: string;
   status?: string;
