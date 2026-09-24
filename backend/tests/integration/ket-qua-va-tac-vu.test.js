@@ -22,16 +22,19 @@ kiemThu(
           cho_phep_mua_ngay: 1,
         });
         const { don_hang: donHang } = await cacPhienDauGia.muaNgay(duLieu.a, phienId, {});
+
         await cacDonHang.thanhToan(duLieu.a, donHang.id, {});
         await cacDonHang.guiHang(duLieu.seller, donHang.id, {
           don_vi_van_chuyen: 'Kiểm thử',
           ma_van_don: 'TEST-TRANH-CHAP',
         });
         await cacDonHang.xacNhanDaGiao(duLieu.a, donHang.id);
+
         const tranhChap = await cacTranhChap.mo(duLieu.a, donHang.id, {
           ly_do: 'KHAC',
           mo_ta: 'Kiểm thử kết quả xử lý tiền',
         });
+
         await xacNhan.rejects(
           cacTranhChap.giaiQuyet(duLieu.admin, tranhChap.id, {
             ket_qua: 'NGUOI_MUA',
@@ -73,13 +76,19 @@ kiemThu(
     hoanTac(async () => {
       const duLieu = await taoDuLieuKiemThu();
       const phienId = await phienDauGia(duLieu);
+
       await cacPhienDauGia.datGia(duLieu.b, phienId, { gia_toi_da: '20000000' });
       await cacPhienDauGia.datGia(duLieu.outsider, phienId, { gia_toi_da: '21000000' });
       await cacPhienDauGia.datGia(duLieu.a, phienId, { gia_toi_da: '22000000' });
+
       const hienTai = await coSoDuLieu.thoiGianHienTai();
+
       await khoBanGhi.capNhat('phien_dau_gia', phienId, { thoi_gian_ket_thuc: hienTai });
+
       await cacPhienDauGia.xuLyDenHan(phienId);
+
       const donHang = await khoDonHang.donDangXuLyCuaPhien(phienId);
+
       // Bản ghi nằm ngoài thời gian phiên không được che mất lượt công khai hợp lệ.
       await khoBanGhi.them('luot_tra_gia', {
         phien_dau_gia_id: phienId,
@@ -90,20 +99,27 @@ kiemThu(
       await khoBanGhi.capNhat('don_hang', donHang.id, {
         han_thanh_toan: thoiGian.congGiay(hienTai, -1),
       });
+
       await cacDonHang.xuLyDenHan(donHang.id);
       xacNhan.equal(await khoDonHang.deNghiDangCho(phienId), null);
-      await xacNhan.rejects(cacDeNghi.tao(duLieu.admin, donHang.id), {status:403});
+      await xacNhan.rejects(cacDeNghi.tao(duLieu.admin, donHang.id), { status: 403 });
+
       const deNghiDau = await cacDeNghi.tao(duLieu.seller, donHang.id);
+
       xacNhan.equal(String(deNghiDau.nguoi_tra_gia_id), duLieu.outsider.id);
       xacNhan.equal(deNghiDau.gia_de_nghi, '21000000.00');
       await cacDeNghi.phanHoiDeNghi(duLieu.outsider, deNghiDau.id, { chap_nhan: false });
       xacNhan.equal(await khoDonHang.deNghiDangCho(phienId), null);
+
       const deNghiSau = await cacDeNghi.tao(duLieu.seller, donHang.id);
+
       xacNhan.equal(String(deNghiSau.nguoi_tra_gia_id), duLieu.b.id);
       xacNhan.equal(deNghiSau.gia_de_nghi, '20000000.00');
+
       await khoBanGhi.capNhat('de_nghi_mua_tiep_theo', deNghiSau.id, {
         het_han_luc: thoiGian.congGiay(hienTai, -1),
       });
+
       await xacNhan.rejects(cacDeNghi.phanHoiDeNghi(duLieu.b, deNghiSau.id, { chap_nhan: true }), {
         status: 409,
       });
@@ -113,18 +129,24 @@ kiemThu(
       xacNhan.equal((await khoDonHang.donHangCuaPhien(phienId)).length, 1);
 
       const phienCoSan = await phienDauGia(duLieu, { gia_san: '21500000' });
+
       await cacPhienDauGia.datGia(duLieu.b, phienCoSan, { gia_toi_da: '20000000' });
       await cacPhienDauGia.datGia(duLieu.a, phienCoSan, { gia_toi_da: '22000000' });
+
       await khoBanGhi.capNhat('phien_dau_gia', phienCoSan, {
         thoi_gian_ket_thuc: await coSoDuLieu.thoiGianHienTai(),
       });
+
       await cacPhienDauGia.xuLyDenHan(phienCoSan);
+
       const donCoSan = await khoDonHang.donDangXuLyCuaPhien(phienCoSan);
+
       await khoBanGhi.capNhat('don_hang', donCoSan.id, {
         han_thanh_toan: thoiGian.congGiay(hienTai, -1),
       });
+
       await cacDonHang.xuLyDenHan(donCoSan.id);
-      await xacNhan.rejects(cacDeNghi.tao(duLieu.seller, donCoSan.id), {status:409});
+      await xacNhan.rejects(cacDeNghi.tao(duLieu.seller, donCoSan.id), { status: 409 });
       xacNhan.equal(await khoDonHang.deNghiDangCho(phienCoSan), null);
     }),
 );
@@ -141,20 +163,26 @@ kiemThu(
         cho_phep_mua_ngay: 1,
       });
       const { don_hang: donMuon } = await cacPhienDauGia.muaNgay(duLieu.a, phienMuon, {});
+
       await cacDonHang.thanhToan(duLieu.a, donMuon.id, {});
+
       await khoBanGhi.capNhat('don_hang', donMuon.id, {
         han_nguoi_ban_gui_hang: thoiGian.congGiay(hienTai, -1),
       });
+
       const phienNhac = await phienDauGia(duLieu, {
         gia_mua_ngay: '24000000',
         cho_phep_mua_ngay: 1,
       });
       const { don_hang: donNhac } = await cacPhienDauGia.muaNgay(duLieu.b, phienNhac, {});
+
       await khoBanGhi.capNhat('don_hang', donNhac.id, {
         han_thanh_toan: thoiGian.congGiay(hienTai, 3600),
       });
+
       for (let lan = 0; lan < 2; lan++) {
         const ketQua = await lichChay.chayMotLuot();
+
         xacNhan.equal(ketQua.failed, 0, 'Các nhánh truy vấn và xử lý tác vụ phải thành công');
       }
       xacNhan.equal((await khoBanGhi.layTheoId('phien_dau_gia', phienCho)).trang_thai, 'HOAT_DONG');

@@ -6,9 +6,15 @@ const tep = process.argv.includes('--api')
   : 'tests/integration/*.test.js';
 const ketQua = spawnSync(process.execPath, ['--test', '--test-isolation=none', tep], {
   cwd: path.resolve(__dirname, '..'),
-  env: { ...process.env, DB_NAME: 'doan4_daugia_kiem_thu_19', JOBS_ENABLED: 'false' },
+  env: {
+    ...process.env,
+    DB_NAME: 'doan4_daugia_kiem_thu_19',
+    JOBS_ENABLED: 'false',
+  },
   stdio: 'inherit',
   windowsHide: true,
 });
-if (ketQua.error) console.error('Không chạy được kiểm thử:', ketQua.error.code);
+if (ketQua.error) {
+  console.error('Không chạy được kiểm thử:', ketQua.error.code);
+}
 process.exitCode = ketQua.status ?? 1;

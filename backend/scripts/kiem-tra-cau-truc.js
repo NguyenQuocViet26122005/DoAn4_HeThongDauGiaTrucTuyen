@@ -15,16 +15,21 @@ async function kiemTraCauTruc() {
         /^\s{4}(\w+)\s+(?:BIGINT|VARCHAR|ENUM|DATETIME|TIMESTAMP|TINYINT|INT|DECIMAL|JSON|TEXT)\b/gm,
       ),
     ].map((cot) => cot[1]);
+
     mongDoi.set(ketQuaKhop[1], cacCot);
   }
 
-  if (mongDoi.size !== 19) throw new Error('SQL chuẩn phải có 19 bảng');
+  if (mongDoi.size !== 19) {
+    throw new Error('SQL chuẩn phải có 19 bảng');
+  }
+
   const thucTe = await coSoDuLieu.truyVan(`
     SELECT TABLE_NAME AS table_name, COLUMN_NAME AS column_name
     FROM information_schema.COLUMNS
     WHERE TABLE_SCHEMA = DATABASE()
   `);
   const conThieu = [];
+
   for (const [bang, cacCot] of mongDoi) {
     for (const cot of cacCot) {
       if (!thucTe.some((banGhi) => banGhi.table_name === bang && banGhi.column_name === cot)) {
@@ -38,18 +43,27 @@ async function kiemTraCauTruc() {
     FROM information_schema.TABLES
     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'
   `);
-  const bangDu = thongTinBoMay.filter(b => !mongDoi.has(b.table_name));
+  const bangDu = thongTinBoMay.filter((b) => !mongDoi.has(b.table_name));
   const boMayKhongHoTro = thongTinBoMay.filter(
     (banGhi) => mongDoi.has(banGhi.table_name) && banGhi.engine !== 'InnoDB',
   );
+
   console.log(
     JSON.stringify(
-      { expectedTables: mongDoi.size, actualTables: thongTinBoMay.length, extraTables: bangDu, missingColumns: conThieu, unsafeEngines: boMayKhongHoTro },
+      {
+        expectedTables: mongDoi.size,
+        actualTables: thongTinBoMay.length,
+        extraTables: bangDu,
+        missingColumns: conThieu,
+        unsafeEngines: boMayKhongHoTro,
+      },
       null,
       2,
     ),
   );
-  if (conThieu.length || boMayKhongHoTro.length || bangDu.length || thongTinBoMay.length !== 19) process.exitCode = 1;
+  if (conThieu.length || boMayKhongHoTro.length || bangDu.length || thongTinBoMay.length !== 19) {
+    process.exitCode = 1;
+  }
 }
 
 if (require.main === module) {

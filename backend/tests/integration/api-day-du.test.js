@@ -16,14 +16,17 @@ const { taoDuLieuKiemThu, hoanTac } = require('../helpers/du-lieu-mau');
 async function cacRouteHienCo() {
   const thuMuc = duongDan.join(__dirname, '../../src/routes');
   const ketQua = ['GET /health', 'GET /admin/jobs'];
+
   for (const ten of await tepTin.readdir(thuMuc)) {
     const noiDung = await tepTin.readFile(duongDan.join(thuMuc, ten), 'utf8');
+
     for (const khop of noiDung.matchAll(
       /boDinhTuyen\.(get|post|put|patch|delete)\(\s*'([^']+)'/g,
     )) {
       ketQua.push(`${khop[1].toUpperCase()} ${khop[2]}`);
     }
   }
+
   return [...new Set(ketQua)].sort(
     (a, b) => (a.match(/:/g) || []).length - (b.match(/:/g) || []).length,
   );
@@ -50,7 +53,9 @@ kiemThu(
         const duLieu = await taoDuLieuKiemThu();
         const ma = {};
         const mayChu = http.createServer(require('../../dist/ung-dung'));
+
         await new Promise((xong) => mayChu.listen(0, '127.0.0.1', xong));
+
         const diaChiGoc = `http://127.0.0.1:${mayChu.address().port}`;
 
         async function gui(phuongThuc, url, vaiTro, noiDung, trangThai = 200) {
@@ -64,11 +69,14 @@ kiemThu(
             body: noiDung === undefined ? undefined : bieuMau ? noiDung : JSON.stringify(noiDung),
             signal: AbortSignal.timeout(10000),
           });
+
           soYeuCau++;
           // Không in body/token/mật khẩu nếu assertion thất bại.
           xacNhan.equal(phanHoi.status, trangThai, `${phuongThuc} ${url}`);
+
           const laJSON = phanHoi.headers.get('content-type')?.includes('application/json');
           const ketQua = laJSON ? await phanHoi.json() : await phanHoi.arrayBuffer();
+
           if (laJSON) {
             xacNhan.equal(ketQua.success, trangThai < 400, `${phuongThuc} ${url}: success`);
             kiemTraDuLieuCongKhai(ketQua);
@@ -77,14 +85,19 @@ kiemThu(
             const duongDanAPI = url.split('?')[0];
             const tenRoute = cacRoute.find((route) => {
               const [cach, mau] = route.split(' ');
+
               return (
                 cach === phuongThuc &&
                 new RegExp('^' + mau.replace(/:\w+/g, '[^/]+') + '$').test(duongDanAPI)
               );
             });
+
             xacNhan.ok(tenRoute, `Không tìm thấy route đã gọi: ${phuongThuc} ${duongDanAPI}`);
             daThanhCong.add(tenRoute);
-          } else soLoiMongDoi++;
+          } else {
+            soLoiMongDoi++;
+          }
+
           return laJSON ? ketQua.data : ketQua;
         }
 
@@ -94,14 +107,18 @@ kiemThu(
             'base64',
           );
           const bieuMau = new FormData();
+
           bieuMau.set('file', new Blob([anh], { type: 'image/png' }), 'kiem-thu.png');
+
           const tep = await gui('POST', `/uploads/${nhom}`, vaiTro, bieuMau, 201);
           const tuyetDoi = duongDan.resolve(
             cauHinh.uploadRoot,
             tep.duong_dan.replace('/api/uploads/files/', ''),
           );
+
           xacNhan.ok(tuyetDoi.startsWith(duongDan.resolve(cauHinh.uploadRoot) + duongDan.sep));
           cacTepDaTao.push(tuyetDoi);
+
           return tep.duong_dan;
         }
 
@@ -125,6 +142,7 @@ kiemThu(
 
         async function taoPhienMoi() {
           const sp = await gui('POST', '/products', 'seller', noiDungSanPham(), 201);
+
           await gui(
             'POST',
             `/products/${sp.id}/images`,
@@ -136,11 +154,13 @@ kiemThu(
           await gui('PATCH', `/admin/products/${sp.id}/review`, 'admin', {
             trang_thai_duyet: 'DA_DUYET',
           });
+
           return taoPhienChoSanPham(sp.id);
         }
 
         async function taoPhienChoSanPham(sanPhamId, soGiay = 3600) {
           const hienTai = await coSoDuLieu.thoiGianHienTai();
+
           return gui(
             'POST',
             '/auctions',
@@ -163,7 +183,9 @@ kiemThu(
           await khoBanGhi.capNhat('phien_dau_gia', phienId, {
             thoi_gian_ket_thuc: await coSoDuLieu.thoiGianHienTai(),
           });
+
           await dauGia.xuLyDenHan(phienId);
+
           return khoDonHang.donDangXuLyCuaPhien(phienId);
         }
 
@@ -175,12 +197,14 @@ kiemThu(
               await gui('GET', '/health');
               await gui('GET', '/users/me', null, undefined, 401);
               await gui('POST', '/auth/register', null, { vai_tro: 'QUAN_TRI' }, 400);
+
               const dangKy = {
                 ho_ten: 'Kiểm thử đăng ký API',
                 email: `${duLieu.prefix}-http@example.invalid`,
                 mat_khau: duLieu.password,
               };
               const daDangKy = await gui('POST', '/auth/register', null, dangKy, 201);
+
               xacNhan.equal(daDangKy.vai_tro, 'NGUOI_DUNG');
               await gui('POST', '/auth/register', null, dangKy, 409);
               for (const vaiTro of ['admin', 'seller', 'a', 'b', 'outsider']) {
@@ -188,6 +212,7 @@ kiemThu(
                   email: duLieu[vaiTro].email,
                   mat_khau: duLieu.password,
                 });
+
                 ma[vaiTro] = ketQua.token;
               }
               await gui(
@@ -209,14 +234,19 @@ kiemThu(
                 ly_do: 'Kết thúc kiểm thử khóa',
               });
               xacNhan.equal((await gui('GET', '/users/me', 'a')).id, duLieu.a.id);
+
               const avatar = await taiAnh('avatar', 'a');
+
               await gui('PATCH', '/users/me', 'a', {
                 ho_ten: 'Người mua thử API',
                 anh_dai_dien: avatar,
               });
+
               const dc = await gui('POST', '/users/me/addresses', 'a', noiDungDiaChi, 201);
+
               diaChiMoi = await gui('PUT', `/users/me/addresses/${dc.id}`, 'a', noiDungDiaChi);
               await gui('PUT', `/users/me/addresses/${dc.id}`, 'b', noiDungDiaChi, 403);
+
               const dcBo = await gui(
                 'POST',
                 '/users/me/addresses',
@@ -224,8 +254,11 @@ kiemThu(
                 { ...noiDungDiaChi, la_mac_dinh: false },
                 201,
               );
+
               await gui('DELETE', `/users/me/addresses/${dcBo.id}`, 'a');
+
               const cacDiaChi = await gui('GET', '/users/me/addresses', 'a');
+
               xacNhan.ok(cacDiaChi.some((x) => String(x.id) === String(dc.id)));
             },
           );
@@ -234,9 +267,11 @@ kiemThu(
             'Xác minh người bán, tải tệp và bảo vệ giấy tờ riêng tư',
             async () => {
               const anh = await taiAnh('verification', 'outsider');
+
               await gui('GET', anh.replace('/api', ''), null, undefined, 401);
               await gui('GET', anh.replace('/api', ''), 'b', undefined, 403);
               xacNhan.ok((await gui('GET', anh.replace('/api', ''), 'admin')).byteLength > 0);
+
               const hoSo = await gui(
                 'POST',
                 '/seller-verifications',
@@ -253,6 +288,7 @@ kiemThu(
                 },
                 201,
               );
+
               await gui('GET', '/seller-verifications/me', 'outsider');
               await gui('GET', '/admin/seller-verifications', 'admin');
               await gui(
@@ -272,6 +308,7 @@ kiemThu(
             'Danh mục, thuộc tính, sản phẩm, ảnh, gửi duyệt và ownership',
             async () => {
               const noiDung = { ten: duLieu.prefix, duong_dan: `${duLieu.prefix}-api` };
+
               danhMuc = await gui('POST', '/admin/categories', 'admin', noiDung, 201);
               await gui('PUT', `/admin/categories/${danhMuc.id}`, 'admin', {
                 ...noiDung,
@@ -279,12 +316,14 @@ kiemThu(
               });
               await gui('GET', '/categories');
               await gui('GET', '/admin/categories', 'admin');
+
               const ndThuocTinh = {
                 ten_thuoc_tinh: 'RAM',
                 khoa_thuoc_tinh: 'ram',
                 kieu_nhap: 'SO',
                 bat_buoc: true,
               };
+
               thuocTinh = await gui(
                 'POST',
                 `/admin/categories/${danhMuc.id}/attributes`,
@@ -308,6 +347,7 @@ kiemThu(
               });
               await gui('PUT', `/products/${sanPham.id}`, 'outsider', noiDungSanPham(), 403);
               anhSanPham = await taiAnh('product', 'seller');
+
               const anhBo = await gui(
                 'POST',
                 `/products/${sanPham.id}/images`,
@@ -315,6 +355,7 @@ kiemThu(
                 { duong_dan_anh: anhSanPham },
                 201,
               );
+
               await gui('DELETE', `/products/${sanPham.id}/images/${anhBo.id}`, 'seller');
               await gui('POST', `/products/${sanPham.id}/submit`, 'seller', {}, 400);
               await gui(
@@ -346,13 +387,17 @@ kiemThu(
                 { gia_toi_da: '20000000' },
                 403,
               );
+
               const dauTien = await gui('POST', `/auctions/${phien.id}/bids`, 'a', {
                 gia_toi_da: '20000000',
               });
+
               xacNhan.equal(dauTien.so_lan_gia_han, 1);
+
               const thuHai = await gui('POST', `/auctions/${phien.id}/bids`, 'b', {
                 gia_toi_da: '22000000',
               });
+
               xacNhan.equal(thuHai.gia_hien_tai, '20200000.00');
               await gui('POST', `/auctions/${phien.id}/buy-now`, 'b', {}, 409);
               await gui('GET', `/auctions/${phien.id}/bids`);
@@ -369,6 +414,7 @@ kiemThu(
                 ),
               );
               await gui('DELETE', `/watchlist/${phien.id}`, 'a');
+
               const phienHuy = await taoPhienMoi();
               const yc = await gui(
                 'POST',
@@ -377,6 +423,7 @@ kiemThu(
                 { ly_do: 'Kiểm thử hủy' },
                 201,
               );
+
               await gui('GET', '/admin/cancellation-requests', 'admin');
               await gui('PATCH', `/admin/cancellation-requests/${yc.id}/review`, 'admin', {
                 trang_thai: 'DA_DUYET',
@@ -393,7 +440,9 @@ kiemThu(
               await gui('GET', '/orders', 'b');
               await gui('GET', '/admin/orders', 'admin');
               await gui('GET', `/orders/${don.id}`, 'outsider', undefined, 403);
+
               const dcNguoiThang = (await gui('GET', '/users/me/addresses', 'b'))[0];
+
               await gui(
                 'PATCH',
                 `/orders/${don.id}/address`,
@@ -414,7 +463,9 @@ kiemThu(
               await gui('POST', `/orders/${don.id}/delivered`, 'seller', {}, 403);
               await gui('POST', `/orders/${don.id}/delivered`, 'b', {});
               await gui('POST', `/orders/${don.id}/confirm`, 'b', {});
+
               const chiTiet = await gui('GET', `/orders/${don.id}`, 'b');
+
               xacNhan.equal(chiTiet.trang_thai, 'HOAN_THANH');
               xacNhan.equal(chiTiet.giu_tien.trang_thai, 'DA_GIAI_NGAN');
               await gui('POST', `/orders/${don.id}/reviews`, 'b', { so_sao: 5 }, 201);
@@ -428,6 +479,7 @@ kiemThu(
             'Mua ngay, tranh chấp, bằng chứng riêng tư và hoàn tiền toàn bộ',
             async () => {
               const phienMuaNgay = await taoPhienMoi();
+
               donTranhChap = (await gui('POST', `/auctions/${phienMuaNgay.id}/buy-now`, 'a', {}))
                 .don_hang;
               await gui('POST', `/orders/${donTranhChap.id}/payments/simulate`, 'a', {});
@@ -436,6 +488,7 @@ kiemThu(
                 ma_van_don: 'HTTP-2',
               });
               await gui('POST', `/orders/${donTranhChap.id}/delivered`, 'a', {});
+
               const tc = await gui(
                 'POST',
                 `/orders/${donTranhChap.id}/disputes`,
@@ -443,11 +496,14 @@ kiemThu(
                 { ly_do: 'KHONG_DUNG_MO_TA', mo_ta: 'Kiểm thử tranh chấp HTTP' },
                 201,
               );
+
               await gui('POST', `/orders/${donTranhChap.id}/confirm`, 'a', {}, 409);
               await gui('GET', '/disputes', 'a');
               await gui('GET', '/admin/disputes', 'admin');
               await gui('GET', `/disputes/${tc.id}`, 'outsider', undefined, 403);
+
               const bangChung = await taiAnh('evidence', 'a');
+
               await gui(
                 'POST',
                 `/disputes/${tc.id}/evidence`,
@@ -462,11 +518,13 @@ kiemThu(
                 phan_hoi_nguoi_ban: 'Phản hồi kiểm thử',
               });
               await gui('POST', `/admin/disputes/${tc.id}/take`, 'admin', {});
+
               const nd = {
                 ket_qua: 'NGUOI_MUA',
                 so_tien_hoan: donTranhChap.tong_tien,
                 ket_qua_xu_ly: 'Hoàn toàn bộ',
               };
+
               await gui('POST', `/admin/disputes/${tc.id}/resolve`, 'a', nd, 403);
               await gui('POST', `/admin/disputes/${tc.id}/resolve`, 'admin', nd);
               await gui('POST', `/admin/disputes/${tc.id}/resolve`, 'admin', nd, 409);
@@ -485,14 +543,18 @@ kiemThu(
             'Second Chance: tạo, xem, chấp nhận bằng giá công khai',
             async () => {
               const phienTiep = await taoPhienMoi();
+
               await gui('POST', `/auctions/${phienTiep.id}/bids`, 'a', { gia_toi_da: '20000000' });
               await gui('POST', `/auctions/${phienTiep.id}/bids`, 'b', { gia_toi_da: '22000000' });
+
               const donGoc = await chotPhien(phienTiep.id);
+
               // Tạo trạng thái đầu vào riêng cho API đề nghị; job hủy/vi phạm đã có bài tích hợp khác.
               await khoBanGhi.capNhat('don_hang', donGoc.id, {
                 trang_thai: 'DA_HUY',
                 ly_do_huy: 'KHONG_THANH_TOAN',
               });
+
               const deNghi = await gui(
                 'POST',
                 `/orders/${donGoc.id}/second-chance`,
@@ -500,6 +562,7 @@ kiemThu(
                 {},
                 201,
               );
+
               xacNhan.equal(deNghi.gia_de_nghi, '20000000.00');
               await gui('GET', '/second-chances', 'a');
               await gui('GET', `/second-chances/${deNghi.id}`, 'a');
@@ -510,13 +573,17 @@ kiemThu(
                 { chap_nhan: true },
                 403,
               );
+
               const chapNhan = await gui('POST', `/second-chances/${deNghi.id}/respond`, 'a', {
                 chap_nhan: true,
               });
+
               xacNhan.equal(chapNhan.don_hang.gia_san_pham, deNghi.gia_de_nghi);
+
               const lapLai = await gui('POST', `/second-chances/${deNghi.id}/respond`, 'a', {
                 chap_nhan: true,
               });
+
               xacNhan.equal(lapLai.don_hang.id, chapNhan.don_hang.id);
             },
           );
@@ -525,6 +592,7 @@ kiemThu(
             'Thông báo, vi phạm, cấu hình, bước giá, thống kê và trạng thái jobs',
             async () => {
               const thongBao = await gui('GET', '/notifications?unread=true', 'a');
+
               xacNhan.ok(thongBao.length > 0);
               await gui('GET', '/notifications/unread-count', 'a');
               await gui('PATCH', `/notifications/${thongBao[0].id}/read`, 'b', {}, 403);
@@ -534,6 +602,7 @@ kiemThu(
                 Number((await gui('GET', '/notifications/unread-count', 'a')).chua_doc),
                 0,
               );
+
               const viPham = await gui(
                 'POST',
                 '/admin/violations',
@@ -546,6 +615,7 @@ kiemThu(
                 },
                 201,
               );
+
               await gui('PATCH', `/admin/violations/${viPham.id}/review`, 'admin', {
                 trang_thai: 'DA_XAC_NHAN',
               });
@@ -555,12 +625,31 @@ kiemThu(
               await gui('PUT', '/admin/config/PAYMENT_DEADLINE_HOURS', 'admin', {
                 gia_tri_cau_hinh: 48,
               });
+
               const cacBuoc = await gui('GET', '/bid-increments');
               // Các phiên kiểm thử đã chốt/hủy; chỉ phiên tạo bởi bài này được đóng trước khi đổi cấu hình.
-              const dangMo = await coSoDuLieu.truyVan("SELECT a.id FROM phien_dau_gia a JOIN san_pham p ON p.id=a.san_pham_id WHERE p.nguoi_ban_id=? AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG')",[duLieu.seller.id]);
+              const dangMo = await coSoDuLieu.truyVan(
+                "SELECT a.id FROM phien_dau_gia a JOIN san_pham p ON p.id=a.san_pham_id WHERE p.nguoi_ban_id=? AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG')",
+                [duLieu.seller.id],
+              );
+
               if (dangMo.length) {
-                await gui('PUT', '/admin/bid-increments', 'admin', {buoc_gia:cacBuoc.map(({gia_tu,gia_den,muc_tang_gia})=>({gia_tu,gia_den,muc_tang_gia}))},409);
-                for (const p of dangMo) await chotPhien(p.id);
+                await gui(
+                  'PUT',
+                  '/admin/bid-increments',
+                  'admin',
+                  {
+                    buoc_gia: cacBuoc.map(({ gia_tu, gia_den, muc_tang_gia }) => ({
+                      gia_tu,
+                      gia_den,
+                      muc_tang_gia,
+                    })),
+                  },
+                  409,
+                );
+                for (const p of dangMo) {
+                  await chotPhien(p.id);
+                }
               }
               await gui('PUT', '/admin/bid-increments', 'admin', {
                 buoc_gia: cacBuoc.map(({ gia_tu, gia_den, muc_tang_gia }) => ({
@@ -576,6 +665,7 @@ kiemThu(
           );
 
           const chuaKiemTra = cacRoute.filter((route) => !daThanhCong.has(route));
+
           xacNhan.deepEqual(chuaKiemTra, [], 'Mỗi API phải có ít nhất một yêu cầu thành công');
           boKiemThu.diagnostic(
             `${soYeuCau} yêu cầu HTTP; ${daThanhCong.size}/${cacRoute.length} API thành công; ${soLoiMongDoi} phản hồi lỗi được kiểm tra đúng mã.`,
@@ -585,7 +675,9 @@ kiemThu(
         }
       });
     } finally {
-      for (const tep of cacTepDaTao) await tepTin.unlink(tep);
+      for (const tep of cacTepDaTao) {
+        await tepTin.unlink(tep);
+      }
     }
     xacNhan.equal(await demTaiKhoan(), soLuongBanDau, 'Không để lại tài khoản kiểm thử');
   },

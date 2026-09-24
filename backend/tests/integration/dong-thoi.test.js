@@ -18,13 +18,16 @@ const { taoDuLieuKiemThu, phienDauGia } = require('../helpers/du-lieu-mau');
 async function donDuLieuKiemThu(duLieu) {
   const cacId = ['admin', 'seller', 'a', 'b', 'outsider'].map((vaiTro) => duLieu[vaiTro].id);
   const choTrong = cacId.map(() => '?').join(',');
+
   await coSoDuLieu.giaoDich(async () => {
     const taiKhoan = await coSoDuLieu.truyVan(
       `SELECT id,email FROM nguoi_dung WHERE id IN (${choTrong})`,
       cacId,
     );
+
     xacNhan.equal(taiKhoan.length, cacId.length);
     xacNhan.ok(taiKhoan.every((banGhi) => banGhi.email.startsWith(`${duLieu.prefix}-`)));
+
     const nguoiBanId = duLieu.seller.id;
     const cacPhien = await coSoDuLieu.truyVan(
       'SELECT a.id FROM phien_dau_gia a JOIN san_pham p ON p.id=a.san_pham_id WHERE p.nguoi_ban_id=?',
@@ -33,16 +36,13 @@ async function donDuLieuKiemThu(duLieu) {
     const cacDon = await coSoDuLieu.truyVan('SELECT id FROM don_hang WHERE nguoi_ban_id=?', [
       nguoiBanId,
     ]);
+
     for (const banGhi of cacDon) {
       await coSoDuLieu.truyVan(
         'DELETE b FROM tep_dinh_kem b JOIN tranh_chap t ON t.id=b.tranh_chap_id WHERE t.don_hang_id=?',
         [banGhi.id],
       );
-      for (const bang of [
-        'danh_gia',
-        'tranh_chap',
-        'thanh_toan',
-      ]) {
+      for (const bang of ['danh_gia', 'tranh_chap', 'thanh_toan']) {
         await coSoDuLieu.truyVan(`DELETE FROM ${bang} WHERE don_hang_id=?`, [banGhi.id]);
       }
       await coSoDuLieu.truyVan(
@@ -56,22 +56,20 @@ async function donDuLieuKiemThu(duLieu) {
         banGhi.id,
       ]);
       await coSoDuLieu.truyVan('DELETE FROM don_hang WHERE phien_dau_gia_id=?', [banGhi.id]);
-      for (const bang of [
-        'yeu_cau_xu_ly',
-        'nhat_ky_hoat_dong',
-        'luot_tra_gia',
-        'tham_gia_phien',
-      ]) {
+      for (const bang of ['yeu_cau_xu_ly', 'nhat_ky_hoat_dong', 'luot_tra_gia', 'tham_gia_phien']) {
         await coSoDuLieu.truyVan(`DELETE FROM ${bang} WHERE phien_dau_gia_id=?`, [banGhi.id]);
       }
       await coSoDuLieu.truyVan(
         "DELETE FROM nhat_ky_hoat_dong WHERE loai_doi_tuong='phien_dau_gia' AND doi_tuong_id=?",
         [banGhi.id],
       );
+
       await khoBanGhi.xoa('phien_dau_gia', banGhi.id);
     }
     await coSoDuLieu.truyVan('DELETE FROM san_pham WHERE nguoi_ban_id=?', [nguoiBanId]);
+
     await khoBanGhi.xoa('danh_muc', duLieu.categoryId);
+
     await coSoDuLieu.truyVan(
       `DELETE FROM nhat_ky_hoat_dong WHERE nguoi_thuc_hien_id IN (${choTrong})`,
       cacId,
@@ -86,20 +84,31 @@ async function donDuLieuKiemThu(duLieu) {
 function taoKhachSocket(cong) {
   const ketNoi = new WebSocket(`ws://127.0.0.1:${cong}/socket.io/?EIO=4&transport=websocket`);
   const hangDoi = [];
+
   ketNoi.addEventListener('message', (suKien) => {
     const noiDung = String(suKien.data);
-    if (noiDung === '2') ketNoi.send('3');
-    else hangDoi.push(noiDung);
+
+    if (noiDung === '2') {
+      ketNoi.send('3');
+    } else {
+      hangDoi.push(noiDung);
+    }
   });
+
   async function choTin(dieuKien) {
     const han = Date.now() + 5000;
+
     while (Date.now() < han) {
       const chiSo = hangDoi.findIndex(dieuKien);
-      if (chiSo >= 0) return hangDoi.splice(chiSo, 1)[0];
+
+      if (chiSo >= 0) {
+        return hangDoi.splice(chiSo, 1)[0];
+      }
       await new Promise((xong) => setTimeout(xong, 10));
     }
     throw new Error('Hết thời gian chờ sự kiện Socket.IO');
   }
+
   return { ketNoi, choTin };
 }
 
@@ -107,17 +116,23 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
   const duLieu = await coSoDuLieu.giaoDich(taoDuLieuKiemThu);
   const mayChu = http.createServer(require('../../dist/ung-dung'));
   const io = new MayChuSocket(mayChu);
+
   require('../../dist/sockets/ket-noi').khoiTao(io);
   await new Promise((xong) => mayChu.listen(0, '127.0.0.1', xong));
+
   let khach;
+
   try {
     const phienId = await coSoDuLieu.giaoDich(() => phienDauGia(duLieu));
+
     khach = taoKhachSocket(mayChu.address().port);
     await khach.choTin((tin) => tin.startsWith('0'));
     khach.ketNoi.send('40');
     await khach.choTin((tin) => tin.startsWith('40'));
     khach.ketNoi.send(`421${JSON.stringify(['auction:join', { auctionId: phienId }])}`);
+
     const xacNhanPhong = JSON.parse((await khach.choTin((tin) => tin.startsWith('431'))).slice(3));
+
     xacNhan.equal(xacNhanPhong[0].success, true);
     kiemTraDuLieuCongKhai(xacNhanPhong);
 
@@ -125,6 +140,7 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
       dauGia.datGia(duLieu.a, phienId, { gia_toi_da: '22000000' }),
       dauGia.datGia(duLieu.b, phienId, { gia_toi_da: '22000000' }),
     ]);
+
     const phien = await khoPhien.layTheoId(phienId);
     const mucDauTien = (
       await coSoDuLieu.truyVan(
@@ -132,9 +148,12 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
         [phienId],
       )
     )[0];
+
     xacNhan.equal(String(phien.nguoi_dan_dau_id), String(mucDauTien.nguoi_tra_gia_id));
     xacNhan.equal(phien.gia_hien_tai, '22000000.00');
+
     const suKienGia = JSON.parse((await khach.choTin((tin) => tin.startsWith('42'))).slice(2));
+
     xacNhan.equal(suKienGia[0], 'auction:bid-updated');
     kiemTraDuLieuCongKhai(suKienGia[1]);
     xacNhan.ok(
@@ -144,10 +163,15 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
     await khoBanGhi.capNhat('phien_dau_gia', phienId, {
       thoi_gian_ket_thuc: thoiGian.congGiay(await coSoDuLieu.thoiGianHienTai(), -1),
     });
+
     await Promise.all([dauGia.xuLyDenHan(phienId), dauGia.xuLyDenHan(phienId)]);
+
     const cacDon = await khoDon.donHangCuaPhien(phienId);
+
     xacNhan.equal(cacDon.length, 1);
+
     const nguoiThang = String(cacDon[0].nguoi_mua_id) === duLieu.a.id ? duLieu.a : duLieu.b;
+
     await Promise.all([
       donHang.thanhToan(nguoiThang, cacDon[0].id, {}),
       donHang.thanhToan(nguoiThang, cacDon[0].id, {}),
@@ -159,6 +183,7 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
       ma_van_don: 'DONG-THOI',
     });
     await donHang.xacNhanDaGiao(nguoiThang, cacDon[0].id);
+
     const ketQua = await Promise.allSettled([
       tranhChap.mo(nguoiThang, cacDon[0].id, {
         ly_do: 'KHAC',
@@ -166,9 +191,12 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
       }),
       donHang.xacNhanHoanThanh(nguoiThang, cacDon[0].id),
     ]);
+
     xacNhan.equal(ketQua.filter((muc) => muc.status === 'fulfilled').length, 1);
+
     const trangThaiDon = (await khoBanGhi.layTheoId('don_hang', cacDon[0].id)).trang_thai;
     const trangThaiTien = (await khoDon.tienTrungGian(cacDon[0].id)).trang_thai;
+
     xacNhan.equal(trangThaiTien, trangThaiDon === 'DANG_TRANH_CHAP' ? 'DANG_GIU' : 'DA_GIAI_NGAN');
 
     const phienMuaNgay = await coSoDuLieu.giaoDich(() =>
@@ -178,6 +206,7 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
       dauGia.datGia(duLieu.a, phienMuaNgay, { gia_toi_da: '22000000' }),
       dauGia.muaNgay(duLieu.b, phienMuaNgay, {}),
     ]);
+
     xacNhan.equal(canhTranh.filter((muc) => muc.status === 'fulfilled').length, 1);
   } finally {
     khach?.ketNoi.close();

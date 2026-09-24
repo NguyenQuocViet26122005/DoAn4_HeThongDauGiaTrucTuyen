@@ -7,9 +7,24 @@ const { buocGiaTaiMuc } = require('../dist/services/cau-hinh');
 const { dongKetNoiMotLan } = require('./helpers/dong-ket-noi');
 
 const cacBuocGia = [
-  { gia_tu: '0', gia_den: '999999.99', muc_tang_gia: '50000', dang_hoat_dong: 1 },
-  { gia_tu: '1000000', gia_den: '9999999.99', muc_tang_gia: '100000', dang_hoat_dong: 1 },
-  { gia_tu: '10000000', gia_den: null, muc_tang_gia: '200000', dang_hoat_dong: 1 },
+  {
+    gia_tu: '0',
+    gia_den: '999999.99',
+    muc_tang_gia: '50000',
+    dang_hoat_dong: 1,
+  },
+  {
+    gia_tu: '1000000',
+    gia_den: '9999999.99',
+    muc_tang_gia: '100000',
+    dang_hoat_dong: 1,
+  },
+  {
+    gia_tu: '10000000',
+    gia_den: null,
+    muc_tang_gia: '200000',
+    dang_hoat_dong: 1,
+  },
 ];
 const phienDauGia = {
   gia_khoi_diem: '18000000',
@@ -21,6 +36,7 @@ const gioiHan = (id, gia) => ({ nguoi_tra_gia_id: String(id), gia_toi_da: String
 
 kiemThu('B vượt A: chỉ hiển thị 20.2 triệu, không nhảy lên trần 22 triệu', () => {
   const ketQua = tinhKetQuaDauGia(phienDauGia, [gioiHan(1, 20000000)], '2', '22000000', cacBuocGia);
+
   xacNhan.equal(ketQua.winnerId, '2');
   xacNhan.equal(chuoiTien(ketQua.price), '20200000.00');
 });
@@ -34,23 +50,27 @@ kiemThu('Bằng trần: giữ người dẫn đầu dù ID lớn hơn và cùng 
     '20000000',
     cacBuocGia,
   );
+
   xacNhan.equal(ketQua.winnerId, '9');
   xacNhan.equal(chuoiTien(ketQua.price), '20000000.00');
 });
 
 kiemThu('Trần người mới thấp hơn: tự động trả cho người dẫn đầu', () => {
   const ketQua = tinhKetQuaDauGia(phienDauGia, [gioiHan(1, 22000000)], '2', '20000000', cacBuocGia);
+
   xacNhan.equal(ketQua.winnerId, '1');
   xacNhan.equal(chuoiTien(ketQua.price), '20200000.00');
 });
 
 kiemThu('Giá cuối bị chặn tại trần, kể cả khi bước giá vượt trần', () => {
   const ketQua = tinhKetQuaDauGia(phienDauGia, [gioiHan(1, 20000000)], '2', '20100000', cacBuocGia);
+
   xacNhan.equal(chuoiTien(ketQua.price), '20100000.00');
 });
 
 kiemThu('Người dẫn đầu nâng trần không tạo giá hoặc gia hạn giả', () => {
   const ketQua = tinhKetQuaDauGia(phienDauGia, [gioiHan(1, 20000000)], '1', '22000000', cacBuocGia);
+
   xacNhan.equal(ketQua.publicBids.length, 0);
   xacNhan.equal(ketQua.validPublicBid, false);
   xacNhan.equal(ketQua.price, donViTienNho(phienDauGia.gia_hien_tai));
@@ -59,6 +79,7 @@ kiemThu('Người dẫn đầu nâng trần không tạo giá hoặc gia hạn g
 kiemThu('Trần được nâng đủ giá sàn: giá đạt sàn nhưng không vượt trần', () => {
   const hienTai = { ...phienDauGia, gia_san: '23000000' };
   const ketQua = tinhKetQuaDauGia(hienTai, [gioiHan(1, 20000000)], '1', '22000000', cacBuocGia);
+
   xacNhan.equal(ketQua.price, donViTienNho('22000000'));
   xacNhan.equal(ketQua.validPublicBid, true);
 });
@@ -76,6 +97,7 @@ kiemThu('Không giảm trần và không bỏ qua bước giá tối thiểu', (
 
 kiemThu('Người đầu tiên trả giá khởi điểm hoặc giá sàn trong khả năng cam kết', () => {
   const rong = { ...phienDauGia, nguoi_dan_dau_id: null };
+
   xacNhan.equal(
     tinhKetQuaDauGia(rong, [], '1', '22000000', cacBuocGia).price,
     donViTienNho('18000000'),
@@ -93,13 +115,26 @@ kiemThu('Mua ngay tắt theo giá sàn hoặc lượt trả giá đầu', () => 
     gia_san: null,
     tong_luot_tra_gia: 0,
   };
+
   xacNhan.equal(choPhepMuaNgay(banDau), true);
   xacNhan.equal(choPhepMuaNgay({ ...banDau, tong_luot_tra_gia: 1 }), false);
   xacNhan.equal(
-    choPhepMuaNgay({ ...banDau, gia_san: '900000', tong_luot_tra_gia: 2, dat_gia_san: 0 }),
+    choPhepMuaNgay({
+      ...banDau,
+      gia_san: '900000',
+      tong_luot_tra_gia: 2,
+      dat_gia_san: 0,
+    }),
     true,
   );
-  xacNhan.equal(choPhepMuaNgay({ ...banDau, gia_san: '900000', dat_gia_san: 1 }), false);
+  xacNhan.equal(
+    choPhepMuaNgay({
+      ...banDau,
+      gia_san: '900000',
+      dat_gia_san: 1,
+    }),
+    false,
+  );
 });
 
 kiemThu('Tính tiền thập phân chính xác tới giới hạn DECIMAL(15,2)', () => {

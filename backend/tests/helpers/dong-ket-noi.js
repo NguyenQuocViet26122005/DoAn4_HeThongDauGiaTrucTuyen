@@ -6,6 +6,7 @@ let tacVuDong;
 // Những hàm dọn dẹp cùng chờ một tác vụ, tránh đóng MySQL nhiều lần.
 function dongKetNoiMotLan() {
   tacVuDong ??= nhomKetNoi.end();
+
   return tacVuDong;
 }
 

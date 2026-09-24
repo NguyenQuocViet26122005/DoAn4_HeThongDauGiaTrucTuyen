@@ -22,6 +22,7 @@ kiemThu('API riêng tư yêu cầu đăng nhập trước khi đọc MySQL', asy
     '/admin/jobs',
   ]) {
     const ketQuaHTTP = await fetch(`${diaChiGoc}/api${duongDanAPI}`);
+
     xacNhan.equal(ketQuaHTTP.status, 401, duongDanAPI);
     xacNhan.equal((await ketQuaHTTP.json()).success, false);
   }
@@ -31,6 +32,7 @@ kiemThu('Bearer token giả bị từ chối', async () => {
   const ketQuaHTTP = await fetch(`${diaChiGoc}/api/users/me`, {
     headers: { Authorization: 'Bearer invalid-token' },
   });
+
   xacNhan.equal(ketQuaHTTP.status, 401);
 });
 
@@ -40,12 +42,15 @@ kiemThu('Đăng ký từ chối quyền tự nâng vai trò và JSON không hợ
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ vai_tro: 'QUAN_TRI' }),
   });
+
   xacNhan.equal(yeuCauNangQuyen.status, 400);
+
   const saiDinhDang = await fetch(`${diaChiGoc}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: '{broken',
   });
+
   xacNhan.equal(saiDinhDang.status, 400);
 });
 

@@ -11,6 +11,7 @@ async function taoDuLieuKiemThu() {
   const matKhau = taoMaNgauNhien();
   const maBam = await bcrypt.hash(matKhau, 4);
   const cacTaiKhoan = {};
+
   for (const vaiTro of ['admin', 'seller', 'a', 'b', 'outsider']) {
     const id = await khoBanGhi.them('nguoi_dung', {
       ho_ten: `${tienTo}-${vaiTro}`,
@@ -19,6 +20,7 @@ async function taoDuLieuKiemThu() {
       vai_tro: vaiTro === 'admin' ? 'QUAN_TRI' : 'NGUOI_DUNG',
       trang_thai_nguoi_ban: vaiTro === 'seller' ? 'DA_XAC_MINH' : 'CHUA_DANG_KY',
     });
+
     cacTaiKhoan[vaiTro] = nguoiDungAnToan(await cacNguoiDung.layTheoId(id));
     if (vaiTro !== 'admin') {
       await khoBanGhi.them('dia_chi_nguoi_dung', {
@@ -33,8 +35,15 @@ async function taoDuLieuKiemThu() {
       });
     }
   }
+
   const danhMucId = await khoBanGhi.them('danh_muc', { ten: tienTo, duong_dan: tienTo });
-  return { ...cacTaiKhoan, prefix: tienTo, password: matKhau, categoryId: danhMucId };
+
+  return {
+    ...cacTaiKhoan,
+    prefix: tienTo,
+    password: matKhau,
+    categoryId: danhMucId,
+  };
 }
 
 async function sanPham(duLieuKiemThu, ghiDe = {}) {
@@ -52,6 +61,7 @@ async function sanPham(duLieuKiemThu, ghiDe = {}) {
 
 async function phienDauGia(duLieuKiemThu, ghiDe = {}) {
   const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
+
   return khoBanGhi.them('phien_dau_gia', {
     san_pham_id: await sanPham(duLieuKiemThu),
     gia_khoi_diem: '18000000.00',
@@ -66,14 +76,22 @@ async function phienDauGia(duLieuKiemThu, ghiDe = {}) {
 
 async function hoanTac(congViec) {
   const tinHieuHoanTac = new Error('ROLLBACK_TEST_DATA');
+
   try {
     await coSoDuLieu.giaoDich(async () => {
       await congViec();
       throw tinHieuHoanTac;
     });
   } catch (loi) {
-    if (loi !== tinHieuHoanTac) throw loi;
+    if (loi !== tinHieuHoanTac) {
+      throw loi;
+    }
   }
 }
 
-module.exports = { taoDuLieuKiemThu, sanPham, phienDauGia, hoanTac };
+module.exports = {
+  taoDuLieuKiemThu,
+  sanPham,
+  phienDauGia,
+  hoanTac,
+};
