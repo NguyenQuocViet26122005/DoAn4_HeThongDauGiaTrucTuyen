@@ -1,2 +1,37 @@
 # Bản sao riêng chứa dữ liệu tài khoản, hồ sơ và cam kết đấu giá.
 co-so-du-lieu/ban-sao-rieng/
+# Khóa đăng nhập riêng cho máy phát triển, không đưa vào repository.
+backend/.local/
+backend/uploads-kiem-thu/
+
+# Môi trường và thư viện
+node_modules/
+**/node_modules/
+.env
+.env.*
+!.env.example
+*.local
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+**/dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
