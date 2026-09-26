@@ -1,0 +1,234 @@
+.lo-trinh-san-pham {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  padding: 22px 0;
+  margin-bottom: 24px;
+  border-block: 1px solid var(--vien);
+  color: var(--chu-phu);
+  font-size: 12px;
+}
+.lo-trinh-san-pham span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lo-trinh-san-pham b {
+  font-family: var(--tieu-de);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--vang);
+}
+.bo-loc-san-pham {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.5fr) 1fr 1fr auto;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.bo-loc-san-pham .ant-select {
+  min-width: 0;
+}
+.danh-sach-san-pham-ban {
+  display: grid;
+  gap: 12px;
+}
+.dong-san-pham-ban {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 22px;
+  padding: 16px;
+  border: 1px solid var(--vien);
+  border-radius: 4px;
+  background: #1b1e18;
+}
+.dong-san-pham-ban .anh-san-pham {
+  aspect-ratio: 1;
+  border-radius: 3px;
+}
+.dong-san-pham-ban .anh-thay-the span {
+  display: none;
+}
+.thong-tin-san-pham-ban h2 {
+  margin: 8px 0;
+  font-size: 23px;
+  overflow-wrap: anywhere;
+}
+.thong-tin-san-pham-ban small,
+.thong-tin-san-pham-ban p {
+  color: var(--chu-phu);
+  font-size: 12px;
+  margin: 0;
+}
+.hanh-dong-san-pham-ban {
+  display: grid;
+  gap: 22px;
+  justify-items: end;
+  font-size: 12px;
+}
+.hanh-dong-san-pham-ban a,
+.kiem-tra-gui-duyet > a {
+  color: var(--vang);
+}
+.bien-tap-san-pham > .ant-alert {
+  margin-bottom: 20px;
+}
+.quay-lai-san-pham {
+  margin-bottom: 22px;
+}
+.cot-bien-tap-san-pham {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  align-items: start;
+  gap: 24px;
+}
+.cac-buoc-san-pham {
+  display: grid;
+  min-width: 0;
+  gap: 24px;
+}
+.luoi-truong-san-pham {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+.nut-luu-san-pham {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+.nut-luu-san-pham span,
+.tieu-de-khoi-san-pham > span {
+  font-size: 12px;
+}
+.kiem-tra-gui-duyet {
+  position: sticky;
+  top: 110px;
+  padding: 24px;
+  border-color: #534a34;
+  background: #222319;
+}
+.kiem-tra-gui-duyet h2 {
+  font-size: 25px;
+  margin: 16px 0;
+}
+.kiem-tra-gui-duyet ul {
+  padding-left: 18px;
+  color: var(--chu-phu);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.kiem-tra-gui-duyet li {
+  margin-bottom: 10px;
+}
+.kiem-tra-gui-duyet p,
+.kiem-tra-gui-duyet > a {
+  font-size: 12px;
+}
+.kiem-tra-gui-duyet > a {
+  display: block;
+  margin-top: 24px;
+}
+.nhac-gui-duyet {
+  display: block;
+  margin-top: 14px;
+  color: var(--vang);
+  font-size: 12px;
+}
+.tieu-de-khoi-san-pham {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.tieu-de-khoi-san-pham h2 {
+  font-size: 25px;
+}
+.luoi-anh-nguoi-ban {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.luoi-anh-nguoi-ban article {
+  min-width: 0;
+  border: 1px solid var(--vien);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.luoi-anh-nguoi-ban .anh-san-pham {
+  aspect-ratio: 4 / 3;
+}
+.luoi-anh-nguoi-ban img {
+  object-fit: contain;
+}
+.hanh-dong-anh {
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+.chon-anh-san-pham {
+  margin-top: 22px;
+}
+.tep-cho-tai > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--vien);
+}
+.tep-cho-tai span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.tep-cho-tai small {
+  display: block;
+  color: var(--chu-phu);
+  margin-top: 4px;
+}
+.tep-cho-tai .loi-tep {
+  color: #ffa39e;
+}
+.tep-cho-tai > button {
+  margin-top: 16px;
+}
+@media (max-width: 1200px) {
+  .cot-bien-tap-san-pham {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .kiem-tra-gui-duyet {
+    position: static;
+  }
+  .lo-trinh-san-pham,
+  .bo-loc-san-pham {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .dong-san-pham-ban {
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: 14px;
+  }
+  .hanh-dong-san-pham-ban {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+  }
+  .thong-tin-san-pham-ban h2 {
+    font-size: 20px;
+  }
+  .luoi-truong-san-pham,
+  .bo-loc-san-pham,
+  .luoi-anh-nguoi-ban {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bien-tap-san-pham .tam-noi-dung {
+    padding: 20px;
+  }
+}

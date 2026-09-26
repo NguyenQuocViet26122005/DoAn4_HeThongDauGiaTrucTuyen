@@ -14,19 +14,11 @@ import {
   Switch,
   Tag,
 } from 'antd';
-import { useQuery } from '@tanstack/react-query';
-import type { BanGhi, TruongNhap } from '../types/du-lieu';
-import { boNho, doc, duongDanAnh, http, loiDeDoc, taiTep } from '../services/api';
+import type { BanGhi, Phien, TruongNhap } from '../types/du-lieu';
+import { boNho, duongDanAnh, http, loiDeDoc, taiTep } from '../services/api';
 import { chuoi, mocThoiGian, nhan } from '../utils/dinh-dang';
-import { BieuTuong, bieuTuongDanhMuc } from './bieu-tuong';
-
-export function useDuLieu<T>(url: string, thamSo?: Record<string, unknown>, bat = true) {
-  return useQuery({
-    queryKey: [url, thamSo],
-    queryFn: () => doc<T>(url, thamSo),
-    enabled: bat,
-  });
-}
+import { BieuTuong } from './bieu-tuong';
+import { bieuTuongDanhMuc } from '../utils/bieu-tuong';
 
 export function TrangThai({ giaTri }: { giaTri: unknown }) {
   const ten = chuoi(giaTri);
@@ -44,6 +36,26 @@ export function TrangThai({ giaTri }: { giaTri: unknown }) {
       : 'gold';
 
   return <Tag color={mau}>{nhan(giaTri)}</Tag>;
+}
+
+export function TrangThaiPhien({ phien }: { phien: Phien }) {
+  const [hienTai, datHienTai] = useState(Date.now);
+
+  useEffect(() => {
+    const boDem = setInterval(() => datHienTai(Date.now()), 1000);
+
+    return () => clearInterval(boDem);
+  }, []);
+
+  const choKetQua =
+    ['DA_LEN_LICH', 'HOAT_DONG'].includes(phien.trang_thai) &&
+    mocThoiGian(phien.thoi_gian_ket_thuc) <= hienTai;
+
+  if (choKetQua) {
+    return <Tag color="gold">Chờ kết quả</Tag>;
+  }
+
+  return <TrangThai giaTri={phien.trang_thai} />;
 }
 
 export function TieuDe({
@@ -73,14 +85,16 @@ export function ChoDuLieu({
   truyVan,
   children,
   rong = false,
+  thongDiepRong = 'Chưa có dữ liệu trong mục này',
 }: {
   truyVan: { isPending: boolean; isError: boolean; error: unknown; refetch: () => unknown };
   children: ReactNode;
   rong?: boolean;
+  thongDiepRong?: string;
 }) {
   if (truyVan.isPending) {
     return (
-      <div className="khoi-cho">
+      <div className="khoi-cho" role="status" aria-label="Đang tải dữ liệu">
         <Skeleton active paragraph={{ rows: 5 }} />
       </div>
     );
@@ -99,7 +113,7 @@ export function ChoDuLieu({
   if (rong) {
     return (
       <div className="trong">
-        <Empty description="Chưa có dữ liệu trong mục này" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        <Empty description={thongDiepRong} image={Empty.PRESENTED_IMAGE_SIMPLE} />
       </div>
     );
   }

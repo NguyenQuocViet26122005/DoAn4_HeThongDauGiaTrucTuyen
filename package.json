@@ -1,0 +1,9 @@
+{
+  "name": "doan4-he-thong-dau-gia",
+  "private": true,
+  "scripts": {
+    "format": "node backend/scripts/dinh-dang-khoi.js && node backend/node_modules/prettier/bin/prettier.cjs --write --ignore-unknown backend/src backend/scripts backend/tests backend/docs backend/HUONG-DAN.md backend/package.json backend/tsconfig.json backend/.prettierrc.json frontend/src frontend/*.ts frontend/*.js frontend/*.json frontend/*.html frontend/*.md co-so-du-lieu/cong-cu co-so-du-lieu/*.md co-so-du-lieu/mau-so-do.html TAI-LIEU-NGHIEP-VU-VA-CONG-NGHE.md package.json .prettierrc.cjs",
+    "format:check": "node backend/scripts/dinh-dang-khoi.js --check && node backend/node_modules/prettier/bin/prettier.cjs --check --ignore-unknown backend/src backend/scripts backend/tests backend/docs backend/HUONG-DAN.md backend/package.json backend/tsconfig.json backend/.prettierrc.json frontend/src frontend/*.ts frontend/*.js frontend/*.json frontend/*.html frontend/*.md co-so-du-lieu/cong-cu co-so-du-lieu/*.md co-so-du-lieu/mau-so-do.html TAI-LIEU-NGHIEP-VU-VA-CONG-NGHE.md package.json .prettierrc.cjs",
+    "check": "npm run format:check && npm --prefix backend run check && npm --prefix frontend run lint"
+  }
+}

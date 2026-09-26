@@ -1,3 +1,5 @@
+import type { KiemDinhMoiNhat } from './kiem-dinh';
+
 export type BanGhi = Record<string, unknown>;
 export interface NguoiDung {
   id: string;
@@ -14,6 +16,7 @@ export interface DanhMuc {
   ten: string;
   danh_muc_cha_id: string | null;
   duong_dan: string;
+  yeu_cau_kiem_dinh?: number;
 }
 export interface Phien {
   id: string;
@@ -36,6 +39,9 @@ export interface Phien {
   dat_gia_san: number;
   tong_luot_tra_gia: number;
   so_lan_gia_han: number;
+  phi_van_chuyen: string;
+  yeu_cau_dat_coc: number;
+  so_tien_dat_coc: string;
 }
 export interface SanPham {
   id: string;
@@ -47,11 +53,17 @@ export interface SanPham {
   thuong_hieu: string | null;
   trang_thai_duyet?: string;
   ly_do_tu_choi?: string;
+  co_the_sua?: boolean;
+  ly_do_khong_the_sua?: string | null;
+  bat_buoc_kiem_dinh?: number;
+  kiem_dinh_moi_nhat?: KiemDinhMoiNhat | null;
+  ngay_duyet?: string | null;
   hinh_anh: { id: string; duong_dan_anh: string; la_anh_chinh: number }[];
   thuoc_tinh: {
     thuoc_tinh_id: string;
     ten_thuoc_tinh: string;
     gia_tri: string;
+    kieu_nhap?: string;
     don_vi: string | null;
   }[];
 }

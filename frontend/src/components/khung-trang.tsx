@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { Badge, Button, Drawer, Dropdown, Input } from 'antd';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { BieuTuong } from './bieu-tuong';
-import { useDuLieu } from './dung-chung';
+import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { boNho } from '../services/api';
 
 export function ThuongHieu() {
   return (
-    <Link to="/" className="thuong-hieu" aria-label="Lạc Việt Auctions, trang chủ">
+    <Link to="/" className="thuong-hieu" aria-label="VietBid, trang chủ">
       <span className="dau-an">
         <BieuTuong ten="kimCuong" size={26} />
       </span>
       <span>
-        LẠC VIỆT<small>AUCTIONS</small>
+        VietBid<small>ĐẤU GIÁ & SƯU TẦM</small>
       </span>
     </Link>
   );
@@ -81,6 +81,9 @@ export default function KhungTrang() {
 
   return (
     <>
+      <a href="#noi-dung" className="bo-qua-dieu-huong">
+        Đến nội dung chính
+      </a>
       <div className="thanh-thong-diep">
         <span>NHỮNG GIÁ TRỊ ĐẶC BIỆT, ĐANG CHỜ CHỦ NHÂN MỚI</span>
         <span>Đấu giá minh bạch · Giao dịch có bảo vệ</span>
@@ -88,12 +91,15 @@ export default function KhungTrang() {
       <header className="dau-trang">
         <div className="khung thanh-dieu-huong">
           <ThuongHieu />
-          <nav className="menu-chinh">{dieuHuong}</nav>
+          <nav className="menu-chinh" aria-label="Điều hướng chính">
+            {dieuHuong}
+          </nav>
           <div className="tim-kiem-dau-trang">
             <Input.Search
               aria-label="Tìm sản phẩm"
               placeholder="Tìm điều bạn yêu thích…"
-              onSearch={(q) => diDen(`/kham-pha?q=${encodeURIComponent(q)}`)}
+              maxLength={100}
+              onSearch={(q) => diDen(`/kham-pha?q=${encodeURIComponent(q.trim())}`)}
             />
           </div>
           <div className="tac-vu-dau-trang">
@@ -137,7 +143,16 @@ export default function KhungTrang() {
           </div>
         </div>
       </header>
-      <Drawer title="Khám phá Lạc Việt" open={mo} onClose={() => datMo(false)}>
+      <Drawer title="Khám phá VietBid" open={mo} onClose={() => datMo(false)} size={320}>
+        <Input.Search
+          aria-label="Tìm kiếm trong menu"
+          placeholder="Tìm món đồ bạn thích…"
+          maxLength={100}
+          onSearch={(q) => {
+            diDen(`/kham-pha?q=${encodeURIComponent(q.trim())}`);
+            datMo(false);
+          }}
+        />
         <nav className="menu-di-dong">
           {dieuHuong}
           <NavLink to="/tai-khoan" onClick={() => datMo(false)}>
@@ -145,7 +160,7 @@ export default function KhungTrang() {
           </NavLink>
         </nav>
       </Drawer>
-      <main id="noi-dung">
+      <main id="noi-dung" tabIndex={-1}>
         <Outlet />
       </main>
       <footer className="chan-trang">
@@ -182,7 +197,7 @@ export default function KhungTrang() {
             </div>
           </div>
           <div className="chan-cuoi">
-            <span>© {new Date().getFullYear()} Lạc Việt Auctions · Đồ án 4</span>
+            <span>© {new Date().getFullYear()} VietBid · Đồ án 4</span>
             <span>Thanh toán mô phỏng phục vụ học tập</span>
             <span>Tiếng Việt / VND</span>
           </div>
@@ -205,7 +220,8 @@ const mucTaiKhoan = [
   ['xac-minh', 'nguoi', 'Xác minh người bán'],
 ];
 const mucNguoiBan = [
-  ['', 'luoi', 'Sản phẩm của tôi'],
+  ['san-pham', 'luoi', 'Sản phẩm của tôi'],
+  ['kiem-dinh', 'khien', 'Hồ sơ kiểm định'],
   ['phien', 'bua', 'Phiên đấu giá'],
   ['don-hang', 'hop', 'Đơn bán hàng'],
 ];
@@ -214,6 +230,8 @@ const mucQuanTri = [
   ['nguoi-dung', 'nguoi', 'Người dùng'],
   ['xac-minh', 'khien', 'Xác minh người bán'],
   ['san-pham', 'hop', 'Duyệt sản phẩm'],
+  ['kiem-dinh', 'khien', 'Kiểm định sản phẩm'],
+  ['dat-coc', 'the', 'Quản lý đặt cọc'],
   ['phien', 'bua', 'Phiên & yêu cầu hủy'],
   ['danh-muc', 'luoi', 'Danh mục'],
   ['don-hang', 'the', 'Đơn hàng'],
@@ -243,7 +261,11 @@ export function KhungLamViec({ loai }: { loai: 'tai-khoan' | 'nguoi-ban' | 'quan
         </div>
         <nav>
           {muc.map(([duongDan, bieuTuong, ten]) => (
-            <NavLink end to={`/${loai}${duongDan ? `/${duongDan}` : ''}`} key={ten}>
+            <NavLink
+              end={!['san-pham', 'kiem-dinh'].includes(duongDan)}
+              to={`/${loai}${duongDan ? `/${duongDan}` : ''}`}
+              key={ten}
+            >
               <BieuTuong ten={bieuTuong} size={18} />
               {ten}
             </NavLink>

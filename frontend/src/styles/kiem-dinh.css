@@ -1,0 +1,111 @@
+.bo-loc-kiem-dinh {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.5fr) minmax(180px, 1fr) auto;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.danh-sach-kiem-dinh {
+  display: grid;
+  gap: 14px;
+}
+.dong-kiem-dinh {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  padding: 24px;
+  border: 1px solid var(--vien);
+  border-left: 3px solid var(--vang);
+  background: #1b1e18;
+  border-radius: 4px;
+}
+.dong-kiem-dinh h2 {
+  font-size: 24px;
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+.ma-kiem-dinh {
+  font-size: 12px;
+  color: var(--chu-phu);
+  overflow-wrap: anywhere;
+}
+.quay-lai-kiem-dinh {
+  display: inline-block;
+  margin-bottom: 24px;
+}
+.cot-ho-so-kiem-dinh {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.lo-trinh-kiem-dinh {
+  margin-bottom: 24px;
+}
+.lo-trinh-kiem-dinh > p {
+  margin-block: 20px;
+}
+.cot-ho-so-kiem-dinh .tam-noi-dung {
+  padding: 24px;
+  overflow-wrap: anywhere;
+}
+.cot-ho-so-kiem-dinh h2 {
+  font-size: 25px;
+  margin-top: 0;
+}
+.cac-nut-kiem-dinh {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 20px;
+}
+.kiem-tra-gui-duyet .cac-nut-kiem-dinh {
+  flex-direction: column;
+}
+.van-ban-kiem-dinh {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.85;
+}
+.tep-ho-so article {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--vien);
+}
+.tep-ho-so p {
+  color: var(--chu-phu);
+  font-size: 12px;
+  margin: 6px 0 0;
+}
+.chon-tep-kiem-dinh {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px dashed var(--vien);
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+.chon-tep-kiem-dinh input {
+  width: 100%;
+  min-width: 0;
+}
+.nut-luu-kiem-dinh {
+  margin-top: 18px;
+}
+@media (max-width: 1200px) {
+  .cot-ho-so-kiem-dinh {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 650px) {
+  .bo-loc-kiem-dinh,
+  .dong-kiem-dinh {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tep-ho-so article {
+    flex-wrap: wrap;
+  }
+}
