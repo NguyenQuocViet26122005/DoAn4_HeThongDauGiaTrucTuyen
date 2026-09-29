@@ -17,13 +17,17 @@ erDiagram
     de_nghi_mua_tiep_theo {
         bigint id PK
     }
+    kiem_dinh_san_pham {
+        bigint id PK
+    }
+    kiem_dinh_san_pham ||--o{ don_hang : "kiem_dinh_san_pham_id"
     phien_dau_gia ||--o{ don_hang : "phien_dau_gia_id"
     nguoi_dung ||--o{ don_hang : "nguoi_mua_id"
     nguoi_dung ||--o{ don_hang : "nguoi_ban_id"
     don_hang ||--o{ thanh_toan : "don_hang_id"
-    phien_dau_gia ||--o{ de_nghi_mua_tiep_theo : "phien_dau_gia_id"
-    don_hang ||--o{ de_nghi_mua_tiep_theo : "don_hang_goc_id"
-    nguoi_dung ||--o{ de_nghi_mua_tiep_theo : "nguoi_tra_gia_id"
-    don_hang ||--o{ de_nghi_mua_tiep_theo : "don_hang_moi_id"
     luot_tra_gia ||--o{ de_nghi_mua_tiep_theo : "luot_tra_gia_nguon_id"
     nguoi_dung ||--o{ de_nghi_mua_tiep_theo : "nguoi_yeu_cau_id"
+    phien_dau_gia ||--o{ de_nghi_mua_tiep_theo : "phien_dau_gia_id"
+    nguoi_dung ||--o{ de_nghi_mua_tiep_theo : "nguoi_tra_gia_id"
+    don_hang ||--o{ de_nghi_mua_tiep_theo : "don_hang_goc_id"
+    don_hang ||--o{ de_nghi_mua_tiep_theo : "don_hang_moi_id"

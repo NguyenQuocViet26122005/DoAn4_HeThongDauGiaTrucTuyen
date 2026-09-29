@@ -1,15 +1,17 @@
 const { spawnSync } = require('node:child_process');
 const path = require('node:path');
+const { randomBytes } = require('node:crypto');
 // Cố định database kiểm thử; không để npm test:integration quét dữ liệu chính.
 const tep = process.argv.includes('--api')
-  ? 'tests/integration/api-day-du.test.js'
+  ? 'tests/integration/api-*.test.js'
   : 'tests/integration/*.test.js';
 const ketQua = spawnSync(process.execPath, ['--test', '--test-isolation=none', tep], {
   cwd: path.resolve(__dirname, '..'),
   env: {
     ...process.env,
-    DB_NAME: 'doan4_daugia_kiem_thu_19',
+    DB_NAME: 'doan4_daugia_kiem_thu',
     JOBS_ENABLED: 'false',
+    JWT_SECRET: randomBytes(48).toString('hex'),
   },
   stdio: 'inherit',
   windowsHide: true,

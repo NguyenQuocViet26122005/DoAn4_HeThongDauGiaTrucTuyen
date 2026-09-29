@@ -19,7 +19,13 @@ const boDiaChiMacDinh = (nguoiDungId) =>
   ]);
 const coCamKet = (nguoiDungId) =>
   coSoDuLieu.layMot(
-    `SELECT m.id FROM tham_gia_phien m JOIN phien_dau_gia a ON a.id = m.phien_dau_gia_id WHERE m.nguoi_dung_id = ? AND m.gia_toi_da IS NOT NULL AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG') LIMIT 1`,
+    `SELECT m.id
+     FROM tham_gia_phien m
+     JOIN phien_dau_gia a ON a.id = m.phien_dau_gia_id
+     WHERE m.nguoi_dung_id = ?
+       AND m.gia_toi_da IS NOT NULL
+       AND a.trang_thai IN ('DA_LEN_LICH', 'HOAT_DONG')
+     LIMIT 1`,
     [nguoiDungId],
   );
 const cacHoSoXacMinh = (nguoiDungId) =>

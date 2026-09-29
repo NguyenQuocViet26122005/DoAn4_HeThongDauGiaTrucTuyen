@@ -5,7 +5,7 @@ import ungDung = require('./ung-dung');
 import coSoDuLieu = require('./repositories/ket-noi');
 import cacSuKien = require('./sockets/su-kien');
 
-async function khoiDongMayChu() {
+async function khoiDongMayChu(diaChiLangNghe?: string) {
   kiemTraMoiTruong();
   await coSoDuLieu.layMot('SELECT 1 AS ok');
 
@@ -18,7 +18,7 @@ async function khoiDongMayChu() {
   require('./sockets/ket-noi').khoiTao(io);
   await new Promise<void>((giaiQuyet, tuChoi) => {
     mayChu.once('error', tuChoi);
-    mayChu.listen(cauHinh.port, giaiQuyet);
+    mayChu.listen(cauHinh.port, diaChiLangNghe, giaiQuyet);
   });
   console.log(`Backend: http://localhost:${cauHinh.port} — MySQL đã kết nối`);
 

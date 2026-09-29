@@ -22,6 +22,8 @@ const tomTat = {
   dia_chi_nguoi_dung: 'Sổ địa chỉ của người dùng',
   danh_muc: 'Thuộc tính mẫu lưu bằng JSON',
   san_pham: 'Thông tin và snapshot thuộc tính',
+  kiem_dinh_san_pham: 'Tiếp nhận, báo cáo và lưu giữ thực tế',
+  dat_coc_dau_gia: 'Cọc theo người/phiên; hoàn hoặc chuyển đơn',
   phien_dau_gia: 'Giá công khai, thời gian, phí',
   tham_gia_phien: 'RIÊNG TƯ: theo dõi và cam kết',
   luot_tra_gia: 'Lịch sử giá công khai',
@@ -86,10 +88,11 @@ const trang = [
       luot_tra_gia: [930, 50],
       don_hang: [60, 420],
       thanh_toan: [60, 790],
-      de_nghi_mua_tiep_theo: [700, 610],
+      de_nghi_mua_tiep_theo: [900, 420],
+      kiem_dinh_san_pham: [490, 850],
     },
     w: 1310,
-    h: 1090,
+    h: 1150,
   },
   {
     id: '05-hau-mai',
@@ -102,6 +105,7 @@ const trang = [
       tranh_chap: [490, 400],
       tep_dinh_kem: [930, 780],
       danh_gia: [40, 780],
+      kiem_dinh_san_pham: [490, 780],
     },
     w: 1310,
     h: 1080,
@@ -112,9 +116,9 @@ const trang = [
     own: ['yeu_cau_xu_ly', 'vi_pham'],
     pos: {
       nguoi_dung: [30, 50],
-      san_pham: [460, 50],
+      san_pham: [530, 50],
       phien_dau_gia: [890, 50],
-      yeu_cau_xu_ly: [460, 420],
+      yeu_cau_xu_ly: [530, 420],
       don_hang: [30, 770],
       vi_pham: [890, 770],
     },
@@ -127,7 +131,7 @@ const trang = [
     own: ['thong_bao', 'cau_hinh_he_thong', 'nhat_ky_hoat_dong'],
     pos: {
       nguoi_dung: [30, 50],
-      phien_dau_gia: [460, 50],
+      phien_dau_gia: [530, 50],
       luot_tra_gia: [890, 50],
       thong_bao: [30, 420],
       cau_hinh_he_thong: [30, 780],
@@ -135,6 +139,31 @@ const trang = [
     },
     w: 1270,
     h: 1100,
+  },
+  {
+    id: '08-kiem-dinh',
+    ten: 'Kiểm định và trung tâm',
+    own: ['kiem_dinh_san_pham'],
+    pos: {
+      san_pham: [40, 50],
+      nguoi_dung: [930, 50],
+      kiem_dinh_san_pham: [490, 430],
+    },
+    w: 1310,
+    h: 740,
+  },
+  {
+    id: '09-dat-coc',
+    ten: 'Đăng ký và đặt cọc',
+    own: ['dat_coc_dau_gia'],
+    pos: {
+      phien_dau_gia: [40, 50],
+      nguoi_dung: [930, 50],
+      dat_coc_dau_gia: [490, 430],
+      don_hang: [490, 850],
+    },
+    w: 1310,
+    h: 1150,
   },
 ];
 const W = 340,
@@ -176,6 +205,8 @@ function cotHien(b) {
     tep_dinh_kem: ['loai_tep'],
     phien_dau_gia: ['gia_hien_tai', 'thoi_gian_ket_thuc'],
     thanh_toan: ['so_tien', 'trang_thai'],
+    kiem_dinh_san_pham: ['lan_kiem_dinh', 'ket_qua', 'trang_thai'],
+    dat_coc_dau_gia: ['so_tien', 'trang_thai'],
     nhat_ky_hoat_dong: ['hanh_dong', 'du_lieu_moi'],
   };
 
@@ -238,9 +269,9 @@ function svg(p) {
 }
 
 fs.mkdirSync(path.join(thuMuc, 'so-do'), { recursive: true });
-let draw = `<mxfile host="app.diagrams.net" modified="2026-09-23T00:00:00.000Z" agent="DoAn4" version="24.7.17">`;
+let draw = `<mxfile host="app.diagrams.net" modified="2026-09-25T00:00:00.000Z" agent="DoAn4" version="24.7.17">`;
 let mmdAll =
-  '# Sơ đồ quan hệ — 19 bảng\n\nMỗi hình chỉ vẽ quan hệ có bảng con thuộc nhóm. Bảng tham chiếu xuất hiện ở nhiều hình nhưng chỉ có một bảng vật lý. SQL giữ đủ 46 khóa ngoại. Các cột hiển thị được rút gọn, chi tiết ở SQL và trình xem HTML.\n\n';
+  '# Sơ đồ quan hệ — 21 bảng\n\nMỗi hình chỉ vẽ quan hệ có bảng con thuộc nhóm. Bảng tham chiếu xuất hiện ở nhiều hình nhưng chỉ có một bảng vật lý. SQL giữ đủ 53 khóa ngoại. Các cột hiển thị được rút gọn, chi tiết ở SQL và trình xem HTML.\n\n';
 const coverage = [];
 for (const p of trang) {
   p.svg = svg(p);
@@ -273,10 +304,10 @@ for (const p of trang) {
   draw += '</root></mxGraphModel></diagram>';
 }
 draw += '</mxfile>';
-if (coverage.length !== 46 || new Set(coverage).size !== 46) {
+if (coverage.length !== 53 || new Set(coverage).size !== 53) {
   throw new Error('Sơ đồ thiếu/trùng FK');
 }
-fs.writeFileSync(path.join(thuMuc, 'so-do-19-bang.drawio'), draw);
+fs.writeFileSync(path.join(thuMuc, 'so-do-21-bang.drawio'), draw);
 fs.writeFileSync(path.join(thuMuc, 'SO-DO-QUAN-HE.md'), mmdAll);
 const data = JSON.stringify({
   nhom,
@@ -284,22 +315,15 @@ const data = JSON.stringify({
   trang,
   tomTat,
 }).replace(/</g, '\\u003c');
-const html = `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Cơ sở dữ liệu đấu giá · 19 bảng</title><style>
-*{box-sizing:border-box}body{margin:0;background:#f3f5f2;color:#20302c;font:14px 'Segoe UI',Arial,sans-serif}button,a{font:inherit}button{cursor:pointer}header{padding:28px 34px 22px;background:#fff;border-bottom:1px solid #dce3de}header small{letter-spacing:2px;color:#77877e;font-size:11px}h1{font-size:28px;margin:9px 0 7px;font-weight:650}p{line-height:1.6}header p{margin:0;color:#65766c;max-width:1000px}.status{float:right;background:#eff5eb;color:#527245;border:1px solid #dce7d4;padding:7px 11px;border-radius:5px;font-size:12px}.layout{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:calc(100vh - 152px)}nav{padding:20px 14px;background:#163a35;color:#c5d8d0}nav label{display:block;padding:12px 12px 8px;font-size:10px;letter-spacing:1.5px;color:#8faea3}nav button{width:100%;text-align:left;border:0;border-radius:5px;background:transparent;color:#dbe5df;padding:12px;margin:2px 0;font-size:13px}nav button.active{background:#e7efdc;color:#21392d;font-weight:650}nav a{display:block;padding:8px 12px;color:#c5d8d0;font-size:12px;text-decoration:none}main{min-width:0;padding:24px}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-bottom:12px}.toolbar h2{font-size:19px;margin:0 auto 0 0}.toolbar button,.toolbar select,.download{background:white;color:#425b50;border:1px solid #ccd7cd;padding:7px 10px;border-radius:4px;text-decoration:none;font-size:12px}.note{font-size:12px;color:#63756a;margin:5px 0 15px}.board{border:1px solid #dce3de;background:#fafbf9;border-radius:7px;overflow:auto;min-height:440px}.board svg{display:block;width:100%;height:auto;min-width:760px}.board svg .node{cursor:pointer}.board svg .node:hover rect,.board svg .node:focus rect{stroke:#39795f;stroke-width:3;outline:0}.board svg .node.selected rect{stroke:#b68a3e;stroke-width:3}.board svg .edge{opacity:.9}.board svg .edge.dim{opacity:.12}.board svg .edge.selected path{stroke:#a27530;stroke-width:3}.board.hide-actors .actor{display:none}.details{margin-top:18px;padding:22px;background:white;border:1px solid #dce3de;border-radius:6px}.details h3{margin:0 0 10px;font-size:18px}.columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:5px 24px}.field{padding:8px 0;border-bottom:1px solid #eef1ed;font:12px Consolas,monospace;overflow-wrap:anywhere}.field span{color:#849084;font:11px 'Segoe UI',Arial;float:right}.link-list{padding-left:20px;color:#576b60;line-height:1.8;font-size:12px}.overview{padding:28px}.intro{font-size:21px;margin:0 0 8px}.flow{margin:26px 0;padding:16px 20px;border-left:3px solid #b5944b;background:#eef2e8;color:#456052;line-height:1.9}.groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.group{background:white;border:1px solid #d6e0d8;border-radius:7px;padding:20px}.group h3{margin:0 0 14px;font-size:15px;display:flex;justify-content:space-between}.group h3 span{font-weight:400;color:#7c8d81}.group button{display:block;border:0;background:none;color:#436859;padding:6px 0;text-align:left;font:12px Consolas,monospace;overflow-wrap:anywhere}.legend{display:flex;flex-wrap:wrap;gap:20px;font-size:12px;color:#748679;margin-top:14px}.legend b{color:#264b3a}code{font-family:Consolas,monospace}footer{padding:18px 0;color:#7b887f;font-size:11px}@media(max-width:1000px){.layout{grid-template-columns:195px minmax(0,1fr)}main{padding:16px}.groups{grid-template-columns:repeat(2,minmax(0,1fr))}header{padding:22px}.status{float:none;display:inline-block;margin-bottom:12px}}@media(max-width:650px){.layout{display:block}nav{display:flex;overflow:auto;padding:8px}nav label,nav a{display:none}nav button{width:auto;white-space:nowrap}h1{font-size:22px}.groups{grid-template-columns:1fr}.overview{padding:18px}.toolbar h2{width:100%}}@media print{nav,header,.toolbar button,.toolbar select,.download,footer{display:none}.layout{display:block}main{padding:0}.board{overflow:visible;border:0}.board svg{min-width:0}.details{break-before:page}.group{break-inside:avoid}}
-</style></head><body><header><span class="status">Bản thiết kế riêng · chưa chuyển backend</span><small>ĐỒ ÁN 4 / THIẾT KẾ DỮ LIỆU</small><h1>Hệ thống đấu giá · 19 bảng</h1><p>Đọc từ tổng quan đến từng nhóm nghiệp vụ. Sơ đồ nhỏ giúp theo dõi quan hệ; SQL vẫn giữ đủ khóa ngoại cần thiết.</p></header><div class="layout"><nav id="menu"></nav><main><div class="toolbar"><h2 id="title">Tổng quan</h2><button id="actors" hidden>Hiện quan hệ tài khoản</button><select id="zoom" aria-label="Độ phóng đại"><option value="100">Vừa khung</option><option value="125">125%</option><option value="150">150%</option><option value="200">200%</option></select><a class="download" id="download" hidden>Tải SVG</a><button id="print">In sơ đồ</button></div><p class="note" id="note"></p><div class="board" id="board"></div><div id="details" class="details" hidden></div><footer>19 bảng vật lý · 46 khóa ngoại · 7 sơ đồ chi tiết. Mũi tên đi từ bảng con đến bảng được tham chiếu. Một đường có thể gộp nhiều FK giữa cùng hai bảng.</footer></main></div><script>
-const DATA=${data};
-const el=id=>document.getElementById(id);const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let active='overview',showActors=false;
-el('menu').innerHTML='<label>THIẾT KẾ 19 BẢNG</label><button data-page="overview">Tổng quan</button><label>SƠ ĐỒ THEO NGHIỆP VỤ</label>'+DATA.trang.map((p,i)=>'<button data-page="'+p.id+'">0'+(i+1)+' &nbsp; '+esc(p.ten)+'</button>').join('')+'<label>TỆP THIẾT KẾ</label><a href="01-tao-csdl-19-bang.sql">SQL tạo cấu trúc</a><a href="so-do-19-bang.drawio">Sơ đồ chỉnh sửa bằng draw.io</a><a href="HUONG-DAN-CSDL.md">Hướng dẫn và chuyển đổi</a>';
-function show(id){active=id;const p=DATA.trang.find(p=>p.id===id);document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));el('details').hidden=true;el('actors').hidden=!p||p.own.includes('nguoi_dung');el('download').hidden=!p;el('zoom').value='100';el('title').textContent=p?p.ten:'Tổng quan nghiệp vụ';el('board').classList.toggle('hide-actors',!showActors);if(p){el('board').innerHTML=p.svg;el('download').href='so-do/'+p.id+'.svg';el('download').download=p.id+'.svg';el('note').textContent='Bảng xanh thuộc nhóm, bảng xám là tham chiếu. Chọn một bảng để xem đầy đủ cột và khóa ngoại. Quan hệ tài khoản có thể bật riêng để hình gọn hơn.';}else{el('note').textContent='Database thiết kế: doan4_daugia_thiet_ke_19. Database gốc doan4_daugia được giữ nguyên.';el('board').innerHTML='<div class="overview"><h2 class="intro">Một luồng chính, sáu nhóm dữ liệu</h2><p>Gộp các phần phụ thuộc chặt chẽ; giữ tách biệt tiền, lịch sử giao dịch và cam kết bí mật.</p><div class="flow">Xác minh người bán → Duyệt sản phẩm → Đấu giá → Thanh toán mô phỏng → Giao và kiểm tra hàng → Hoàn tất / Admin xử lý tranh chấp</div><div class="groups">'+DATA.nhom.map(n=>'<section class="group"><h3>'+esc(n.ten)+'<span>'+n.bang.length+' bảng</span></h3>'+n.bang.map(b=>'<button data-bang="'+b.ten+'">'+esc(b.ten)+'</button>').join('')+'</section>').join('')+'</div><div class="legend"><span><b>JSON:</b> thuộc tính và bộ bước giá</span><span><b>Gộp vào đơn:</b> giữ tiền, vận chuyển</span><span><b>Riêng tư:</b> trần, hồ sơ, bằng chứng</span></div></div>';}}
-function detail(ten){const b=DATA.bang.find(b=>b.ten===ten);if(!b)return;el('details').hidden=false;el('details').innerHTML='<h3>'+esc(ten)+'</h3><p class="note">'+esc(DATA.tomTat[ten])+'. '+b.cot.length+' cột; '+b.lienKet.length+' khóa ngoại. Kiểu/enum/ràng buộc đầy đủ xem tệp SQL.</p><div class="columns">'+b.cot.map(c=>'<div class="field">'+esc(c.ten)+'<span>'+esc(c.kieu)+'</span></div>').join('')+'</div><ul class="link-list">'+b.lienKet.map(l=>'<li><code>'+esc(l.cot)+'</code> → <code>'+esc(l.bangCha)+'.'+esc(l.cotCha)+'</code></li>').join('')+'</ul>';el('board').querySelectorAll('.node').forEach(n=>n.classList.toggle('selected',n.dataset.bang===ten));el('board').querySelectorAll('.edge').forEach(e=>{const yes=e.dataset.con===ten||e.dataset.cha===ten;e.classList.toggle('selected',yes);e.classList.toggle('dim',!yes);});}
-document.addEventListener('click',e=>{const page=e.target.closest('[data-page]');if(page){show(page.dataset.page);return;}const b=e.target.closest('[data-bang]');if(b)detail(b.dataset.bang);});document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-bang]'))detail(e.target.dataset.bang);});el('actors').onclick=()=>{showActors=!showActors;el('board').classList.toggle('hide-actors',!showActors);el('actors').textContent=showActors?'Ẩn quan hệ tài khoản':'Hiện quan hệ tài khoản';};el('zoom').onchange=()=>{const s=el('board').querySelector('svg');if(s)s.style.width=el('zoom').value+'%';};el('print').onclick=()=>window.print();show('overview');
-</script></body></html>`;
+const html = fs
+  .readFileSync(path.join(thuMuc, 'mau-so-do.html'), 'utf8')
+  .replace('/*DU_LIEU_SO_DO*/ null', data);
 fs.writeFileSync(path.join(thuMuc, 'so-do-csdl.html'), html);
 console.log(
   JSON.stringify({
     soTrang: trang.length,
     khoaNgoaiDuocVe: coverage.length,
     html: 'so-do-csdl.html',
-    drawio: 'so-do-19-bang.drawio',
+    drawio: 'so-do-21-bang.drawio',
   }),
 );

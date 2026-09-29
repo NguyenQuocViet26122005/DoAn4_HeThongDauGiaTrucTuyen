@@ -24,6 +24,8 @@ const truongPhienCongKhai = [
   'gia_khoi_diem',
   'gia_mua_ngay',
   'phi_van_chuyen',
+  'yeu_cau_dat_coc',
+  'so_tien_dat_coc',
   'cho_phep_mua_ngay',
   'gia_hien_tai',
   'thoi_gian_bat_dau',
@@ -79,9 +81,4 @@ function kiemTraDuLieuCongKhai(giaTri: unknown): void {
   }
 }
 
-export {
-  chonTruong,
-  nguoiDungAnToan,
-  phienCongKhai,
-  kiemTraDuLieuCongKhai,
-};
+export { chonTruong, nguoiDungAnToan, phienCongKhai, kiemTraDuLieuCongKhai };

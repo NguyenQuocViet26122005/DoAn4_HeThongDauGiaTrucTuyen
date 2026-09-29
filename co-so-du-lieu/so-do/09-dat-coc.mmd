@@ -1,0 +1,16 @@
+erDiagram
+    phien_dau_gia {
+        bigint id PK
+    }
+    nguoi_dung {
+        bigint id PK
+    }
+    dat_coc_dau_gia {
+        bigint id PK
+    }
+    don_hang {
+        bigint id PK
+    }
+    don_hang ||--o{ dat_coc_dau_gia : "don_hang_id"
+    nguoi_dung ||--o{ dat_coc_dau_gia : "nguoi_dung_id"
+    phien_dau_gia ||--o{ dat_coc_dau_gia : "phien_dau_gia_id"

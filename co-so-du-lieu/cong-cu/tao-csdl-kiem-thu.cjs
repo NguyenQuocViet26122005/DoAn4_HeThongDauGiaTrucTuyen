@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const pool = require('../../backend/dist/config/co-so-du-lieu');
-const ten = 'doan4_daugia_kiem_thu_19';
+const ten = 'doan4_daugia_kiem_thu';
 
 async function main() {
   const c = await pool.getConnection();
@@ -17,8 +17,8 @@ async function main() {
     assert.equal(co.length, 0, 'Database kiểm thử đã tồn tại; không ghi đè.');
 
     const sql = fs
-      .readFileSync(path.join(__dirname, '../01-tao-csdl-19-bang.sql'), 'utf8')
-      .replaceAll('doan4_daugia_thiet_ke_19', ten);
+      .readFileSync(path.join(__dirname, '../../doan4_daugia_tieng_viet.sql'), 'utf8')
+      .replaceAll('doan4_daugia', ten);
     let ngan = ';',
       khoi = '';
 
@@ -46,10 +46,9 @@ async function main() {
       }
     }
     assert.equal(khoi.trim(), '');
-    await c.query(
-      `INSERT INTO ${ten}.cau_hinh_he_thong (khoa_cau_hinh,gia_tri_cau_hinh,kieu_du_lieu,mo_ta) SELECT khoa_cau_hinh,gia_tri_cau_hinh,kieu_du_lieu,mo_ta FROM doan4_daugia_thiet_ke_19.cau_hinh_he_thong`,
+    console.log(
+      'Đã tạo ' + ten + ': chỉ cấu hình/danh mục mẫu công khai từ SQL, không sao chép tài khoản.',
     );
-    console.log('Đã tạo ' + ten + ': chỉ cấu hình công khai, không sao chép tài khoản.');
   } finally {
     c.release();
   }

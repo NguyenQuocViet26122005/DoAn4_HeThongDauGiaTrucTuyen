@@ -1,0 +1,19 @@
+{
+  "thoi_gian": "2026-09-25T09:34:00.878Z",
+  "csdl_chinh": "doan4_daugia",
+  "so_bang": 21,
+  "da_xoa": [
+    "doan4_daugia_thiet_ke_19",
+    "doan4_daugia_kiem_thu_19",
+    "doan4_daugia_phuc_hoi_27",
+    "doan4_daugia_sao_luu_20260923070110",
+    "doan4_daugia_phuc_hoi_19",
+    "doan4_daugia_kiem_thu"
+  ],
+  "lan_nay": [
+    "doan4_daugia_kiem_thu"
+  ],
+  "lan_truoc": "2026-09-25T04:43:34.850Z",
+  "du_lieu_chinh": "KHONG_THAY_DOI",
+  "ban_sao_sha256": "81a3b81f2ff71b16a4a792732df04c6c7de536ab2203282568963a4d5623a916"
+}

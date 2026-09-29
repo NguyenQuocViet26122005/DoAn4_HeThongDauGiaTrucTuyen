@@ -6,7 +6,7 @@ const trangThai = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../trang-thai-chuyen-doi.json'), 'utf8'),
 );
 const nguon = trangThai.backup;
-const dich = process.argv.includes('--chinh-thuc') ? 'doan4_daugia' : 'doan4_daugia_thiet_ke_19';
+const dich = 'doan4_daugia';
 assert(/^[a-z0-9_]+$/.test(nguon));
 const json = (v) => (typeof v === 'string' ? JSON.parse(v) : v);
 

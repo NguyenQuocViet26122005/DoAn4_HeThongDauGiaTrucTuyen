@@ -1,6 +1,8 @@
 # Thử Backend bằng Postman
 
-Nếu muốn kiểm tra tự động trước khi dùng Postman, chạy `npm run test:api` trong `backend`. Bộ test gửi 155 yêu cầu HTTP đến cổng riêng, bao phủ 86 API, dùng tài khoản ngẫu nhiên rồi rollback và dọn tệp. Không cần khởi động server riêng hoặc lấy token thủ công. Dừng backend đang chạy tác vụ định kỳ trước khi chạy bộ tích hợp để tránh tiến trình khác cùng xử lý dữ liệu kiểm thử.
+Nếu muốn kiểm tra tự động trước khi dùng Postman, chạy `npm run test:api` trong `backend`. Hai bộ HTTP chạy trên cổng riêng, bao phủ 103 API, dùng tài khoản ngẫu nhiên rồi rollback và dọn tệp. Không cần khởi động server riêng hoặc lấy token thủ công. Dừng backend đang chạy tác vụ định kỳ trước khi chạy bộ tích hợp để tránh tiến trình khác cùng xử lý dữ liệu kiểm thử.
+
+Trong nhóm sản phẩm có yêu cầu **Chọn ảnh đại diện**. Sau khi tải và gắn ảnh, chọn đúng `sanPhamId` và `anhId` rồi gửi PATCH; phản hồi là danh sách ảnh với một ảnh chính. Sản phẩm chờ duyệt/đang kiểm định/đã có phiên không được đổi ảnh.
 
 ## Chuẩn bị
 
@@ -56,14 +58,14 @@ Không sửa giá trị `gia_toi_da` xuống thấp hơn lần trước. Ngườ
 
 ## Mua ngay và luồng đơn hàng
 
-1. Tạo sản phẩm/phiên mới chưa có giá trả để thử Mua ngay. Thành công trả `{ phien, don_hang }` và tự lưu `donHangId`.
-2. Với token người mua đúng đơn, gửi “Thanh toán mô phỏng”. Body chỉ `{}`; server lấy tổng tiền trong đơn. Gửi lại không tạo khoản thanh toán mới.
+1. Tạo phiên còn Mua ngay. Gửi kết quả mô phỏng và khóa yêu cầu; thành công trả đơn CHO_GUI_HANG đã thu đủ, Postman lưu donHangId.
+2. Mua ngay đã thanh toán trong bước trên. Thử THAT_BAI trên phiên khác: không có đơn, phiên/cọc không đổi. Giữ khóa khi retry cùng lần thử; đổi khóa cho lần thử mới. API thanh toán đơn riêng dành cho đơn thắng đấu giá thường còn thiếu tiền.
 3. Đọc chi tiết đơn: tiền trung gian `DANG_GIU`, đơn chờ gửi hàng.
-4. Người bán gửi “Người bán xác nhận đã gửi hàng” cùng mã vận đơn.
+4. Gửi shipping cùng mã vận đơn: token Admin cho đơn TRUNG_TAM; token seller cho đơn NGUOI_BAN.
 5. Người mua gửi “Người mua xác nhận hàng đã giao”. Bắt đầu thời gian kiểm tra hàng.
 6. Với nhánh hàng tốt, gửi “Người mua nhận hàng tốt và giải ngân”: đơn `HOAN_THANH`, tiền `DA_GIAI_NGAN`. Sau đó mới đánh giá được.
 
-Mua ngay tắt sau giá đầu tiên ở phiên không có sàn. Nếu có sàn, còn Mua ngay trước khi đạt sàn. Sau Mua ngay, đặt giá hoặc mua tiếp phải bị từ chối.
+Mua ngay tắt sau giá đầu tiên ở phiên không có sàn. Nếu có sàn, còn Mua ngay trước khi đạt sàn. Sau Mua ngay, đặt giá hoặc buyer khác mua tiếp bị từ chối; buyer cũ gửi lặp nhận lại đơn cũ, không thu thêm.
 
 ## Tranh chấp
 
@@ -72,7 +74,7 @@ Dùng một đơn khác đã trả tiền, gửi hàng và xác nhận giao, đa
 1. Người mua mở tranh chấp; Postman lưu `tranhChapId`.
 2. Đặt `nhomTep = evidence`, đổi Authorization của request tải tệp sang `maNguoiMua`, chọn ảnh/PDF. Sao chép đường dẫn trả về vào `tepBangChung`, sau đó gửi “Gắn bằng chứng đã tải lên”.
 3. Người bán gửi phản hồi. Admin tiếp nhận và giải quyết.
-4. Mẫu giải quyết hiện hoàn 1 triệu. Muốn hoàn toàn bộ, đặt `so_tien_hoan` bằng tiền đang giữ. Muốn giải ngân cho người bán, dùng `ket_qua = NGUOI_BAN`, `so_tien_hoan = "0"`.
+4. Mẫu giải quyết hoàn toàn bộ. Bỏ so_tien_hoan để server lấy đủ tiền (cả cọc và phí); nếu gửi thì phải khớp. Giải ngân seller dùng ket_qua = NGUOI_BAN. Không hỗ trợ hoàn một phần mới.
 5. Đọc lại chi tiết đơn/tranh chấp để kiểm tra tiền và trạng thái. Gửi lại quyết định giải quyết phải trả 409.
 
 Nếu cùng gửi yêu cầu mở tranh chấp và xác nhận hàng tốt, chỉ một nhánh được thành công. Khi tranh chấp đã mở, tác vụ hết hạn kiểm tra không được giải ngân.
@@ -125,3 +127,16 @@ ketNoi.on('notification:new', themThongBao);
 ```
 
 `maDangNhap`, `phienId`, `capNhatPhien`, `themThongBao` lấy từ phần ứng dụng frontend sẽ triển khai. Khi mất rồi nối lại kết nối, đọc API để đồng bộ trạng thái mới nhất.
+
+## Kiểm định, trung tâm và cọc
+
+1. Admin đặt yeu_cau_kiem_dinh = true cho danh mục. Seller tạo sản phẩm có ảnh/thuộc tính và gửi duyệt.
+2. Admin tạo hồ sơ kiểm định; seller khai báo gửi. Admin ghi tình trạng/serial/số kiện rồi bắt đầu kiểm định.
+3. Upload bằng token Admin, nhomTep = inspection, chọn ảnh/PDF. Chép tepVuaTai sang tepKiemDinh, gắn loại BAO_CAO_KIEM_DINH.
+4. Đặt ngayKiemDinh đúng thời gian báo cáo, ISO có múi giờ, từ lúc nhận đến hiện tại. Admin ghi DAT rồi duyệt sản phẩm. Nếu KHONG_DAT/CAN_BO_SUNG thì có thể ghi trả; không chạy bước trả cho hàng DAT đang giữ.
+5. Muốn thử cọc: Admin chọn chính sách rồi đặt bat = true trước khi seller tạo phiên mới. Phiên cũ không đổi.
+6. Buyer đăng ký, trả cọc rồi đặt giá. khoaDatCoc giữ cố định cho cùng lần thử; lần thử mới đổi khóa. HTTP 200 có thể là THAT_BAI, phải đọc thêm trạng thái.
+7. Chốt phiên: cọc winner chuyển vào đơn, loser được hoàn; winner chỉ trả phần thiếu. Hàng ở trung tâm dùng Admin gọi shipping. Nhận hàng chưa giải ngân.
+8. Second Chance: seller tạo từ đơn hủy vì quá hạn; ứng viên chấp nhận kèm thanh toán đủ ngay, không cọc lại. Kiểm tra thất bại giữ đề nghị đang chờ và retry không tạo đơn trùng.
+
+Bộ Postman không tự tạo tài khoản hoặc bật cọc. Điền thông tin thử nghiệm thực tế và chạy từng nhánh. Đổi khóa khi chuyển sang giao dịch mới.

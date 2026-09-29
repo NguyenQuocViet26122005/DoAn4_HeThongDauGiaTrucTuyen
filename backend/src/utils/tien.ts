@@ -32,10 +32,4 @@ function chuoiTien(giaTri: bigint) {
 
 const nhoHon = (a: bigint, b: bigint) => (a < b ? a : b);
 const lonHon = (a: bigint, b: bigint) => (a > b ? a : b);
-export {
-  donViTienNho,
-  chuoiTien,
-  nhoHon,
-  lonHon,
-  GIOI_HAN_TIEN,
-};
+export { donViTienNho, chuoiTien, nhoHon, lonHon, GIOI_HAN_TIEN };

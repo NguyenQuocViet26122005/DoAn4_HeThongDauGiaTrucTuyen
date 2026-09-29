@@ -25,12 +25,22 @@ const cacThanhToan = (id) =>
   coSoDuLieu.truyVan('SELECT * FROM thanh_toan WHERE don_hang_id=? ORDER BY id DESC', [id]);
 const tienTrungGian = (id, khoaDuLieu = false) =>
   coSoDuLieu.layMot(
-    `SELECT id,id AS don_hang_id,so_tien_da_thu AS so_tien,trang_thai_giu_tien AS trang_thai,so_tien_da_hoan,so_tien_da_giai_ngan,so_tien_dang_giu,ngay_bat_dau_giu,ngay_giai_ngan,ngay_hoan_tien,ghi_chu_giu_tien AS ghi_chu FROM don_hang WHERE id=?${khoaDuLieu ? ' FOR UPDATE' : ''}`,
+    `SELECT id, id AS don_hang_id, so_tien_da_thu AS so_tien,
+            trang_thai_giu_tien AS trang_thai,
+            so_tien_da_hoan, so_tien_da_giai_ngan, so_tien_dang_giu,
+            ngay_bat_dau_giu, ngay_giai_ngan, ngay_hoan_tien,
+            ghi_chu_giu_tien AS ghi_chu
+     FROM don_hang
+     WHERE id = ?${khoaDuLieu ? ' FOR UPDATE' : ''}`,
     [id],
   );
 const vanChuyen = (id) =>
   coSoDuLieu.layMot(
-    'SELECT id,id AS don_hang_id,don_vi_van_chuyen,ma_van_don,trang_thai_van_chuyen AS trang_thai,ngay_gui_hang,ngay_giao_van_chuyen AS ngay_giao_hang FROM don_hang WHERE id=? AND trang_thai_van_chuyen IS NOT NULL',
+    `SELECT id, id AS don_hang_id, don_vi_van_chuyen, ma_van_don,
+            trang_thai_van_chuyen AS trang_thai, ngay_gui_hang,
+            ngay_giao_van_chuyen AS ngay_giao_hang
+     FROM don_hang
+     WHERE id = ? AND trang_thai_van_chuyen IS NOT NULL`,
     [id],
   );
 const cacTranhChap = (id) =>

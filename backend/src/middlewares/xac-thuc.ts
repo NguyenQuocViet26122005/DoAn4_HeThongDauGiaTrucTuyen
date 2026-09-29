@@ -85,9 +85,4 @@ function nguoiBan(yeuCau: Request, phanHoi: Response, tiepTheo: NextFunction) {
   }
 }
 
-export {
-  yeuCauDangNhap,
-  quanTri,
-  nguoiBan,
-  xacThucToken,
-};
+export { yeuCauDangNhap, quanTri, nguoiBan, xacThucToken };

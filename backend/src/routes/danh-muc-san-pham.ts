@@ -11,6 +11,12 @@ boDinhTuyen.post('/products', yeuCauDangNhap(), nguoiBan, dieuKhien.tao);
 boDinhTuyen.put('/products/:id', yeuCauDangNhap(), nguoiBan, dieuKhien.capNhat);
 boDinhTuyen.post('/products/:id/submit', yeuCauDangNhap(), nguoiBan, dieuKhien.guiDuyet);
 boDinhTuyen.post('/products/:id/images', yeuCauDangNhap(), nguoiBan, dieuKhien.themAnh);
+boDinhTuyen.patch(
+  '/products/:id/images/:imageId/primary',
+  yeuCauDangNhap(),
+  nguoiBan,
+  dieuKhien.chonAnhChinh,
+);
 boDinhTuyen.delete('/products/:id/images/:imageId', yeuCauDangNhap(), nguoiBan, dieuKhien.xoaAnh);
 boDinhTuyen.get('/admin/categories', yeuCauDangNhap(), quanTri, dieuKhien.danhMucQuanTri);
 boDinhTuyen.post('/admin/categories', yeuCauDangNhap(), quanTri, dieuKhien.taoDanhMuc);

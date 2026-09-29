@@ -8,6 +8,7 @@ const khoPhien = require('../../dist/repositories/dau-gia');
 const khoDon = require('../../dist/repositories/don-hang');
 const dauGia = require('../../dist/services/dau-gia');
 const donHang = require('../../dist/services/don-hang');
+const datCoc = require('../../dist/services/dat-coc');
 const tranhChap = require('../../dist/services/tranh-chap');
 const thoiGian = require('../../dist/utils/thoi-gian');
 const { kiemTraDuLieuCongKhai } = require('../../dist/utils/du-lieu-cong-khai');
@@ -52,6 +53,11 @@ async function donDuLieuKiemThu(duLieu) {
     }
     await coSoDuLieu.truyVan(`DELETE FROM vi_pham WHERE nguoi_dung_id IN (${choTrong})`, cacId);
     for (const banGhi of cacPhien) {
+      await coSoDuLieu.truyVan(
+        "DELETE nk FROM nhat_ky_hoat_dong nk JOIN dat_coc_dau_gia c ON nk.loai_doi_tuong='dat_coc_dau_gia' AND nk.doi_tuong_id=c.id WHERE c.phien_dau_gia_id=?",
+        [banGhi.id],
+      );
+      await coSoDuLieu.truyVan('DELETE FROM dat_coc_dau_gia WHERE phien_dau_gia_id=?', [banGhi.id]);
       await coSoDuLieu.truyVan('DELETE FROM de_nghi_mua_tiep_theo WHERE phien_dau_gia_id=?', [
         banGhi.id,
       ]);
@@ -200,14 +206,53 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
     xacNhan.equal(trangThaiTien, trangThaiDon === 'DANG_TRANH_CHAP' ? 'DANG_GIU' : 'DA_GIAI_NGAN');
 
     const phienMuaNgay = await coSoDuLieu.giaoDich(() =>
-      phienDauGia(duLieu, { gia_mua_ngay: '24000000', cho_phep_mua_ngay: 1 }),
+      phienDauGia(duLieu, {
+        gia_mua_ngay: '24000000',
+        cho_phep_mua_ngay: 1,
+        yeu_cau_dat_coc: 1,
+        so_tien_dat_coc: '1800000',
+      }),
     );
+
+    for (const nguoi of [duLieu.a, duLieu.b]) {
+      await datCoc.dangKy(nguoi, phienMuaNgay);
+      await Promise.all([
+        datCoc.thanhToan(nguoi, phienMuaNgay, {
+          khoa_yeu_cau: `race-coc-${phienMuaNgay}-${nguoi.id}`,
+        }),
+        datCoc.thanhToan(nguoi, phienMuaNgay, {
+          khoa_yeu_cau: `race-coc-${phienMuaNgay}-${nguoi.id}`,
+        }),
+      ]);
+    }
+
     const canhTranh = await Promise.allSettled([
       dauGia.datGia(duLieu.a, phienMuaNgay, { gia_toi_da: '22000000' }),
       dauGia.muaNgay(duLieu.b, phienMuaNgay, {}),
     ]);
 
     xacNhan.equal(canhTranh.filter((muc) => muc.status === 'fulfilled').length, 1);
+
+    const phienSau = await khoPhien.layTheoId(phienMuaNgay);
+
+    if (phienSau.trang_thai === 'HOAT_DONG') {
+      await khoBanGhi.capNhat('phien_dau_gia', phienMuaNgay, {
+        thoi_gian_ket_thuc: await coSoDuLieu.thoiGianHienTai(),
+      });
+
+      await Promise.all([dauGia.xuLyDenHan(phienMuaNgay), dauGia.xuLyDenHan(phienMuaNgay)]);
+    }
+
+    const donSau = await khoDon.donHangCuaPhien(phienMuaNgay);
+
+    xacNhan.equal(donSau.length, 1);
+
+    const cocSau = await coSoDuLieu.truyVan(
+      'SELECT trang_thai FROM dat_coc_dau_gia WHERE phien_dau_gia_id=?',
+      [phienMuaNgay],
+    );
+
+    xacNhan.deepEqual(cocSau.map((c) => c.trang_thai).sort(), ['DA_CHUYEN_VAO_DON', 'DA_HOAN_COC']);
   } finally {
     khach?.ketNoi.close();
     await new Promise((xong) => io.close(xong));

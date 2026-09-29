@@ -21,6 +21,9 @@ import { baoDam, batBuocTonTai, cungId } from '../utils/loi';
 import { donViTienNho, chuoiTien } from '../utils/tien';
 import thoiGian = require('../utils/thoi-gian');
 import { phienCongKhai } from '../utils/du-lieu-cong-khai';
+import datCoc = require('./dat-coc');
+import { thanhToanSchema } from '../validations/don-hang.schema';
+import { taoKhoaYeuCau, ketQuaDaXuLy, luuKetQua } from './yeu-cau-thanh-toan';
 
 async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
   const dauVao = kiemTra.docSchema(taoPhienSchema, duLieuNhap);
@@ -63,6 +66,9 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
 
     baoDam(cungId(sanPham.nguoi_ban_id, nguoiDung.id), 403, 'Sản phẩm không thuộc tài khoản');
     baoDam(sanPham.trang_thai_duyet === 'DA_DUYET', 409, 'Sản phẩm chưa được duyệt');
+
+    await require('./kiem-dinh').kiemTraDuocDauGia(sanPham);
+
     baoDam(
       !(await khoDuLieu.phienDaCoCuaSanPham(sanPham.id)),
       409,
@@ -87,6 +93,7 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
 
     const id = await khoBanGhi.them('phien_dau_gia', {
       ...duLieu,
+      ...(await cauHinhNghiepVu.chupChinhSachCoc(duLieu.gia_khoi_diem)),
       gia_hien_tai: duLieu.gia_khoi_diem,
       cho_phep_mua_ngay: duLieu.gia_mua_ngay ? 1 : 0,
       thoi_gian_ket_thuc_goc: duLieu.thoi_gian_ket_thuc,
@@ -158,6 +165,7 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
     const { row: banGhi, now: thoiGianHienTai } = await layPhienDangChay(id);
 
     await kiemTraNguoiMua(nguoiDung, banGhi);
+    await datCoc.kiemTraQuyenDatGia(banGhi, nguoiDung.id);
 
     const cacMucToiDa = await khoDuLieu.cacMucToiDa(id);
     const ketQua = boTinhGia.tinhKetQuaDauGia(
@@ -282,14 +290,54 @@ async function datGia(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
   });
 }
 
-async function muaNgay(nguoiDung: NguoiDungDangNhap, id, dauVao = {}) {
-  kiemTra.kiemTraNoiDung(dauVao, []);
+async function muaNgay(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown = {}) {
+  const dauVao = kiemTra.docSchema(thanhToanSchema, duLieuNhap);
+  const khoa = taoKhoaYeuCau(dauVao);
 
   return coSoDuLieu.giaoDich(async () => {
+    const phien = batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id), true));
+    const daXuLy = await ketQuaDaXuLy('MUA_NGAY_THANH_TOAN', khoa, nguoiDung.id, phien.id);
+    const dichVuDon = require('./don-hang');
+
+    if (daXuLy) {
+      return {
+        ...daXuLy,
+        phien: phienCongKhai(phien),
+        don_hang: daXuLy.don_hang_id
+          ? await dichVuDon.chiTiet(nguoiDung, daXuLy.don_hang_id)
+          : null,
+      };
+    }
+    if (phien.ly_do_ket_thuc === 'MUA_NGAY' && cungId(phien.nguoi_dan_dau_id, nguoiDung.id)) {
+      const don = await require('../repositories/don-hang').donDangXuLyCuaPhien(phien.id);
+
+      baoDam(don && cungId(don.nguoi_mua_id, nguoiDung.id), 409, 'Đơn Mua ngay không còn hiệu lực');
+
+      return {
+        ket_qua_mo_phong: 'THANH_CONG',
+        phien: phienCongKhai(phien),
+        don_hang: await dichVuDon.chiTiet(nguoiDung, don.id),
+      };
+    }
+
     const { row: banGhi, now: thoiGianHienTai } = await layPhienDangChay(id);
     const diaChi = await kiemTraNguoiMua(nguoiDung, banGhi);
 
     baoDam(boTinhGia.choPhepMuaNgay(banGhi), 409, 'Mua ngay không còn hiệu lực');
+
+    if (dauVao.ket_qua_mo_phong === 'THAT_BAI') {
+      const ketQua = { ket_qua_mo_phong: 'THAT_BAI', don_hang_id: null };
+
+      await luuKetQua('MUA_NGAY_THANH_TOAN', khoa, nguoiDung.id, id, ketQua);
+
+      await ghiNhatKy(nguoiDung.id, 'MUA_NGAY_THANH_TOAN_THAT_BAI', 'phien_dau_gia', id);
+
+      return {
+        ...ketQua,
+        phien: phienCongKhai(banGhi),
+        don_hang: null,
+      };
+    }
 
     await khoBanGhi.capNhat('phien_dau_gia', id, {
       trang_thai: 'DA_KET_THUC',
@@ -302,20 +350,35 @@ async function muaNgay(nguoiDung: NguoiDungDangNhap, id, dauVao = {}) {
     });
 
     const daCapNhat = await khoDuLieu.layTheoId(id);
-    const donHang = await require('./don-hang').taoDonNguoiThang(
+    const donHang = await dichVuDon.taoDonNguoiThang(
       daCapNhat,
       nguoiDung.id,
       banGhi.gia_mua_ngay,
       'THANG_DAU_GIA',
       diaChi,
     );
+    const daThanhToan = await dichVuDon.thanhToan(nguoiDung, donHang.id, {
+      ...dauVao,
+      khoa_yeu_cau: khoa,
+    });
 
+    baoDam(daThanhToan.trang_thai === 'CHO_GUI_HANG', 409, 'Chưa thanh toán đủ để chốt Mua ngay');
+
+    await datCoc.ketThucPhien(id);
+
+    const ketQua = { ket_qua_mo_phong: 'THANH_CONG', don_hang_id: donHang.id };
+
+    await luuKetQua('MUA_NGAY_THANH_TOAN', khoa, nguoiDung.id, id, ketQua);
     await thongBaoKetThuc(daCapNhat);
 
-    await ghiNhatKy(nguoiDung.id, 'MUA_NGAY', 'phien_dau_gia', id);
+    await ghiNhatKy(nguoiDung.id, 'MUA_NGAY_THANH_CONG', 'phien_dau_gia', id);
     cacSuKien.phienDauGia(daCapNhat, 'auction:ended');
 
-    return { phien: phienCongKhai(daCapNhat), don_hang: donHang };
+    return {
+      ...ketQua,
+      phien: phienCongKhai(daCapNhat),
+      don_hang: daThanhToan,
+    };
   });
 }
 
@@ -393,6 +456,7 @@ async function xuLyDenHan(id) {
         banGhi.gia_hien_tai,
       );
     }
+    await datCoc.ketThucPhien(id);
     await thongBaoKetThuc(daCapNhat);
 
     await ghiNhatKy(null, 'KET_THUC_PHIEN', 'phien_dau_gia', id, {
@@ -462,6 +526,8 @@ async function duyetHuyPhien(quanTri: NguoiDungDangNhap, yeuCauId, duLieuNhap: u
         ly_do_ket_thuc: 'HUY_THEO_YEU_CAU_NGUOI_BAN',
         cho_phep_mua_ngay: 0,
       });
+
+      await datCoc.ketThucPhien(banGhi.id);
 
       for (const p of await khoDuLieu.nguoiThamGia(banGhi.id)) {
         await taoThongBao(

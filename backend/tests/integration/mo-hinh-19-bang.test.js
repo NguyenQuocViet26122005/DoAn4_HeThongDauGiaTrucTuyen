@@ -43,11 +43,17 @@ test('19 bảng: thanh toán lỗi không giữ tiền; retry một lần và ho
   hoanTac(async () => {
     const d = await taoDuLieuKiemThu();
     const id = await phienDauGia(d, {
-      gia_mua_ngay: '24000000',
-      cho_phep_mua_ngay: 1,
+      gia_san: '24000000',
       phi_van_chuyen: '35000',
     });
-    const { don_hang: don } = await dauGia.muaNgay(d.a, id);
+
+    await dauGia.datGia(d.a, id, { gia_toi_da: '24000000' });
+    await banGhi.capNhat('phien_dau_gia', id, {
+      thoi_gian_ket_thuc: thoiGian.congGiay(await db.thoiGianHienTai(), -1),
+    });
+    await dauGia.xuLyDenHan(id);
+
+    const don = await khoDon.donDangXuLyCuaPhien(id);
 
     assert.equal(don.tong_tien, '24035000.00');
 

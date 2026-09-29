@@ -12,6 +12,7 @@ import kiemTra = require('../validations/du-lieu-dau-vao');
 import { baoDam, batBuocTonTai, cungId } from '../utils/loi';
 import { donViTienNho } from '../utils/tien';
 import thoiGian = require('../utils/thoi-gian');
+import { taoKhoaYeuCau, ketQuaDaXuLy, luuKetQua } from './yeu-cau-thanh-toan';
 
 async function deNghiNguoiTiepTheoDaKhoa(phienDauGia, banGoc, nguoiYeuCauId) {
   if (
@@ -116,6 +117,7 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
 async function phanHoiDeNghi(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
   const dauVao = kiemTra.docSchema(phanHoiDeNghiSchema, duLieuNhap);
   const chapNhan = kiemTra.giaTriDungSai(dauVao.chap_nhan, 'Chấp nhận');
+  const khoa = taoKhoaYeuCau(dauVao);
 
   return coSoDuLieu.giaoDich(async () => {
     const banDau = batBuocTonTai(
@@ -127,6 +129,18 @@ async function phanHoiDeNghi(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unkno
     const banGhi = batBuocTonTai(await khoBanGhi.layTheoId('de_nghi_mua_tiep_theo', id, true));
 
     baoDam(cungId(banGhi.nguoi_tra_gia_id, nguoiDung.id), 403, 'Đề nghị không thuộc tài khoản');
+
+    const daXuLy = await ketQuaDaXuLy('SECOND_CHANCE_THANH_TOAN', khoa, nguoiDung.id, id);
+
+    if (daXuLy) {
+      return {
+        ...daXuLy,
+        de_nghi: banGhi,
+        don_hang: daXuLy.don_hang_id
+          ? await cacDonHang.chiTiet(nguoiDung, daXuLy.don_hang_id)
+          : null,
+      };
+    }
 
     if (chapNhan && banGhi.trang_thai === 'DA_CHAP_NHAN') {
       return {
@@ -195,12 +209,42 @@ async function phanHoiDeNghi(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unkno
         'Đề nghị chưa đạt giá sàn',
       );
 
+      if (dauVao.ket_qua_mo_phong === 'THAT_BAI') {
+        const ketQua = { ket_qua_mo_phong: 'THAT_BAI', don_hang_id: null };
+
+        await luuKetQua('SECOND_CHANCE_THANH_TOAN', khoa, nguoiDung.id, id, ketQua);
+
+        await ghiNhatKy(
+          nguoiDung.id,
+          'SECOND_CHANCE_THANH_TOAN_THAT_BAI',
+          'de_nghi_mua_tiep_theo',
+          id,
+        );
+
+        return {
+          ...ketQua,
+          de_nghi: banGhi,
+          don_hang: null,
+        };
+      }
+
       donHang = await cacDonHang.taoDonNguoiThang(
         phienDauGia,
         nguoiDung.id,
         banGhi.gia_de_nghi,
         'DE_NGHI_TIEP_THEO',
       );
+      donHang = await cacDonHang.thanhToan(nguoiDung, donHang.id, {
+        ket_qua_mo_phong: 'THANH_CONG',
+        khoa_yeu_cau: khoa,
+      });
+
+      baoDam(donHang.trang_thai === 'CHO_GUI_HANG', 409, 'Second Chance chưa được thanh toán đủ');
+
+      await luuKetQua('SECOND_CHANCE_THANH_TOAN', khoa, nguoiDung.id, id, {
+        ket_qua_mo_phong: 'THANH_CONG',
+        don_hang_id: donHang.id,
+      });
     }
 
     await khoBanGhi.capNhat('de_nghi_mua_tiep_theo', id, {
@@ -246,9 +290,4 @@ async function xuLyHetHan(id) {
   });
 }
 
-export {
-  tao,
-  chiTiet,
-  phanHoiDeNghi,
-  xuLyHetHan,
-};
+export { tao, chiTiet, phanHoiDeNghi, xuLyHetHan };

@@ -93,11 +93,4 @@ function sauKhiCommit(congViec: () => unknown | Promise<unknown>) {
   }
 }
 
-export {
-  truyVan,
-  layMot,
-  thoiGianHienTai,
-  giaoDich,
-  sauKhiCommit,
-  nhomKetNoi,
-};
+export { truyVan, layMot, thoiGianHienTai, giaoDich, sauKhiCommit, nhomKetNoi };

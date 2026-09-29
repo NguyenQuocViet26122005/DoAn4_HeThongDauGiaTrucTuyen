@@ -7,6 +7,9 @@ import { baoDam } from '../utils/loi';
 import { donViTienNho, GIOI_HAN_TIEN } from '../utils/tien';
 import kiemTra = require('../validations/du-lieu-dau-vao');
 import { ghiNhatKy } from './nhat-ky-thong-bao';
+import { chinhSachCocSchema } from '../validations/kiem-dinh.schema';
+import { docJSON } from '../utils/du-lieu-json';
+import { chuoiTien } from '../utils/tien';
 const giaTriMacDinh = {
   PAYMENT_DEADLINE_HOURS: 48,
   SELLER_SHIP_DEADLINE_DAYS: 3,
@@ -50,6 +53,29 @@ function buocGiaTaiMuc(gia: bigint, cacBanGhi: BuocGia[]) {
 }
 
 async function luu(quanTri: NguoiDungDangNhap, khoa, dauVao) {
+  if (khoa === 'DEPOSIT_POLICY') {
+    kiemTra.kiemTraNoiDung(dauVao, ['gia_tri_cau_hinh']);
+
+    const chinhSach = kiemTra.docSchema(chinhSachCocSchema, dauVao.gia_tri_cau_hinh);
+
+    return coSoDuLieu.giaoDich(async () => {
+      await khoDuLieu.khoaCauHinh();
+
+      const banGhi = await khoDuLieu.cauHinh(khoa);
+
+      baoDam(banGhi, 409, 'Chưa có cấu hình cọc trong CSDL');
+
+      await khoBanGhi.capNhat('cau_hinh_he_thong', banGhi.id, {
+        gia_tri_cau_hinh: JSON.stringify(chinhSach),
+        nguoi_cap_nhat_id: quanTri.id,
+      });
+
+      await ghiNhatKy(quanTri.id, 'DOI_CHINH_SACH_COC', 'cau_hinh_he_thong', banGhi.id, chinhSach);
+
+      return khoDuLieu.cauHinh(khoa);
+    });
+  }
+
   baoDam(Object.hasOwn(giaTriMacDinh, khoa), 400, 'Khóa cấu hình không được hỗ trợ');
   kiemTra.kiemTraNoiDung(dauVao, ['gia_tri_cau_hinh']);
 
@@ -151,9 +177,24 @@ async function thayBoBuocGia(quanTri: NguoiDungDangNhap, dauVao) {
   });
 }
 
-export {
-  docSoCauHinh,
-  buocGiaTaiMuc,
-  luu,
-  thayBoBuocGia,
-};
+async function chupChinhSachCoc(giaKhoiDiem: string) {
+  const banGhi = await khoDuLieu.cauHinh('DEPOSIT_POLICY');
+  const chinhSach = kiemTra.docSchema(chinhSachCocSchema, docJSON(banGhi?.gia_tri_cau_hinh, {}));
+
+  if (!chinhSach.bat) {
+    return { yeu_cau_dat_coc: 0, so_tien_dat_coc: null };
+  }
+
+  const gia = donViTienNho(giaKhoiDiem);
+  // Làm tròn lên đến một đồng, giữ phép tính bằng bigint.
+  const coc =
+    chinhSach.kieu === 'TY_LE'
+      ? ((gia * BigInt(chinhSach.gia_tri) + 9999n) / 10000n) * 100n
+      : BigInt(chinhSach.gia_tri) * 100n;
+
+  baoDam(coc > 0n && coc <= gia, 409, 'Tiền cọc cấu hình không phù hợp với giá khởi điểm');
+
+  return { yeu_cau_dat_coc: 1, so_tien_dat_coc: chuoiTien(coc) };
+}
+
+export { docSoCauHinh, buocGiaTaiMuc, luu, thayBoBuocGia, chupChinhSachCoc };

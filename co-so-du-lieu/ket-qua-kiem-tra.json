@@ -1,10 +1,10 @@
 {
-  "thoi_diem": "2026-09-23T11:41:05.934Z",
+  "thoi_diem": "2026-09-25T09:33:18.598Z",
   "mysql": "8.0.46",
-  "database_thiet_ke": "doan4_daugia_thiet_ke_19",
-  "so_bang": 19,
-  "so_khoa_ngoai": 46,
-  "so_trigger": 6,
+  "database_thiet_ke": "doan4_daugia_kiem_thu",
+  "so_bang": 21,
+  "so_khoa_ngoai": 53,
+  "so_trigger": 12,
   "so_view": 2,
   "so_ca_dat": 29,
   "cac_ca": [
@@ -128,19 +128,11 @@
   "du_lieu_kiem_thu": "ROLLBACK",
   "nguon_khong_doi_ve_cau_truc_va_so_dong": true,
   "nguon": {
-    "so_bang": 27,
+    "so_bang": 21,
     "dem_dong": [
       {
-        "bang": "bang_chung_tranh_chap",
-        "so_dong": "2"
-      },
-      {
-        "bang": "buoc_gia",
-        "so_dong": "4"
-      },
-      {
         "bang": "cau_hinh_he_thong",
-        "so_dong": "7"
+        "so_dong": "10"
       },
       {
         "bang": "danh_gia",
@@ -151,8 +143,8 @@
         "so_dong": "12"
       },
       {
-        "bang": "danh_sach_theo_doi",
-        "so_dong": "4"
+        "bang": "dat_coc_dau_gia",
+        "so_dong": "0"
       },
       {
         "bang": "de_nghi_mua_tiep_theo",
@@ -167,28 +159,12 @@
         "so_dong": "3"
       },
       {
-        "bang": "gia_han_phien_dau_gia",
-        "so_dong": "1"
-      },
-      {
-        "bang": "gia_tri_thuoc_tinh_san_pham",
-        "so_dong": "20"
-      },
-      {
-        "bang": "giu_tien_trung_gian",
-        "so_dong": "2"
-      },
-      {
-        "bang": "hinh_anh_san_pham",
-        "so_dong": "9"
+        "bang": "kiem_dinh_san_pham",
+        "so_dong": "0"
       },
       {
         "bang": "luot_tra_gia",
         "so_dong": "12"
-      },
-      {
-        "bang": "muc_gia_toi_da",
-        "so_dong": "10"
       },
       {
         "bang": "nguoi_dung",
@@ -196,7 +172,7 @@
       },
       {
         "bang": "nhat_ky_hoat_dong",
-        "so_dong": "3"
+        "so_dong": "4"
       },
       {
         "bang": "phien_dau_gia",
@@ -207,6 +183,14 @@
         "so_dong": "8"
       },
       {
+        "bang": "tep_dinh_kem",
+        "so_dong": "11"
+      },
+      {
+        "bang": "tham_gia_phien",
+        "so_dong": "12"
+      },
+      {
         "bang": "thanh_toan",
         "so_dong": "3"
       },
@@ -215,16 +199,8 @@
         "so_dong": "4"
       },
       {
-        "bang": "thuoc_tinh_danh_muc",
-        "so_dong": "18"
-      },
-      {
         "bang": "tranh_chap",
         "so_dong": "1"
-      },
-      {
-        "bang": "van_chuyen",
-        "so_dong": "2"
       },
       {
         "bang": "vi_pham",
@@ -235,10 +211,10 @@
         "so_dong": "3"
       },
       {
-        "bang": "yeu_cau_huy_phien",
+        "bang": "yeu_cau_xu_ly",
         "so_dong": "1"
       }
     ],
-    "ma_cau_truc": "402023dd8b4144a69df2820de20a4fd2e05c4c6a4beafa7db3a266876647883e"
+    "ma_cau_truc": "79290827d1fc7b97680cfa27bc3d87de59fb5afd46eb2ca13c23f46e785a8229"
   }
 }

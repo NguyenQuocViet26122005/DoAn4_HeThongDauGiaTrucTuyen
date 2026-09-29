@@ -84,8 +84,4 @@ const trangThai = () => ({
   lastRun: lanChayCuoi,
   interval_ms: cauHinh.jobIntervalMs,
 });
-export {
-  batDau,
-  chayMotLuot,
-  trangThai,
-};
+export { batDau, chayMotLuot, trangThai };

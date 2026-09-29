@@ -16,7 +16,11 @@ async function khoaTranhChap(id) {
 
 const bangChung = (id) =>
   coSoDuLieu.truyVan(
-    `SELECT id,tranh_chap_id,nguoi_tai_len_id,duong_dan_tep,loai_noi_dung AS loai_bang_chung,mo_ta,ngay_tao FROM tep_dinh_kem WHERE loai_tep='BANG_CHUNG_TRANH_CHAP' AND tranh_chap_id=? ORDER BY id`,
+    `SELECT id, tranh_chap_id, nguoi_tai_len_id, duong_dan_tep,
+            loai_noi_dung AS loai_bang_chung, mo_ta, ngay_tao
+     FROM tep_dinh_kem
+     WHERE loai_tep = 'BANG_CHUNG_TRANH_CHAP' AND tranh_chap_id = ?
+     ORDER BY id`,
     [id],
   );
 const cacTranhChap = (nguoiDung, { limit: gioiHan, offset: viTriBatDau }, quanTri = false) =>
@@ -100,7 +104,11 @@ async function thongKe() {
       'SELECT trang_thai,COUNT(*) AS so_luong,COALESCE(SUM(so_tien),0) AS tong_tien FROM thanh_toan GROUP BY trang_thai',
     ),
     coSoDuLieu.truyVan(
-      'SELECT trang_thai_giu_tien AS trang_thai,COALESCE(SUM(so_tien_da_thu),0) AS tong_tien,COALESCE(SUM(so_tien_dang_giu),0) AS dang_giu FROM don_hang GROUP BY trang_thai_giu_tien',
+      `SELECT trang_thai_giu_tien AS trang_thai,
+              COALESCE(SUM(so_tien_da_thu), 0) AS tong_tien,
+              COALESCE(SUM(so_tien_dang_giu), 0) AS dang_giu
+       FROM don_hang
+       GROUP BY trang_thai_giu_tien`,
     ),
     coSoDuLieu.truyVan(
       'SELECT trang_thai,COUNT(*) AS so_luong FROM tranh_chap GROUP BY trang_thai',

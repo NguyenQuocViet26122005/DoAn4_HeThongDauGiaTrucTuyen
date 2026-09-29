@@ -65,7 +65,6 @@ for (const tep of cacThuMuc.flatMap((thuMuc) => danhSachTep(path.join(gocDuAn, t
 
   function duyet(cauLenh) {
     if (
-      !chiKiemTra &&
       ts.isObjectLiteralExpression(cauLenh) &&
       cauLenh.properties.length >= 3 &&
       !cauLenh.getText(nguon).includes('\n')
@@ -98,9 +97,6 @@ for (const tep of cacThuMuc.flatMap((thuMuc) => danhSachTep(path.join(gocDuAn, t
 
   duyet(nguon);
 
-  if (chiKiemTra) {
-    continue;
-  }
   for (const muc of chen.sort((a, b) => b.viTri - a.viTri)) {
     noiDung = noiDung.slice(0, muc.viTri) + muc.chuoi + noiDung.slice(muc.viTri);
   }
@@ -133,18 +129,24 @@ for (const tep of cacThuMuc.flatMap((thuMuc) => danhSachTep(path.join(gocDuAn, t
     noiDung = noiDung.slice(0, viTri) + '\n\n' + noiDung.slice(viTri);
   }
   if (noiDung !== banDau) {
-    fs.writeFileSync(tep, noiDung);
+    if (!chiKiemTra) {
+      fs.writeFileSync(tep, noiDung);
+    } else {
+      console.error(path.relative(gocDuAn, tep));
+    }
     soTepThayDoi++;
   }
 }
 
-if (chiKiemTra && soKhoiThieu) {
-  console.error(`Còn ${soKhoiThieu} khối điều kiện/vòng lặp thiếu ngoặc nhọn.`);
+if (chiKiemTra && soTepThayDoi) {
+  console.error(
+    `Còn ${soTepThayDoi} tệp cần tách khối/khoảng cách (${soKhoiThieu} khối thiếu ngoặc).`,
+  );
   process.exitCode = 1;
 } else {
   console.log(
     chiKiemTra
-      ? 'Khối điều kiện/vòng lặp đã có ngoặc nhọn.'
+      ? 'Đã kiểm tra ngoặc nhọn, object nhiều thuộc tính và khoảng cách giữa các bước.'
       : `Đã sắp xếp khối và khoảng cách trong ${soTepThayDoi} tệp.`,
   );
 }

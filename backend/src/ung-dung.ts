@@ -49,6 +49,7 @@ ungDung.use('/api', require('./routes/tai-tep'));
 ungDung.use('/api', require('./routes/dau-gia'));
 ungDung.use('/api', require('./routes/tuong-tac'));
 ungDung.use('/api', require('./routes/don-hang'));
+ungDung.use('/api', require('./routes/kiem-dinh-dat-coc'));
 ungDung.get(
   '/api/admin/jobs',
   require('./middlewares/xac-thuc').yeuCauDangNhap(),

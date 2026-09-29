@@ -1,93 +1,26 @@
-# Các tệp đã tạo, sửa và đổi tên
+# Cấu trúc và thay đổi mã nguồn
 
-Danh sách so với thời điểm bắt đầu audit: backend khi đó có ba tệp khởi tạo, package.json/package-lock.json và cấu hình kết nối. Các đường dẫn bên dưới tính từ thư mục backend.
+Backend hiện dùng TypeScript + Express + Zod, MySQL 21 bảng. Tên tệp/hàm nghiệp vụ tiếng Việt được giữ; các thư mục kiến trúc vẫn theo cấu trúc đã có.
 
-## Tệp khởi tạo được sửa và đổi tên
+- `src/may-chu.ts`: khởi động HTTP, Socket.IO và tác vụ nền.
+- `src/ung-dung.ts`: middleware, route và phản hồi lỗi.
+- `src/config`: cấu hình runtime và pool MySQL; không đưa bí mật vào mã nguồn.
+- `src/routes` → `controllers` → `services` → `repositories`: định tuyến, nhận/trả HTTP, nghiệp vụ và truy vấn SQL.
+- `src/validations`: schema Zod và các hàm kiểm tra/chuẩn hóa đầu vào.
+- `src/types`: kiểu dùng chung và phần mở rộng Express.
+- `src/jobs`, `sockets`, `utils`: tác vụ định kỳ, sự kiện và tiện ích.
+- `tests`: kiểm thử đơn vị, HTTP, nghiệp vụ và nhiều kết nối MySQL.
+- `scripts`: kiểm tra schema, chạy kiểm thử tích hợp, định dạng và kiểm tra các khối code.
+- `dist`: kết quả `npm run build`; không sửa trực tiếp và không lưu vào Git.
 
-- `src/app.js` → `src/ung-dung.js`: lắp route, CORS, phản hồi và xử lý lỗi.
-- `src/server.js` → `src/may-chu.js`: HTTP, Socket.IO, tác vụ định kỳ và tắt kết nối có kiểm soát.
-- `src/config/database.js` → `src/config/co-so-du-lieu.js`: nhóm kết nối mysql2, múi giờ và kiểu dữ liệu tiền/ID.
-- `package.json`: điểm khởi động tiếng Việt, lệnh chạy/kiểm thử/định dạng, thêm Prettier vào devDependencies.
-- `package-lock.json`: cập nhật tương ứng với cài Prettier. Những thay đổi trong node_modules do npm sinh ra, không phải mã ứng dụng.
+Các tệp `.js` cũ trong `src` đã chuyển sang `.ts`; công cụ kiểm tra cú pháp JavaScript cũ được bỏ vì lệnh `check` dùng TypeScript. `package.json` và lockfile chứa các công cụ tương ứng. Kiểm thử và công cụ CSDL dùng mã đã biên dịch nên phải build trước khi chạy riêng.
 
-## Tệp nguồn được bổ sung
+Quy tắc định dạng nằm ở gốc dự án: `.prettierrc.cjs`, `.editorconfig`, `.cursor/rules/code-de-doc.mdc`. Lệnh `format` và `format:check` dùng chung cho backend, frontend, kiểm thử và công cụ CSDL. Cấu hình không định dạng thư viện, tệp build, bản sao dữ liệu hoặc lịch sử SQL.
 
-Có 46 tệp JavaScript trong src, gồm ba tệp thay thế ở trên và các tệp bổ sung sau:
+Các truy vấn đã đồng bộ 21 bảng, gồm giữ tiền/vận chuyển trong đơn, theo dõi/cam kết trong bảng tham gia, tệp đính kèm chung, thuộc tính JSON, kiểm định và cọc. Xem `../../co-so-du-lieu/HUONG-DAN-CSDL.md` về mapping, bản sao và sơ đồ.
 
-- `src/config/moi-truong.js`
-- `src/controllers/danh-muc-san-pham.js`
-- `src/controllers/dau-gia.js`
-- `src/controllers/don-hang.js`
-- `src/controllers/nguoi-dung.js`
-- `src/controllers/tuong-tac.js`
-- `src/controllers/xu-ly-http.js`
-- `src/jobs/lich-chay.js`
-- `src/middlewares/gioi-han-yeu-cau.js`
-- `src/middlewares/xac-thuc.js`
-- `src/middlewares/xu-ly-loi.js`
-- `src/repositories/ban-ghi.js`
-- `src/repositories/danh-muc-san-pham.js`
-- `src/repositories/dau-gia.js`
-- `src/repositories/don-hang.js`
-- `src/repositories/he-thong.js`
-- `src/repositories/ket-noi.js`
-- `src/repositories/nguoi-dung.js`
-- `src/repositories/tuong-tac.js`
-- `src/routes/danh-muc-san-pham.js`
-- `src/routes/dau-gia.js`
-- `src/routes/don-hang.js`
-- `src/routes/nguoi-dung.js`
-- `src/routes/tai-tep.js`
-- `src/routes/tuong-tac.js`
-- `src/services/cau-hinh.js`
-- `src/services/danh-muc-san-pham.js`
-- `src/services/dau-gia.js`
-- `src/services/de-nghi-mua-tiep.js`
-- `src/services/don-hang.js`
-- `src/services/nguoi-dung.js`
-- `src/services/nhat-ky-thong-bao.js`
-- `src/services/tai-tep.js`
-- `src/services/tinh-gia-tu-dong.js`
-- `src/services/tranh-chap.js`
-- `src/services/tuong-tac.js`
-- `src/sockets/ket-noi.js`
-- `src/sockets/su-kien.js`
-- `src/utils/du-lieu-cong-khai.js`
-- `src/utils/loi.js`
-- `src/utils/thoi-gian.js`
-- `src/utils/tien.js`
-- `src/validators/du-lieu-dau-vao.js`
+Nhóm mới nằm ở `services/kiem-dinh.ts`, `services/dat-coc.ts`, `services/yeu-cau-thanh-toan.ts`, repository tương ứng, schema kiểm định và route/controller `kiem-dinh-dat-coc.ts`. Luồng Mua ngay/Second Chance, thanh toán phần thiếu, vận chuyển trung tâm và tranh chấp đã cập nhật cùng kiểm thử HTTP/MySQL.
 
-## Kiểm tra, kiểm thử và định dạng
+SQL chính dùng 21 bảng; migration 003/004 giữ dữ liệu cũ. Bản sao 19 và 27 bảng được giữ riêng. Sơ đồ hiện tại có 9 trang, sinh từ metadata và mẫu HTML/CSS/JavaScript đã định dạng dễ đọc; bản draw.io 19 bảng cũ được bỏ để tránh nhầm.
 
-- `.gitignore`
-- `.prettierignore`
-- `.prettierrc.json`
-- `scripts/kiem-tra-cau-truc.js`
-- `scripts/kiem-tra.js`
-- `tests/helpers/dong-ket-noi.js`
-- `tests/helpers/du-lieu-mau.js`
-- `tests/http.test.js`
-- `tests/integration/api-day-du.test.js`
-- `tests/integration/dong-thoi.test.js`
-- `tests/integration/ket-qua-va-tac-vu.test.js`
-- `tests/integration/nghiep-vu.test.js`
-- `tests/integration/tep-va-san-pham.test.js`
-- `tests/tinh-gia.test.js`
-
-## Tài liệu và bộ yêu cầu mẫu
-
-- `HUONG-DAN.md`
-- `docs/danh-sach-api.md`
-- `docs/doan4-dau-gia.postman_collection.json`
-- `docs/huong-dan-postman.md`
-- `docs/nghiep-vu-va-gioi-han.md`
-- `docs/tep-da-thay-doi.md`
-
-## Phạm vi đổi tên và bảo toàn dữ liệu
-
-Các tên tiếng Anh tạm xuất hiện trong quá trình triển khai đã được thay bằng tên tiếng Việt tương ứng, đồng thời cập nhật mọi đường dẫn require và lệnh chạy. Không để lại hai bộ triển khai cũ/mới chạy song song. Thư mục kiến trúc (routes, controllers, services, repositories...) giữ tên để đúng cấu trúc đã chọn.
-
-Không sửa frontend, tệp SQL gốc hoặc cấu trúc MySQL. Không đọc hoặc sửa nội dung .env; phần JWT_SECRET do chủ project tự bổ sung. Không xóa dữ liệu mẫu. Kiểm thử đăng nhập tài khoản mẫu có cập nhật thời điểm đăng nhập cuối như luồng đăng nhập bình thường. Dữ liệu tạo riêng cho kiểm thử được rollback hoặc dọn theo UUID của từng lần chạy.
-
-Git có thể hiển thị file cũ là D và file mới là U trong quá trình đổi tên, hoặc ít file thay đổi hơn danh sách này nếu đã lưu một phần công việc vào Git giữa chừng. Danh sách trên mô tả kết quả của toàn bộ lần triển khai, không dùng trạng thái Git giữa chừng làm mốc audit.
+Phía frontend, hook `useDuLieu` đặt trong `hooks/su-dung-du-lieu.ts`, hàm chọn biểu tượng danh mục đặt trong `utils/bieu-tuong.ts`; component vẫn giữ tên cũ. Việc sắp xếp code không đồng nghĩa giao diện đã hoàn thiện.

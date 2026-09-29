@@ -16,6 +16,9 @@ export const guiHangSchema = z.strictObject({
   ma_van_don: vanBan(100, 'Mã vận đơn'),
 });
 export const diaChiDonSchema = z.strictObject({ dia_chi_id: dinhDanh });
-export const phanHoiDeNghiSchema = z.strictObject({ chap_nhan: dungSai });
+export const phanHoiDeNghiSchema = z.strictObject({
+  chap_nhan: dungSai,
+  ...thanhToanSchema.shape,
+});
 export type DuLieuThanhToan = z.infer<typeof thanhToanSchema>;
 export type DuLieuGuiHang = z.infer<typeof guiHangSchema>;

@@ -18,6 +18,11 @@ async function cacRouteHienCo() {
   const ketQua = ['GET /health', 'GET /admin/jobs'];
 
   for (const ten of await tepTin.readdir(thuMuc)) {
+    // 16 route mới được đối chiếu riêng trong api-kiem-dinh-dat-coc.test.js.
+    if (ten === 'kiem-dinh-dat-coc.ts') {
+      continue;
+    }
+
     const noiDung = await tepTin.readFile(duongDan.join(thuMuc, ten), 'utf8');
 
     for (const khop of noiDung.matchAll(
@@ -33,7 +38,7 @@ async function cacRouteHienCo() {
 }
 
 kiemThu(
-  'HTTP: tất cả API có kịch bản thành công và kiểm tra quyền; dữ liệu được rollback',
+  'HTTP: 87 API nền có kịch bản thành công và kiểm tra quyền; dữ liệu được rollback',
   async (boKiemThu) => {
     const cacRoute = await cacRouteHienCo();
     const daThanhCong = new Set();
@@ -356,6 +361,74 @@ kiemThu(
                 201,
               );
 
+              const anhThuHai = await gui(
+                'POST',
+                `/products/${sanPham.id}/images`,
+                'seller',
+                { duong_dan_anh: await taiAnh('product', 'seller') },
+                201,
+              );
+              const anhLapLai = await gui(
+                'POST',
+                `/products/${sanPham.id}/images`,
+                'seller',
+                { duong_dan_anh: anhSanPham },
+                201,
+              );
+
+              xacNhan.equal(String(anhLapLai.id), String(anhBo.id));
+
+              const daDoiAnh = await gui(
+                'PATCH',
+                `/products/${sanPham.id}/images/${anhThuHai.id}/primary`,
+                'seller',
+                {},
+              );
+
+              xacNhan.equal(daDoiAnh.length, 2, 'Thử lại không nhân bản ảnh');
+              xacNhan.equal(daDoiAnh.filter((anh) => anh.la_anh_chinh).length, 1);
+              xacNhan.equal(String(daDoiAnh[0].id), String(anhThuHai.id));
+
+              await gui(
+                'PATCH',
+                `/products/${sanPham.id}/images/${anhBo.id}/primary`,
+                'a',
+                {},
+                403,
+              );
+              await gui(
+                'PATCH',
+                `/products/${sanPham.id}/images/${anhBo.id}/primary`,
+                'admin',
+                {},
+                403,
+              );
+
+              const spKhac = await gui('POST', '/products', 'seller', noiDungSanPham(), 201);
+
+              await gui(
+                'PATCH',
+                `/products/${spKhac.id}/images/${anhBo.id}/primary`,
+                'seller',
+                {},
+                404,
+              );
+
+              const sauLoi = await gui('GET', `/products/${sanPham.id}`, 'seller');
+
+              xacNhan.equal(sauLoi.co_the_sua, true);
+              xacNhan.equal(
+                String(sauLoi.hinh_anh[0].id),
+                String(anhThuHai.id),
+                'Yêu cầu sai không bỏ ảnh chính',
+              );
+
+              await gui('DELETE', `/products/${sanPham.id}/images/${anhThuHai.id}`, 'seller');
+
+              const sauXoa = await gui('GET', `/products/${sanPham.id}`, 'seller');
+
+              xacNhan.equal(sauXoa.hinh_anh[0].la_anh_chinh, 1, 'Tự chọn ảnh còn lại');
+
               await gui('DELETE', `/products/${sanPham.id}/images/${anhBo.id}`, 'seller');
               await gui('POST', `/products/${sanPham.id}/submit`, 'seller', {}, 400);
               await gui(
@@ -365,13 +438,28 @@ kiemThu(
                 { duong_dan_anh: anhSanPham },
                 201,
               );
-              await gui('POST', `/products/${sanPham.id}/submit`, 'seller', {});
+
+              const daGuiDuyet = await gui('POST', `/products/${sanPham.id}/submit`, 'seller', {});
+
+              xacNhan.equal(daGuiDuyet.co_the_sua, false);
+              xacNhan.ok(daGuiDuyet.ly_do_khong_the_sua);
+              await gui(
+                'PATCH',
+                `/products/${sanPham.id}/images/${daGuiDuyet.hinh_anh[0].id}/primary`,
+                'seller',
+                {},
+                409,
+              );
               await gui('GET', '/products/mine', 'seller');
               await gui('GET', '/admin/products?trang_thai=CHO_XU_LY', 'admin');
               await gui('PATCH', `/admin/products/${sanPham.id}/review`, 'admin', {
                 trang_thai_duyet: 'DA_DUYET',
               });
-              await gui('GET', `/products/${sanPham.id}`);
+
+              const congKhai = await gui('GET', `/products/${sanPham.id}`);
+
+              xacNhan.equal(congKhai.co_the_sua, undefined);
+              xacNhan.equal(congKhai.ly_do_khong_the_sua, undefined);
               await gui('GET', `/products?danh_muc_id=${danhMuc.id}`);
             },
           );
@@ -398,7 +486,8 @@ kiemThu(
                 gia_toi_da: '22000000',
               });
 
-              xacNhan.equal(thuHai.gia_hien_tai, '20200000.00');
+              // SQL kiểm thử có bước 500.000 đồng tại mức 20 triệu.
+              xacNhan.equal(thuHai.gia_hien_tai, '20500000.00');
               await gui('POST', `/auctions/${phien.id}/buy-now`, 'b', {}, 409);
               await gui('GET', `/auctions/${phien.id}/bids`);
               await gui('GET', `/auctions/${phien.id}`);

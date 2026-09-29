@@ -2,7 +2,15 @@ import { z } from 'zod';
 import { soTien, vanBan, vanBanTuyChon } from './schema-chung';
 
 export const moTranhChapSchema = z.strictObject({
-  ly_do: z.enum(['CHUA_NHAN_HANG', 'KHONG_DUNG_MO_TA', 'HONG_HOC', 'HANG_GIA', 'KHAC']),
+  ly_do: z.enum([
+    'CHUA_NHAN_HANG',
+    'KHONG_DUNG_MO_TA',
+    'HONG_HOC',
+    'KHONG_KHOP_HO_SO_KIEM_DINH',
+    'NGHI_NGO_TINH_XAC_THUC',
+    'THIEU_PHU_KIEN',
+    'KHAC',
+  ]),
   mo_ta: vanBan(20000, 'Mô tả'),
 });
 export const phanHoiSchema = z.strictObject({ phan_hoi_nguoi_ban: vanBan(20000, 'Phản hồi') });

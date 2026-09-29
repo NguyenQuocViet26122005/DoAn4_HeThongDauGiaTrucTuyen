@@ -198,7 +198,8 @@ kiemThu('MySQL: toàn bộ kiểm thử nghiệp vụ được rollback', async 
 
         const thuHai = await cacPhienDauGia.datGia(duLieuKiemThu.b, id, { gia_toi_da: '22000000' });
 
-        xacNhan.equal(thuHai.gia_hien_tai, '20200000.00');
+        // SQL kiểm thử có bước 500.000 đồng tại mức 20 triệu.
+        xacNhan.equal(thuHai.gia_hien_tai, '20500000.00');
         xacNhan.equal(thuHai.so_lan_gia_han, 1);
         xacNhan.equal(thuHai.nguoi_dan_dau, `ND-${duLieuKiemThu.b.id}`);
         kiemTraDuLieuCongKhai(await cacPhienDauGia.lichSu(id, {}));

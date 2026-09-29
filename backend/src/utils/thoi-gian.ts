@@ -36,10 +36,4 @@ const congGiay = (giaTri, soGiay) =>
   ngaySQL(new Date(doiThanhNgay(giaTri).getTime() + soGiay * 1000));
 const daHetHan = (hanChot, thoiGianHienTai) =>
   hanChot != null && doiThanhNgay(hanChot).getTime() <= doiThanhNgay(thoiGianHienTai).getTime();
-export {
-  doiThanhNgay,
-  ngaySQL,
-  kiemTraNgayNhap,
-  congGiay,
-  daHetHan,
-};
+export { doiThanhNgay, ngaySQL, kiemTraNgayNhap, congGiay, daHetHan };

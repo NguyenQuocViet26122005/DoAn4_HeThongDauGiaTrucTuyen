@@ -38,6 +38,17 @@ const quyenXemBangChung = (duongDan, nguoiDungId) =>
      LIMIT 1`,
     [duongDan, nguoiDungId, nguoiDungId],
   );
+const quyenXemKiemDinh = (duongDan, nguoiDungId) =>
+  coSoDuLieu.layMot(
+    `SELECT t.id FROM tep_dinh_kem t
+     JOIN kiem_dinh_san_pham k ON k.id = t.kiem_dinh_san_pham_id
+     JOIN san_pham s ON s.id = k.san_pham_id
+     WHERE t.duong_dan_tep = ? AND (s.nguoi_ban_id = ? OR EXISTS (
+       SELECT 1 FROM don_hang d WHERE d.kiem_dinh_san_pham_id = k.id AND d.nguoi_mua_id = ?
+     )) LIMIT 1`,
+    [duongDan, nguoiDungId, nguoiDungId],
+  );
+
 export {
   cauHinh,
   danhSachCauHinh,
@@ -46,4 +57,5 @@ export {
   luuBoBuocGia,
   thongBaoDaCo,
   quyenXemBangChung,
+  quyenXemKiemDinh,
 };

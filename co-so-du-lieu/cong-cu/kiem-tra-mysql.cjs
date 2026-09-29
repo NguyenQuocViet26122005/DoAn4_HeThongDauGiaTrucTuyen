@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const thuMuc = path.resolve(__dirname, '..');
 const pool = require('../../backend/dist/config/co-so-du-lieu');
-const dich = 'doan4_daugia_thiet_ke_19';
+const dich = 'doan4_daugia_kiem_thu';
 const nguon = 'doan4_daugia';
 const cheDo = process.argv[2];
 if (!['--tao', '--kiem-tra'].includes(cheDo)) {
@@ -102,8 +102,10 @@ async function main() {
 
       let i = 0;
 
-      for (const tep of ['01-tao-csdl-19-bang.sql', '02-du-lieu-cau-hinh.sql']) {
-        for (const sql of tachLenh(fs.readFileSync(path.join(thuMuc, tep), 'utf8'))) {
+      for (const tep of ['../doan4_daugia_tieng_viet.sql']) {
+        for (const sql of tachLenh(
+          fs.readFileSync(path.join(thuMuc, tep), 'utf8').replaceAll('doan4_daugia', dich),
+        )) {
           assert(!/\b(?:DROP|TRUNCATE)\b/i.test(sql));
           try {
             await c.query(sql);
@@ -128,7 +130,7 @@ async function main() {
       [dich],
     );
 
-    assert.equal(bang.length, 19);
+    assert.equal(bang.length, 21);
 
     const moHinh = JSON.parse(fs.readFileSync(path.join(thuMuc, 'mo-hinh.json'), 'utf8')).flatMap(
       (n) => n.bang,
@@ -141,7 +143,7 @@ async function main() {
       [dich],
     );
 
-    assert.equal(fk.length, 46);
+    assert.equal(fk.length, 53);
     for (const b of moHinh) {
       for (const l of b.lienKet) {
         assert(
@@ -172,7 +174,7 @@ async function main() {
       [dich],
     );
 
-    assert.equal(Number(tr.so), 6);
+    assert.equal(Number(tr.so), 12);
     assert(!col.some((x) => x.TABLE_NAME.startsWith('v_') && x.COLUMN_NAME === 'gia_toi_da'));
 
     await c.beginTransaction();
@@ -603,9 +605,9 @@ async function main() {
       thoi_diem: new Date().toISOString(),
       mysql: current.phien_ban,
       database_thiet_ke: dich,
-      so_bang: 19,
-      so_khoa_ngoai: 46,
-      so_trigger: 6,
+      so_bang: 21,
+      so_khoa_ngoai: 53,
+      so_trigger: 12,
       so_view: 2,
       so_ca_dat: ketQua.length,
       cac_ca: ketQua,
@@ -620,8 +622,8 @@ async function main() {
     );
     console.log(
       JSON.stringify({
-        bang: 19,
-        khoaNgoai: 46,
+        bang: 21,
+        khoaNgoai: 53,
         caDat: ketQua.length,
         duLieuThu: 'rollback',
         nguon: 'cấu trúc/số dòng không đổi',

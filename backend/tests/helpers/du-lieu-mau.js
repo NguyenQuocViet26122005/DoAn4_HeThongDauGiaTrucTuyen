@@ -6,6 +6,10 @@ const cacNguoiDung = require('../../dist/repositories/nguoi-dung');
 const { nguoiDungAnToan } = require('../../dist/utils/du-lieu-cong-khai');
 const thoiGian = require('../../dist/utils/thoi-gian');
 
+if (process.env.DB_NAME !== 'doan4_daugia_kiem_thu') {
+  throw new Error('Chỉ được tạo dữ liệu kiểm thử trong doan4_daugia_kiem_thu.');
+}
+
 async function taoDuLieuKiemThu() {
   const tienTo = `test-${taoMaNgauNhien()}`;
   const matKhau = taoMaNgauNhien();

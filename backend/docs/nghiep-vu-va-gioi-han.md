@@ -48,9 +48,9 @@ Các request tham gia/gửi giá vẫn qua HTTP có JWT. Client nên đọc lạ
 
 Người mua cần ít nhất một địa chỉ trước khi đặt giá/Mua ngay vì schema đơn bắt buộc địa chỉ nhận hàng. Khi chốt, hệ thống chụp địa chỉ mặc định; nếu không có cờ mặc định sẽ chọn địa chỉ đầu tiên còn lại. Không được xóa địa chỉ cuối cùng khi đang có cam kết. Đơn chưa thanh toán cho phép chọn lại địa chỉ thuộc mình.
 
-Luồng thực tế: `CHO_THANH_TOAN` → `CHO_GUI_HANG` sau thanh toán mô phỏng → `DA_GUI_HANG` → `DANG_KIEM_TRA` khi xác nhận đã giao → `HOAN_THANH`. Các trạng thái `DA_THANH_TOAN`/`DA_GIAO` trong dữ liệu hiện có vẫn được xử lý ở những bước tương ứng. Phí vận chuyển bằng 0; tổng tiền lấy từ kết quả phiên hoặc đề nghị, không nhận số tiền do client tự gửi.
+Luồng thực tế: `CHO_THANH_TOAN` → `CHO_GUI_HANG` sau thanh toán mô phỏng → `DA_GUI_HANG` → `DANG_KIEM_TRA` khi xác nhận đã giao → `HOAN_THANH`. Các trạng thái `DA_THANH_TOAN`/`DA_GIAO` trong dữ liệu hiện có vẫn được xử lý ở những bước tương ứng. Phí vận chuyển công bố từ phiên và chụp sang đơn. Tổng tiền bằng giá sản phẩm cộng phí; phần còn phải trả bằng tổng trừ tiền đã thu, gồm cọc chuyển vào đơn. Không nhận số tiền từ client.
 
-Thanh toán lặp lại không tạo trùng lần thu/giữ tiền. Tiền được giữ ở `DANG_GIU`; khi hoàn thành chuyển `DA_GIAI_NGAN`. Người bán nhập đơn vị vận chuyển và mã vận đơn. Người mua hoặc Admin được xác nhận đã giao; người bán không tự bắt đầu đồng hồ kiểm tra hàng.
+Thanh toán lặp lại không tạo trùng lần thu/giữ tiền. Tiền được giữ ở `DANG_GIU`; khi hoàn thành chuyển `DA_GIAI_NGAN`. Đơn NGUOI_BAN do seller nhập vận chuyển; đơn TRUNG_TAM chỉ Admin ghi nhận trung tâm gửi khi hồ sơ đạt, hàng còn giữ và đơn đã thu đủ. Người mua hoặc Admin được xác nhận đã giao; người bán không tự bắt đầu đồng hồ kiểm tra hàng.
 
 Các hạn mặc định nếu chưa có bản ghi cấu hình: thanh toán 48 giờ, gửi hàng 3 ngày, kiểm tra hàng 3 ngày, Second Chance 24 giờ. Nếu có bản ghi cấu hình thì sử dụng giá trị trong MySQL. Thời hạn được chụp vào đối tượng tại bước tương ứng, không tự tính lại hạn cũ khi Admin sửa cấu hình.
 
@@ -70,9 +70,9 @@ Người mua/người bán chỉ đánh giá bên còn lại sau khi đơn hoàn
 
 Đơn hết hạn thanh toán bị hủy với lý do `KHONG_THANH_TOAN`, tạo vi phạm một lần. Người bán chủ động gọi API tạo đề nghị khi chưa có đơn hoặc đề nghị đang chờ. Job không tự tạo đề nghị; Admin không thay người bán gửi đề nghị.
 
-Ứng viên được xếp theo **lượt trả giá công khai hợp lệ cuối cùng của từng người**, giá giảm dần, rồi thời gian/ID tăng dần. Lượt phải nằm trong thời gian phiên và có số tiền dương. Loại người bán, tài khoản không hoạt động, người đã từng có đơn/đề nghị trong phiên và người chưa đạt sàn. Truy vấn không đọc bảng `muc_gia_toi_da`.
+Ứng viên được xếp theo **lượt trả giá công khai hợp lệ cuối cùng của từng người**, giá giảm dần, rồi thời gian/ID tăng dần. Lượt phải nằm trong thời gian phiên và có số tiền dương. Loại người bán, tài khoản không hoạt động, người đã từng có đơn/đề nghị trong phiên và người chưa đạt sàn. Truy vấn không đọc mức tối đa trong `tham_gia_phien`.
 
-Chấp nhận đề nghị kiểm tra lại quyền, hạn, giá công khai và điều kiện người bán, rồi tạo đơn mới tại chính `gia_de_nghi`. Chấp nhận lặp không tạo trùng đơn. Từ chối hoặc hết hạn chỉ đóng đề nghị hiện tại; người bán phải yêu cầu lại để gửi cho người tiếp theo.
+Chấp nhận đề nghị kiểm tra quyền, hạn, giá công khai và seller; thanh toán đủ giá đề nghị cộng phí trong cùng transaction rồi mới hoàn tất việc nhận đề nghị/tạo đơn. Không cọc lại. Thanh toán lỗi không tạo đơn, giữ đề nghị đang chờ khi còn hạn. Chấp nhận lặp không tạo trùng đơn. Từ chối hoặc hết hạn chỉ đóng đề nghị hiện tại; người bán phải yêu cầu lại để gửi cho người tiếp theo.
 
 ## Tác vụ và vận hành
 
@@ -81,3 +81,13 @@ Bộ lập lịch chạy mỗi 60 giây, mỗi nhóm lấy tối đa 100 bản g
 `GET /api/admin/jobs` trả trạng thái bật/tắt, đang chạy, thời gian gần nhất và số bản ghi xử lý/thất bại. Lỗi từng bản ghi được ghi bằng ID/mã lỗi để các bản ghi khác vẫn được xử lý.
 
 Các giới hạn còn lại: giao hàng được cập nhật thủ công, không có theo dõi vận đơn thật; chưa có xử lý rút giá đặc biệt bởi Admin; chưa có quy trình đăng bán lại sau khi tất cả Second Chance thất bại; chưa có dọn tệp upload không được gắn vào dữ liệu. Giới hạn request và bộ lập lịch ở trong tiến trình; Socket.IO chưa có adapter chia sẻ giữa nhiều máy chủ. Đây là các phần mở rộng vận hành, cần triển khai riêng khi mở rộng phạm vi.
+
+## Kiểm định và cọc — phiên bản 3.0
+
+Đặc tả chính ở `../../TAI-LIEU-NGHIEP-VU-VA-CONG-NGHE.md`. Admin nhập báo cáo chuyên gia bên ngoài, không có tài khoản chuyên gia. Hàng bắt buộc kiểm định cần báo cáo đạt và đang ở trung tâm trước khi duyệt/mở phiên. Khi có nghĩa vụ bán, không sửa hồ sơ hoặc đổi sản phẩm.
+
+Admin cấu hình DEPOSIT_POLICY rồi bật; mặc định tắt, chỉ phiên mới lấy chính sách mới. Đặt giá cần cọc thành công khi phiên yêu cầu. Nộp cọc sớm không tạo ưu tiên trả giá. Người thua/phiên hủy/thất bại được hoàn; winner chuyển cọc vào đơn. Quá hạn phần còn lại ghi không hoàn cọc và cờ Admin, không tự trả cọc cho seller.
+
+Mua ngay không yêu cầu cọc riêng: nếu có cọc thì trừ vào phần phải trả. Thanh toán đủ và chốt phiên cùng transaction; thất bại giữ phiên/cọc, không tạo đơn. Không áp dụng thanh toán sau cho Mua ngay hoặc Second Chance.
+
+Nhận hàng chưa giải ngân; giải ngân cần đủ tiền, không tranh chấp/cờ Admin và tài khoản đủ điều kiện. Lý do tranh chấp mới hỗ trợ không khớp kiểm định, nghi ngờ tính xác thực và thiếu phụ kiện. API không nhận HANG_GIA mới; MySQL giữ giá trị lịch sử. Hoàn toàn bộ bao gồm cọc, phần trả thêm và phí; không hoàn một phần mới.

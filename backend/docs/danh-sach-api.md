@@ -1,6 +1,6 @@
 # Danh sách API Backend
 
-Đã đối chiếu 86 cặp phương thức/đường dẫn với các tệp thật trong src/routes và ung-dung.js. Bộ Postman có 90 yêu cầu, gồm các biến thể đăng nhập và đặt giá.
+Đã đối chiếu 103 cặp phương thức/đường dẫn với các tệp thật trong src/routes và ung-dung.ts. Bộ Postman có các biến thể đăng nhập, đặt giá và cấu hình để chạy từng kịch bản. Nghiệp vụ 3.0 dùng 21 bảng.
 
 Địa chỉ gốc: `http://localhost:5000/api`. `GET /` ngoài tiền tố `/api` trả thông tin máy chủ.
 
@@ -13,6 +13,16 @@ Các danh sách có phân trang dùng `page=1&limit=20` (limit tối đa 100); d
 Body dưới đây là mẫu hợp lệ sau khi điền biến. `{}` là JSON rỗng; không tự thêm trường như vai trò, số tiền thanh toán hay người thắng. Các thao tác PUT sản phẩm/địa chỉ/danh mục nhận đủ trường bắt buộc như mẫu. HTTP GET tải tệp trả dữ liệu nhị phân.
 
 ## 01. Kết nối và đăng nhập
+
+Các thay đổi của bản 19 bảng:
+
+- `POST /auctions` nhận thêm `phi_van_chuyen`, mặc định 0; chỉ nhận số tiền VND nguyên cho giao dịch mới. Phí được công bố trên phiên và chụp sang đơn.
+- `POST /orders/:id/payments/simulate` nhận `{ "ket_qua_mo_phong": "THANH_CONG", "khoa_yeu_cau": "ma-yeu-cau-01" }`. Kết quả có thể là `THAT_BAI`; cùng khóa sẽ trả lần xử lý cũ. Lần thử mới cần khóa mới. Không truyền tổng tiền từ client.
+- Khóa yêu cầu tùy chọn dài 8–100 ký tự chữ/số/gạch ngang/gạch dưới. Nếu không truyền, backend tạo mã; client nên giữ khóa khi thử lại sau lỗi mạng.
+- Khiếu nại `CHUA_NHAN_HANG` của người mua chỉ mở sau mốc 7 ngày từ khai báo gửi và còn đúng trạng thái. Admin có thể tiếp nhận trường hợp hàng đã thanh toán cần can thiệp.
+- Quyết định tranh chấp chỉ có `NGUOI_MUA` (hoàn toàn bộ, gồm phí) hoặc `NGUOI_BAN` (giải ngân toàn bộ). Nên bỏ `so_tien_hoan` để backend lấy từ đơn; nếu gửi thì phải khớp toàn bộ số tiền tương ứng.
+- Second Chance phải do người bán yêu cầu từng lần; từ chối/hết hạn không tự tạo đề nghị tiếp theo. Giá lấy từ lượt công khai hợp lệ.
+- `PATCH /admin/violations/:id/review` nhận `trang_thai`, `hinh_thuc_xu_ly` và `ly_do_xu_ly`. Hình thức gồm `CANH_CAO`, `TAM_NGUNG`, `KHOA_TAI_KHOAN`, `KHONG_VI_PHAM`; Admin phải nêu lý do quyết định.
 
 ### GET /health — Kiểm tra backend và MySQL
 
@@ -218,6 +228,8 @@ Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 
 Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 
+Chính chủ nhận thêm `co_the_sua` (boolean) và `ly_do_khong_the_sua` (string/null). Chỉ bản nháp/bị từ chối, chưa có phiên và không có hồ sơ kiểm định đang xử lý/giữ hàng mới được sửa. Thông tin này chỉ hỗ trợ giao diện; mỗi thao tác ghi kiểm tra lại trong transaction. Khách chỉ đọc sản phẩm đã duyệt, không nhận hai trường hỗ trợ sửa này.
+
 ### POST /products — Tạo sản phẩm nháp
 
 Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
@@ -263,6 +275,12 @@ Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 ```
 
 Postman tự lưu: `anhId` ← `data.id`.
+
+Tối đa 12 ảnh/sản phẩm. Gắn lại cùng đường dẫn tệp vào cùng sản phẩm trả ảnh đã có (HTTP 201), không nhân bản hoặc tự đổi ảnh chính; để đổi ảnh chính dùng API bên dưới. Tệp phải tồn tại, thuộc tài khoản và đúng nhóm `product`.
+
+### PATCH /products/:id/images/:imageId/primary — Chọn ảnh đại diện
+
+Quyền: chính chủ là người bán đã xác minh; sản phẩm còn được sửa. Body `{}`. Trả danh sách ảnh sau cập nhật. Khóa sản phẩm, kiểm tra ảnh thuộc sản phẩm rồi đổi ảnh chính trong cùng transaction và ghi nhật ký. Ảnh không thuộc sản phẩm trả 404, sản phẩm khóa sửa trả 409; yêu cầu sai không làm mất ảnh chính hiện tại.
 
 ### DELETE /products/:id/images/:imageId — Bỏ ảnh khỏi sản phẩm nháp
 
@@ -414,8 +432,13 @@ Quyền: Người mua B.
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 
 ```json
-{}
+{
+  "ket_qua_mo_phong": "THANH_CONG",
+  "khoa_yeu_cau": "mua-ngay-yeu-cau-0001"
+}
 ```
+
+Thành công chốt phiên và tạo đơn đã thu đủ trong cùng transaction, trạng thái `CHO_GUI_HANG`. Nếu có cọc hợp lệ của chính người mua, chỉ thu phần còn lại. Không bắt buộc cọc riêng để Mua ngay. `THAT_BAI` trả HTTP 200 với `data.ket_qua_mo_phong = THAT_BAI`, `don_hang = null`, giữ nguyên phiên và cọc. HTTP thành công không đồng nghĩa thanh toán thành công. Giữ cùng khóa khi gửi lại yêu cầu bị mất phản hồi; một lần thử thanh toán mới cần khóa mới.
 
 Postman tự lưu: `donHangId` ← `data.don_hang.id`.
 
@@ -549,11 +572,15 @@ Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 
 ```json
 {
-  "chap_nhan": true
+  "chap_nhan": true,
+  "ket_qua_mo_phong": "THANH_CONG",
+  "khoa_yeu_cau": "second-chance-yeu-cau-0001"
 }
 ```
 
 Postman tự lưu: `donHangId` ← `data.don_hang.id`.
+
+Chấp nhận chỉ hoàn tất cùng thanh toán đủ giá đề nghị và phí vận chuyển. Không yêu cầu cọc mới hoặc dùng cọc đã hoàn. `THAT_BAI` giữ đề nghị `CHO_XU_LY` khi còn hạn, không tạo đơn. `chap_nhan = false` từ chối mà không thanh toán. Cùng khóa trả kết quả lần xử lý cũ; đổi khóa cho lần thử mới.
 
 ### GET /admin/orders — Admin xem đơn hàng
 
@@ -770,3 +797,157 @@ Postman tự lưu: `tepVuaTai` ← `data.duong_dan`.
 ### GET /uploads/files/:kind/:owner/:name — Đọc tệp theo nhóm, chủ sở hữu và tên
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
+
+## 10. Kiểm định, trung tâm và đặt cọc — phiên bản 3.0
+
+Danh mục nhận thêm `yeu_cau_kiem_dinh` (boolean) khi tạo/sửa. Yêu cầu được chụp lên sản phẩm lúc gửi duyệt, không áp ngược lên sản phẩm cũ. Chỉ Admin nhận hàng/ghi kết quả; báo cáo do chuyên gia bên ngoài cung cấp. Tạo hồ sơ không tự duyệt sản phẩm. Sau kết quả đạt và đang giữ hàng, Admin mới dùng API review sản phẩm hiện có.
+
+### GET /products/:id/inspection — Thông tin kiểm định công khai
+
+Quyền: công khai, sản phẩm đã duyệt.
+
+### GET /inspections — Hồ sơ kiểm định của tôi
+
+Quyền: người bán chính chủ (Admin xem được hồ sơ/thống kê).
+
+### GET /inspections/:id — Chi tiết hồ sơ riêng
+
+Quyền: người bán chính chủ (Admin xem được hồ sơ/thống kê).
+
+### POST /admin/products/:id/inspections — Admin tạo hồ sơ kiểm định
+
+Quyền: Admin.
+
+```json
+{}
+```
+
+### POST /inspections/:id/shipping — Seller khai báo gửi trung tâm
+
+Quyền: người bán chính chủ (Admin xem được hồ sơ/thống kê).
+
+```json
+{
+  "don_vi_van_chuyen": "Đơn vị vận chuyển thử",
+  "ma_van_don": "KD-DEN-001"
+}
+```
+
+### GET /admin/inspections — Admin xem hàng đợi kiểm định
+
+Quyền: Admin.
+
+### POST /admin/inspections/:id/received — Admin ghi nhận trung tâm nhận hàng
+
+Quyền: Admin.
+
+```json
+{
+  "tinh_trang_khi_nhan": "Nguyên niêm phong",
+  "serial_khi_nhan": "SERIAL-001",
+  "so_kien": 1,
+  "ghi_chu": "Đối chiếu biên bản và ảnh tiếp nhận"
+}
+```
+
+### POST /admin/inspections/:id/start — Admin bắt đầu ghi hồ sơ kiểm định
+
+Quyền: Admin.
+
+```json
+{}
+```
+
+### POST /admin/inspections/:id/files — Gắn báo cáo chuyên gia đã tải lên
+
+Quyền: Admin.
+
+```json
+{
+  "loai_tep": "BAO_CAO_KIEM_DINH",
+  "duong_dan_tep": "{{tepKiemDinh}}",
+  "mo_ta": "Báo cáo trung tâm cung cấp"
+}
+```
+
+### PATCH /admin/inspections/:id/result — Admin nhập kết quả từ báo cáo chuyên gia
+
+Quyền: Admin.
+
+```json
+{
+  "ket_qua": "DAT",
+  "ten_chuyen_gia": "Tên trên báo cáo",
+  "don_vi_kiem_dinh": "Đơn vị trên báo cáo",
+  "ngay_kiem_dinh": "{{ngayKiemDinh}}",
+  "nhan_xet": "Nội dung kết luận trong báo cáo",
+  "ma_chung_nhan": "CERT-001"
+}
+```
+
+### POST /admin/inspections/:id/return — Admin trả hàng không đạt hoặc cần bổ sung
+
+Quyền: Admin.
+
+```json
+{
+  "ly_do": "Không đạt theo báo cáo; đã bàn giao trả người bán"
+}
+```
+
+### POST /auctions/:id/deposit/register — Đăng ký tham gia phiên cần cọc
+
+Quyền: người mua đăng nhập, chỉ dữ liệu của mình.
+
+```json
+{}
+```
+
+### GET /auctions/:id/deposit — Xem cọc của chính tôi
+
+Quyền: người mua đăng nhập, chỉ dữ liệu của mình.
+
+### POST /auctions/:id/deposit/pay — Thanh toán cọc mô phỏng
+
+Quyền: người mua đăng nhập, chỉ dữ liệu của mình.
+
+```json
+{
+  "ket_qua_mo_phong": "THANH_CONG",
+  "khoa_yeu_cau": "{{khoaDatCoc}}"
+}
+```
+
+### GET /auctions/:id/participants/summary — Seller xem số lượng tham gia
+
+Quyền: người bán chính chủ (Admin xem được hồ sơ/thống kê).
+
+### GET /admin/deposits — Admin quản lý các khoản cọc
+
+Quyền: Admin.
+
+### Chính sách cọc và kết quả trả về
+
+`PUT /admin/config/DEPOSIT_POLICY` chỉ Admin; body:
+
+```json
+{
+  "gia_tri_cau_hinh": {
+    "bat": false,
+    "kieu": "TY_LE",
+    "gia_tri": 10
+  }
+}
+```
+
+Admin tự chọn tỷ lệ/số tiền rồi đặt `bat = true`. `TY_LE`: số nguyên 1–100%; `CO_DINH`: số tiền VND nguyên dương không vượt giá khởi điểm. Số tiền cọc được chụp vào phiên khi tạo, không thay các phiên trước đó. Mặc định đang tắt.
+
+`deposit/register` trả bản ghi cọc, HTTP 201; đăng ký lặp trả cùng bản ghi. `deposit` trả bản ghi của chính người gọi hoặc null. `deposit/pay` trả `{ket_qua_mo_phong, dat_coc}`; thanh toán thất bại vẫn HTTP 200, trạng thái `THAT_BAI`. Không truyền số tiền; server lấy từ phiên. Khóa yêu cầu 8–100 ký tự, giữ nguyên khi gửi lại cùng lần thử; lần thử mới đổi khóa. Phiên không yêu cầu cọc trả 409 ở API đăng ký/thanh toán cọc.
+
+Thống kê seller chỉ có `da_dang_ky`, `da_coc` (đang có cọc hợp lệ), `du_dieu_kien` (cọc hợp lệ, tài khoản hoạt động, vai trò người dùng và có địa chỉ). Không trả danh sách người cọc hoặc mức giá tối đa. Admin xem danh sách cọc phân trang qua `/admin/deposits`.
+
+Hồ sơ riêng trả biên bản, serial và tệp cho Admin, chủ sản phẩm hoặc buyer có đơn gắn hồ sơ. Bản công khai chỉ có mã kiểm định, kết quả, ngày, chuyên gia/đơn vị và mã chứng nhận. Upload `/uploads/inspection` chỉ Admin, ảnh/PDF tối đa 10 MB; lưu `data.duong_dan` vào `tepKiemDinh`. Ngày kiểm định phải là ISO có múi giờ, từ thời điểm trung tâm nhận hàng đến hiện tại.
+
+Đơn trả thêm `tien_coc_da_chuyen`, `so_tien_con_phai_thanh_toan`, `nguon_gui_hang`, `kiem_dinh_san_pham_id` và hồ sơ `kiem_dinh` khi có quyền. Đơn `TRUNG_TAM` dùng API shipping hiện có bằng token Admin; đơn `NGUOI_BAN` dùng token seller. Không gửi hàng khi chưa thu đủ.
+
+Lý do tranh chấp mới gồm `KHONG_KHOP_HO_SO_KIEM_DINH`, `NGHI_NGO_TINH_XAC_THUC`, `THIEU_PHU_KIEN` cùng các lý do thông thường đang hỗ trợ. Không nhận `HANG_GIA` mới; vẫn giữ/đọc dữ liệu lịch sử. Chi tiết tranh chấp có `ho_so_kiem_dinh` để đối chiếu, vẫn kiểm tra quyền theo đơn.

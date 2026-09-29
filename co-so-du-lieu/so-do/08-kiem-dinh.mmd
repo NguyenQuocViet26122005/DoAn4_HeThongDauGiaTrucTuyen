@@ -1,0 +1,12 @@
+erDiagram
+    san_pham {
+        bigint id PK
+    }
+    nguoi_dung {
+        bigint id PK
+    }
+    kiem_dinh_san_pham {
+        bigint id PK
+    }
+    nguoi_dung ||--o{ kiem_dinh_san_pham : "nguoi_cap_nhat_id"
+    san_pham ||--o{ kiem_dinh_san_pham : "san_pham_id"

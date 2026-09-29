@@ -12,7 +12,7 @@ import kiemTra = require('../validations/du-lieu-dau-vao');
 import { baoDam, batBuocTonTai, cungId } from '../utils/loi';
 import { donViTienNho, chuoiTien } from '../utils/tien';
 import thoiGian = require('../utils/thoi-gian');
-
+import datCoc = require('./dat-coc');
 
 function kiemTraQuyen(nguoiDung: NguoiDungDangNhap, banGhi) {
   baoDam(
@@ -24,16 +24,13 @@ function kiemTraQuyen(nguoiDung: NguoiDungDangNhap, banGhi) {
   );
 }
 
-
 function nguoiMua(nguoiDung: NguoiDungDangNhap, banGhi) {
   baoDam(cungId(nguoiDung.id, banGhi.nguoi_mua_id), 403, 'Chỉ người mua của đơn được thực hiện');
 }
 
-
 function nguoiBan(nguoiDung: NguoiDungDangNhap, banGhi) {
   baoDam(cungId(nguoiDung.id, banGhi.nguoi_ban_id), 403, 'Chỉ người bán của đơn được thực hiện');
 }
-
 
 function chupDiaChi(diaChi) {
   return {
@@ -50,7 +47,6 @@ function chupDiaChi(diaChi) {
   };
 }
 
-
 // Nơi gọi phải đang giữ khóa phiên. Cả chốt phiên và đề nghị mua tiếp đều qua đây.
 async function taoDonNguoiThang(
   phienDauGia,
@@ -61,7 +57,6 @@ async function taoDonNguoiThang(
 ) {
   const daCo = await khoDuLieu.donDangXuLyCuaPhien(phienDauGia.id);
 
-
   if (daCo) {
     baoDam(
       cungId(daCo.nguoi_mua_id, nguoiMuaId) && daCo.nguon_don === nguon,
@@ -69,18 +64,19 @@ async function taoDonNguoiThang(
       'Phiên đã có đơn hàng đang xử lý',
     );
 
-
     return daCo;
   }
   await cacNguoiDung.layTheoId(nguoiMuaId, true);
   diaChi = diaChi || (await cacNguoiDung.diaChiMacDinh(nguoiMuaId));
 
-
   baoDam(diaChi, 409, 'Người thắng cần có địa chỉ giao hàng để tạo đơn');
-
 
   const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
 
+  const sanPham = batBuocTonTai(
+    await khoBanGhi.layTheoId('san_pham', phienDauGia.san_pham_id, true),
+  );
+  const kiemDinh = await require('./kiem-dinh').kiemTraDuocDauGia(sanPham);
 
   const id = await khoBanGhi.them('don_hang', {
     ma_don_hang: `DG${taoMaNgauNhien().replaceAll('-', '').slice(0, 26)}`,
@@ -88,6 +84,8 @@ async function taoDonNguoiThang(
     nguoi_mua_id: nguoiMuaId,
     nguoi_ban_id: phienDauGia.nguoi_ban_id,
     nguon_don: nguon,
+    nguon_gui_hang: kiemDinh ? 'TRUNG_TAM' : 'NGUOI_BAN',
+    kiem_dinh_san_pham_id: kiemDinh?.id ?? null,
     gia_san_pham: gia,
     phi_van_chuyen: phienDauGia.phi_van_chuyen ?? '0.00',
     tong_tien: chuoiTien(donViTienNho(gia) + donViTienNho(phienDauGia.phi_van_chuyen ?? '0.00')),
@@ -98,6 +96,13 @@ async function taoDonNguoiThang(
     ...chupDiaChi(diaChi),
   });
 
+  if (nguon !== 'DE_NGHI_TIEP_THEO') {
+    await datCoc.chuyenVaoDon(
+      phienDauGia,
+      await khoBanGhi.layTheoId('don_hang', id),
+      phienDauGia.yeu_cau_dat_coc && phienDauGia.ly_do_ket_thuc !== 'MUA_NGAY',
+    );
+  }
 
   await taoThongBao(
     nguoiMuaId,
@@ -115,20 +120,21 @@ async function taoDonNguoiThang(
   );
   await ghiNhatKy(null, 'TAO_DON_HANG', 'don_hang', id, { nguon_don: nguon });
 
+  const daTao = batBuocTonTai(await khoBanGhi.layTheoId('don_hang', id));
+
+  if (donViTienNho(daTao.so_tien_da_thu) === donViTienNho(daTao.tong_tien)) {
+    await thanhToan({ id: String(nguoiMuaId) } as NguoiDungDangNhap, id, {});
+  }
 
   return khoBanGhi.layTheoId('don_hang', id);
 }
 
-
 async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
   const banGhi = batBuocTonTai(await khoBanGhi.layTheoId('don_hang', kiemTra.id(id)));
 
-
   kiemTraQuyen(nguoiDung, banGhi);
 
-
   const phienDauGia = await cacPhienDauGia.layTheoId(banGhi.phien_dau_gia_id);
-
 
   return {
     ...banGhi,
@@ -137,17 +143,17 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
     giu_tien: await khoDuLieu.tienTrungGian(id),
     van_chuyen: await khoDuLieu.vanChuyen(id),
     tranh_chap: await khoDuLieu.cacTranhChap(id),
+    kiem_dinh: banGhi.kiem_dinh_san_pham_id
+      ? await require('./kiem-dinh').chiTiet(nguoiDung, banGhi.kiem_dinh_san_pham_id)
+      : null,
   };
 }
-
 
 async function capNhatDiaChi(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
   const dauVao = kiemTra.docSchema(diaChiDonSchema, duLieuNhap);
 
-
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.khoaDuLieu(kiemTra.id(id)));
-
 
     nguoiMua(nguoiDung, banGhi);
     baoDam(
@@ -157,22 +163,17 @@ async function capNhatDiaChi(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unkno
       'Không thể đổi địa chỉ ở trạng thái này',
     );
 
-
     const diaChi = batBuocTonTai(
       await khoBanGhi.layTheoId('dia_chi_nguoi_dung', kiemTra.id(dauVao.dia_chi_id)),
     );
 
-
     baoDam(cungId(diaChi.nguoi_dung_id, nguoiDung.id), 403, 'Địa chỉ không thuộc tài khoản');
 
-
     await khoBanGhi.capNhat('don_hang', id, chupDiaChi(diaChi));
-
 
     return chiTiet(nguoiDung, id);
   });
 }
-
 
 async function thanhToan(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown = {}) {
   const dauVao = kiemTra.docSchema(thanhToanSchema, duLieuNhap);
@@ -184,20 +185,16 @@ async function thanhToan(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown =
   const khoaYeuCau =
     dauVao.khoa_yeu_cau == null ? null : kiemTra.chuoi(dauVao.khoa_yeu_cau, 'Khóa yêu cầu', 100);
 
-
   baoDam(
     khoaYeuCau == null || /^[a-zA-Z0-9_-]{8,100}$/.test(khoaYeuCau),
     400,
     'Khóa yêu cầu cần 8–100 ký tự chữ, số, gạch ngang hoặc gạch dưới',
   );
 
-
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.khoaDuLieu(kiemTra.id(id)));
 
-
     nguoiMua(nguoiDung, banGhi);
-
 
     if (
       [
@@ -210,14 +207,11 @@ async function thanhToan(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown =
         'HOAN_THANH',
       ].includes(banGhi.trang_thai) &&
       (await khoDuLieu.cacThanhToan(id)).some((p) => p.trang_thai === 'DA_THANH_TOAN')
-    )
-      {
-return chiTiet(nguoiDung, id);
-}
-
+    ) {
+      return chiTiet(nguoiDung, id);
+    }
 
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
-
 
     baoDam(
       banGhi.trang_thai === 'CHO_THANH_TOAN' &&
@@ -227,17 +221,14 @@ return chiTiet(nguoiDung, id);
       'Đơn không còn trong hạn thanh toán',
     );
 
-
     if (khoaYeuCau) {
       const daXuLy = await coSoDuLieu.layMot(
         'SELECT don_hang_id FROM thanh_toan WHERE khoa_yeu_cau=?',
         [khoaYeuCau],
       );
 
-
       if (daXuLy) {
         baoDam(cungId(daXuLy.don_hang_id, id), 409, 'Khóa yêu cầu đã được dùng');
-
 
         return chiTiet(nguoiDung, id);
       }
@@ -246,20 +237,17 @@ return chiTiet(nguoiDung, id);
       await khoBanGhi.them('thanh_toan', {
         don_hang_id: id,
         phuong_thuc_thanh_toan: 'MO_PHONG',
-        so_tien: banGhi.tong_tien,
+        so_tien: banGhi.so_tien_con_phai_thanh_toan,
         trang_thai: 'THAT_BAI',
         ma_giao_dich: `SIM-${taoMaNgauNhien()}`,
         khoa_yeu_cau: khoaYeuCau,
         ngay_het_han: banGhi.han_thanh_toan,
       });
 
-
       await ghiNhatKy(nguoiDung.id, 'THANH_TOAN_MO_PHONG_THAT_BAI', 'don_hang', id);
-
 
       return chiTiet(nguoiDung, id);
     }
-
 
     // Số tiền lấy từ đơn đã khóa; phía khách không được tự chọn số tiền thanh toán.
     const cacThanhToan = await khoDuLieu.cacThanhToan(id);
@@ -267,31 +255,29 @@ return chiTiet(nguoiDung, id);
     const duLieu = {
       phuong_thuc_thanh_toan: 'MO_PHONG',
       khoa_yeu_cau: khoaYeuCau,
-      so_tien: banGhi.tong_tien,
+      so_tien: banGhi.so_tien_con_phai_thanh_toan,
       trang_thai: 'DA_THANH_TOAN',
       ma_giao_dich: `SIM-${taoMaNgauNhien()}`,
       ngay_thanh_toan: thoiGianHienTai,
       ngay_het_han: banGhi.han_thanh_toan,
     };
 
-
     if (dangCho) {
-await khoBanGhi.capNhat('thanh_toan', dangCho.id, duLieu);
-}
-    else {
-await khoBanGhi.them('thanh_toan', { ...duLieu, don_hang_id: id });
-}
-
+      await khoBanGhi.capNhat('thanh_toan', dangCho.id, duLieu);
+    } else {
+      await khoBanGhi.them('thanh_toan', { ...duLieu, don_hang_id: id });
+    }
 
     const tienTrungGian = await khoDuLieu.tienTrungGian(id, true);
 
-
     baoDam(
-      !tienTrungGian || tienTrungGian.trang_thai === 'CHO_GIU_TIEN',
+      !tienTrungGian ||
+        tienTrungGian.trang_thai === 'CHO_GIU_TIEN' ||
+        (tienTrungGian.trang_thai === 'DANG_GIU' &&
+          donViTienNho(banGhi.so_tien_da_thu) === donViTienNho(banGhi.tien_coc_da_chuyen)),
       409,
       'Đơn đã có giao dịch giữ tiền',
     );
-
 
     await khoBanGhi.capNhat('don_hang', id, {
       so_tien_da_thu: banGhi.tong_tien,
@@ -303,7 +289,6 @@ await khoBanGhi.them('thanh_toan', { ...duLieu, don_hang_id: id });
         (await cauHinhNghiepVu.docSoCauHinh('SELLER_SHIP_DEADLINE_DAYS')) * 86400,
       ),
     });
-
 
     await ghiNhatKy(nguoiDung.id, 'THANH_TOAN_MO_PHONG', 'don_hang', id);
     await taoThongBao(
@@ -321,44 +306,56 @@ await khoBanGhi.them('thanh_toan', { ...duLieu, don_hang_id: id });
       `/orders/${id}`,
     );
 
-
     return chiTiet(nguoiDung, id);
   });
 }
-
 
 async function guiHang(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
   const dauVao = kiemTra.docSchema(guiHangSchema, duLieuNhap);
   const donViVanChuyen = kiemTra.chuoi(dauVao.don_vi_van_chuyen, 'Đơn vị vận chuyển', 100);
   const maVanDon = kiemTra.chuoi(dauVao.ma_van_don, 'Mã vận đơn', 100);
 
-
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.khoaDuLieu(kiemTra.id(id)));
 
+    if (banGhi.nguon_gui_hang === 'TRUNG_TAM') {
+      baoDam(nguoiDung.vai_tro === 'QUAN_TRI', 403, 'Chỉ Admin được ghi nhận trung tâm gửi hàng');
+    } else {
+      nguoiBan(nguoiDung, banGhi);
+    }
 
-    nguoiBan(nguoiDung, banGhi);
     baoDam(
       ['CHO_GUI_HANG', 'DA_THANH_TOAN'].includes(banGhi.trang_thai),
       409,
       'Đơn không ở bước gửi hàng',
     );
 
-
     const tienDangGiu = await khoDuLieu.tienTrungGian(id, true);
-
 
     baoDam(tienDangGiu?.trang_thai === 'DANG_GIU', 409, 'Đơn chưa được giữ tiền');
 
-
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
 
+    if (banGhi.nguon_gui_hang === 'TRUNG_TAM') {
+      const hoSo = batBuocTonTai(
+        await khoBanGhi.layTheoId('kiem_dinh_san_pham', banGhi.kiem_dinh_san_pham_id, true),
+      );
 
-    if (thoiGian.daHetHan(banGhi.han_nguoi_ban_gui_hang, thoiGianHienTai))
-      {
-await ghiNhanGiaoMuon(banGhi);
-}
+      baoDam(
+        hoSo.ket_qua === 'DAT' && hoSo.trang_thai === 'DANG_LUU_GIU' && !hoSo.ngay_roi_trung_tam,
+        409,
+        'Hàng không còn đủ điều kiện gửi từ trung tâm',
+      );
 
+      await khoBanGhi.capNhat('kiem_dinh_san_pham', hoSo.id, {
+        ngay_roi_trung_tam: thoiGianHienTai,
+        nguoi_cap_nhat_id: nguoiDung.id,
+      });
+    }
+
+    if (thoiGian.daHetHan(banGhi.han_nguoi_ban_gui_hang, thoiGianHienTai)) {
+      await ghiNhanGiaoMuon(banGhi);
+    }
 
     await khoBanGhi.capNhat('don_hang', id, {
       don_vi_van_chuyen: donViVanChuyen,
@@ -372,8 +369,12 @@ await ghiNhanGiaoMuon(banGhi);
       trang_thai: 'DA_GUI_HANG',
     });
 
-
-    await ghiNhatKy(nguoiDung.id, 'GUI_HANG', 'don_hang', id);
+    await ghiNhatKy(
+      nguoiDung.id,
+      banGhi.nguon_gui_hang === 'TRUNG_TAM' ? 'TRUNG_TAM_GUI_HANG' : 'GUI_HANG',
+      'don_hang',
+      id,
+    );
     await taoThongBao(
       banGhi.nguoi_mua_id,
       'DA_GUI_HANG',
@@ -382,16 +383,13 @@ await ghiNhanGiaoMuon(banGhi);
       `/orders/${id}`,
     );
 
-
     return chiTiet(nguoiDung, id);
   });
 }
 
-
 async function xacNhanDaGiao(nguoiDung: NguoiDungDangNhap, id) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.khoaDuLieu(kiemTra.id(id)));
-
 
     baoDam(
       nguoiDung.vai_tro === 'QUAN_TRI' || cungId(nguoiDung.id, banGhi.nguoi_mua_id),
@@ -400,10 +398,8 @@ async function xacNhanDaGiao(nguoiDung: NguoiDungDangNhap, id) {
     );
     baoDam(banGhi.trang_thai === 'DA_GUI_HANG', 409, 'Đơn chưa được gửi hoặc đã xác nhận giao');
 
-
     const vanChuyen = batBuocTonTai(await khoDuLieu.vanChuyen(id));
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
-
 
     await khoBanGhi.capNhat('don_hang', id, {
       trang_thai_van_chuyen: 'DA_GIAO',
@@ -416,7 +412,6 @@ async function xacNhanDaGiao(nguoiDung: NguoiDungDangNhap, id) {
       ),
     });
 
-
     await ghiNhatKy(nguoiDung.id, 'XAC_NHAN_GIAO_HANG', 'don_hang', id);
     await taoThongBao(
       banGhi.nguoi_mua_id,
@@ -426,13 +421,22 @@ async function xacNhanDaGiao(nguoiDung: NguoiDungDangNhap, id) {
       `/orders/${id}`,
     );
 
-
     return chiTiet(nguoiDung, id);
   });
 }
 
-
 async function hoanThanhDonDaKhoa(banGhi, nguoiThucHienId) {
+  if (banGhi.can_admin_xu_ly) {
+    baoDam(nguoiThucHienId == null, 409, 'Đơn cần Admin xử lý trước khi giải ngân');
+
+    return;
+  }
+
+  baoDam(
+    donViTienNho(banGhi.so_tien_da_thu) === donViTienNho(banGhi.tong_tien),
+    409,
+    'Đơn chưa thanh toán đủ',
+  );
   baoDam(
     ['DA_GIAO', 'DANG_KIEM_TRA'].includes(banGhi.trang_thai),
     409,
@@ -440,21 +444,18 @@ async function hoanThanhDonDaKhoa(banGhi, nguoiThucHienId) {
   );
   baoDam(!(await khoDuLieu.tranhChapDangMo(banGhi.id)), 409, 'Đơn có tranh chấp chưa xử lý');
 
-
   // Khóa tài khoản theo cùng thứ tự để việc khóa và giải ngân không vượt nhau.
   const cacId = [banGhi.nguoi_mua_id, banGhi.nguoi_ban_id].sort((a, b) =>
     BigInt(a) < BigInt(b) ? -1 : 1,
   );
   let biHanChe = false;
 
-
   for (const id of cacId) {
     const taiKhoan = batBuocTonTai(await cacNguoiDung.layTheoId(id, true));
 
-
     if (taiKhoan.trang_thai_tai_khoan !== 'HOAT_DONG') {
-biHanChe = true;
-}
+      biHanChe = true;
+    }
   }
   if (biHanChe) {
     await khoBanGhi.capNhat('don_hang', banGhi.id, {
@@ -463,22 +464,17 @@ biHanChe = true;
         'Tài khoản giao dịch bị khóa/tạm ngưng; cần Admin kiểm tra trước khi giải ngân.',
     });
 
-
     return;
   }
-
 
   const tienDangGiu = batBuocTonTai(
     await khoDuLieu.tienTrungGian(banGhi.id, true),
     'Không tìm thấy tiền trung gian',
   );
 
-
   baoDam(tienDangGiu.trang_thai === 'DANG_GIU', 409, 'Tiền trung gian không ở trạng thái giữ');
 
-
   const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
-
 
   await khoBanGhi.capNhat('don_hang', banGhi.id, {
     trang_thai_giu_tien: 'DA_GIAI_NGAN',
@@ -490,47 +486,50 @@ biHanChe = true;
     ngay_hoan_thanh: thoiGianHienTai,
   });
 
-
   await ghiNhatKy(nguoiThucHienId, 'HOAN_THANH_GIAI_NGAN', 'don_hang', banGhi.id);
 
-
-  for (const nguoiDungId of [banGhi.nguoi_mua_id, banGhi.nguoi_ban_id])
-    {
-await taoThongBao(
+  for (const nguoiDungId of [banGhi.nguoi_mua_id, banGhi.nguoi_ban_id]) {
+    await taoThongBao(
       nguoiDungId,
       'HOAN_THANH_DON',
       'Giao dịch đã hoàn thành',
       'Tiền mô phỏng đã được giải ngân cho người bán.',
       `/orders/${banGhi.id}`,
     );
+  }
 }
-}
-
 
 async function xacNhanHoanThanh(nguoiDung: NguoiDungDangNhap, id) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.khoaDuLieu(kiemTra.id(id)));
 
-
     nguoiMua(nguoiDung, banGhi);
 
-
     if (banGhi.trang_thai === 'HOAN_THANH') {
-return chiTiet(nguoiDung, id);
-}
+      return chiTiet(nguoiDung, id);
+    }
     await hoanThanhDonDaKhoa(banGhi, nguoiDung.id);
-
 
     return chiTiet(nguoiDung, id);
   });
 }
 
-
 async function ghiNhanGiaoMuon(banGhi) {
-  if (await khoDuLieu.viPhamCuaDon(banGhi.id, 'GIAO_HANG_MUON')) {
-return;
-}
+  if (banGhi.nguon_gui_hang === 'TRUNG_TAM') {
+    if (!banGhi.can_admin_xu_ly) {
+      await khoBanGhi.capNhat('don_hang', banGhi.id, {
+        can_admin_xu_ly: 1,
+        ly_do_can_xu_ly: 'Trung tâm quá hạn gửi hàng; cần Admin kiểm tra, không tự quy lỗi seller.',
+      });
 
+      await ghiNhatKy(null, 'TRUNG_TAM_GUI_MUON', 'don_hang', banGhi.id);
+    }
+
+    return;
+  }
+  if (await khoDuLieu.viPhamCuaDon(banGhi.id, 'GIAO_HANG_MUON')) {
+    return;
+  }
 
   await khoBanGhi.capNhat('don_hang', banGhi.id, {
     can_admin_xu_ly: 1,
@@ -545,7 +544,6 @@ return;
     diem_vi_pham: 1,
   });
 
-
   await thongBaoMotLan(
     banGhi.nguoi_ban_id,
     'GUI_HANG_QUA_HAN',
@@ -555,12 +553,10 @@ return;
   );
 }
 
-
 async function xuLyDenHan(id) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = batBuocTonTai(await khoDuLieu.khoaDuLieu(kiemTra.id(id)));
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
-
 
     if (
       banGhi.trang_thai === 'CHO_THANH_TOAN' &&
@@ -572,11 +568,10 @@ async function xuLyDenHan(id) {
         ly_do_huy: 'KHONG_THANH_TOAN',
       });
 
-
       await khoDuLieu.danhDauThanhToanHetHan(id);
-      if (!(await khoDuLieu.viPhamCuaDon(id, 'KHONG_THANH_TOAN')))
-        {
-await khoBanGhi.them('vi_pham', {
+      await datCoc.khongHoanCoc(banGhi);
+      if (!(await khoDuLieu.viPhamCuaDon(id, 'KHONG_THANH_TOAN'))) {
+        await khoBanGhi.them('vi_pham', {
           nguoi_dung_id: banGhi.nguoi_mua_id,
           phien_dau_gia_id: banGhi.phien_dau_gia_id,
           don_hang_id: id,
@@ -584,8 +579,7 @@ await khoBanGhi.them('vi_pham', {
           mo_ta: 'Người thắng không thanh toán đúng hạn.',
           diem_vi_pham: 1,
         });
-}
-
+      }
 
       await taoThongBao(
         banGhi.nguoi_mua_id,
@@ -606,42 +600,35 @@ await khoBanGhi.them('vi_pham', {
       ['DA_GIAO', 'DANG_KIEM_TRA'].includes(banGhi.trang_thai) &&
       thoiGian.daHetHan(banGhi.han_kiem_tra, thoiGianHienTai) &&
       !(await khoDuLieu.tranhChapDangMo(id))
-    )
-      {
-await hoanThanhDonDaKhoa(banGhi, null);
-}
-    else if (
+    ) {
+      await hoanThanhDonDaKhoa(banGhi, null);
+    } else if (
       ['CHO_GUI_HANG', 'DA_THANH_TOAN'].includes(banGhi.trang_thai) &&
       thoiGian.daHetHan(banGhi.han_nguoi_ban_gui_hang, thoiGianHienTai)
-    )
-      {
-await ghiNhanGiaoMuon(banGhi);
-}
+    ) {
+      await ghiNhanGiaoMuon(banGhi);
+    }
   });
 }
-
 
 async function nhacThanhToan(id) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = await khoDuLieu.khoaDuLieu(id);
 
-
     if (
       banGhi?.trang_thai === 'CHO_THANH_TOAN' &&
       !thoiGian.daHetHan(banGhi.han_thanh_toan, await coSoDuLieu.thoiGianHienTai())
-    )
-      {
-await thongBaoMotLan(
+    ) {
+      await thongBaoMotLan(
         banGhi.nguoi_mua_id,
         'SAP_HET_HAN_THANH_TOAN',
         'Sắp hết hạn thanh toán',
         'Hãy hoàn tất thanh toán mô phỏng trước thời hạn.',
         `/orders/${id}`,
       );
-}
+    }
   });
 }
-
 
 export {
   kiemTraQuyen,

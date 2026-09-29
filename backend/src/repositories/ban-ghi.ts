@@ -22,6 +22,8 @@ const cacBang = new Set([
   'de_nghi_mua_tiep_theo',
   'cau_hinh_he_thong',
   'nhat_ky_hoat_dong',
+  'kiem_dinh_san_pham',
+  'dat_coc_dau_gia',
 ]);
 
 function bang(ten: string) {
@@ -68,9 +70,4 @@ const layTheoId = <T = BanGhiSQL>(ten: string, id: DinhDanh, khoaDuLieu = false)
   );
 const xoa = (ten: string, id: DinhDanh) =>
   coSoDuLieu.truyVan(`DELETE FROM ${bang(ten)} WHERE id = ?`, [id]);
-export {
-  them,
-  capNhat,
-  layTheoId,
-  xoa,
-};
+export { them, capNhat, layTheoId, xoa };

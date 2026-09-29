@@ -1047,6 +1047,40 @@
           ]
         },
         {
+          "name": "Chọn ảnh đại diện",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/products/{{sanPhamId}}/images/{{anhId}}/primary",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Người bán chính chủ đã xác minh; sản phẩm còn được sửa. Trả danh sách ảnh sau cập nhật nguyên tử."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Bỏ ảnh khỏi sản phẩm nháp",
           "request": {
             "method": "DELETE",
@@ -1761,7 +1795,7 @@
             "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Mua ngay khi còn hiệu lực. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
             "body": {
               "mode": "raw",
-              "raw": "{}",
+              "raw": "{\n  \"ket_qua_mo_phong\": \"THANH_CONG\",\n  \"khoa_yeu_cau\": \"{{khoaMuaNgay}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1779,7 +1813,7 @@
                   "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
                   "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
                   "  const duLieu = pm.response.json().data;",
-                  "  if (duLieu?.don_hang.id != null) pm.collectionVariables.set('donHangId', String(duLieu.don_hang.id));",
+                  "  if (duLieu?.don_hang?.id != null) pm.collectionVariables.set('donHangId', String(duLieu.don_hang.id));",
                   "}"
                 ]
               }
@@ -2548,7 +2582,7 @@
             "description": "Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Người nhận chấp nhận; đổi false để từ chối. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"chap_nhan\": true\n}",
+              "raw": "{\n  \"chap_nhan\": true,\n  \"ket_qua_mo_phong\": \"THANH_CONG\",\n  \"khoa_yeu_cau\": \"{{khoaSecondChance}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2566,7 +2600,7 @@
                   "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
                   "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
                   "  const duLieu = pm.response.json().data;",
-                  "  if (duLieu?.don_hang.id != null) pm.collectionVariables.set('donHangId', String(duLieu.don_hang.id));",
+                  "  if (duLieu?.don_hang?.id != null) pm.collectionVariables.set('donHangId', String(duLieu.don_hang.id));",
                   "}"
                 ]
               }
@@ -3681,6 +3715,498 @@
           ]
         }
       ]
+    },
+    {
+      "name": "10. Kiểm định, trung tâm và đặt cọc",
+      "item": [
+        {
+          "name": "Thông tin kiểm định công khai",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/products/{{sanPhamId}}/inspection",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Hồ sơ kiểm định của tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/inspections",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Chi tiết hồ sơ riêng",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/inspections/{{kiemDinhId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin tạo hồ sơ kiểm định",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/products/{{sanPhamId}}/inspections",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) { pm.collectionVariables.set('kiemDinhId', String(duLieu.id)); }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller khai báo gửi trung tâm",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/inspections/{{kiemDinhId}}/shipping",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"don_vi_van_chuyen\": \"Đơn vị vận chuyển thử\",\n  \"ma_van_don\": \"KD-DEN-001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin xem hàng đợi kiểm định",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/inspections",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin ghi nhận trung tâm nhận hàng",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/inspections/{{kiemDinhId}}/received",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tinh_trang_khi_nhan\": \"Nguyên niêm phong\",\n  \"serial_khi_nhan\": \"SERIAL-001\",\n  \"so_kien\": 1,\n  \"ghi_chu\": \"Đối chiếu biên bản và ảnh tiếp nhận\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin bắt đầu ghi hồ sơ kiểm định",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/inspections/{{kiemDinhId}}/start",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Gắn báo cáo chuyên gia đã tải lên",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/inspections/{{kiemDinhId}}/files",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loai_tep\": \"BAO_CAO_KIEM_DINH\",\n  \"duong_dan_tep\": \"{{tepKiemDinh}}\",\n  \"mo_ta\": \"Báo cáo trung tâm cung cấp\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin nhập kết quả từ báo cáo chuyên gia",
+          "request": {
+            "method": "PATCH",
+            "url": "{{diaChiGoc}}/admin/inspections/{{kiemDinhId}}/result",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ket_qua\": \"DAT\",\n  \"ten_chuyen_gia\": \"Tên trên báo cáo\",\n  \"don_vi_kiem_dinh\": \"Đơn vị trên báo cáo\",\n  \"ngay_kiem_dinh\": \"{{ngayKiemDinh}}\",\n  \"nhan_xet\": \"Nội dung kết luận trong báo cáo\",\n  \"ma_chung_nhan\": \"CERT-001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin trả hàng không đạt hoặc cần bổ sung",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/inspections/{{kiemDinhId}}/return",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ly_do\": \"Không đạt theo báo cáo; đã bàn giao trả người bán\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Đăng ký tham gia phiên cần cọc",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/deposit/register",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Xem cọc của chính tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/deposit",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Thanh toán cọc mô phỏng",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/deposit/pay",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ket_qua_mo_phong\": \"THANH_CONG\",\n  \"khoa_yeu_cau\": \"{{khoaDatCoc}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Seller xem số lượng tham gia",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/participants/summary",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin quản lý các khoản cọc",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/admin/deposits",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin cấu hình cọc (mặc định đang tắt)",
+          "request": {
+            "method": "PUT",
+            "url": "{{diaChiGoc}}/admin/config/DEPOSIT_POLICY",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gia_tri_cau_hinh\": {\n    \"bat\": false,\n    \"kieu\": \"TY_LE\",\n    \"gia_tri\": 10\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
@@ -3854,6 +4380,36 @@
     {
       "key": "tenTep",
       "value": "",
+      "type": "string"
+    },
+    {
+      "key": "kiemDinhId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tepKiemDinh",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ngayKiemDinh",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "khoaDatCoc",
+      "value": "coc-yeu-cau-0001",
+      "type": "string"
+    },
+    {
+      "key": "khoaMuaNgay",
+      "value": "mua-ngay-yeu-cau-0001",
+      "type": "string"
+    },
+    {
+      "key": "khoaSecondChance",
+      "value": "second-chance-yeu-cau-0001",
       "type": "string"
     }
   ]

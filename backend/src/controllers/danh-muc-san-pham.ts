@@ -35,4 +35,7 @@ export = {
     status: 201,
   }),
   xoaAnh: xuLyHTTP((yeuCau) => dichVu.xoaAnh(yeuCau.user, yeuCau.params.id, yeuCau.params.imageId)),
+  chonAnhChinh: xuLyHTTP((yeuCau) =>
+    dichVu.chonAnhChinh(yeuCau.user, yeuCau.params.id, yeuCau.params.imageId),
+  ),
 };

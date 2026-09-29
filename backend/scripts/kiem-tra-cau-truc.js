@@ -9,18 +9,23 @@ async function kiemTraCauTruc() {
   );
   const mongDoi = new Map();
 
-  for (const ketQuaKhop of sql.matchAll(/CREATE TABLE (\w+) \(([\s\S]*?)\) ENGINE=InnoDB;/g)) {
+  for (const ketQuaKhop of sql.matchAll(
+    /CREATE TABLE `?(\w+)`? \(([\s\S]*?)\) ENGINE=InnoDB[^;]*;/gi,
+  )) {
     const cacCot = [
       ...ketQuaKhop[2].matchAll(
-        /^\s{4}(\w+)\s+(?:BIGINT|VARCHAR|ENUM|DATETIME|TIMESTAMP|TINYINT|INT|DECIMAL|JSON|TEXT)\b/gm,
+        /^\s+`?(\w+)`?\s+(?:BIGINT|VARCHAR|ENUM|DATETIME|TIMESTAMP|TINYINT|INT|DECIMAL|JSON|TEXT)\b/gim,
       ),
     ].map((cot) => cot[1]);
 
+    if (!cacCot.length) {
+      throw new Error('Không đọc được cột từ SQL chuẩn');
+    }
     mongDoi.set(ketQuaKhop[1], cacCot);
   }
 
-  if (mongDoi.size !== 19) {
-    throw new Error('SQL chuẩn phải có 19 bảng');
+  if (mongDoi.size !== 21) {
+    throw new Error('SQL chuẩn phải có 21 bảng');
   }
 
   const thucTe = await coSoDuLieu.truyVan(`
@@ -53,6 +58,7 @@ async function kiemTraCauTruc() {
       {
         expectedTables: mongDoi.size,
         actualTables: thongTinBoMay.length,
+        checkedColumns: [...mongDoi.values()].reduce((tong, cot) => tong + cot.length, 0),
         extraTables: bangDu,
         missingColumns: conThieu,
         unsafeEngines: boMayKhongHoTro,
@@ -61,7 +67,7 @@ async function kiemTraCauTruc() {
       2,
     ),
   );
-  if (conThieu.length || boMayKhongHoTro.length || bangDu.length || thongTinBoMay.length !== 19) {
+  if (conThieu.length || boMayKhongHoTro.length || bangDu.length || thongTinBoMay.length !== 21) {
     process.exitCode = 1;
   }
 }
