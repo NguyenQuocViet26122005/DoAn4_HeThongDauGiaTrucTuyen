@@ -7,6 +7,7 @@ import heThong = require('../repositories/he-thong');
 export = {
   danhSach: xuLyHTTP((yeuCau) => dichVu.danhSach(yeuCau.user, yeuCau.query)),
   cuaToi: xuLyHTTP((yeuCau) => dichVu.danhSach(yeuCau.user, yeuCau.query, 'mine')),
+  chiTietCuaToi: xuLyHTTP((yeuCau) => dichVu.chiTietCuaToi(yeuCau.user, yeuCau.params.id)),
   phienDaThamGia: xuLyHTTP((yeuCau) => dichVu.danhSach(yeuCau.user, yeuCau.query, 'bids')),
   chiTiet: xuLyHTTP((yeuCau) => dichVu.chiTiet(yeuCau.params.id)),
   lichSu: xuLyHTTP((yeuCau) => dichVu.lichSu(yeuCau.params.id, yeuCau.query)),

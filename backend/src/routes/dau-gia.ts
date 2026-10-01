@@ -6,6 +6,7 @@ const boDinhTuyen = TaoBoDinhTuyen();
 const gioiHanDatGia = gioiHanYeuCau({ limit: 60, windowMs: 60000 });
 boDinhTuyen.get('/auctions', dieuKhien.danhSach);
 boDinhTuyen.get('/auctions/mine', yeuCauDangNhap(), nguoiBan, dieuKhien.cuaToi);
+boDinhTuyen.get('/auctions/mine/:id', yeuCauDangNhap(), nguoiBan, dieuKhien.chiTietCuaToi);
 boDinhTuyen.get('/auctions/my-bids', yeuCauDangNhap(), dieuKhien.phienDaThamGia);
 boDinhTuyen.get('/auctions/:id', dieuKhien.chiTiet);
 boDinhTuyen.get('/auctions/:id/bids', dieuKhien.lichSu);
