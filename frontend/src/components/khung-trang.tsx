@@ -262,7 +262,7 @@ export function KhungLamViec({ loai }: { loai: 'tai-khoan' | 'nguoi-ban' | 'quan
         <nav>
           {muc.map(([duongDan, bieuTuong, ten]) => (
             <NavLink
-              end={!['san-pham', 'kiem-dinh'].includes(duongDan)}
+              end={!['san-pham', 'kiem-dinh', 'phien'].includes(duongDan)}
               to={`/${loai}${duongDan ? `/${duongDan}` : ''}`}
               key={ten}
             >

@@ -25,6 +25,7 @@ export const nhanTrangThai: Record<string, string> = {
   DA_HUY: 'Đã hủy',
   BAN_NHAP: 'Bản nháp',
   CHO_XU_LY: 'Chờ xử lý',
+  DANG_XU_LY: 'Đang xử lý',
   DA_DUYET: 'Đã duyệt',
   TU_CHOI: 'Từ chối',
   LUU_TRU: 'Lưu trữ',

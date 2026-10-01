@@ -16,6 +16,9 @@ const DuyetSanPham = lazy(() => import('../pages/duyet-san-pham'));
 const ChiTietDuyetSanPham = lazy(() =>
   import('../pages/duyet-san-pham').then((muc) => ({ default: muc.ChiTietDuyetSanPham })),
 );
+const PhienNguoiBan = lazy(() => import('../pages/phien-nguoi-ban'));
+const TaoPhien = lazy(() => import('../pages/tao-phien'));
+const ChiTietPhienNguoiBan = lazy(() => import('../pages/chi-tiet-phien-nguoi-ban'));
 const KiemDinh = lazy(() => import('../pages/kiem-dinh'));
 const ChiTietKiemDinh = lazy(() => import('../pages/chi-tiet-kiem-dinh'));
 
@@ -115,6 +118,9 @@ export default function DinhTuyen() {
                 <Route path="san-pham" element={<SanPhamNguoiBan />} />
                 <Route path="san-pham/moi" element={<BienTapSanPham />} />
                 <Route path="san-pham/:id" element={<BienTapSanPham />} />
+                <Route path="phien" element={<PhienNguoiBan />} />
+                <Route path="phien/moi" element={<TaoPhien />} />
+                <Route path="phien/:id" element={<ChiTietPhienNguoiBan />} />
                 <Route path="kiem-dinh" element={<KiemDinh />} />
                 <Route path="kiem-dinh/:id" element={<ChiTietKiemDinh />} />
                 <Route path=":muc" element={<KhongGianNghiepVu loai="nguoi-ban" />} />
