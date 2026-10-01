@@ -245,7 +245,7 @@ export default function ThaoTacKiemDinh({
         width={640}
         destroyOnHidden
         closable={!dangBan}
-        maskClosable={!dangBan}
+        mask={{ closable: !dangBan }}
         onCancel={() => !dangBan && datThaoTac('')}
       >
         <Form
