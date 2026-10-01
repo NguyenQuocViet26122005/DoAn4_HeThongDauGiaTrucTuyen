@@ -525,6 +525,13 @@ function danhSach(nguoiDung: NguoiDungDangNhap, truyVan: TruyVanDanhSach = {}, p
   if (phamVi === 'mine') {
     boLoc.sellerId = nguoiDung.id;
   }
+  if (truyVan.du_dieu_kien_dau_gia !== undefined) {
+    baoDam(phamVi === 'mine', 400, 'Bộ lọc này chỉ dùng cho sản phẩm của tôi');
+
+    boLoc.duDieuKienDauGia =
+      kiemTra.giaTriLuaChon(truyVan.du_dieu_kien_dau_gia, ['0', '1'], 'Đủ điều kiện đấu giá') ===
+      '1';
+  }
   if (phamVi === 'public') {
     boLoc.status = 'DA_DUYET';
   } else if (truyVan.trang_thai) {

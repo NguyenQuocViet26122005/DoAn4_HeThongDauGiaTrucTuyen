@@ -598,6 +598,31 @@ async function chiTiet(id) {
   return phienCongKhai(batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id))));
 }
 
+async function chiTietCuaToi(nguoiDung: NguoiDungDangNhap, id) {
+  const phien = batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id)));
+
+  baoDam(cungId(phien.nguoi_ban_id, nguoiDung.id), 403, 'Phiên không thuộc tài khoản');
+
+  const yeuCau = await khoDuLieu.yeuCauHuyMoiNhat(phien.id);
+  const hienTai = await coSoDuLieu.thoiGianHienTai();
+  const daHetHan =
+    !['DA_LEN_LICH', 'HOAT_DONG'].includes(phien.trang_thai) ||
+    thoiGian.daHetHan(phien.thoi_gian_ket_thuc, hienTai);
+  const dangCho = yeuCau && ['CHO_XU_LY', 'DANG_XU_LY'].includes(yeuCau.trang_thai);
+  const lyDo = daHetHan
+    ? 'Phiên đã kết thúc hoặc hết thời gian gửi yêu cầu hủy.'
+    : dangCho
+      ? 'Yêu cầu hủy đang chờ Admin xử lý. Phiên vẫn tiếp tục cho đến khi được duyệt hủy.'
+      : null;
+
+  return {
+    ...phienCongKhai(phien),
+    yeu_cau_huy_moi_nhat: yeuCau,
+    co_the_yeu_cau_huy: !lyDo,
+    ly_do_khong_the_huy: lyDo,
+  };
+}
+
 async function lichSu(id, truyVan) {
   batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id)));
 
@@ -654,6 +679,7 @@ export {
   duyetHuyPhien,
   danhSach,
   chiTiet,
+  chiTietCuaToi,
   lichSu,
   theoDoi,
   nhacPhienSapKetThuc,
