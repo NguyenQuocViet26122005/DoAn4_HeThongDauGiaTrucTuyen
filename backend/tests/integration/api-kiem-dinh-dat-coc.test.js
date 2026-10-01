@@ -157,15 +157,33 @@ test('HTTP: đủ 16 API kiểm định/cọc mới và quyền truy cập hồ 
           await gui('GET', `/inspections/${hoSo.id}`, 'outsider', undefined, 403);
 
           const rieng = await gui('GET', `/products/${sp}`, 'admin');
+
           assert.equal(String(rieng.kiem_dinh_moi_nhat.id), String(hoSo.id));
-          const loc = await gui('GET', `/admin/inspections?san_pham_id=${sp}&trang_thai=DANG_KIEM_DINH&q=${hoSo.ma_kiem_dinh}`, 'admin');
+
+          const loc = await gui(
+            'GET',
+            `/admin/inspections?san_pham_id=${sp}&trang_thai=DANG_KIEM_DINH&q=${hoSo.ma_kiem_dinh}`,
+            'admin',
+          );
+
           assert.equal(loc.length, 1);
           assert.equal((await gui('GET', `/inspections?san_pham_id=${sp}`, 'outsider')).length, 0);
-          assert.equal((await gui('GET', `/admin/inspections?san_pham_id=${sp}&trang_thai=CHO_GUI_TRUNG_TAM`, 'admin')).length, 0);
+          assert.equal(
+            (
+              await gui(
+                'GET',
+                `/admin/inspections?san_pham_id=${sp}&trang_thai=CHO_GUI_TRUNG_TAM`,
+                'admin',
+              )
+            ).length,
+            0,
+          );
           await gui('GET', '/admin/inspections?trang_thai=SAI', 'admin', undefined, 400);
           await gui('GET', '/admin/inspections?san_pham_id=abc', 'admin', undefined, 400);
-          assert.equal((await gui('GET', `/inspections/${hoSo.id}`, 'seller')).co_the_cap_nhat, true);
-
+          assert.equal(
+            (await gui('GET', `/inspections/${hoSo.id}`, 'seller')).co_the_cap_nhat,
+            true,
+          );
         });
 
         await t.test(
@@ -211,12 +229,29 @@ test('HTTP: đủ 16 API kiểm định/cọc mới và quyền truy cập hồ 
             assert.equal(congKhai.tep_dinh_kem, undefined);
 
             assert.equal((await gui('GET', `/products/${sp}`)).kiem_dinh_moi_nhat, undefined);
-            assert.equal((await gui('GET', `/products/${sp}`, 'admin')).kiem_dinh_moi_nhat.co_bao_cao, true);
-            const ganLai = await gui('POST', `/admin/inspections/${hoSo.id}/files`, 'admin', { loai_tep: 'BAO_CAO_KIEM_DINH', duong_dan_tep: baoCao }, 201);
+            assert.equal(
+              (await gui('GET', `/products/${sp}`, 'admin')).kiem_dinh_moi_nhat.co_bao_cao,
+              true,
+            );
+
+            const ganLai = await gui(
+              'POST',
+              `/admin/inspections/${hoSo.id}/files`,
+              'admin',
+              { loai_tep: 'BAO_CAO_KIEM_DINH', duong_dan_tep: baoCao },
+              201,
+            );
             const chiTiet = await gui('GET', `/inspections/${hoSo.id}`, 'admin');
+
             assert.equal(chiTiet.tep_dinh_kem.length, 1);
             assert.equal(String(chiTiet.tep_dinh_kem[0].id), String(ganLai.id));
-            await gui('POST', `/admin/inspections/${hoSo.id}/files`, 'admin', { loai_tep: 'CHUNG_NHAN_KIEM_DINH', duong_dan_tep: baoCao }, 409);
+            await gui(
+              'POST',
+              `/admin/inspections/${hoSo.id}/files`,
+              'admin',
+              { loai_tep: 'CHUNG_NHAN_KIEM_DINH', duong_dan_tep: baoCao },
+              409,
+            );
 
             await gui('GET', baoCao.slice(4), undefined, undefined, 401);
             await gui('GET', baoCao.slice(4), 'outsider', undefined, 403);
@@ -241,7 +276,9 @@ test('HTTP: đủ 16 API kiểm định/cọc mới và quyền truy cập hồ 
             await ketQua('KHONG_DAT'),
             409,
           );
+
           const biKhoa = await gui('GET', `/inspections/${hoSo.id}`, 'admin');
+
           assert.equal(biKhoa.co_the_cap_nhat, false);
           assert.match(biKhoa.ly_do_khong_the_cap_nhat, /nghĩa vụ bán/);
           await assert.rejects(

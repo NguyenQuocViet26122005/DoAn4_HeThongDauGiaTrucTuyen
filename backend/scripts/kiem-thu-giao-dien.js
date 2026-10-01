@@ -24,7 +24,12 @@ async function chay() {
       cacChuTep.push(String(duLieu[vaiTro].id));
 
       await khoBanGhi.capNhat('nguoi_dung', duLieu[vaiTro].id, {
-        ho_ten: vaiTro === 'admin' ? 'Admin kiểm thử' : vaiTro === 'seller' ? 'Người bán kiểm thử' : 'Người mua kiểm thử',
+        ho_ten:
+          vaiTro === 'admin'
+            ? 'Admin kiểm thử'
+            : vaiTro === 'seller'
+              ? 'Người bán kiểm thử'
+              : 'Người mua kiểm thử',
         email: `${vaiTro}-giao-dien@example.invalid`,
         mat_khau_bam: await require('bcrypt').hash(matKhauThu, 4),
       });
@@ -48,24 +53,45 @@ async function chay() {
       });
     }
 
-    const thuocTinh = await require('../dist/repositories/danh-muc-san-pham').danhSachThuocTinh(duLieu.categoryId);
-    const giaTri = { serial: 'TEST-001', nam: '2024', mau: 'Vàng', hop: 'false', ngay: '2024-06-01' };
+    const thuocTinh = await require('../dist/repositories/danh-muc-san-pham').danhSachThuocTinh(
+      duLieu.categoryId,
+    );
+    const giaTri = {
+      serial: 'TEST-001',
+      nam: '2024',
+      mau: 'Vàng',
+      hop: 'false',
+      ngay: '2024-06-01',
+    };
     const tenAnh = require('node:crypto').randomUUID() + '.png';
     const thuMucAnh = duongDan.join(cauHinh.uploadRoot, 'product', String(duLieu.seller.id));
 
     await tepTin.mkdir(thuMucAnh, { recursive: true });
-    await tepTin.copyFile(duongDan.join(__dirname, '../../frontend/src/assets/khong-gian-dau-gia.png'), duongDan.join(thuMucAnh, tenAnh));
+    await tepTin.copyFile(
+      duongDan.join(__dirname, '../../frontend/src/assets/khong-gian-dau-gia.png'),
+      duongDan.join(thuMucAnh, tenAnh),
+    );
 
     for (const batBuoc of [false, true]) {
-      await khoBanGhi.capNhat('danh_muc', duLieu.categoryId, { yeu_cau_kiem_dinh: batBuoc ? 1 : 0 });
+      await khoBanGhi.capNhat('danh_muc', duLieu.categoryId, {
+        yeu_cau_kiem_dinh: batBuoc ? 1 : 0,
+      });
+
       const sp = await dichVu.luuSanPham(duLieu.seller, null, {
         danh_muc_id: duLieu.categoryId,
         tieu_de: batBuoc ? 'Đồng hồ kiểm thử cần kiểm định' : 'Sản phẩm kiểm thử duyệt trực tiếp',
-        mo_ta: 'Dữ liệu kiểm thử riêng, được hoàn tác khi dừng máy chủ. Ảnh minh họa chỉ dùng thử giao diện.',
+        mo_ta:
+          'Dữ liệu kiểm thử riêng, được hoàn tác khi dừng máy chủ. Ảnh minh họa chỉ dùng thử giao diện.',
         tinh_trang_san_pham: 'MOI',
-        thuoc_tinh: thuocTinh.map((muc) => ({ thuoc_tinh_id: muc.id, gia_tri: giaTri[muc.khoa_thuoc_tinh] })),
+        thuoc_tinh: thuocTinh.map((muc) => ({
+          thuoc_tinh_id: muc.id,
+          gia_tri: giaTri[muc.khoa_thuoc_tinh],
+        })),
       });
-      await dichVu.themAnh(duLieu.seller, sp.id, { duong_dan_anh: '/api/uploads/files/product/' + duLieu.seller.id + '/' + tenAnh });
+
+      await dichVu.themAnh(duLieu.seller, sp.id, {
+        duong_dan_anh: '/api/uploads/files/product/' + duLieu.seller.id + '/' + tenAnh,
+      });
       await dichVu.guiDuyet(duLieu.seller, sp.id);
     }
 
@@ -75,7 +101,9 @@ async function chay() {
     console.log(
       'API kiểm thử giao diện: http://127.0.0.1:5001; dữ liệu riêng sẽ rollback khi dừng.',
     );
-    console.log('Tài khoản thử: admin-giao-dien@example.invalid / seller-giao-dien@example.invalid / a-giao-dien@example.invalid');
+    console.log(
+      'Tài khoản thử: admin-giao-dien@example.invalid / seller-giao-dien@example.invalid / a-giao-dien@example.invalid',
+    );
     console.log('Mật khẩu tài khoản thử: KiemThuVietBid123!');
     console.log('Nhấn Enter để dừng, hoàn tác dữ liệu và dọn ảnh kiểm thử.');
 
@@ -104,6 +132,7 @@ chay()
         if (!thuMuc.startsWith(goc + duongDan.sep)) {
           throw new Error('Thư mục dọn tệp nằm ngoài vùng kiểm thử');
         }
+
         const cacTep = await tepTin.readdir(thuMuc).catch(() => []);
 
         for (const ten of cacTep) {
