@@ -4,11 +4,11 @@
 
 **Tài liệu nghiệp vụ chi tiết và công nghệ — phiên bản 3.0, ngày 25/09/2026.**
 
-Cập nhật giao diện duyệt sản phẩm và kiểm định ngày 01/10/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
+Cập nhật giao diện duyệt sản phẩm, kiểm định và tạo/quản lý phiên người bán ngày 01/10/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
 
 Đây là đặc tả chính của project. Phiên bản này thay thế các mô tả cũ về phạm vi hàng phổ thông, đặt cọc ngoài phạm vi, Mua ngay tạo đơn chưa thanh toán và Second Chance thanh toán sau. Khi triển khai phải đồng bộ tài liệu, SQL, backend, hợp đồng API và kiểm thử.
 
-**Trạng thái triển khai:** SQL và backend đã nâng cấp lên 21 bảng ngày 25/09/2026; toàn bộ dữ liệu ở các cột cũ khớp bản sao. Kiểm tra lại ngày 26/09/2026 đạt 18 kiểm thử đơn vị/HTTP cơ bản và 54 kiểm thử tích hợp; 103 API có kịch bản HTTP thành công. 29 kiểm tra ràng buộc MySQL đã đạt ở đợt nâng cấp. Chính sách cọc mặc định tắt, Admin cấu hình rồi bật cho phiên mới. Giao diện đầy đủ chưa nghiệm thu.
+**Trạng thái triển khai:** SQL và backend đã nâng cấp lên 21 bảng ngày 25/09/2026; toàn bộ dữ liệu ở các cột cũ khớp bản sao. Kiểm tra lại ngày 01/10/2026 đạt 18 kiểm thử đơn vị/HTTP cơ bản và 55 kiểm thử tích hợp; 104 API có kịch bản HTTP thành công. 29 kiểm tra ràng buộc MySQL đã đạt ở đợt nâng cấp. Chính sách cọc mặc định tắt, Admin cấu hình rồi bật cho phiên mới. Giao diện đầy đủ chưa nghiệm thu.
 
 ## 1. Mục tiêu và phạm vi
 
@@ -54,6 +54,7 @@ Các thư mục hiện có gồm `pages`, `components`, `services`, `socket`, `s
 - Đăng nhập/đăng ký: kiểm tra đầu vào, báo lỗi từng trường, nút đang xử lý, gọi API thật và quay lại trang cần đăng nhập. Đăng ký thành công chuyển về đăng nhập. Không thêm đăng nhập mạng xã hội, quên mật khẩu hoặc ví khi chưa có trong đặc tả/API.
 - Tài khoản: hiển thị hồ sơ, danh sách theo dõi và phiên đã tham gia. Các mục tài khoản khác còn là bố cục/điều hướng có thông báo đang hoàn thiện. Phạm vi đã có của người bán và Admin được liệt kê riêng bên dưới.
 - Người bán — sản phẩm: đã có danh sách riêng, tìm kiếm/lọc/phân trang, tạo/sửa bản nháp, thuộc tính theo danh mục, tải nhiều ảnh, chọn ảnh đại diện, bỏ ảnh và gửi duyệt qua API thật. Chỉ người bán đã xác minh, tài khoản hoạt động mới vào luồng này. Màn hình hiển thị lý do từ chối và lý do khóa sửa; không tự mở khóa sản phẩm đã kiểm định hoặc có phiên.
+- Người bán — phiên đấu giá: danh sách riêng có tìm kiếm/lọc/phân trang; tạo phiên từ sản phẩm đủ điều kiện với giá khởi điểm, giá sàn/Mua ngay tùy chọn, phí vận chuyển và lịch giờ Việt Nam. Có kiểm tra biểu mẫu và xác nhận trước khi tạo. Chi tiết hiển thị giá công khai, lịch, kết quả, cọc đã chụp theo cấu hình và yêu cầu hủy mới nhất. Gửi yêu cầu hủy phải có lý do; phiên tiếp tục cho đến khi Admin duyệt hoặc có kết quả. Chưa có thao tác sửa giá/lịch sau khi tạo. Làm mới qua API, chưa nối realtime ở màn hình này.
 - Admin — duyệt sản phẩm: danh sách mặc định chờ xử lý, tìm tên/lọc trạng thái/danh mục/phân trang; xem ảnh, mô tả, thuộc tính; duyệt hoặc từ chối có lý do. Sản phẩm bắt buộc kiểm định chưa đạt/không còn được trung tâm giữ/thiếu báo cáo bị khóa nút duyệt. Admin mở hồ sơ kiểm định từ sản phẩm và quay lại duyệt nội dung khi đủ điều kiện.
 - Kiểm định — Admin: danh sách tìm theo mã hoặc tên sản phẩm, lọc trạng thái và phân trang; ghi tiếp nhận (tình trạng, serial, số kiện, ghi chú), bắt đầu kiểm định, đính kèm ảnh/PDF, ghi kết quả chuyên gia và ghi nhận trả hàng khi được phép. Kết quả đạt chuyển sang lưu giữ, không tự duyệt nội dung. Màn hình hiển thị riêng thời điểm hàng rời trung tâm để không hiểu nhầm trạng thái lưu giữ cũ.
 - Kiểm định — người bán: xem hồ sơ của chính mình, khai báo đơn vị/mã vận đơn gửi đến trung tâm khi đang chờ gửi; xem biên bản, báo cáo và kết quả theo quyền. Không có nút ghi kết quả hoặc tải báo cáo của Admin.
@@ -72,7 +73,7 @@ Luồng tệp kiểm định trên web: Admin chọn loại hồ sơ → chọn 
 
 Chi tiết sản phẩm chỉ trả thêm thông tin kiểm định mới nhất cho chính chủ/Admin. Chi tiết hồ sơ trả trạng thái có thể cập nhật và lý do khóa để giao diện giải thích; các API ghi vẫn kiểm tra quyền, trạng thái và nghĩa vụ giao dịch trong transaction. Không thêm bảng, cột hay vai trò cho đợt giao diện này.
 
-Kiểm tra lại ngày 01/10/2026: 18 kiểm thử cơ bản và 54 kiểm thử tích hợp đạt; build frontend, lint và định dạng đạt. Đã thử trực tiếp luồng Admin duyệt/kiểm định và người bán khai báo gửi hàng bằng dữ liệu riêng, sau đó hoàn tác.
+Kiểm tra lại ngày 01/10/2026: 18 kiểm thử cơ bản và 55 kiểm thử tích hợp đạt, bao phủ 104 API; build frontend, lint và định dạng đạt. Đã thử trực tiếp luồng Admin duyệt/kiểm định, người bán khai báo gửi hàng, tạo phiên, kiểm tra giá/lịch, tìm kiếm và gửi yêu cầu hủy còn hiển thị sau tải lại. Toàn bộ dữ liệu thử dùng CSDL riêng và được hoàn tác.
 
 ### 3.2. Backend
 
@@ -147,6 +148,10 @@ Phiên có giá khởi điểm, giá sàn tùy chọn, Mua ngay tùy chọn, ph�
 Bước giá do Admin cấu hình thành các khoảng liên tục, không chồng lấn. Không đổi bộ bước giá khi còn phiên chờ hoặc đang chạy. Cửa sổ gia hạn và số giây gia hạn được chụp vào phiên.
 
 Trạng thái chính: `DA_LEN_LICH`, `HOAT_DONG`, `DA_KET_THUC`, `THAT_BAI`, `DA_HUY`. Tác vụ mở/đóng theo giờ MySQL; API tự kiểm tra hạn ngay khi nhận yêu cầu, không chờ tác vụ quét.
+
+Giao diện chọn sản phẩm dùng `GET /products/mine?du_dieu_kien_dau_gia=1`: lọc trước phân trang, chỉ lấy sản phẩm của chính chủ đã duyệt, không có phiên chờ/chạy/đã kết thúc thành công. Nếu bắt buộc kiểm định, hồ sơ mới nhất phải đạt, còn lưu giữ, chưa rời trung tâm và có báo cáo. Kết quả chỉ phản ánh lúc đọc; API tạo vẫn kiểm tra lại điều kiện và khóa dữ liệu trong transaction.
+
+`GET /auctions/mine/:id` dành riêng cho người bán đã xác minh sở hữu phiên; trả thông tin công khai cùng yêu cầu hủy mới nhất, khả năng gửi yêu cầu và lý do bị khóa. Không trả giá sàn hoặc mức tối đa bí mật. Giao diện nhập lịch theo UTC+7 và gửi ISO có múi giờ; không tự chốt phiên theo đồng hồ trình duyệt. Đợt bổ sung giao diện này không đổi cấu trúc CSDL.
 
 ## 8. Chính sách cọc và đăng ký tham gia
 

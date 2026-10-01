@@ -867,6 +867,40 @@
           ]
         },
         {
+          "name": "Sản phẩm đủ điều kiện tạo phiên",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/products/mine?du_dieu_kien_dau_gia=1",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Sản phẩm của người bán đã duyệt, đủ kiểm định/lưu giữ nếu bắt buộc và chưa có phiên trùng. Điều kiện được kiểm tra lại khi tạo phiên."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Chi tiết sản phẩm của người bán",
           "request": {
             "method": "GET",
@@ -1521,6 +1555,40 @@
             },
             "header": [],
             "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Phiên do tôi bán. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết phiên của tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/auctions/mine/{{phienId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiBan}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Chỉ người bán đã xác minh sở hữu phiên. Trả thông tin công khai, yêu cầu hủy mới nhất và điều kiện gửi yêu cầu; không trả giá sàn hoặc mức tối đa bí mật."
           },
           "response": [],
           "event": [

@@ -1,6 +1,6 @@
 # Danh sách API Backend
 
-Đã đối chiếu 103 cặp phương thức/đường dẫn với các tệp thật trong src/routes và ung-dung.ts. Bộ Postman có các biến thể đăng nhập, đặt giá và cấu hình để chạy từng kịch bản. Nghiệp vụ 3.0 dùng 21 bảng.
+Đã đối chiếu 104 cặp phương thức/đường dẫn với các tệp thật trong src/routes và ung-dung.ts. Bộ Postman có các biến thể đăng nhập, đặt giá và cấu hình để chạy từng kịch bản. Nghiệp vụ 3.0 dùng 21 bảng.
 
 Địa chỉ gốc: `http://localhost:5000/api`. `GET /` ngoài tiền tố `/api` trả thông tin máy chủ.
 
@@ -224,6 +224,8 @@ Quyền: Công khai.
 
 Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 
+Thêm query `du_dieu_kien_dau_gia=1` để chỉ lấy sản phẩm đã duyệt và chưa có phiên `DA_LEN_LICH`, `HOAT_DONG` hoặc `DA_KET_THUC`. Nếu bắt buộc kiểm định, hồ sơ mới nhất phải đạt, đang lưu giữ, chưa rời trung tâm và có báo cáo. Bộ lọc chạy trước phân trang; `0` hoặc bỏ qua giữ danh sách thông thường. Giá trị khác hoặc dùng tham số này trên danh sách công khai/Admin trả 400. Điều kiện được kiểm tra lại trong transaction khi tạo phiên.
+
 ### GET /products/:id — Chi tiết sản phẩm của người bán
 
 Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
@@ -380,6 +382,12 @@ Quyền: Công khai.
 
 Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 
+### GET /auctions/mine/:id — Chi tiết phiên của tôi
+
+Quyền: chính chủ phiên, người bán đã xác minh. Không đăng nhập trả 401; người bán khác hoặc Admin trả 403. Trả các trường công khai của phiên cùng `yeu_cau_huy_moi_nhat` (object/null), `co_the_yeu_cau_huy` (boolean) và `ly_do_khong_the_huy` (string/null).
+
+Yêu cầu mới nhất gồm `id`, `ly_do`, `trang_thai`, `ghi_chu_duyet`, `ngay_tao`, `ngay_duyet`. Không thể gửi yêu cầu mới khi đang chờ xét/xử lý hoặc phiên đã hết hạn/kết thúc. Thông tin này phục vụ hiển thị; API gửi yêu cầu kiểm tra lại trong transaction. Không trả giá sàn hoặc mức tối đa bí mật. API chi tiết công khai không trả thông tin yêu cầu hủy riêng tư.
+
 ### GET /auctions/my-bids — Các phiên đã tham gia
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
@@ -392,7 +400,7 @@ Quyền: Công khai.
 
 Quyền: Công khai.
 
-### POST /auctions — Tạo phiên hai phút cho sản phẩm đã duyệt
+### POST /auctions — Tạo phiên cho sản phẩm đã duyệt
 
 Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 
@@ -402,6 +410,7 @@ Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
   "gia_khoi_diem": "18000000",
   "gia_san": null,
   "gia_mua_ngay": "25000000",
+  "phi_van_chuyen": "50000",
   "thoi_gian_bat_dau": "{{batDauISO}}",
   "thoi_gian_ket_thuc": "{{ketThucISO}}"
 }
@@ -455,6 +464,8 @@ Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 ```
 
 Postman tự lưu: `yeuCauHuyId` ← `data.id`.
+
+Lý do bắt buộc, tối đa 1.000 ký tự. Thành công chỉ tạo yêu cầu chờ xét, không dừng phiên. Yêu cầu trùng khi đang chờ hoặc phiên đã hết hạn/kết thúc trả 409. Đọc lại `GET /auctions/mine/:id` để xem yêu cầu đã lưu và phản hồi của Admin.
 
 ### GET /bid-increments — Đọc bước giá đang cấu hình
 
