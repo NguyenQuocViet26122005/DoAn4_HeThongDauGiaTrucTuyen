@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Descriptions, Steps } from 'antd';
+import { Alert, Button, Descriptions, Steps } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import { ChoDuLieu, TieuDe, TrangThai } from '../components/dung-chung';
 import ThaoTacKiemDinh from '../components/thao-tac-kiem-dinh';
@@ -12,10 +12,10 @@ function NoiDungHoSo({ hoSo, quanTri }: { hoSo: HoSoKiemDinh; quanTri: boolean }
   const [dangBan, datDangBan] = useState(false);
   const goc = quanTri ? '/quan-tri' : '/nguoi-ban';
   const buoc =
-    ['DAT', 'KHONG_DAT', 'CAN_BO_SUNG'].includes(hoSo.ket_qua || '')
-      ? 3
-      : hoSo.trang_thai === 'DANG_KIEM_DINH'
-        ? 2
+    hoSo.trang_thai === 'DANG_KIEM_DINH'
+      ? 2
+      : ['DAT', 'KHONG_DAT', 'CAN_BO_SUNG'].includes(hoSo.ket_qua || '')
+        ? 3
         : hoSo.ngay_nhan_trung_tam
           ? 1
           : 0;
@@ -185,6 +185,7 @@ export default function ChiTietKiemDinh({ quanTri = false }: { quanTri?: boolean
             <Alert
               type="warning"
               title="Chưa làm mới được hồ sơ"
+              action={<Button onClick={() => hoSo.refetch()}>Thử lại</Button>}
               description="Dữ liệu đang hiển thị là lần tải gần nhất. Hãy thử tải lại trước khi xử lý."
             />
           )}

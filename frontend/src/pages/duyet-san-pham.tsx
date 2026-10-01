@@ -251,7 +251,7 @@ function QuyetDinhSanPham({ sanPham }: { sanPham: SanPham }) {
         footer={null}
         destroyOnHidden
         closable={!dangLuu}
-        maskClosable={!dangLuu}
+        mask={{ closable: !dangLuu }}
       >
         <Form
           layout="vertical"
