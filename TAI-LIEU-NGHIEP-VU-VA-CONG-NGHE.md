@@ -4,7 +4,7 @@
 
 **Tài liệu nghiệp vụ chi tiết và công nghệ — phiên bản 3.0, ngày 25/09/2026.**
 
-Cập nhật giao diện người bán ngày 26/09/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
+Cập nhật giao diện duyệt sản phẩm và kiểm định ngày 01/10/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
 
 Đây là đặc tả chính của project. Phiên bản này thay thế các mô tả cũ về phạm vi hàng phổ thông, đặt cọc ngoài phạm vi, Mua ngay tạo đơn chưa thanh toán và Second Chance thanh toán sau. Khi triển khai phải đồng bộ tài liệu, SQL, backend, hợp đồng API và kiểm thử.
 
@@ -52,8 +52,11 @@ Các thư mục hiện có gồm `pages`, `components`, `services`, `socket`, `s
 - Khám phá: tìm tên, lọc danh mục/trạng thái và phân trang theo hợp đồng API. Thứ tự hiện tại là phiên mới nhất trước; chưa đưa lên giao diện các kiểu sắp xếp chưa được backend hỗ trợ.
 - Chi tiết phiên: xem ảnh, mô tả, thuộc tính, giá công khai, thời gian, phí vận chuyển, yêu cầu cọc, tóm tắt kiểm định và lịch sử giá. Chưa có thao tác đặt cọc, trả giá hoặc thanh toán trên giao diện nền.
 - Đăng nhập/đăng ký: kiểm tra đầu vào, báo lỗi từng trường, nút đang xử lý, gọi API thật và quay lại trang cần đăng nhập. Đăng ký thành công chuyển về đăng nhập. Không thêm đăng nhập mạng xã hội, quên mật khẩu hoặc ví khi chưa có trong đặc tả/API.
-- Tài khoản: hiển thị hồ sơ, danh sách theo dõi và phiên đã tham gia. Các mục nghiệp vụ khác của người mua, người bán và Admin hiện là bố cục/điều hướng có thông báo đang hoàn thiện; chưa coi là màn hình xử lý hoàn chỉnh.
+- Tài khoản: hiển thị hồ sơ, danh sách theo dõi và phiên đã tham gia. Các mục tài khoản khác còn là bố cục/điều hướng có thông báo đang hoàn thiện. Phạm vi đã có của người bán và Admin được liệt kê riêng bên dưới.
 - Người bán — sản phẩm: đã có danh sách riêng, tìm kiếm/lọc/phân trang, tạo/sửa bản nháp, thuộc tính theo danh mục, tải nhiều ảnh, chọn ảnh đại diện, bỏ ảnh và gửi duyệt qua API thật. Chỉ người bán đã xác minh, tài khoản hoạt động mới vào luồng này. Màn hình hiển thị lý do từ chối và lý do khóa sửa; không tự mở khóa sản phẩm đã kiểm định hoặc có phiên.
+- Admin — duyệt sản phẩm: danh sách mặc định chờ xử lý, tìm tên/lọc trạng thái/danh mục/phân trang; xem ảnh, mô tả, thuộc tính; duyệt hoặc từ chối có lý do. Sản phẩm bắt buộc kiểm định chưa đạt/không còn được trung tâm giữ/thiếu báo cáo bị khóa nút duyệt. Admin mở hồ sơ kiểm định từ sản phẩm và quay lại duyệt nội dung khi đủ điều kiện.
+- Kiểm định — Admin: danh sách tìm theo mã hoặc tên sản phẩm, lọc trạng thái và phân trang; ghi tiếp nhận (tình trạng, serial, số kiện, ghi chú), bắt đầu kiểm định, đính kèm ảnh/PDF, ghi kết quả chuyên gia và ghi nhận trả hàng khi được phép. Kết quả đạt chuyển sang lưu giữ, không tự duyệt nội dung. Màn hình hiển thị riêng thời điểm hàng rời trung tâm để không hiểu nhầm trạng thái lưu giữ cũ.
+- Kiểm định — người bán: xem hồ sơ của chính mình, khai báo đơn vị/mã vận đơn gửi đến trung tâm khi đang chờ gửi; xem biên bản, báo cáo và kết quả theo quyền. Không có nút ghi kết quả hoặc tải báo cáo của Admin.
 - Hướng dẫn: diễn giải đúng quy tắc kiểm định, cọc theo phiên, mức tối đa bí mật, gia hạn, Mua ngay, Second Chance, thời gian kiểm tra hàng và tranh chấp trong tài liệu này.
 - Thành phần dùng chung: thanh điều hướng/chân trang, biểu mẫu, trạng thái tải, lỗi có nút thử lại, danh sách rỗng, ảnh không tải được, trang 404 và chặn khu vực Admin theo vai trò. Backend vẫn là lớp quyết định quyền và nghiệp vụ.
 - Nếu đồng hồ phía trình duyệt cho thấy phiên đã hết giờ nhưng backend còn trạng thái lên lịch/hoạt động, giao diện ghi “Chờ kết quả”. Đây chỉ là nhãn hiển thị; không thêm trạng thái MySQL, không tự xác định người thắng và không thay tác vụ đóng phiên của backend.
@@ -64,6 +67,12 @@ Màu sắc, thụt lề, thông báo lỗi và trạng thái xử lý thống nh
 Luồng ảnh trên web: lưu bản nháp → chọn ảnh trên máy → tải các ảnh đã chọn → chọn ảnh đại diện → gửi duyệt. Tối đa 12 ảnh/sản phẩm, JPG/PNG/WebP không quá 5 MiB/ảnh. Lỗi từng ảnh giữ trong hàng đợi để thử lại hoặc bỏ chọn; ảnh đã gắn thành công không bị mất khi ảnh khác lỗi. Khi thử lại bước gắn cùng một đường dẫn tệp vào cùng sản phẩm, backend trả ảnh đã có, không tạo bản ghi trùng. Đổi ảnh đại diện thực hiện trong một transaction; khi bỏ ảnh đại diện, ảnh còn lại đầu tiên được chọn. Các thao tác ảnh ghi nhật ký. Bỏ ảnh chỉ bỏ liên kết với sản phẩm; không tự xóa tệp vật lý dùng chung.
 
 Gửi duyệt dùng thông tin đã lưu, có ảnh và đầy đủ thuộc tính bắt buộc. Nút gửi duyệt tạm khóa khi đang lưu/tải ảnh, còn thay đổi chưa lưu hoặc ảnh chưa tải; có bước xác nhận trước khi gửi. Bản nháp cho phép thiếu thuộc tính bắt buộc để hoàn thiện sau. Nếu sản phẩm chỉ xem, giao diện ẩn thao tác sửa/ảnh/gửi duyệt; backend vẫn kiểm tra lại điều kiện trong transaction của mỗi yêu cầu.
+
+Luồng tệp kiểm định trên web: Admin chọn loại hồ sơ → chọn ảnh/PDF không quá 10 MiB → tải và gắn vào hồ sơ sau tiếp nhận. Khi gắn thất bại, giao diện giữ đường dẫn đã tải để thử lại. Backend trả lại bản ghi đã có nếu cùng hồ sơ/đường dẫn/loại tệp; nếu cùng đường dẫn nhưng khác loại thì báo xung đột. Tệp được xem qua API có xác thực, không dùng đường dẫn công khai trực tiếp.
+
+Chi tiết sản phẩm chỉ trả thêm thông tin kiểm định mới nhất cho chính chủ/Admin. Chi tiết hồ sơ trả trạng thái có thể cập nhật và lý do khóa để giao diện giải thích; các API ghi vẫn kiểm tra quyền, trạng thái và nghĩa vụ giao dịch trong transaction. Không thêm bảng, cột hay vai trò cho đợt giao diện này.
+
+Kiểm tra lại ngày 01/10/2026: 18 kiểm thử cơ bản và 54 kiểm thử tích hợp đạt; build frontend, lint và định dạng đạt. Đã thử trực tiếp luồng Admin duyệt/kiểm định và người bán khai báo gửi hàng bằng dữ liệu riêng, sau đó hoàn tác.
 
 ### 3.2. Backend
 

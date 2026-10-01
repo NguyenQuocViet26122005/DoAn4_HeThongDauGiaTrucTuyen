@@ -82,11 +82,11 @@ Lệnh `npm run format` từ gốc, backend hoặc frontend đều dùng cùng c
 
 ## Các giới hạn cần biết
 
-Thanh toán và giải ngân là mô phỏng; phí vận chuyển cố định được công bố từ phiên và chụp sang đơn. Chưa tích hợp đơn vị vận chuyển, cổng thanh toán thật, email/SMS, khôi phục mật khẩu hoặc refresh token. Frontend đã có trang công khai, đăng nhập/đăng ký và quản lý sản phẩm người bán; các luồng kiểm định, tạo phiên và giao dịch trên web còn phải hoàn thiện theo tài liệu nghiệp vụ.
+Thanh toán và giải ngân là mô phỏng; phí vận chuyển cố định được công bố từ phiên và chụp sang đơn. Chưa tích hợp đơn vị vận chuyển, cổng thanh toán thật, email/SMS, khôi phục mật khẩu hoặc refresh token. Frontend đã có trang công khai, đăng nhập/đăng ký, quản lý sản phẩm người bán, Admin duyệt sản phẩm và luồng kiểm định. Các màn hình tài khoản bổ sung, tạo phiên và giao dịch trên web còn phải hoàn thiện theo tài liệu nghiệp vụ.
 
 Tác vụ chạy mỗi 60 giây và bắt đầu sau chu kỳ đầu tiên, nên chuyển trạng thái hiển thị có thể chậm khoảng một phút. API đặt giá/thanh toán vẫn tự kiểm tra giờ và trạng thái khi nhận yêu cầu.
 
-Git hiện đang theo dõi `backend/.env` và một phần `node_modules` từ trước; `.gitignore` không tự bỏ theo dõi các tệp đã được lưu vào Git. Công việc này không đọc nội dung `.env` và không tự thay đổi lịch sử/index Git. Cần xử lý việc theo dõi tệp này trước khi chia sẻ repository.
+Kiểm tra ngày 01/10/2026: `.env` và `node_modules` không còn được Git theo dõi ở phiên bản hiện tại; quy tắc ignore giữ chúng trên máy. Việc bỏ theo dõi không xóa nội dung khỏi lịch sử commit cũ. Không đưa tệp cấu hình riêng hoặc bản sao dữ liệu vào repository.
 
 ## Quy tắc trình bày chung
 

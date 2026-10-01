@@ -228,6 +228,8 @@ Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 
 Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 
+Chính chủ/Admin nhận thêm `kiem_dinh_moi_nhat` (object/null) gồm ID, mã, lần, trạng thái, kết quả, ngày rời trung tâm và `co_bao_cao`. Khách không nhận trường này; dùng API tóm tắt công khai riêng.
+
 Chính chủ nhận thêm `co_the_sua` (boolean) và `ly_do_khong_the_sua` (string/null). Chỉ bản nháp/bị từ chối, chưa có phiên và không có hồ sơ kiểm định đang xử lý/giữ hàng mới được sửa. Thông tin này chỉ hỗ trợ giao diện; mỗi thao tác ghi kiểm tra lại trong transaction. Khách chỉ đọc sản phẩm đã duyệt, không nhận hai trường hỗ trợ sửa này.
 
 ### POST /products — Tạo sản phẩm nháp
@@ -808,11 +810,11 @@ Quyền: công khai, sản phẩm đã duyệt.
 
 ### GET /inspections — Hồ sơ kiểm định của tôi
 
-Quyền: người bán chính chủ (Admin xem được hồ sơ/thống kê).
+Quyền: đã đăng nhập; người dùng chỉ thấy hồ sơ của sản phẩm mình sở hữu, Admin xem tất cả. Tham số: `page`, `limit`, `q` (tên sản phẩm hoặc mã kiểm định, tối đa 100 ký tự), `trang_thai`, `san_pham_id`. Lọc vẫn giữ điều kiện chính chủ; trạng thái hoặc ID không hợp lệ trả 400.
 
 ### GET /inspections/:id — Chi tiết hồ sơ riêng
 
-Quyền: người bán chính chủ (Admin xem được hồ sơ/thống kê).
+Quyền: Admin, chủ sản phẩm hoặc người mua có đơn gắn hồ sơ. Trả thêm `tieu_de`, `nguoi_ban_id`, `co_the_cap_nhat`, `ly_do_khong_the_cap_nhat` và `tep_dinh_kem`. Có phiên/nghĩa vụ bán hoặc đã trả hàng thì chỉ xem; người mua không cập nhật. Đây là thông tin hỗ trợ giao diện, không thay kiểm tra quyền/trạng thái tại API ghi.
 
 ### POST /admin/products/:id/inspections — Admin tạo hồ sơ kiểm định
 
@@ -835,7 +837,7 @@ Quyền: người bán chính chủ (Admin xem được hồ sơ/thống kê).
 
 ### GET /admin/inspections — Admin xem hàng đợi kiểm định
 
-Quyền: Admin.
+Quyền: Admin. Hỗ trợ cùng bộ lọc `page`, `limit`, `q`, `trang_thai`, `san_pham_id` như `/inspections`.
 
 ### POST /admin/inspections/:id/received — Admin ghi nhận trung tâm nhận hàng
 
@@ -860,7 +862,7 @@ Quyền: Admin.
 
 ### POST /admin/inspections/:id/files — Gắn báo cáo chuyên gia đã tải lên
 
-Quyền: Admin.
+Quyền: Admin. Cùng đường dẫn đã gắn vào cùng hồ sơ và cùng loại trả bản ghi hiện có (201), không tạo trùng. Cùng đường dẫn nhưng đổi loại trả 409. Chỉ gắn sau tiếp nhận và khi hồ sơ còn được cập nhật.
 
 ```json
 {
