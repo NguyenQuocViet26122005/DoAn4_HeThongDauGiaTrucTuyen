@@ -6,9 +6,12 @@ export async function lamMoiDuyetVaKiemDinh() {
     predicate: ({ queryKey }) => {
       const url = queryKey[0];
 
-      return typeof url === 'string' &&
-        ['/products', '/admin/products', '/inspections', '/admin/inspections']
-          .some((tienTo) => url.startsWith(tienTo));
+      return (
+        typeof url === 'string' &&
+        ['/products', '/admin/products', '/inspections', '/admin/inspections'].some((tienTo) =>
+          url.startsWith(tienTo),
+        )
+      );
     },
   });
 }
