@@ -259,6 +259,31 @@ test('HTTP: đủ 16 API kiểm định/cọc mới và quyền truy cập hồ 
           },
         );
 
+        await t.test(
+          'lọc sản phẩm tạo phiên kiểm tra báo cáo và hàng còn tại trung tâm',
+          async () => {
+            async function coSanPham() {
+              const danhSach = await gui('GET', '/products/mine?du_dieu_kien_dau_gia=1', 'seller');
+
+              return danhSach.some((muc) => String(muc.id) === String(sp));
+            }
+
+            assert.equal(await coSanPham(), true);
+
+            const tep = (await kiemDinh.chiTiet(d.admin, hoSo.id)).tep_dinh_kem[0];
+
+            await records.capNhat('tep_dinh_kem', tep.id, { loai_tep: 'CHUNG_NHAN_KIEM_DINH' });
+            assert.equal(await coSanPham(), false);
+            await records.capNhat('tep_dinh_kem', tep.id, { loai_tep: 'BAO_CAO_KIEM_DINH' });
+            await records.capNhat('kiem_dinh_san_pham', hoSo.id, {
+              ngay_roi_trung_tam: await db.thoiGianHienTai(),
+            });
+            assert.equal(await coSanPham(), false);
+            await records.capNhat('kiem_dinh_san_pham', hoSo.id, { ngay_roi_trung_tam: null });
+            assert.equal(await coSanPham(), true);
+          },
+        );
+
         await t.test('đã mở phiên không sửa hồ sơ đạt hoặc hàng đang lưu giữ', async () => {
           const now = await db.thoiGianHienTai();
 

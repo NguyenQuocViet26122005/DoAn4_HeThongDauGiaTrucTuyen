@@ -93,6 +93,10 @@ async function chay() {
         duong_dan_anh: '/api/uploads/files/product/' + duLieu.seller.id + '/' + tenAnh,
       });
       await dichVu.guiDuyet(duLieu.seller, sp.id);
+
+      if (process.argv.includes('--phien') && !batBuoc) {
+        await dichVu.duyet(duLieu.admin, sp.id, { trang_thai_duyet: 'DA_DUYET' });
+      }
     }
 
     const mayChu = http.createServer(require('../dist/ung-dung'));

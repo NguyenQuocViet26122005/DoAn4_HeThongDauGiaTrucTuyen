@@ -38,7 +38,7 @@ async function cacRouteHienCo() {
 }
 
 kiemThu(
-  'HTTP: 87 API nền có kịch bản thành công và kiểm tra quyền; dữ liệu được rollback',
+  'HTTP: 88 API nền có kịch bản thành công và kiểm tra quyền; dữ liệu được rollback',
   async (boKiemThu) => {
     const cacRoute = await cacRouteHienCo();
     const daThanhCong = new Set();
@@ -451,6 +451,16 @@ kiemThu(
                 409,
               );
               await gui('GET', '/products/mine', 'seller');
+
+              const chuaDuDieuKien = await gui(
+                'GET',
+                '/products/mine?du_dieu_kien_dau_gia=1',
+                'seller',
+              );
+
+              xacNhan.ok(!chuaDuDieuKien.some((muc) => String(muc.id) === String(sanPham.id)));
+              await gui('GET', '/products/mine?du_dieu_kien_dau_gia=sai', 'seller', undefined, 400);
+              await gui('GET', '/products?du_dieu_kien_dau_gia=1', undefined, undefined, 400);
               await gui('GET', '/admin/products?trang_thai=CHO_XU_LY', 'admin');
               await gui('PATCH', `/admin/products/${sanPham.id}/review`, 'admin', {
                 trang_thai_duyet: 'DA_DUYET',
@@ -458,6 +468,16 @@ kiemThu(
 
               const congKhai = await gui('GET', `/products/${sanPham.id}`);
 
+              const duDieuKien = await gui(
+                'GET',
+                '/products/mine?du_dieu_kien_dau_gia=1',
+                'seller',
+              );
+
+              xacNhan.ok(duDieuKien.some((muc) => String(muc.id) === String(sanPham.id)));
+              xacNhan.ok(
+                duDieuKien.every((muc) => String(muc.nguoi_ban_id) === String(duLieu.seller.id)),
+              );
               xacNhan.equal(congKhai.co_the_sua, undefined);
               xacNhan.equal(congKhai.ly_do_khong_the_sua, undefined);
               await gui('GET', `/products?danh_muc_id=${danhMuc.id}`);
@@ -493,6 +513,33 @@ kiemThu(
               await gui('GET', `/auctions/${phien.id}`);
               await gui('GET', `/auctions?danh_muc_id=${danhMuc.id}`);
               await gui('GET', '/auctions/mine', 'seller');
+
+              const rieng = await gui('GET', `/auctions/mine/${phien.id}`, 'seller');
+
+              xacNhan.equal(rieng.co_the_yeu_cau_huy, true);
+              xacNhan.equal(rieng.gia_san, undefined);
+              xacNhan.equal(rieng.gia_toi_da, undefined);
+              xacNhan.equal(rieng.yeu_cau_huy_moi_nhat, null);
+              await gui('GET', `/auctions/mine/${phien.id}`, undefined, undefined, 401);
+              await gui('GET', `/auctions/mine/${phien.id}`, 'admin', undefined, 403);
+
+              await khoBanGhi.capNhat('nguoi_dung', duLieu.outsider.id, {
+                trang_thai_nguoi_ban: 'DA_XAC_MINH',
+              });
+
+              await gui('GET', `/auctions/mine/${phien.id}`, 'outsider', undefined, 403);
+
+              await khoBanGhi.capNhat('nguoi_dung', duLieu.outsider.id, {
+                trang_thai_nguoi_ban: 'CHUA_DANG_KY',
+              });
+
+              const sanPhamCoTheTao = await gui(
+                'GET',
+                '/products/mine?du_dieu_kien_dau_gia=1',
+                'seller',
+              );
+
+              xacNhan.ok(!sanPhamCoTheTao.some((muc) => String(muc.id) === String(sanPham.id)));
               await gui('GET', '/auctions/my-bids', 'a');
               await gui('GET', '/admin/auctions', 'admin');
               await gui('GET', '/bid-increments');
@@ -513,12 +560,34 @@ kiemThu(
                 201,
               );
 
+              const dangChoHuy = await gui('GET', `/auctions/mine/${phienHuy.id}`, 'seller');
+
+              xacNhan.equal(dangChoHuy.co_the_yeu_cau_huy, false);
+              xacNhan.equal(String(dangChoHuy.yeu_cau_huy_moi_nhat.id), String(yc.id));
+              xacNhan.equal(dangChoHuy.yeu_cau_huy_moi_nhat.ly_do, 'Kiểm thử hủy');
+              xacNhan.equal(
+                (await gui('GET', `/auctions/${phienHuy.id}`)).yeu_cau_huy_moi_nhat,
+                undefined,
+              );
+              await gui(
+                'POST',
+                `/auctions/${phienHuy.id}/cancellation-requests`,
+                'seller',
+                { ly_do: 'Gửi trùng' },
+                409,
+              );
               await gui('GET', '/admin/cancellation-requests', 'admin');
               await gui('PATCH', `/admin/cancellation-requests/${yc.id}/review`, 'admin', {
                 trang_thai: 'DA_DUYET',
                 ghi_chu_duyet: 'Duyệt hủy kiểm thử',
               });
               xacNhan.equal((await gui('GET', `/auctions/${phienHuy.id}`)).trang_thai, 'DA_HUY');
+
+              const daHuy = await gui('GET', `/auctions/mine/${phienHuy.id}`, 'seller');
+
+              xacNhan.equal(daHuy.co_the_yeu_cau_huy, false);
+              xacNhan.equal(daHuy.yeu_cau_huy_moi_nhat.trang_thai, 'DA_DUYET');
+              xacNhan.equal(daHuy.yeu_cau_huy_moi_nhat.ghi_chu_duyet, 'Duyệt hủy kiểm thử');
             },
           );
 
