@@ -114,7 +114,7 @@ const sanPhamDaCoPhien = (id) =>
 
 function danhSachSanPham(
   { limit, offset }: PhanTrang,
-  { sellerId, status, categoryId, search = '' }: BoLocDanhSach,
+  { sellerId, status, categoryId, search = '', duDieuKienDauGia = false }: BoLocDanhSach,
 ) {
   const dk = ['p.tieu_de LIKE ?'],
     ts: unknown[] = [`%${search}%`];
@@ -130,6 +130,21 @@ function danhSachSanPham(
   if (categoryId) {
     dk.push('p.danh_muc_id=?');
     ts.push(categoryId);
+  }
+
+  if (duDieuKienDauGia) {
+    dk.push(
+      "p.trang_thai_duyet='DA_DUYET'",
+      `NOT EXISTS (SELECT 1 FROM phien_dau_gia a WHERE a.san_pham_id=p.id
+        AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG','DA_KET_THUC'))`,
+      `(p.bat_buoc_kiem_dinh=0 OR EXISTS (
+        SELECT 1 FROM kiem_dinh_san_pham k WHERE k.san_pham_id=p.id
+          AND k.lan_kiem_dinh=(SELECT MAX(m.lan_kiem_dinh) FROM kiem_dinh_san_pham m WHERE m.san_pham_id=p.id)
+          AND k.ket_qua='DAT' AND k.trang_thai='DANG_LUU_GIU' AND k.ngay_roi_trung_tam IS NULL
+          AND EXISTS (SELECT 1 FROM tep_dinh_kem t WHERE t.kiem_dinh_san_pham_id=k.id
+            AND t.loai_tep='BAO_CAO_KIEM_DINH')
+      ))`,
+    );
   }
 
   return coSoDuLieu.truyVan(

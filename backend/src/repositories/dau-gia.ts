@@ -46,6 +46,14 @@ const yeuCauHuyDangCho = (id) =>
     [id],
   );
 
+const yeuCauHuyMoiNhat = (id) =>
+  coSoDuLieu.layMot(
+    `SELECT id,ly_do,trang_thai,ghi_chu_duyet,ngay_tao,ngay_duyet
+     FROM yeu_cau_xu_ly WHERE loai_yeu_cau='HUY_PHIEN' AND phien_dau_gia_id=?
+     ORDER BY id DESC LIMIT 1`,
+    [id],
+  );
+
 function danhSach({ limit: gioiHan, offset: viTriBatDau }: PhanTrang, boLoc: BoLocDanhSach = {}) {
   const dieuKienLoc = ['p.trang_thai_duyet = ?'];
   const thamSo: unknown[] = ['DA_DUYET'];
@@ -136,6 +144,7 @@ export {
   nguoiTheoDoi,
   phienDaCoCuaSanPham,
   yeuCauHuyDangCho,
+  yeuCauHuyMoiNhat,
   danhSach,
   theoDoi,
   boTheoDoi,
