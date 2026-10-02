@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, Button, Descriptions } from 'antd';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import {
   AnhSanPham,
@@ -11,6 +12,10 @@ import {
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import { ngayGio, nhan, tien } from '../utils/dinh-dang';
 import type { Phien, SanPham } from '../types/du-lieu';
+import ThamGiaPhien from '../components/tham-gia-phien';
+import { doc } from '../services/api';
+import { lamMoiThamGia } from '../services/tham-gia-phien';
+import { usePhienDangNhap } from '../store/phien-dang-nhap';
 
 interface LuotGia {
   id: string;
@@ -30,9 +35,15 @@ interface KiemDinhCongKhai {
 function NoiDungPhien({ phien }: { phien: Phien }) {
   const [anhChon, datAnhChon] = useState<string>();
   const [trang, datTrang] = useState(1);
+  const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
   const sanPham = useDuLieu<SanPham>(`/products/${phien.san_pham_id}`);
   const kiemDinh = useDuLieu<KiemDinhCongKhai | null>(`/products/${phien.san_pham_id}/inspection`);
-  const lichSu = useDuLieu<LuotGia[]>(`/auctions/${phien.id}/bids`, { page: trang, limit: 10 });
+  const lichSu = useDuLieu<LuotGia[]>(
+    `/auctions/${phien.id}/bids`,
+    { page: trang, limit: 10 },
+    true,
+    ['DA_LEN_LICH', 'HOAT_DONG'].includes(phien.trang_thai) ? 10000 : false,
+  );
 
   return (
     <>
@@ -96,11 +107,20 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
             )}
           </dl>
           <Alert
-            type="info"
-            showIcon
-            title="Bản giao diện đang hoàn thiện"
-            description="Bạn có thể xem thông tin phiên. Chức năng đặt cọc, trả giá và thanh toán trên website sẽ được bổ sung ở bước tiếp theo."
+            type={phien.nguoi_dan_dau === `ND-${nguoiDung?.id}` ? 'success' : 'info'}
+            title={
+              phien.nguoi_dan_dau
+                ? `Người dẫn đầu: ${phien.nguoi_dan_dau === `ND-${nguoiDung?.id}` ? 'Bạn' : phien.nguoi_dan_dau}`
+                : 'Chưa có người dẫn đầu'
+            }
+            description={
+              Number(phien.dat_gia_san)
+                ? 'Giá hiện tại đã đáp ứng điều kiện giá sàn (hoặc phiên không đặt giá sàn).'
+                : 'Giá hiện tại chưa đạt giá sàn. Dẫn đầu chưa đồng nghĩa với thắng phiên.'
+            }
           />
+          <Button onClick={() => void lamMoiThamGia(phien.id)}>Làm mới giá và trạng thái</Button>
+          <ThamGiaPhien phien={phien} />
           <Link className="link-vang" to="/huong-dan">
             Xem quy tắc tham gia ↗
           </Link>
@@ -228,7 +248,14 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
 
 export default function ChiTietPhien() {
   const { id } = useParams();
-  const phien = useDuLieu<Phien>(`/auctions/${id}`);
+  const phien = useQuery({
+    queryKey: [`/auctions/${id}`, undefined],
+    queryFn: () => doc<Phien>(`/auctions/${id}`),
+    refetchInterval: (truyVan) =>
+      truyVan.state.data && ['DA_LEN_LICH', 'HOAT_DONG'].includes(truyVan.state.data.trang_thai)
+        ? 10000
+        : false,
+  });
 
   return (
     <div className="khung trang-noi-dung">
