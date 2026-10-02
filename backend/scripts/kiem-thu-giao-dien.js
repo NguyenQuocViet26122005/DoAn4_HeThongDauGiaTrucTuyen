@@ -8,7 +8,7 @@ process.env.JWT_SECRET = taoNgauNhien(48).toString('hex');
 process.env.JOBS_ENABLED = 'false';
 process.env.FRONTEND_URL = 'http://localhost:5174';
 
-const { taoDuLieuKiemThu, hoanTac } = require('../tests/helpers/du-lieu-mau');
+const { taoDuLieuKiemThu, phienDauGia, hoanTac } = require('../tests/helpers/du-lieu-mau');
 const khoBanGhi = require('../dist/repositories/ban-ghi');
 const dichVu = require('../dist/services/danh-muc-san-pham');
 const { cauHinh } = require('../dist/config/moi-truong');
@@ -20,7 +20,7 @@ async function chay() {
     const duLieu = await taoDuLieuKiemThu();
     const matKhauThu = 'KiemThuVietBid123!';
 
-    for (const vaiTro of ['admin', 'seller', 'a']) {
+    for (const vaiTro of ['admin', 'seller', 'a', 'b']) {
       cacChuTep.push(String(duLieu[vaiTro].id));
 
       await khoBanGhi.capNhat('nguoi_dung', duLieu[vaiTro].id, {
@@ -99,14 +99,59 @@ async function chay() {
       }
     }
 
-    const mayChu = http.createServer(require('../dist/ung-dung'));
+    if (process.argv.includes('--nguoi-mua')) {
+      for (const [ten, cauHinhPhien] of [
+        ['Phiên kiểm thử có cọc và Mua ngay', { yeu_cau_dat_coc: 1, so_tien_dat_coc: '1800000', gia_san: '24000000', gia_mua_ngay: '25000000', cho_phep_mua_ngay: 1 }],
+        ['Phiên kiểm thử không cọc', { gia_mua_ngay: '25000000', cho_phep_mua_ngay: 1 }],
+        ['Phiên kiểm thử cọc không Mua ngay', { yeu_cau_dat_coc: 1, so_tien_dat_coc: '1800000' }],
+      ]) {
+        const id = await phienDauGia(duLieu, { ...cauHinhPhien, phi_van_chuyen: '50000' });
+        const phien = await khoBanGhi.layTheoId('phien_dau_gia', id);
+
+        await khoBanGhi.capNhat('san_pham', phien.san_pham_id, { tieu_de: ten });
+        await khoBanGhi.them('tep_dinh_kem', {
+          loai_tep: 'ANH_SAN_PHAM',
+          nguoi_tai_len_id: duLieu.seller.id,
+          san_pham_id: phien.san_pham_id,
+          duong_dan_tep: '/api/uploads/files/product/' + duLieu.seller.id + '/' + tenAnh,
+          la_anh_chinh: 1,
+        });
+        console.log(`${ten}: http://localhost:5174/phien/${id}`);
+      }
+      // Buyer B bắt đầu chưa có địa chỉ để kiểm tra luồng bổ sung trên web.
+      await require('../dist/repositories/ket-noi').truyVan(
+        'DELETE FROM dia_chi_nguoi_dung WHERE nguoi_dung_id = ?',
+        [duLieu.b.id],
+      );
+    }
+
+    const ungDung = require('../dist/ung-dung');
+    let daGiaLapMatPhanHoi = false;
+    const mayChu = http.createServer((yeuCau, phanHoi) => {
+      if (process.argv.includes('--mat-phan-hoi') && yeuCau.method === 'POST' && yeuCau.url.endsWith('/buy-now')) {
+        const ketThuc = phanHoi.end;
+
+        phanHoi.end = function (...thamSo) {
+          if (!daGiaLapMatPhanHoi && phanHoi.statusCode === 200) {
+            daGiaLapMatPhanHoi = true;
+            phanHoi.destroy();
+            console.log('Đã mô phỏng mất một phản hồi Mua ngay; lần gửi lại nhận kết quả đã xử lý.');
+            return phanHoi;
+          }
+
+          return ketThuc.apply(phanHoi, thamSo);
+        };
+      }
+
+      ungDung(yeuCau, phanHoi);
+    });
 
     await new Promise((xong) => mayChu.listen(5001, '127.0.0.1', xong));
     console.log(
       'API kiểm thử giao diện: http://127.0.0.1:5001; dữ liệu riêng sẽ rollback khi dừng.',
     );
     console.log(
-      'Tài khoản thử: admin-giao-dien@example.invalid / seller-giao-dien@example.invalid / a-giao-dien@example.invalid',
+      'Tài khoản thử: admin-giao-dien@example.invalid / seller-giao-dien@example.invalid / a-giao-dien@example.invalid / b-giao-dien@example.invalid',
     );
     console.log('Mật khẩu tài khoản thử: KiemThuVietBid123!');
     console.log('Nhấn Enter để dừng, hoàn tác dữ liệu và dọn ảnh kiểm thử.');
@@ -125,6 +170,7 @@ async function chay() {
 chay()
   .catch((loi) => {
     console.error(loi.code || loi.name);
+    console.error(String(loi.stack).split('\n').filter((dong) => /^\s+at /.test(dong)).slice(0, 4).join('\n'));
     process.exitCode = 1;
   })
   .finally(async () => {
