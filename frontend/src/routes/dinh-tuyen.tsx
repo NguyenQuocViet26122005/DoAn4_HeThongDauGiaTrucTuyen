@@ -9,6 +9,8 @@ import { usePhienDangNhap } from '../store/phien-dang-nhap';
 const DangNhapDangKy = lazy(() => import('../pages/dang-nhap-dang-ky'));
 const HuongDan = lazy(() => import('../pages/huong-dan'));
 const ChiTietPhien = lazy(() => import('../pages/chi-tiet-phien'));
+const SoDiaChi = lazy(() => import('../pages/dia-chi'));
+const BienNhanDon = lazy(() => import('../pages/bien-nhan-don'));
 const KhongGianNghiepVu = lazy(() => import('../pages/khong-gian-nghiep-vu'));
 const SanPhamNguoiBan = lazy(() => import('../pages/san-pham-nguoi-ban'));
 const BienTapSanPham = lazy(() => import('../pages/bien-tap-san-pham'));
@@ -111,6 +113,8 @@ export default function DinhTuyen() {
             <Route element={<BaoVeTrang />}>
               <Route path="tai-khoan" element={<KhungLamViec loai="tai-khoan" />}>
                 <Route index element={<KhongGianNghiepVu loai="tai-khoan" />} />
+                <Route path="dia-chi" element={<SoDiaChi />} />
+                <Route path="don-hang/:id" element={<BienNhanDon />} />
                 <Route path=":muc" element={<KhongGianNghiepVu loai="tai-khoan" />} />
               </Route>
               <Route path="nguoi-ban" element={<KhungLamViec loai="nguoi-ban" />}>
