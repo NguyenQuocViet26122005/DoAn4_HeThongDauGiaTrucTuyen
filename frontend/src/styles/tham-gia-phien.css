@@ -1,0 +1,60 @@
+.tham-gia-phien,
+.khoi-tham-gia {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.khoi-tham-gia {
+  padding-top: 24px;
+  border-top: 1px solid var(--vien);
+}
+
+.khoi-tham-gia h2 {
+  font-size: 23px;
+  margin: 0;
+}
+
+.khoi-tham-gia p,
+.dia-chi-nhan p {
+  margin: 0;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.khoi-tham-gia .ant-input-number {
+  width: 100%;
+}
+
+.xac-nhan-thanh-toan,
+.danh-sach-dia-chi {
+  margin-top: 20px;
+}
+
+.danh-sach-dia-chi {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dia-chi-nhan {
+  padding: 16px;
+  background: #24271e;
+  border: 1px solid var(--vien);
+  border-radius: 4px;
+}
+
+.dia-chi-nhan strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.danh-sach-dia-chi .tam-noi-dung {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .danh-sach-dia-chi {
+    grid-template-columns: 1fr;
+  }
+}
