@@ -49,14 +49,42 @@ module.exports = async function taoDonGiaoDien(duLieu) {
   for (const [ten, trangThai] of [
     ['Đơn thử thanh toán có cọc', 'CHO_THANH_TOAN'],
     ['Đơn thử thanh toán thất bại', 'CHO_THANH_TOAN'],
+    ['Đơn thử người bán gửi hàng', 'CHO_GUI_HANG'],
+    ['Đơn thử trung tâm gửi hàng', 'TRUNG_TAM'],
     ['Đơn thử nhận và kiểm tra hàng', 'DA_GUI_HANG'],
     ['Đơn thử cần Admin xử lý', 'CAN_ADMIN'],
+    ['Đơn thử tranh chấp hoàn tiền', 'TRANH_CHAP'],
+    ['Đơn thử tranh chấp giải ngân', 'TRANH_CHAP_GIAI_NGAN'],
     ['Đơn thử đã hết hạn thanh toán', 'HET_HAN'],
   ]) {
     const don = await taoDon(duLieu, duLieu.a, ten, true);
 
-    if (['DA_GUI_HANG', 'CAN_ADMIN'].includes(trangThai)) {
+    if (['CHO_GUI_HANG', 'TRUNG_TAM', 'DA_GUI_HANG', 'CAN_ADMIN', 'TRANH_CHAP', 'TRANH_CHAP_GIAI_NGAN'].includes(trangThai)) {
       await donHang.thanhToan(duLieu.a, don.id, {});
+    }
+    if (trangThai === 'TRUNG_TAM') {
+      const phien = await khoBanGhi.layTheoId('phien_dau_gia', don.phien_dau_gia_id);
+
+      const hoSoId = await khoBanGhi.them('kiem_dinh_san_pham', {
+        ma_kiem_dinh: `KD-THU-${don.id}`,
+        san_pham_id: phien.san_pham_id,
+        lan_kiem_dinh: 1,
+        trang_thai: 'DANG_LUU_GIU',
+        ket_qua: 'DAT',
+        ngay_nhan_trung_tam: await coSoDuLieu.thoiGianHienTai(),
+        ngay_kiem_dinh: await coSoDuLieu.thoiGianHienTai(),
+        ten_chuyen_gia: 'Chuyên gia kiểm thử',
+        don_vi_kiem_dinh: 'Trung tâm kiểm thử',
+        nguoi_cap_nhat_id: duLieu.admin.id,
+      });
+
+      // Trạng thái trung tâm được chuẩn bị riêng để thử quyền gửi hàng trên web.
+      await khoBanGhi.capNhat('don_hang', don.id, {
+        nguon_gui_hang: 'TRUNG_TAM',
+        kiem_dinh_san_pham_id: hoSoId,
+      });
+    }
+    if (['DA_GUI_HANG', 'CAN_ADMIN', 'TRANH_CHAP', 'TRANH_CHAP_GIAI_NGAN'].includes(trangThai)) {
       await donHang.guiHang(duLieu.seller, don.id, {
         don_vi_van_chuyen: 'Vận chuyển kiểm thử',
         ma_van_don: `GUI-${don.id}`,
@@ -69,6 +97,14 @@ module.exports = async function taoDonGiaoDien(duLieu) {
         can_admin_xu_ly: 1,
         ly_do_can_xu_ly: 'Tình huống kiểm thử cần Admin xác minh trước khi giải ngân.',
       });
+    }
+    if (trangThai.startsWith('TRANH_CHAP')) {
+      await donHang.xacNhanDaGiao(duLieu.a, don.id);
+      const hoSo = await require('../dist/services/tranh-chap').mo(duLieu.a, don.id, {
+        ly_do: 'THIEU_PHU_KIEN',
+        mo_ta: 'Hồ sơ riêng để kiểm thử quyết định hoàn tiền hoặc giải ngân.',
+      });
+      console.log(`Hồ sơ ${trangThai}: http://localhost:5174/quan-tri/tranh-chap/${hoSo.id}`);
     }
     if (trangThai === 'HET_HAN') {
       await khoBanGhi.capNhat('don_hang', don.id, {

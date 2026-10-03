@@ -204,7 +204,7 @@ chay()
     process.exitCode = 1;
   })
   .finally(async () => {
-    for (const nhom of ['product', 'inspection']) {
+    for (const nhom of ['product', 'inspection', 'evidence', 'verification', 'avatar']) {
       for (const chuTep of cacChuTep) {
         const thuMuc = duongDan.resolve(cauHinh.uploadRoot, nhom, chuTep);
         const goc = duongDan.resolve(__dirname, '../uploads-kiem-thu');
