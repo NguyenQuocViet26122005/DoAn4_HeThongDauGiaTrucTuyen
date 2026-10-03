@@ -300,6 +300,7 @@
   margin-top: 32px;
 }
 .thanh-ben {
+  min-width: 0;
   padding: 22px 14px;
   background: #171a15;
   border: 1px solid var(--vien);
@@ -409,7 +410,7 @@
     flex-wrap: wrap;
   }
   .khung-lam-viec {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 22px;
   }
   .nguoi-dung-ben,
