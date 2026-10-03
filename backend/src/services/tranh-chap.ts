@@ -163,8 +163,16 @@ async function themBangChung(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unkno
 
     dichVuDonHang.kiemTraQuyen(nguoiDung, donHang);
 
+    const cacBangChung = await khoDuLieu.bangChung(id);
+    const daGan = cacBangChung.find((tep) => tep.duong_dan_tep === dauVao.duong_dan_tep);
+
+    // Gửi lại sau mất phản hồi phải nhận đúng bằng chứng đã lưu, kể cả hồ sơ vừa đóng.
+    if (daGan) {
+      return daGan;
+    }
+
     baoDam(trangThaiDangMo.includes(tranhChap.trang_thai), 409, 'Tranh chấp đã kết thúc');
-    baoDam((await khoDuLieu.bangChung(id)).length < 30, 400, 'Tối đa 30 bằng chứng');
+    baoDam(cacBangChung.length < 30, 400, 'Tối đa 30 bằng chứng');
 
     const bangChungId = await khoBanGhi.them('tep_dinh_kem', {
       loai_tep: 'BANG_CHUNG_TRANH_CHAP',

@@ -3,8 +3,23 @@ import dichVu = require('../services/don-hang');
 import khoDuLieu = require('../repositories/don-hang');
 import cacDeNghi = require('../services/de-nghi-mua-tiep');
 import kiemTra = require('../validations/du-lieu-dau-vao');
+
+function phamViDon(yeuCau) {
+  if (yeuCau.query.vai_tro == null) {
+    return 'mine';
+  }
+
+  return kiemTra.giaTriLuaChon(
+    yeuCau.query.vai_tro,
+    ['NGUOI_MUA', 'NGUOI_BAN'],
+    'Vai trò trong đơn',
+  );
+}
+
 export = {
-  danhSach: xuLyHTTP((yeuCau) => khoDuLieu.danhSach(yeuCau.user, kiemTra.phanTrang(yeuCau.query))),
+  danhSach: xuLyHTTP((yeuCau) =>
+    khoDuLieu.danhSach(yeuCau.user, kiemTra.phanTrang(yeuCau.query), phamViDon(yeuCau)),
+  ),
   danhSachQuanTri: xuLyHTTP((yeuCau) =>
     khoDuLieu.danhSach(yeuCau.user, kiemTra.phanTrang(yeuCau.query), 'admin'),
   ),

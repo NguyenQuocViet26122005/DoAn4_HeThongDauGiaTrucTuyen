@@ -56,7 +56,16 @@ function danhSach(
   { limit: gioiHan, offset: viTriBatDau },
   phamVi = 'mine',
 ) {
-  const dieuKien = phamVi === 'admin' ? '1=1' : '(d.nguoi_mua_id=? OR d.nguoi_ban_id=?)';
+  const dieuKien =
+    phamVi === 'admin'
+      ? '1=1'
+      : phamVi === 'NGUOI_MUA'
+        ? 'd.nguoi_mua_id=?'
+        : phamVi === 'NGUOI_BAN'
+          ? 'd.nguoi_ban_id=?'
+          : '(d.nguoi_mua_id=? OR d.nguoi_ban_id=?)';
+  const thamSo =
+    phamVi === 'admin' ? [] : phamVi === 'mine' ? [nguoiDung.id, nguoiDung.id] : [nguoiDung.id];
 
   return coSoDuLieu.truyVan(
     `SELECT d.*, p.tieu_de, a.ly_do_ket_thuc
@@ -66,7 +75,7 @@ function danhSach(
      WHERE ${dieuKien}
      ORDER BY d.id DESC
      LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
-    phamVi === 'admin' ? [] : [nguoiDung.id, nguoiDung.id],
+    thamSo,
   );
 }
 
