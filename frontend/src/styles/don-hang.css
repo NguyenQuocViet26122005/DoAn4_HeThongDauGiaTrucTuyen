@@ -51,6 +51,34 @@
   min-width: 0;
 }
 
+.chi-tiet-don > div {
+  min-width: 0;
+}
+
+.van-ban-dai,
+.noi-dung-xac-nhan {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.tom-tat-tranh-chap {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bo-loc-thong-bao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.bo-loc-thong-bao .ant-select {
+  min-width: 200px;
+}
+
 .thao-tac-don > h2 {
   margin-bottom: 0;
 }

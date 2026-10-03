@@ -18,6 +18,8 @@ export const ngayGio = (giaTri: unknown) =>
       })
     : 'Chưa cập nhật';
 export const nhanTrangThai: Record<string, string> = {
+  CCCD: 'Căn cước công dân',
+  HO_CHIEU: 'Hộ chiếu',
   HOAT_DONG: 'Đang diễn ra',
   DA_LEN_LICH: 'Sắp bắt đầu',
   DA_KET_THUC: 'Đã kết thúc',
@@ -76,6 +78,10 @@ export const nhanTrangThai: Record<string, string> = {
   KHONG_DUNG_MO_TA: 'Không đúng mô tả',
   HONG_HOC: 'Hỏng hóc',
   HANG_GIA: 'Hàng giả',
+  KHONG_KHOP_HO_SO_KIEM_DINH: 'Không khớp hồ sơ kiểm định',
+  NGHI_NGO_TINH_XAC_THUC: 'Nghi ngờ tính xác thực',
+  THIEU_PHU_KIEN: 'Thiếu phụ kiện',
+  HOAN_TIEN_TRANH_CHAP: 'Hoàn tiền theo quyết định tranh chấp',
   DAT: 'Đạt',
   KHONG_DAT: 'Không đạt',
   CHUA_CO_KET_QUA: 'Chưa có kết quả',

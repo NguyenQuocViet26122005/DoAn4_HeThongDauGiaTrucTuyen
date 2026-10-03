@@ -12,6 +12,10 @@ const ChiTietPhien = lazy(() => import('../pages/chi-tiet-phien'));
 const SoDiaChi = lazy(() => import('../pages/dia-chi'));
 const BienNhanDon = lazy(() => import('../pages/bien-nhan-don'));
 const DonHangCuaToi = lazy(() => import('../pages/don-hang'));
+const ThongBao = lazy(() => import('../pages/thong-bao'));
+const XacMinh = lazy(() => import('../pages/xac-minh'));
+const DanhSachTranhChap = lazy(() => import('../pages/tranh-chap'));
+const ChiTietTranhChap = lazy(() => import('../pages/chi-tiet-tranh-chap'));
 const KhongGianNghiepVu = lazy(() => import('../pages/khong-gian-nghiep-vu'));
 const SanPhamNguoiBan = lazy(() => import('../pages/san-pham-nguoi-ban'));
 const BienTapSanPham = lazy(() => import('../pages/bien-tap-san-pham'));
@@ -115,8 +119,12 @@ export default function DinhTuyen() {
               <Route path="tai-khoan" element={<KhungLamViec loai="tai-khoan" />}>
                 <Route index element={<KhongGianNghiepVu loai="tai-khoan" />} />
                 <Route path="dia-chi" element={<SoDiaChi />} />
+                <Route path="thong-bao" element={<ThongBao />} />
+                <Route path="xac-minh" element={<XacMinh />} />
                 <Route path="don-hang/:id" element={<BienNhanDon />} />
                 <Route path="don-hang" element={<DonHangCuaToi />} />
+                <Route path="tranh-chap" element={<DanhSachTranhChap />} />
+                <Route path="tranh-chap/:id" element={<ChiTietTranhChap />} />
                 <Route path=":muc" element={<KhongGianNghiepVu loai="tai-khoan" />} />
               </Route>
               <Route path="nguoi-ban" element={<KhungLamViec loai="nguoi-ban" />}>
@@ -129,6 +137,8 @@ export default function DinhTuyen() {
                 <Route path="phien/:id" element={<ChiTietPhienNguoiBan />} />
                 <Route path="kiem-dinh" element={<KiemDinh />} />
                 <Route path="kiem-dinh/:id" element={<ChiTietKiemDinh />} />
+                <Route path="don-hang" element={<DonHangCuaToi khuVuc="nguoi-ban" />} />
+                <Route path="don-hang/:id" element={<BienNhanDon khuVuc="nguoi-ban" />} />
                 <Route path=":muc" element={<KhongGianNghiepVu loai="nguoi-ban" />} />
               </Route>
             </Route>
@@ -139,6 +149,11 @@ export default function DinhTuyen() {
                 <Route path="san-pham/:id" element={<ChiTietDuyetSanPham />} />
                 <Route path="kiem-dinh" element={<KiemDinh quanTri />} />
                 <Route path="kiem-dinh/:id" element={<ChiTietKiemDinh quanTri />} />
+                <Route path="don-hang" element={<DonHangCuaToi khuVuc="quan-tri" />} />
+                <Route path="don-hang/:id" element={<BienNhanDon khuVuc="quan-tri" />} />
+                <Route path="tranh-chap" element={<DanhSachTranhChap quanTri />} />
+                <Route path="xac-minh" element={<XacMinh quanTri />} />
+                <Route path="tranh-chap/:id" element={<ChiTietTranhChap quanTri />} />
                 <Route path=":muc" element={<KhongGianNghiepVu loai="quan-tri" />} />
               </Route>
             </Route>
