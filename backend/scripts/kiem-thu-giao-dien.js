@@ -101,7 +101,16 @@ async function chay() {
 
     if (process.argv.includes('--nguoi-mua')) {
       for (const [ten, cauHinhPhien] of [
-        ['Phiên kiểm thử có cọc và Mua ngay', { yeu_cau_dat_coc: 1, so_tien_dat_coc: '1800000', gia_san: '24000000', gia_mua_ngay: '25000000', cho_phep_mua_ngay: 1 }],
+        [
+          'Phiên kiểm thử có cọc và Mua ngay',
+          {
+            yeu_cau_dat_coc: 1,
+            so_tien_dat_coc: '1800000',
+            gia_san: '24000000',
+            gia_mua_ngay: '25000000',
+            cho_phep_mua_ngay: 1,
+          },
+        ],
         ['Phiên kiểm thử không cọc', { gia_mua_ngay: '25000000', cho_phep_mua_ngay: 1 }],
         ['Phiên kiểm thử cọc không Mua ngay', { yeu_cau_dat_coc: 1, so_tien_dat_coc: '1800000' }],
       ]) {
@@ -116,26 +125,41 @@ async function chay() {
           duong_dan_tep: '/api/uploads/files/product/' + duLieu.seller.id + '/' + tenAnh,
           la_anh_chinh: 1,
         });
+
         console.log(`${ten}: http://localhost:5174/phien/${id}`);
       }
-      // Buyer B bắt đầu chưa có địa chỉ để kiểm tra luồng bổ sung trên web.
+      // Người mua B bắt đầu chưa có địa chỉ để kiểm tra luồng bổ sung trên web.
       await require('../dist/repositories/ket-noi').truyVan(
         'DELETE FROM dia_chi_nguoi_dung WHERE nguoi_dung_id = ?',
         [duLieu.b.id],
       );
     }
 
+    if (process.argv.includes('--don-hang')) {
+      await require('./du-lieu-don-giao-dien')(duLieu);
+    }
+
     const ungDung = require('../dist/ung-dung');
     let daGiaLapMatPhanHoi = false;
     const mayChu = http.createServer((yeuCau, phanHoi) => {
-      if (process.argv.includes('--mat-phan-hoi') && yeuCau.method === 'POST' && yeuCau.url.endsWith('/buy-now')) {
+      if (
+        process.argv.includes('--mat-phan-hoi') &&
+        yeuCau.method === 'POST' &&
+        (yeuCau.url.endsWith('/buy-now') || yeuCau.url.endsWith('/payments/simulate'))
+      ) {
         const ketThuc = phanHoi.end;
 
         phanHoi.end = function (...thamSo) {
           if (!daGiaLapMatPhanHoi && phanHoi.statusCode === 200) {
             daGiaLapMatPhanHoi = true;
-            phanHoi.destroy();
-            console.log('Đã mô phỏng mất một phản hồi Mua ngay; lần gửi lại nhận kết quả đã xử lý.');
+            // Gửi một phần nội dung để trình duyệt không tự gửi lại trước khi UI nhận lỗi.
+            phanHoi.flushHeaders();
+            phanHoi.write('{');
+            setImmediate(() => phanHoi.destroy());
+            console.log(
+              'Đã mô phỏng mất một phản hồi thanh toán; lần gửi lại nhận kết quả đã xử lý.',
+            );
+
             return phanHoi;
           }
 
@@ -170,7 +194,13 @@ async function chay() {
 chay()
   .catch((loi) => {
     console.error(loi.code || loi.name);
-    console.error(String(loi.stack).split('\n').filter((dong) => /^\s+at /.test(dong)).slice(0, 4).join('\n'));
+    console.error(
+      String(loi.stack)
+        .split('\n')
+        .filter((dong) => /^\s+at /.test(dong))
+        .slice(0, 4)
+        .join('\n'),
+    );
     process.exitCode = 1;
   })
   .finally(async () => {

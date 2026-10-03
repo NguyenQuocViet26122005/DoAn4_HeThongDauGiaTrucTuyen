@@ -12,6 +12,8 @@ Các danh sách có phân trang dùng `page=1&limit=20` (limit tối đa 100); d
 
 Body dưới đây là mẫu hợp lệ sau khi điền biến. `{}` là JSON rỗng; không tự thêm trường như vai trò, số tiền thanh toán hay người thắng. Các thao tác PUT sản phẩm/địa chỉ/danh mục nhận đủ trường bắt buộc như mẫu. HTTP GET tải tệp trả dữ liệu nhị phân.
 
+Giao diện người mua ngày 02/10/2026 dùng các API hiện có: `/users/me/addresses`, `/auctions/:id/deposit`, `/auctions/:id/deposit/register`, `/auctions/:id/deposit/pay`, `/auctions/:id/bids`, `/auctions/:id/buy-now` và `GET /orders/:id`. Khi thanh toán mô phỏng trả HTTP 200, client phải đọc `ket_qua_mo_phong`; `THAT_BAI` không có nghĩa đã thu tiền. Nếu chưa nhận đủ phản hồi, giữ nguyên `khoa_yeu_cau` và kết quả mô phỏng đã gửi để lấy lại lần xử lý trước. Không tự sinh khóa mới khi chưa rõ kết quả. Không có API đọc lại mức tối đa bí mật.
+
 ## 01. Kết nối và đăng nhập
 
 Các thay đổi của bản 19 bảng:
@@ -527,6 +529,8 @@ Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 ```
 
 ### POST /orders/:id/payments/simulate — Thanh toán mô phỏng; số tiền do server tính
+
+Trả chi tiết đơn, bao gồm mảng `thanh_toan`; không trả trực tiếp `ket_qua_mo_phong` như API Mua ngay. HTTP 200 có thể chứa lần thanh toán `THAT_BAI`. Client đọc giao dịch theo khóa yêu cầu và trạng thái thu tiền của đơn; nếu chưa xác định được kết quả thì giữ mã để kiểm tra lại. Web dùng cùng khóa sau lỗi mạng/tải lại, không tự truyền số tiền cần thu.
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 

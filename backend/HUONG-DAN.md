@@ -51,7 +51,11 @@ Kiểm tra `GET http://localhost:5000/api/health`: phải trả HTTP 200 và `da
 
 Mức giá tối đa được lưu riêng để tính đấu giá. API và Socket.IO không trả trường này; nhật ký mới không ghi mức tối đa hoặc mật khẩu.
 
+Ngày 02/10/2026, web đã nối thêm các API địa chỉ, đăng ký/cọc, đặt giá, Mua ngay và xem biên nhận đơn. Luồng thanh toán giữ khóa yêu cầu để lấy lại kết quả khi mất phản hồi; không đổi schema hoặc API nghiệp vụ trong đợt này. Toàn bộ số tiền và điều kiện giao dịch vẫn do backend kiểm tra trong transaction. Xem `../frontend/README.md` để chạy máy chủ giao diện kiểm thử riêng với các cờ `--nguoi-mua` và `--mat-phan-hoi`.
+
 ## Kiểm thử
+
+Ngày 03/10/2026, web nối danh sách/chi tiết đơn, đổi địa chỉ đơn, thanh toán phần còn lại, xác nhận đã nhận và hoàn tất. Phản hồi `payments/simulate` là chi tiết đơn với `thanh_toan`, không phải đối tượng `ket_qua_mo_phong` của Mua ngay; web kiểm tra giao dịch đã ghi trước khi báo kết quả. Máy chủ thử hỗ trợ thêm `--don-hang`; dữ liệu và ảnh được hoàn tác/dọn khi nhấn Enter. Không đổi API hay schema trong đợt này.
 
 Chạy trong `backend`:
 
@@ -69,6 +73,8 @@ npm run format:check
 Kiểm tra lại ngày 01/10/2026: 18 kiểm thử đơn vị/HTTP và 55 kiểm thử tích hợp đạt. 29 kiểm tra ràng buộc MySQL đã đạt ở đợt nâng cấp 21 bảng. Bộ tích hợp gồm các giao dịch được rollback, kiểm thử HTTP tải tệp và nhiều kết nối MySQL thật cùng thao tác. Ca nhiều kết nối tạo dữ liệu riêng có UUID, commit để các kết nối nhìn thấy nhau, rồi dọn đúng các bản ghi kiểm thử. Tệp tải lên trong kiểm thử cũng được dọn. Các dữ liệu mẫu có sẵn không bị xóa/reset; số tự tăng có thể có khoảng trống sau kiểm thử.
 
 Riêng `npm run test:api` chạy hai bộ HTTP đối chiếu route thật: đủ 104/104 API có ít nhất một trường hợp thành công. Bộ nền gửi 180 yêu cầu (38 trường hợp lỗi), gồm đổi ảnh đại diện, không gắn ảnh trùng và khóa sửa; bộ còn lại kiểm tra thêm 16 API kiểm định/cọc và các nhánh sai quyền, thiếu báo cáo, sai số tiền, tệp riêng tư. Bộ test đối chiếu đường dẫn với route trong mã nguồn, kiểm tra dữ liệu phản hồi, phân quyền, bí mật đầu ra và các chuyển trạng thái nghiệp vụ. Kết quả này không thay thế kiểm thử tải hoặc chứng minh mọi tổ hợp đầu vào đều đúng. Tất cả thay đổi dữ liệu của bộ test API, kể cả cấu hình nghiệp vụ, nằm trong transaction được rollback; tệp tải lên được dọn sau đó.
+
+Bộ `test:api` đã chạy lại thành công ngày 02/10/2026 khi nối giao diện người mua. Máy chủ kiểm thử giao diện cũng đã xác nhận thao tác lấy lại kết quả Mua ngay sau mất phản hồi và tải lại trang. Không thay đổi transaction hoặc quy tắc đấu giá/thanh toán trong backend ở đợt giao diện này.
 
 Bộ API kiểm thử chạy ứng dụng trên cổng riêng rồi dừng. Để sử dụng cổng 5000, chạy `npm run dev`; không cần chạy lại SQL. Các tác vụ nền chỉ nên bật khi sẵn sàng cho hệ thống xử lý các phiên/đơn đã đến hạn.
 
