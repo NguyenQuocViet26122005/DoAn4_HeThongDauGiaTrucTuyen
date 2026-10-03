@@ -60,7 +60,7 @@ function MuaNgay({
       )}
       <ThanhToanMoPhong
         nguoiDungId={nguoiDung.id}
-        phienId={phien.id}
+        doiTuongId={phien.id}
         loai="mua-ngay"
         ten={phien.gia_mua_ngay ? `Mua ngay · ${tien(gia)}` : 'Phiên không bật Mua ngay'}
         khoa={khoa || !Number(phien.cho_phep_mua_ngay) || !phien.gia_mua_ngay}
@@ -209,7 +209,7 @@ function ThaoTacNguoiMua({ phien, nguoiDung }: { phien: Phien; nguoiDung: NguoiD
               )}
               <ThanhToanMoPhong
                 nguoiDungId={nguoiDung.id}
-                phienId={phien.id}
+                doiTuongId={phien.id}
                 loai="coc"
                 ten={
                   coc.data?.trang_thai === 'DA_DAT_COC' ? 'Đã đặt cọc' : 'Thanh toán cọc mô phỏng'

@@ -3,12 +3,13 @@ import type { ReactNode } from 'react';
 import axios from 'axios';
 import { Alert, Button, Modal, Radio } from 'antd';
 import { gui, loiDeDoc } from '../services/api';
+import { thanhToanDon } from '../services/don-hang';
 import { docLanThanhToan, luuLanThanhToan, tenLanThanhToan } from '../services/lan-thanh-toan';
 import type { KetQuaThanhToan, LanThanhToan } from '../types/tham-gia-phien';
 
 export default function ThanhToanMoPhong({
   nguoiDungId,
-  phienId,
+  doiTuongId,
   loai,
   ten,
   khoa,
@@ -16,14 +17,14 @@ export default function ThanhToanMoPhong({
   daXuLy,
 }: {
   nguoiDungId: string;
-  phienId: string;
-  loai: 'coc' | 'mua-ngay';
+  doiTuongId: string;
+  loai: 'coc' | 'mua-ngay' | 'don-hang';
   ten: string;
   khoa: boolean;
   children: ReactNode;
   daXuLy: (ketQua: KetQuaThanhToan) => void;
 }) {
-  const tenLuu = tenLanThanhToan(nguoiDungId, phienId, loai);
+  const tenLuu = tenLanThanhToan(nguoiDungId, doiTuongId, loai);
   const [banDau] = useState(() => {
     try {
       return { lan: docLanThanhToan(tenLuu), loi: '' };
@@ -54,7 +55,10 @@ export default function ThanhToanMoPhong({
       datLan(lanGui);
 
       const duongDan = loai === 'coc' ? 'deposit/pay' : 'buy-now';
-      const phanHoi = await gui<KetQuaThanhToan>(`/auctions/${phienId}/${duongDan}`, lanGui);
+      const phanHoi =
+        loai === 'don-hang'
+          ? await thanhToanDon(doiTuongId, lanGui)
+          : await gui<KetQuaThanhToan>(`/auctions/${doiTuongId}/${duongDan}`, lanGui);
 
       sessionStorage.removeItem(tenLuu);
       datLan(null);
