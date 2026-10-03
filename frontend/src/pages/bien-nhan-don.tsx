@@ -5,10 +5,11 @@ import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import type { DonHang } from '../types/don-hang';
 import { ngayGio, nhan, tien } from '../utils/dinh-dang';
 import ThaoTacDonHang from '../components/thao-tac-don-hang';
+import GiaoHangVaHoTro from '../components/giao-hang-va-ho-tro';
 import { lamMoiDon } from '../services/don-hang';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 
-export default function BienNhanDon() {
+export default function BienNhanDon({ khuVuc = 'tai-khoan' }: { khuVuc?: string }) {
   const { id } = useParams();
   const truyVan = useDuLieu<DonHang>(`/orders/${id}`);
   const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
@@ -21,7 +22,7 @@ export default function BienNhanDon() {
           Làm mới
         </Button>
       </TieuDe>
-      <Link className="link-vang" to="/tai-khoan/don-hang">
+      <Link className="link-vang" to={`/${khuVuc}/don-hang`}>
         ← Danh sách đơn hàng
       </Link>
       <ChoDuLieu truyVan={truyVan}>
@@ -109,7 +110,12 @@ export default function BienNhanDon() {
                 Quay lại phiên đấu giá →
               </Link>
             </section>
-            <ThaoTacDonHang key={`${don.id}:${nguoiDung?.id}`} don={don} />
+            <div className="thao-tac-don">
+              {String(nguoiDung?.id) === String(don.nguoi_mua_id) && (
+                <ThaoTacDonHang key={`${don.id}:${nguoiDung?.id}`} don={don} />
+              )}
+              <GiaoHangVaHoTro key={`ho-tro:${don.id}:${nguoiDung?.id}`} don={don} />
+            </div>
             <section className="tam-noi-dung thong-tin-don">
               <h2>Giao hàng và kiểm tra</h2>
               <Descriptions
@@ -164,8 +170,8 @@ export default function BienNhanDon() {
                 ]}
               />
               <p className="chu-mo">
-                Vận chuyển được mô phỏng; mã vận đơn không tự xác nhận đã giao. Chức năng khai báo
-                gửi hàng và mở tranh chấp trên web sẽ được bổ sung ở đợt tiếp theo.
+                Mã vận đơn không tự xác nhận đã giao. Chỉ xác nhận nhận hàng khi hàng đã tới người
+                mua.
               </p>
               {don.tranh_chap.length > 0 && (
                 <Alert
@@ -178,7 +184,7 @@ export default function BienNhanDon() {
               )}
             </section>
             <section className="tam-noi-dung lich-su-thanh-toan">
-              <h2>Lịch sử thanh toán mô phỏng</h2>
+              <h2>Lịch sử thanh toán</h2>
               {don.thanh_toan.length === 0 ? (
                 <p>Chưa có lần thanh toán ngoài cọc.</p>
               ) : (

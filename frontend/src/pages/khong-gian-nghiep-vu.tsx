@@ -8,6 +8,7 @@ import { nhan } from '../utils/dinh-dang';
 import { ThePhien } from './kham-pha';
 import type { Phien } from '../types/du-lieu';
 import { useState } from 'react';
+import SuaHoSo from '../components/sua-ho-so';
 
 function DanhSachPhienCaNhan({ url }: { url: string }) {
   const [trang, datTrang] = useState(1);
@@ -84,6 +85,12 @@ export default function KhongGianNghiepVu({ loai }: { loai: string }) {
                 },
               ]}
             />
+            {nguoiDung && (
+              <SuaHoSo
+                key={`${nguoiDung.ho_ten}:${nguoiDung.so_dien_thoai}`}
+                nguoiDung={nguoiDung}
+              />
+            )}
           </section>
           <div className="luoi-loi-tat">
             <Link to="/tai-khoan/theo-doi">
