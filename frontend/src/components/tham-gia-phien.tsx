@@ -36,16 +36,13 @@ function MuaNgay({
     <section className="khoi-tham-gia">
       <h2>Mua ngay</h2>
       <p className="chu-mo">
-        Không cần đặt cọc trước. Thanh toán mô phỏng thành công sẽ chốt phiên và tạo đơn chờ gửi
-        hàng.
+        Không cần đặt cọc trước. Thanh toán thành công sẽ chốt phiên và tạo đơn chờ gửi hàng.
       </p>
       {ketQua && (
         <Alert
           type={ketQua.ket_qua_mo_phong === 'THANH_CONG' ? 'success' : 'warning'}
           title={
-            ketQua.ket_qua_mo_phong === 'THANH_CONG'
-              ? 'Mua ngay thành công'
-              : 'Thanh toán mô phỏng thất bại'
+            ketQua.ket_qua_mo_phong === 'THANH_CONG' ? 'Mua ngay thành công' : 'Thanh toán thất bại'
           }
           description={
             ketQua.don_hang ? (
@@ -211,9 +208,7 @@ function ThaoTacNguoiMua({ phien, nguoiDung }: { phien: Phien; nguoiDung: NguoiD
                 nguoiDungId={nguoiDung.id}
                 doiTuongId={phien.id}
                 loai="coc"
-                ten={
-                  coc.data?.trang_thai === 'DA_DAT_COC' ? 'Đã đặt cọc' : 'Thanh toán cọc mô phỏng'
-                }
+                ten={coc.data?.trang_thai === 'DA_DAT_COC' ? 'Đã đặt cọc' : 'Thanh toán cọc'}
                 khoa={
                   !diaChiNhan ||
                   !conHieuLuc ||

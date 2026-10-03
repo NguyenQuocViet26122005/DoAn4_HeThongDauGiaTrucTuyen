@@ -56,7 +56,7 @@ export default function ThaoTacDonHang({ don }: { don: DonHang }) {
 
       datThongBao(
         daLuu.trang_thai === 'HOAN_THANH'
-          ? 'Đơn đã hoàn tất; tiền mô phỏng đã được giải ngân.'
+          ? 'Đơn đã hoàn tất; tiền đã được giải ngân.'
           : Number(daLuu.can_admin_xu_ly)
             ? 'Đơn cần Admin kiểm tra. Tiền chưa được giải ngân.'
             : 'Đã ghi nhận nhận hàng. Tiền vẫn đang giữ trong thời gian kiểm tra.',
@@ -100,7 +100,7 @@ export default function ThaoTacDonHang({ don }: { don: DonHang }) {
           title={
             ketQua.ket_qua_mo_phong === 'THANH_CONG'
               ? 'Đơn đã thanh toán đủ'
-              : 'Thanh toán mô phỏng thất bại, tiền đã thu giữ nguyên'
+              : 'Thanh toán thất bại, tiền đã thu giữ nguyên'
           }
         />
       )}
@@ -152,9 +152,7 @@ export default function ThaoTacDonHang({ don }: { don: DonHang }) {
         open={!!thaoTac}
         onCancel={() => !dangGui && datThaoTac(undefined)}
         onOk={() => void xacNhan()}
-        okText={
-          thaoTac === 'delivered' ? 'Đã nhận, bắt đầu kiểm tra' : 'Hoàn tất và giải ngân mô phỏng'
-        }
+        okText={thaoTac === 'delivered' ? 'Đã nhận, bắt đầu kiểm tra' : 'Hoàn tất và giải ngân'}
         cancelText="Quay lại"
         confirmLoading={dangGui}
         okButtonProps={{ disabled: thaoTac === 'delivered' ? !duocNhan : !duocHoanTat }}
@@ -165,7 +163,7 @@ export default function ThaoTacDonHang({ don }: { don: DonHang }) {
         <p>
           {thaoTac === 'delivered'
             ? 'Chỉ xác nhận khi bạn thực sự đã nhận hàng. Thời gian kiểm tra bắt đầu sau bước này; tiền vẫn được giữ trung gian.'
-            : 'Xác nhận hàng phù hợp sẽ hoàn tất đơn và giải ngân toàn bộ tiền mô phỏng cho người bán. Không chọn nếu hàng có vấn đề cần khiếu nại.'}
+            : 'Xác nhận hàng phù hợp sẽ hoàn tất đơn và giải ngân toàn bộ tiền cho người bán. Không chọn nếu hàng có vấn đề cần khiếu nại.'}
         </p>
         {loi && <Alert type="error" title={loi} />}
       </Modal>

@@ -198,7 +198,7 @@ export default function KhungTrang() {
           </div>
           <div className="chan-cuoi">
             <span>© {new Date().getFullYear()} VietBid · Đồ án 4</span>
-            <span>Thanh toán mô phỏng phục vụ học tập</span>
+            <span>Đấu giá & sưu tầm</span>
             <span>Tiếng Việt / VND</span>
           </div>
         </div>

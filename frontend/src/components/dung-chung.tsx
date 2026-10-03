@@ -377,11 +377,13 @@ export function TaiTep({
   onTai,
   nhan: tieuDe = 'Chọn tệp',
   value,
+  onDangTai,
 }: {
   nhom: string;
   onTai: (url: string) => void;
   nhan?: string;
   value?: string;
+  onDangTai?: (dangTai: boolean) => void;
 }) {
   const [dangTai, datDangTai] = useState(false);
   const { message } = App.useApp();
@@ -415,6 +417,7 @@ export function TaiTep({
             return;
           }
           datDangTai(true);
+          onDangTai?.(true);
           try {
             onTai(await taiTep(tep, nhom));
             message.success('Tải tệp thành công');
@@ -422,6 +425,7 @@ export function TaiTep({
             message.error(loiDeDoc(e));
           } finally {
             datDangTai(false);
+            onDangTai?.(false);
           }
         }}
       />

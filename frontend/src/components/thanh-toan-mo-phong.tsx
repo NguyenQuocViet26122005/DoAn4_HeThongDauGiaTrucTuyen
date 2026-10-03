@@ -109,33 +109,35 @@ export default function ThanhToanMoPhong({
         onCancel={() => !dangGui && datMo(false)}
         onOk={() => void thanhToan()}
         confirmLoading={dangGui}
-        okText={lan ? 'Kiểm tra lại' : 'Xác nhận thanh toán mô phỏng'}
+        okText={lan ? 'Kiểm tra lại' : 'Xác nhận thanh toán'}
         cancelText="Đóng"
         okButtonProps={{ disabled: !!banDau.loi || (khoa && !lan) }}
         cancelButtonProps={{ disabled: dangGui }}
         closable={!dangGui}
         mask={{ closable: !dangGui }}
       >
-        <Alert type="info" showIcon title="Thanh toán mô phỏng, không thu tiền thật" />
         {lan ? (
           <p>
-            Kết quả mô phỏng đã chọn:{' '}
-            {lan.ket_qua_mo_phong === 'THANH_CONG' ? 'Thành công' : 'Thất bại'}. Giữ nguyên lần thử
-            khi kiểm tra lại.
+            Kiểm tra lại giao dịch đã gửi. Hệ thống giữ nguyên mã yêu cầu để lấy đúng kết quả trước
+            đó.
           </p>
         ) : (
           <>
             <div className="xac-nhan-thanh-toan">{children}</div>
-            <p>Kết quả thanh toán dùng để kiểm thử đồ án</p>
-            <Radio.Group
-              value={ketQua}
-              onChange={(suKien) => datKetQua(suKien.target.value)}
-              disabled={dangGui}
-              options={[
-                { value: 'THANH_CONG', label: 'Thành công' },
-                { value: 'THAT_BAI', label: 'Thất bại' },
-              ]}
-            />
+            {import.meta.env.VITE_CHE_DO_KIEM_THU === 'true' && (
+              <>
+                <p>Kết quả thanh toán dùng để kiểm thử</p>
+                <Radio.Group
+                  value={ketQua}
+                  onChange={(suKien) => datKetQua(suKien.target.value)}
+                  disabled={dangGui}
+                  options={[
+                    { value: 'THANH_CONG', label: 'Thành công' },
+                    { value: 'THAT_BAI', label: 'Thất bại' },
+                  ]}
+                />
+              </>
+            )}
           </>
         )}
         {loi && <Alert className="loi-bieu-mau" type="error" title={loi} />}
