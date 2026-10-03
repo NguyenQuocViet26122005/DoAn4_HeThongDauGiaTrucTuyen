@@ -512,6 +512,8 @@ Quyền: QUAN_TRI.
 
 ### GET /orders — Đơn của tôi; chọn ID đơn cần thao tác
 
+Tùy chọn `vai_tro=NGUOI_MUA` hoặc `vai_tro=NGUOI_BAN` lọc đúng tài khoản trước phân trang. Bỏ tham số trả cả đơn mua và bán như trước; giá trị khác trả 400. Không cấp quyền đọc đơn của người khác qua bộ lọc.
+
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 
 ### GET /orders/:id — Chi tiết đơn và tiền đang giữ
@@ -637,6 +639,8 @@ Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 ```
 
 ### POST /disputes/:id/evidence — Gắn bằng chứng đã tải lên
+
+Gửi lại cùng đường dẫn của chính người tải trong cùng hồ sơ trả bằng chứng đã lưu (201), không thêm bản ghi hoặc ghi đè mô tả. Vẫn kiểm tra quyền xem đơn và sở hữu tệp trước khi trả. Tệp mới chỉ được gắn khi hồ sơ còn mở và dưới 30 bằng chứng.
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 

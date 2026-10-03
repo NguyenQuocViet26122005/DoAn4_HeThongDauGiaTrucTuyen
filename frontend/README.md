@@ -39,8 +39,6 @@ Bản xuất `dist` cần máy chủ web trả `index.html` cho đường dẫn 
 - `/nguoi-ban/phien/:id`: xem giá công khai, lịch, kết quả, phí và cọc; gửi yêu cầu hủy có lý do, xem trạng thái/phản hồi mới nhất sau tải lại. Gửi yêu cầu không dừng phiên ngay. Khi có yêu cầu chờ xét hoặc phiên đã hết hạn/kết thúc, nút gửi bị khóa.
 - Chưa sửa giá/lịch phiên đã tạo hoặc cập nhật realtime trên các trang này; có nút làm mới. API riêng không trả giá sàn hoặc mức tối đa của người tham gia.
 
-## Còn phải triển khai
-
 ## Người mua tham gia phiên
 
 - `/tai-khoan/dia-chi`: thêm/sửa, chọn mặc định và xóa địa chỉ theo API; có liên kết quay về phiên khi bổ sung địa chỉ từ trang đấu giá.
@@ -58,7 +56,15 @@ Bản xuất `dist` cần máy chủ web trả `index.html` cho đường dẫn 
 - Đã gửi hàng: **Tôi đã nhận hàng** chỉ bắt đầu kiểm tra, tiền vẫn giữ. **Hàng phù hợp — hoàn tất** giải ngân mô phỏng sau xác nhận riêng; bị khóa khi cần Admin, có tranh chấp, thiếu tiền hoặc sai trạng thái.
 - Backend luôn kiểm tra lại quyền và điều kiện. Người bán/Admin xem chi tiết qua API có quyền nhưng không có thao tác mua. Nút làm mới và tải lại sau thao tác phản ánh dữ liệu máy chủ; chưa nối realtime.
 
-Các màn hình xác minh, thông báo, tranh chấp và những mục Admin ngoài duyệt sản phẩm/kiểm định còn là bố cục và lời giải thích. Khai báo gửi hàng từ seller/trung tâm, Second Chance, đánh giá và realtime chưa có luồng thao tác trên web. Các mục này không hiển thị số liệu hay nút thành công giả.
+## Gửi hàng, tranh chấp, thông báo và xác minh
+
+- Đơn bán ở `/nguoi-ban/don-hang`; toàn bộ đơn Admin ở `/quan-tri/don-hang`. Người bán chỉ khai báo đơn mình gửi; Admin khai báo trung tâm gửi và xác nhận đã giao. Các thao tác có kiểm tra biểu mẫu, xem lại thông tin và xác nhận.
+- Mở tranh chấp từ chi tiết đơn. Người mua/người bán xem `/tai-khoan/tranh-chap`; Admin dùng `/quan-tri/tranh-chap`. Có phản hồi, bằng chứng riêng tư, hồ sơ kiểm định liên quan, tiếp nhận và quyết định hoàn/giải ngân toàn bộ. Bằng chứng được giữ đường dẫn để thử gắn lại; backend không tạo trùng cùng đường dẫn/hồ sơ.
+- `/tai-khoan/thong-bao`: phân trang, lọc chưa đọc, đánh dấu đã đọc và liên kết tới giao dịch. Hồ sơ cá nhân cho phép sửa tên/điện thoại.
+- `/tai-khoan/xac-minh`: tải giấy tờ và nộp hồ sơ, xem kết quả/lịch sử. `/quan-tri/xac-minh`: lọc, xem hồ sơ và duyệt/từ chối. Tệp giấy tờ chỉ đọc qua API có xác thực.
+- Nhãn giao diện không dùng chữ “mô phỏng”. Backend vẫn chỉ phục vụ giao dịch mô phỏng của đồ án. Bộ chọn kết quả thanh toán chỉ hiện khi chạy frontend với `VITE_CHE_DO_KIEM_THU=true`; mặc định ẩn, không phải tích hợp cổng thanh toán thật.
+
+Second Chance, đánh giá, vi phạm, các mục quản trị người dùng/phiên/cọc/danh mục/cấu hình/thống kê/nhật ký và realtime vẫn cần hoàn thiện. Các mục chưa triển khai không hiển thị số liệu hoặc kết quả giả.
 
 Khóa phiên đang giữ tên lưu trữ `lac-viet-token` để tương thích phiên trước khi đổi thương hiệu; toàn bộ tên hiển thị là VietBid. Khóa nằm trong sessionStorage của tab, được xóa khi đăng xuất hoặc hết phiên. Không lưu mức tối đa bí mật của các thành viên khác.
 

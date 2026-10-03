@@ -4,7 +4,7 @@
 
 **Tài liệu nghiệp vụ chi tiết và công nghệ — phiên bản 3.0, ngày 25/09/2026.**
 
-Cập nhật giao diện đơn hàng, thanh toán phần còn lại và xác nhận nhận/hoàn tất ngày 03/10/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
+Cập nhật giao diện giao hàng, tranh chấp, thông báo, sửa hồ sơ và xác minh người bán ngày 03/10/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
 
 Đây là đặc tả chính của project. Phiên bản này thay thế các mô tả cũ về phạm vi hàng phổ thông, đặt cọc ngoài phạm vi, Mua ngay tạo đơn chưa thanh toán và Second Chance thanh toán sau. Khi triển khai phải đồng bộ tài liệu, SQL, backend, hợp đồng API và kiểm thử.
 
@@ -88,6 +88,19 @@ Giao diện đơn hàng ngày 03/10/2026: dùng `/tai-khoan/don-hang` và `/tai-
 Đơn quá hạn thanh toán khóa thanh toán và đổi địa chỉ. “Tôi đã nhận hàng” mở thời gian kiểm tra, không giải ngân. “Hàng phù hợp — hoàn tất” có xác nhận riêng; khóa khi thiếu tiền, có tranh chấp đang mở, cờ Admin hoặc tiền không còn đang giữ. Nếu backend trả cờ cần Admin mà chưa hoàn tất, giao diện không thông báo đã giải ngân. Các mốc vận chuyển chỉ đọc từ API; không đánh dấu giao chỉ vì đã có vận đơn. Đơn làm mới thủ công/sau thao tác; chưa nối realtime. Chế độ `dev:local` tắt tác vụ nền nên không dùng để nghiệm thu tự đóng đơn theo hạn.
 
 Kiểm tra ngày 03/10/2026: sáu kiểm thử frontend đạt, bao gồm ba kiểm thử mới về kết quả thanh toán đơn và điều kiện hoàn tất. Trình duyệt đã thử danh sách đúng quyền, đổi địa chỉ đơn, thanh toán có cọc, mất phản hồi rồi tải lại (chỉ một lần thu trong lịch sử), thất bại giữ tiền/hạn, nhận hàng vẫn giữ tiền, hoàn tất mới giải ngân; khóa đơn quá hạn/cờ Admin và chặn đọc đơn người khác. Danh sách và chi tiết không tràn ngang tại chiều rộng thực tế 444 px. Dữ liệu thử ở CSDL riêng; không đổi schema hoặc transaction nghiệp vụ backend.
+
+### 3.1.3. Giao hàng, tranh chấp và hồ sơ tài khoản
+
+Ngày 03/10/2026 bổ sung các luồng web sau, thay thế những ghi chú “chưa có giao diện” tương ứng ở các đợt trước:
+
+- Đơn người bán tại `/nguoi-ban/don-hang`; đơn Admin tại `/quan-tri/don-hang`, có trang chi tiết theo ID. Danh sách người bán lọc ở backend trước phân trang qua `GET /orders?vai_tro=NGUOI_BAN`, không lọc một trang dữ liệu hỗn hợp ở frontend. API cũng hỗ trợ `NGUOI_MUA`; bỏ tham số giữ hành vi cũ, giá trị khác trả 400, không dùng tham số này để mở quyền Admin.
+- Người bán khai báo đơn vị vận chuyển và mã vận đơn cho đơn nguồn `NGUOI_BAN`; Admin ghi nhận gửi cho nguồn `TRUNG_TAM`. Có bước xem lại và xác nhận. Gửi muộn vẫn theo xử lý backend hiện có; không khóa gửi chỉ vì quá hạn. Admin có thể ghi nhận đã giao khi có xác nhận thực tế; người bán không tự bắt đầu thời gian kiểm tra. Gửi hàng không đồng nghĩa đã nhận hoặc đã giải ngân.
+- Người mua mở tranh chấp từ chi tiết đơn trong thời gian kiểm tra, hoặc khi chưa nhận hàng từ mốc cho phép; Admin mở hồ sơ can thiệp với đơn thuộc trạng thái được phép. Trang danh sách/chi tiết ở `/tai-khoan/tranh-chap` và `/quan-tri/tranh-chap`. Người bán phản hồi, các bên bổ sung bằng chứng, Admin tiếp nhận và ra quyết định có căn cứ và bước xác nhận. Chỉ hoàn toàn bộ hoặc giải ngân toàn bộ; không nhận số tiền tự nhập hoặc quyết định xác thực hàng hóa tự động.
+- Bằng chứng là JPG/PNG/WebP/PDF tối đa 10 MiB, tối đa 30 tệp/hồ sơ; đọc qua API có xác thực. Gửi lại cùng đường dẫn trong cùng hồ sơ trả bản ghi đã lưu, không ghi đè mô tả hoặc tạo trùng kể cả hồ sơ vừa đóng. Tệp mới vẫn bị chặn khi hồ sơ đã kết thúc. Hồ sơ kiểm định liên quan được đọc theo quyền API hiện có.
+- Thông báo: danh sách có phân trang, lọc chưa đọc, đánh dấu một/tất cả đã đọc; làm mới số chưa đọc. Đường dẫn thông báo được ánh xạ tới các trang nghiệp vụ đã biết, không mở URL tùy ý. Second Chance hiện dẫn tới mục đề nghị; trang thao tác đề nghị tiếp tục được triển khai riêng.
+- Hồ sơ cá nhân: sửa họ tên và số điện thoại. Xác minh người bán: nộp giấy tờ/ảnh chân dung và thông tin ngân hàng, xem lịch sử/lý do từ chối; Admin lọc danh sách, xem tệp riêng, duyệt/từ chối có lý do. Chờ duyệt/đã xác minh không được gửi hồ sơ mới; từ chối cho phép nộp lại. Giao diện không lưu giấy tờ hoặc thông tin ngân hàng vào bộ nhớ bền vững của trình duyệt.
+
+Theo yêu cầu trình bày, các nhãn trên web dùng “Thanh toán”, “Gửi hàng”, “Hoàn tiền”, không kèm chữ “mô phỏng”. Phạm vi kỹ thuật không đổi: chưa có cổng thanh toán hoặc vận chuyển thật. Chế độ thông thường không hiển thị lựa chọn thành công/thất bại; công cụ kiểm thử có thể bật `VITE_CHE_DO_KIEM_THU=true` để chọn tình huống. Không thay đổi tên trường API, trạng thái CSDL hoặc cơ chế chống xử lý trùng.
 
 ### 3.2. Backend
 
