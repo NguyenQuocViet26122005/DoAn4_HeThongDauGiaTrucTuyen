@@ -4,7 +4,7 @@
 
 **Tài liệu nghiệp vụ chi tiết và công nghệ — phiên bản 3.0, ngày 25/09/2026.**
 
-Cập nhật giao diện duyệt sản phẩm, kiểm định và tạo/quản lý phiên người bán ngày 01/10/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
+Cập nhật giao diện đơn hàng, thanh toán phần còn lại và xác nhận nhận/hoàn tất ngày 03/10/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
 
 Đây là đặc tả chính của project. Phiên bản này thay thế các mô tả cũ về phạm vi hàng phổ thông, đặt cọc ngoài phạm vi, Mua ngay tạo đơn chưa thanh toán và Second Chance thanh toán sau. Khi triển khai phải đồng bộ tài liệu, SQL, backend, hợp đồng API và kiểm thử.
 
@@ -39,7 +39,7 @@ Một tài khoản có thể vừa mua vừa bán khi đã được xác minh b�
 - **Ant Design:** thành phần giao diện và biểu mẫu hiện có.
 - **Axios:** gọi HTTP API; **TanStack Query:** tải, lưu tạm và làm mới dữ liệu máy chủ.
 - **Zustand:** trạng thái phiên đăng nhập dùng chung.
-- **Socket.IO Client:** nhận biến động phiên và thông báo realtime.
+- **Socket.IO Client:** đã cài để nhận biến động phiên và thông báo realtime; chưa nối vào luồng giao diện hiện tại.
 - **Day.js:** hiển thị thời gian; **Framer Motion:** chuyển động giao diện.
 - **React Hook Form + Zod:** đã cài, định hướng dùng cho biểu mẫu nghiệp vụ; không để hai thư viện cùng quản lý một bộ giá trị biểu mẫu.
 - **ESLint, TypeScript, Prettier:** kiểm tra và thống nhất cách trình bày.
@@ -50,9 +50,9 @@ Các thư mục hiện có gồm `pages`, `components`, `services`, `socket`, `s
 
 - Trang chủ: ảnh bìa, bốn phiên mới nhất từ API, danh mục, hướng dẫn ngắn và liên kết xác minh người bán.
 - Khám phá: tìm tên, lọc danh mục/trạng thái và phân trang theo hợp đồng API. Thứ tự hiện tại là phiên mới nhất trước; chưa đưa lên giao diện các kiểu sắp xếp chưa được backend hỗ trợ.
-- Chi tiết phiên: xem ảnh, mô tả, thuộc tính, giá công khai, thời gian, phí vận chuyển, yêu cầu cọc, tóm tắt kiểm định và lịch sử giá. Chưa có thao tác đặt cọc, trả giá hoặc thanh toán trên giao diện nền.
+- Chi tiết phiên: xem ảnh, mô tả, thuộc tính, giá công khai, thời gian, phí vận chuyển, yêu cầu cọc, tóm tắt kiểm định và lịch sử giá. Người mua có địa chỉ được đăng ký/thanh toán cọc, đặt mức giá tối đa bí mật và Mua ngay qua API thật. Hiển thị điều kiện còn thiếu, trạng thái đang gửi, lỗi và xác nhận trước khi giao dịch; người bán không thao tác mua trên phiên của mình, Admin không tham gia mua.
 - Đăng nhập/đăng ký: kiểm tra đầu vào, báo lỗi từng trường, nút đang xử lý, gọi API thật và quay lại trang cần đăng nhập. Đăng ký thành công chuyển về đăng nhập. Không thêm đăng nhập mạng xã hội, quên mật khẩu hoặc ví khi chưa có trong đặc tả/API.
-- Tài khoản: hiển thị hồ sơ, danh sách theo dõi và phiên đã tham gia. Các mục tài khoản khác còn là bố cục/điều hướng có thông báo đang hoàn thiện. Phạm vi đã có của người bán và Admin được liệt kê riêng bên dưới.
+- Tài khoản: hiển thị hồ sơ, danh sách theo dõi, phiên đã tham gia; sổ địa chỉ cho phép thêm/sửa/chọn mặc định/xóa theo điều kiện API. Danh sách đơn có phân trang, phân biệt bạn mua/bạn bán theo API hiện có; chi tiết hiển thị số tiền, giữ/hoàn/giải ngân, địa chỉ chụp, vận đơn, hạn và lịch sử thanh toán. Người mua đổi địa chỉ đơn khi còn chờ thanh toán và còn hạn; thanh toán phần còn lại; xác nhận nhận hàng rồi hoàn tất qua hai bước riêng. Khai báo gửi hàng, tranh chấp, Second Chance, đánh giá và thông báo vẫn cần hoàn thiện trên web. Phạm vi đã có của người bán và Admin được liệt kê riêng bên dưới.
 - Người bán — sản phẩm: đã có danh sách riêng, tìm kiếm/lọc/phân trang, tạo/sửa bản nháp, thuộc tính theo danh mục, tải nhiều ảnh, chọn ảnh đại diện, bỏ ảnh và gửi duyệt qua API thật. Chỉ người bán đã xác minh, tài khoản hoạt động mới vào luồng này. Màn hình hiển thị lý do từ chối và lý do khóa sửa; không tự mở khóa sản phẩm đã kiểm định hoặc có phiên.
 - Người bán — phiên đấu giá: danh sách riêng có tìm kiếm/lọc/phân trang; tạo phiên từ sản phẩm đủ điều kiện với giá khởi điểm, giá sàn/Mua ngay tùy chọn, phí vận chuyển và lịch giờ Việt Nam. Có kiểm tra biểu mẫu và xác nhận trước khi tạo. Chi tiết hiển thị giá công khai, lịch, kết quả, cọc đã chụp theo cấu hình và yêu cầu hủy mới nhất. Gửi yêu cầu hủy phải có lý do; phiên tiếp tục cho đến khi Admin duyệt hoặc có kết quả. Chưa có thao tác sửa giá/lịch sau khi tạo. Làm mới qua API, chưa nối realtime ở màn hình này.
 - Admin — duyệt sản phẩm: danh sách mặc định chờ xử lý, tìm tên/lọc trạng thái/danh mục/phân trang; xem ảnh, mô tả, thuộc tính; duyệt hoặc từ chối có lý do. Sản phẩm bắt buộc kiểm định chưa đạt/không còn được trung tâm giữ/thiếu báo cáo bị khóa nút duyệt. Admin mở hồ sơ kiểm định từ sản phẩm và quay lại duyệt nội dung khi đủ điều kiện.
@@ -65,6 +65,10 @@ Các thư mục hiện có gồm `pages`, `components`, `services`, `socket`, `s
 
 Màu sắc, thụt lề, thông báo lỗi và trạng thái xử lý thống nhất trên toàn bộ màn hình. Bố cục PC được ưu tiên; màn hình nhỏ có menu thu gọn và lưới một/hai cột. Khi bổ sung nghiệp vụ phải cập nhật tài liệu này cùng code, API và kiểm thử liên quan; thay đổi trình bày không được tự đổi quy tắc giao dịch.
 
+Luồng người mua trên web: bổ sung địa chỉ nếu thiếu → đăng ký và thanh toán cọc nếu phiên yêu cầu → nhập mức tối đa → xác nhận đặt giá. Mức tối đa chỉ nằm trong biểu mẫu đang nhập, được xóa sau khi gửi thành công; không lưu vào bộ nhớ trình duyệt, lịch sử công khai hoặc thông báo. Giá và bước giá được backend quyết định; giao diện không tự tính người thắng. Phiên chưa có lượt hợp lệ không bị mô tả thành chưa đạt giá sàn. Giá/trạng thái và lịch sử được làm mới mỗi 10 giây khi phiên còn lên lịch/hoạt động, có nút làm mới thủ công; chưa phải realtime Socket.IO.
+
+Mua ngay hiển thị giá sản phẩm + phí vận chuyển − cọc được chuyển (nếu đã có), không bắt buộc cọc trước. Thanh toán hoàn toàn mô phỏng, có lựa chọn thành công/thất bại. HTTP 200 kèm kết quả `THAT_BAI` vẫn hiển thị thất bại, không được báo đã thu tiền. Trước khi gửi, giao diện giữ khóa yêu cầu và kết quả mô phỏng theo người dùng/phiên/loại thanh toán trong `sessionStorage`. Khi mất phản hồi, người mua chủ động kiểm tra lại cùng khóa, kể cả sau tải lại trang và phiên đã kết thúc; không tự gửi lại hoặc tạo lần thu mới. Sau khi nhận kết quả chắc chắn thì xóa khóa. Cơ chế này giới hạn trong tab còn lưu phiên trình duyệt; biên nhận đọc lại từ API đơn hàng là dữ liệu chính thức.
+
 Luồng ảnh trên web: lưu bản nháp → chọn ảnh trên máy → tải các ảnh đã chọn → chọn ảnh đại diện → gửi duyệt. Tối đa 12 ảnh/sản phẩm, JPG/PNG/WebP không quá 5 MiB/ảnh. Lỗi từng ảnh giữ trong hàng đợi để thử lại hoặc bỏ chọn; ảnh đã gắn thành công không bị mất khi ảnh khác lỗi. Khi thử lại bước gắn cùng một đường dẫn tệp vào cùng sản phẩm, backend trả ảnh đã có, không tạo bản ghi trùng. Đổi ảnh đại diện thực hiện trong một transaction; khi bỏ ảnh đại diện, ảnh còn lại đầu tiên được chọn. Các thao tác ảnh ghi nhật ký. Bỏ ảnh chỉ bỏ liên kết với sản phẩm; không tự xóa tệp vật lý dùng chung.
 
 Gửi duyệt dùng thông tin đã lưu, có ảnh và đầy đủ thuộc tính bắt buộc. Nút gửi duyệt tạm khóa khi đang lưu/tải ảnh, còn thay đổi chưa lưu hoặc ảnh chưa tải; có bước xác nhận trước khi gửi. Bản nháp cho phép thiếu thuộc tính bắt buộc để hoàn thiện sau. Nếu sản phẩm chỉ xem, giao diện ẩn thao tác sửa/ảnh/gửi duyệt; backend vẫn kiểm tra lại điều kiện trong transaction của mỗi yêu cầu.
@@ -74,6 +78,16 @@ Luồng tệp kiểm định trên web: Admin chọn loại hồ sơ → chọn 
 Chi tiết sản phẩm chỉ trả thêm thông tin kiểm định mới nhất cho chính chủ/Admin. Chi tiết hồ sơ trả trạng thái có thể cập nhật và lý do khóa để giao diện giải thích; các API ghi vẫn kiểm tra quyền, trạng thái và nghĩa vụ giao dịch trong transaction. Không thêm bảng, cột hay vai trò cho đợt giao diện này.
 
 Kiểm tra lại ngày 01/10/2026: 18 kiểm thử cơ bản và 55 kiểm thử tích hợp đạt, bao phủ 104 API; build frontend, lint và định dạng đạt. Đã thử trực tiếp luồng Admin duyệt/kiểm định, người bán khai báo gửi hàng, tạo phiên, kiểm tra giá/lịch, tìm kiếm và gửi yêu cầu hủy còn hiển thị sau tải lại. Toàn bộ dữ liệu thử dùng CSDL riêng và được hoàn tác.
+
+Kiểm tra luồng người mua ngày 02/10/2026: bộ HTTP đối chiếu 104 API và ba kiểm thử frontend về tiền/khôi phục thanh toán đạt. Trên trình duyệt đã thử thiếu địa chỉ, lưu địa chỉ và quay về phiên, cọc thất bại/thành công, trả giá và xóa ô nhập, hai mức tối đa bằng nhau ưu tiên người đặt trước, Mua ngay thất bại/thành công, khấu trừ cọc, xem biên nhận, mất phản hồi rồi tải lại để lấy đúng đơn đã xử lý. Phiên có cọc nhưng không có Mua ngay vẫn hiển thị bình thường sau thanh toán cọc. Người bán ở phiên của mình và Admin không có thao tác mua. Đã sửa tràn ngang menu tài khoản; sổ địa chỉ và chi tiết phiên không tràn ngang ở chiều rộng thực tế 444 px. Dữ liệu thử nằm trong transaction riêng, không sửa schema hoặc dữ liệu chính. Chưa nghiệm thu toàn bộ quy trình đơn hàng và realtime.
+
+### 3.1.2. Giao diện đơn hàng
+
+Giao diện đơn hàng ngày 03/10/2026: dùng `/tai-khoan/don-hang` và `/tai-khoan/don-hang/:id`; danh sách gồm cả đơn mua/bán đúng phạm vi API, không tự lọc trên một trang rồi trình bày thành tổng dữ liệu. Chỉ người mua hoạt động có nút thanh toán/nhận/hoàn tất; các quyền vẫn kiểm tra lại ở backend. Tiền cần thanh toán lấy từ đơn, không gửi số tiền tùy chọn. API thanh toán đơn trả chi tiết đơn và lịch sử giao dịch, khác phản hồi Mua ngay: giao diện đối chiếu kết quả đã lưu, không suy thành công chỉ vì HTTP 200. Mã yêu cầu được lưu theo tài khoản/đơn/loại; mất phản hồi có thể lấy lại cùng lần xử lý sau tải lại.
+
+Đơn quá hạn thanh toán khóa thanh toán và đổi địa chỉ. “Tôi đã nhận hàng” mở thời gian kiểm tra, không giải ngân. “Hàng phù hợp — hoàn tất” có xác nhận riêng; khóa khi thiếu tiền, có tranh chấp đang mở, cờ Admin hoặc tiền không còn đang giữ. Nếu backend trả cờ cần Admin mà chưa hoàn tất, giao diện không thông báo đã giải ngân. Các mốc vận chuyển chỉ đọc từ API; không đánh dấu giao chỉ vì đã có vận đơn. Đơn làm mới thủ công/sau thao tác; chưa nối realtime. Chế độ `dev:local` tắt tác vụ nền nên không dùng để nghiệm thu tự đóng đơn theo hạn.
+
+Kiểm tra ngày 03/10/2026: sáu kiểm thử frontend đạt, bao gồm ba kiểm thử mới về kết quả thanh toán đơn và điều kiện hoàn tất. Trình duyệt đã thử danh sách đúng quyền, đổi địa chỉ đơn, thanh toán có cọc, mất phản hồi rồi tải lại (chỉ một lần thu trong lịch sử), thất bại giữ tiền/hạn, nhận hàng vẫn giữ tiền, hoàn tất mới giải ngân; khóa đơn quá hạn/cờ Admin và chặn đọc đơn người khác. Danh sách và chi tiết không tràn ngang tại chiều rộng thực tế 444 px. Dữ liệu thử ở CSDL riêng; không đổi schema hoặc transaction nghiệp vụ backend.
 
 ### 3.2. Backend
 
