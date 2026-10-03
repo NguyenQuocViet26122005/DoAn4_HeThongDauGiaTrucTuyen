@@ -114,9 +114,11 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
                 : 'Chưa có người dẫn đầu'
             }
             description={
-              Number(phien.dat_gia_san)
-                ? 'Giá hiện tại đã đáp ứng điều kiện giá sàn (hoặc phiên không đặt giá sàn).'
-                : 'Giá hiện tại chưa đạt giá sàn. Dẫn đầu chưa đồng nghĩa với thắng phiên.'
+              !Number(phien.tong_luot_tra_gia)
+                ? 'Phiên chưa có lượt trả giá.'
+                : Number(phien.dat_gia_san)
+                  ? 'Giá hiện tại đã đáp ứng điều kiện giá sàn (hoặc phiên không đặt giá sàn).'
+                  : 'Giá hiện tại chưa đạt giá sàn. Dẫn đầu chưa đồng nghĩa với thắng phiên.'
             }
           />
           <Button onClick={() => void lamMoiThamGia(phien.id)}>Làm mới giá và trạng thái</Button>
