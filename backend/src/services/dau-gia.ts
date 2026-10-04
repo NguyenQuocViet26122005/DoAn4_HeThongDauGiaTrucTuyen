@@ -70,9 +70,9 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
     await require('./kiem-dinh').kiemTraDuocDauGia(sanPham);
 
     baoDam(
-      !(await khoDuLieu.phienDaCoCuaSanPham(sanPham.id)),
+      await danhMucSanPham.sanPhamDuocTaoPhien(sanPham.id),
       409,
-      'Sản phẩm đã có phiên đang chờ, đang chạy hoặc đã bán',
+      'Sản phẩm còn phiên, đơn hàng hoặc đề nghị mua tiếp chưa kết thúc; chưa thể tạo phiên mới',
     );
 
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();

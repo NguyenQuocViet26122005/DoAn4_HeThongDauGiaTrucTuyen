@@ -17,6 +17,7 @@ export interface BoLocDanhSach {
   categoryId?: DinhDanh;
   watcherId?: DinhDanh;
   bidderId?: DinhDanh;
+  productId?: DinhDanh;
   duDieuKienDauGia?: boolean;
 }
 export type TruyVanDanhSach = Record<string, unknown>;

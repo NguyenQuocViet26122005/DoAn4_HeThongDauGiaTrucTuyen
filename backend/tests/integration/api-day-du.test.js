@@ -38,7 +38,7 @@ async function cacRouteHienCo() {
 }
 
 kiemThu(
-  'HTTP: 89 API nền có kịch bản thành công và kiểm tra quyền; dữ liệu được rollback',
+  'HTTP: toàn bộ API nền có kịch bản thành công và kiểm tra quyền; dữ liệu được rollback',
   async (boKiemThu) => {
     const cacRoute = await cacRouteHienCo();
     const daThanhCong = new Set();
@@ -163,7 +163,7 @@ kiemThu(
           return taoPhienChoSanPham(sp.id);
         }
 
-        async function taoPhienChoSanPham(sanPhamId, soGiay = 3600) {
+        async function taoPhienChoSanPham(sanPhamId, soGiay = 3600, trangThai = 201) {
           const hienTai = await coSoDuLieu.thoiGianHienTai();
 
           return gui(
@@ -179,7 +179,7 @@ kiemThu(
                 .doiThanhNgay(thoiGian.congGiay(hienTai, soGiay))
                 .toISOString(),
             },
-            201,
+            trangThai,
           );
         }
 
@@ -488,6 +488,74 @@ kiemThu(
             'Đấu giá tự động, gia hạn, theo dõi và Admin duyệt hủy',
             async () => {
               phien = await taoPhienChoSanPham(sanPham.id, 30);
+
+              const baoCao = await gui(
+                'POST',
+                `/auctions/${phien.id}/reports`,
+                'a',
+                {
+                  ly_do: 'THONG_TIN_SAI',
+                  mo_ta: 'Mô tả nguồn gốc sản phẩm cần được kiểm tra.',
+                },
+                201,
+              );
+              const baoCaoCuaToi = await gui('GET', '/product-reports/me', 'a');
+
+              xacNhan.ok(baoCaoCuaToi.some((muc) => String(muc.id) === String(baoCao.id)));
+              xacNhan.equal(
+                baoCaoCuaToi.find((muc) => String(muc.id) === String(baoCao.id)).trang_thai,
+                'DANG_MO',
+              );
+
+              const viPhamCuaNguoiBan = await gui('GET', '/violations/me', 'seller');
+              const baoCaoRieng = viPhamCuaNguoiBan.find(
+                (muc) => String(muc.id) === String(baoCao.id),
+              );
+
+              xacNhan.ok(baoCaoRieng);
+              xacNhan.equal(Object.hasOwn(baoCaoRieng, 'nguoi_tao_id'), false);
+
+              const viPhamQuanTri = await gui('GET', '/admin/violations', 'admin');
+              const baoCaoQuanTri = viPhamQuanTri.find(
+                (muc) => String(muc.id) === String(baoCao.id),
+              );
+              const viPhamQuanTriLoc = await gui(
+                'GET',
+                `/admin/violations?nguoi_dung_id=${duLieu.seller.id}`,
+                'admin',
+              );
+              const baoCaoQuanTriLoc = viPhamQuanTriLoc.find(
+                (muc) => String(muc.id) === String(baoCao.id),
+              );
+
+              xacNhan.equal(baoCaoQuanTri.tieu_de_san_pham, 'Đã sửa qua HTTP');
+              xacNhan.equal(String(baoCaoQuanTriLoc.nguoi_tao_id), String(duLieu.a.id));
+              await gui('GET', '/product-reports/me', null, undefined, 401);
+              await gui('POST', `/auctions/${phien.id}/reports`, null, {}, 401);
+              await gui(
+                'POST',
+                `/auctions/${phien.id}/reports`,
+                'seller',
+                { ly_do: 'KHAC', mo_ta: 'Người bán không thể tự báo cáo sản phẩm.' },
+                403,
+              );
+              await gui(
+                'POST',
+                `/auctions/${phien.id}/reports`,
+                'a',
+                { ly_do: 'KHAC', mo_ta: 'Không gửi báo cáo trùng.' },
+                409,
+              );
+              await gui('PATCH', `/admin/violations/${baoCao.id}/review`, 'admin', {
+                trang_thai: 'DA_HUY',
+                hinh_thuc_xu_ly: 'KHONG_VI_PHAM',
+                ly_do_xu_ly: 'Thông tin báo cáo đã được kiểm tra.',
+              });
+
+              const thongBaoBaoCao = await gui('GET', '/notifications?unread=true', 'a');
+
+              xacNhan.ok(thongBaoBaoCao.some((muc) => muc.loai === 'KET_QUA_BAO_CAO_SAN_PHAM'));
+
               await gui(
                 'POST',
                 `/auctions/${phien.id}/bids`,
@@ -759,6 +827,48 @@ kiemThu(
               });
 
               xacNhan.equal(lapLai.don_hang.id, chapNhan.don_hang.id);
+              await taoPhienChoSanPham(phienTiep.san_pham_id, 3600, 409);
+
+              const phienTuChoi = await taoPhienMoi();
+
+              await gui('POST', `/auctions/${phienTuChoi.id}/bids`, 'a', {
+                gia_toi_da: '20000000',
+              });
+              await gui('POST', `/auctions/${phienTuChoi.id}/bids`, 'b', {
+                gia_toi_da: '22000000',
+              });
+
+              const donTuChoi = await chotPhien(phienTuChoi.id);
+
+              await khoBanGhi.capNhat('don_hang', donTuChoi.id, {
+                trang_thai: 'DA_HUY',
+                ly_do_huy: 'KHONG_THANH_TOAN',
+              });
+
+              const deNghiTuChoi = await gui(
+                'POST',
+                `/orders/${donTuChoi.id}/second-chance`,
+                'seller',
+                {},
+                201,
+              );
+
+              await taoPhienChoSanPham(phienTuChoi.san_pham_id, 3600, 409);
+              await gui('POST', `/second-chances/${deNghiTuChoi.id}/respond`, 'a', {
+                chap_nhan: false,
+              });
+
+              const sanPhamDuocDangLai = await gui(
+                'GET',
+                `/products/mine?san_pham_id=${phienTuChoi.san_pham_id}&du_dieu_kien_dau_gia=1`,
+                'seller',
+              );
+
+              xacNhan.equal(sanPhamDuocDangLai.length, 1);
+
+              const phienDangLai = await taoPhienChoSanPham(phienTuChoi.san_pham_id, 30);
+
+              await chotPhien(phienDangLai.id);
             },
           );
 

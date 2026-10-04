@@ -6,10 +6,12 @@ boDinhTuyen.get('/users/:id/reviews', dieuKhien.cacDanhGia);
 boDinhTuyen.use(
   [
     '/orders/:id/reviews',
+    '/auctions/:id/reports',
     '/orders/:id/disputes',
     '/disputes',
     '/notifications',
     '/violations',
+    '/product-reports/me',
     '/admin/disputes',
     '/admin/violations',
     '/admin/statistics',
@@ -18,6 +20,7 @@ boDinhTuyen.use(
   yeuCauDangNhap(),
 );
 boDinhTuyen.post('/orders/:id/reviews', dieuKhien.danhGiaDonHang);
+boDinhTuyen.post('/auctions/:id/reports', dieuKhien.baoCaoSanPham);
 boDinhTuyen.post('/orders/:id/disputes', dieuKhien.tranhChapDangMo);
 boDinhTuyen.get('/disputes', dieuKhien.cacTranhChap);
 boDinhTuyen.get('/disputes/:id', dieuKhien.chiTietTranhChap);
@@ -28,6 +31,7 @@ boDinhTuyen.get('/notifications/unread-count', dieuKhien.chuaDoc);
 boDinhTuyen.patch('/notifications/read-all', dieuKhien.danhDauTatCaDaDoc);
 boDinhTuyen.patch('/notifications/:id/read', dieuKhien.danhDauDaDoc);
 boDinhTuyen.get('/violations/me', dieuKhien.cacViPham);
+boDinhTuyen.get('/product-reports/me', dieuKhien.baoCaoSanPhamCuaToi);
 boDinhTuyen.get('/admin/disputes', quanTri, dieuKhien.tranhChapQuanTri);
 boDinhTuyen.post('/admin/disputes/:id/take', quanTri, dieuKhien.tiepNhanTranhChap);
 boDinhTuyen.post('/admin/disputes/:id/resolve', quanTri, dieuKhien.giaiQuyetTranhChap);

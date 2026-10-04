@@ -11,6 +11,8 @@ export interface SanPhamTrongDanhSach {
   trang_thai_duyet: string;
   tinh_trang_san_pham: string;
   ngay_tao: string;
+  co_the_tao_phien?: boolean | number;
+  da_tung_dau_gia?: boolean | number;
 }
 
 export interface ThuocTinhDanhMuc {

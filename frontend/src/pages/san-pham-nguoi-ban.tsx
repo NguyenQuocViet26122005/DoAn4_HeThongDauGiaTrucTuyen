@@ -118,6 +118,11 @@ function DanhSachSanPham() {
               <div className="hanh-dong-san-pham-ban">
                 <TrangThai giaTri={muc.trang_thai_duyet} />
                 <Link to={`/nguoi-ban/san-pham/${muc.id}`}>Xem chi tiết ↗</Link>
+                {!!Number(muc.co_the_tao_phien) && (
+                  <Link to={`/nguoi-ban/phien/moi?san_pham_id=${muc.id}`}>
+                    {Number(muc.da_tung_dau_gia) ? 'Đăng lại sản phẩm' : 'Tạo phiên đấu giá'} ↗
+                  </Link>
+                )}
               </div>
             </article>
           ))}

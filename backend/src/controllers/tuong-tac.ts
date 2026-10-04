@@ -32,6 +32,10 @@ export = {
       status: 201,
     },
   ),
+  baoCaoSanPham: xuLyHTTP(
+    (yeuCau) => dichVu.baoCaoSanPham(yeuCau.user, yeuCau.params.id, yeuCau.body),
+    { status: 201 },
+  ),
   cacDanhGia: xuLyHTTP((yeuCau) =>
     khoDuLieu.cacDanhGia(kiemTra.id(yeuCau.params.id), kiemTra.phanTrang(yeuCau.query)),
   ),
@@ -48,10 +52,14 @@ export = {
   cacViPham: xuLyHTTP((yeuCau) =>
     khoDuLieu.cacViPham(yeuCau.user.id, kiemTra.phanTrang(yeuCau.query)),
   ),
+  baoCaoSanPhamCuaToi: xuLyHTTP((yeuCau) =>
+    khoDuLieu.baoCaoSanPhamCuaNguoiDung(yeuCau.user.id, kiemTra.phanTrang(yeuCau.query)),
+  ),
   viPhamQuanTri: xuLyHTTP((yeuCau) =>
     khoDuLieu.cacViPham(
       yeuCau.query.nguoi_dung_id ? kiemTra.id(yeuCau.query.nguoi_dung_id) : null,
       kiemTra.phanTrang(yeuCau.query),
+      true,
     ),
   ),
   taoViPham: xuLyHTTP((yeuCau) => dichVu.taoViPham(yeuCau.user, yeuCau.body), { status: 201 }),

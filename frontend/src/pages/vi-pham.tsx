@@ -36,6 +36,18 @@ interface ViPham {
   ly_do_xu_ly: string | null;
   ngay_tao: string;
   ngay_xu_ly: string | null;
+  tieu_de_san_pham?: string | null;
+}
+
+interface BaoCaoSanPham {
+  id: string;
+  phien_dau_gia_id: string;
+  mo_ta: string;
+  trang_thai: string;
+  ly_do_xu_ly: string | null;
+  ngay_tao: string;
+  ngay_xu_ly: string | null;
+  tieu_de_san_pham: string;
 }
 
 async function lamMoi() {
@@ -118,13 +130,16 @@ function TaoViPham({ nguoiDungId }: { nguoiDungId: string }) {
 }
 
 function XetViPham({ muc }: { muc: ViPham }) {
+  const laBaoCaoSanPham = muc.mo_ta.startsWith('[BAO CAO SAN PHAM]');
+
   return (
     <BieuMauThaoTac<{ ket_qua: keyof typeof hinhThucXuLy; ly_do_xu_ly: string }>
       ten="Xét vi phạm"
       xacNhan={(giaTri) => (
         <>
           <p>
-            Vi phạm #{muc.id} · Tài khoản #{muc.nguoi_dung_id}: {hinhThucXuLy[giaTri.ket_qua]}.
+            {laBaoCaoSanPham ? 'Báo cáo sản phẩm' : `Vi phạm #${muc.id}`} · Tài khoản #
+            {muc.nguoi_dung_id}: {hinhThucXuLy[giaTri.ket_qua]}.
           </p>
           <p>{giaTri.ly_do_xu_ly}</p>
           <p>Quyết định được ghi nhận ngay sau khi xác nhận.</p>
@@ -168,6 +183,53 @@ function XetViPham({ muc }: { muc: ViPham }) {
         <Input.TextArea rows={4} maxLength={1000} showCount />
       </Form.Item>
     </BieuMauThaoTac>
+  );
+}
+
+function BaoCaoSanPhamDaGui() {
+  const [trang, datTrang] = useState(1);
+  const truyVan = useDuLieu<BaoCaoSanPham[]>('/product-reports/me', {
+    page: trang,
+    limit: 12,
+  });
+
+  return (
+    <section className="khu-vuc">
+      <div className="tieu-de-muc">
+        <div>
+          <h2>Báo cáo sản phẩm đã gửi</h2>
+          <p className="chu-mo">Quản trị viên sẽ xem xét nội dung trước khi kết luận.</p>
+        </div>
+        <Button loading={truyVan.isFetching} onClick={() => void truyVan.refetch()}>
+          Làm mới
+        </Button>
+      </div>
+      <ChoDuLieu
+        truyVan={truyVan}
+        rong={truyVan.data?.length === 0}
+        thongDiepRong="Bạn chưa gửi báo cáo sản phẩm nào."
+      >
+        {truyVan.data?.map((muc) => (
+          <section className="tam-noi-dung" key={muc.id}>
+            <h3>{muc.tieu_de_san_pham}</h3>
+            <TrangThai giaTri={muc.trang_thai} />
+            <p>{muc.mo_ta.replace(/^\[BAO CAO SAN PHAM\]\s*/, '')}</p>
+            <p>Gửi lúc: {ngayGio(muc.ngay_tao)}</p>
+            {muc.ly_do_xu_ly && <p>Kết quả: {muc.ly_do_xu_ly}</p>}
+            {muc.ngay_xu_ly && <p>Đã xem xét: {ngayGio(muc.ngay_xu_ly)}</p>}
+            <Link to={`/phien/${muc.phien_dau_gia_id}`}>Mở phiên liên quan ↗</Link>
+          </section>
+        ))}
+      </ChoDuLieu>
+      {!truyVan.isPending && !truyVan.isError && (
+        <PhanTrang
+          trang={trang}
+          datTrang={datTrang}
+          soLuong={truyVan.data?.length || 0}
+          gioiHan={12}
+        />
+      )}
+    </section>
   );
 }
 
@@ -217,6 +279,7 @@ function DanhSachViPham({
           Đang xem tài khoản #{nguoiDungId}. <Button onClick={xoaLoc}>Xem tất cả</Button>
         </p>
       )}
+      {!quanTri && <BaoCaoSanPhamDaGui />}
       <ChoDuLieu
         truyVan={truyVan}
         rong={truyVan.data?.length === 0}
@@ -225,13 +288,18 @@ function DanhSachViPham({
         {truyVan.data?.map((muc) => (
           <section className="tam-noi-dung" key={muc.id}>
             <h2>
-              #{muc.id} · {loaiViPham[muc.loai_vi_pham] || nhan(muc.loai_vi_pham)}
+              #{muc.id} ·{' '}
+              {muc.mo_ta.startsWith('[BAO CAO SAN PHAM]')
+                ? 'Báo cáo sản phẩm'
+                : loaiViPham[muc.loai_vi_pham] || nhan(muc.loai_vi_pham)}
             </h2>
             <TrangThai giaTri={muc.trang_thai} />
             {quanTri && <p>Tài khoản #{muc.nguoi_dung_id}</p>}
-            <p>{muc.mo_ta}</p>
+            {muc.tieu_de_san_pham && <p>Sản phẩm: {muc.tieu_de_san_pham}</p>}
+            <p>{muc.mo_ta.replace(/^\[BAO CAO SAN PHAM\]\s*/, '')}</p>
             <p>
-              Điểm: {muc.diem_vi_pham} · Ghi nhận: {ngayGio(muc.ngay_tao)}
+              {muc.mo_ta.startsWith('[BAO CAO SAN PHAM]') ? 'Điểm sau khi xác nhận' : 'Điểm'}:{' '}
+              {muc.diem_vi_pham} · Ghi nhận: {ngayGio(muc.ngay_tao)}
             </p>
             {muc.phien_dau_gia_id && (
               <p>

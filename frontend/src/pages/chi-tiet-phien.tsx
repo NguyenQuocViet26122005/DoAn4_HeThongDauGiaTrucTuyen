@@ -14,6 +14,7 @@ import { ngayGio, nhan, tien } from '../utils/dinh-dang';
 import type { Phien, SanPham } from '../types/du-lieu';
 import ThamGiaPhien from '../components/tham-gia-phien';
 import TheoDoiPhien from '../components/theo-doi-phien';
+import BaoCaoSanPham from '../components/bao-cao-san-pham';
 import { doc } from '../services/api';
 import { lamMoiThamGia } from '../services/tham-gia-phien';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
@@ -160,6 +161,7 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
                   })),
               ]}
             />
+            <BaoCaoSanPham phienId={phien.id} nguoiBanId={phien.nguoi_ban_id} />
           </ChoDuLieu>
         </section>
         <section className="tam-noi-dung">

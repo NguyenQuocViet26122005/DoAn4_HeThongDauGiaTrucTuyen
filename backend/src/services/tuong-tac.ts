@@ -1,5 +1,9 @@
 import type { NguoiDungDangNhap } from '../types/nghiep-vu';
-import { danhGiaSchema, duyetViPhamSchema } from '../validations/tuong-tac.schema';
+import {
+  baoCaoSanPhamSchema,
+  danhGiaSchema,
+  duyetViPhamSchema,
+} from '../validations/tuong-tac.schema';
 import coSoDuLieu = require('../repositories/ket-noi');
 import khoBanGhi = require('../repositories/ban-ghi');
 import khoDuLieu = require('../repositories/tuong-tac');
@@ -46,6 +50,77 @@ async function danhGiaDonHang(nguoiDung: NguoiDungDangNhap, donHangId, duLieuNha
     await ghiNhatKy(nguoiDung.id, 'DANH_GIA', 'danh_gia', id);
 
     return khoBanGhi.layTheoId('danh_gia', id);
+  });
+}
+
+async function baoCaoSanPham(nguoiDung: NguoiDungDangNhap, phienId, duLieuNhap: unknown) {
+  const dauVao = kiemTra.docSchema(baoCaoSanPhamSchema, duLieuNhap);
+  const lyDo = kiemTra.giaTriLuaChon(
+    dauVao.ly_do,
+    ['HANG_GIA', 'THONG_TIN_SAI', 'HANG_CAM', 'QUYEN_SO_HUU', 'KHAC'],
+    'Lý do báo cáo',
+  );
+  const nhanLyDo = {
+    HANG_GIA: 'Nghi hàng giả hoặc sai nguồn gốc',
+    THONG_TIN_SAI: 'Thông tin sản phẩm không chính xác',
+    HANG_CAM: 'Sản phẩm thuộc danh mục bị cấm',
+    QUYEN_SO_HUU: 'Nghi vấn quyền sở hữu hoặc xâm phạm bản quyền',
+    KHAC: 'Lý do khác',
+  }[lyDo];
+  const loaiViPham =
+    lyDo === 'HANG_GIA' || lyDo === 'QUYEN_SO_HUU'
+      ? 'GIAN_LAN'
+      : lyDo === 'HANG_CAM'
+        ? 'LAM_DUNG'
+        : 'KHAC';
+  const moTa = `[BAO CAO SAN PHAM] ${nhanLyDo}: ${kiemTra.chuoi(dauVao.mo_ta, 'Nội dung báo cáo', 850)}`;
+
+  return coSoDuLieu.giaoDich(async () => {
+    const phien = batBuocTonTai(
+      await cacPhienDauGia.layTheoId(kiemTra.id(phienId), true),
+      'Không tìm thấy phiên',
+    );
+    const sanPham = batBuocTonTai(
+      await khoBanGhi.layTheoId('san_pham', phien.san_pham_id, true),
+      'Không tìm thấy sản phẩm',
+    );
+
+    baoDam(
+      ['DA_LEN_LICH', 'HOAT_DONG', 'DA_KET_THUC', 'THAT_BAI'].includes(phien.trang_thai) &&
+        sanPham.trang_thai_duyet === 'DA_DUYET',
+      404,
+      'Không tìm thấy sản phẩm đang được công khai',
+    );
+    baoDam(
+      !cungId(nguoiDung.id, phien.nguoi_ban_id),
+      403,
+      'Người bán không thể báo cáo sản phẩm của mình',
+    );
+    baoDam(
+      !(await khoDuLieu.daBaoCaoSanPham(nguoiDung.id, sanPham.id)),
+      409,
+      'Bạn đã gửi báo cáo cho sản phẩm này',
+    );
+
+    const id = await khoBanGhi.them('vi_pham', {
+      nguoi_dung_id: phien.nguoi_ban_id,
+      phien_dau_gia_id: phien.id,
+      don_hang_id: null,
+      loai_vi_pham: loaiViPham,
+      mo_ta: moTa,
+      diem_vi_pham: 0,
+      trang_thai: 'DANG_MO',
+      nguoi_tao_id: nguoiDung.id,
+      hinh_thuc_xu_ly: 'CHUA_XU_LY',
+    });
+
+    await ghiNhatKy(nguoiDung.id, 'BAO_CAO_SAN_PHAM', 'vi_pham', id, {
+      phien_dau_gia_id: phien.id,
+      san_pham_id: sanPham.id,
+      loai_bao_cao: lyDo,
+    });
+
+    return khoBanGhi.layTheoId('vi_pham', id);
   });
 }
 
@@ -143,6 +218,9 @@ async function duyetViPham(quanTri: NguoiDungDangNhap, id, duLieuNhap: unknown) 
     }
 
     await khoBanGhi.capNhat('vi_pham', id, {
+      ...(banGhi.mo_ta.startsWith('[BAO CAO SAN PHAM]')
+        ? { diem_vi_pham: trangThai === 'DA_XAC_NHAN' ? 1 : 0 }
+        : {}),
       hinh_thuc_xu_ly: hinhThuc,
       ly_do_xu_ly: lyDo,
       nguoi_xu_ly_id: quanTri.id,
@@ -160,6 +238,18 @@ async function duyetViPham(quanTri: NguoiDungDangNhap, id, duLieuNhap: unknown) 
       '/profile/violations',
     );
 
+    if (banGhi.mo_ta.startsWith('[BAO CAO SAN PHAM]')) {
+      await taoThongBao(
+        banGhi.nguoi_tao_id,
+        'KET_QUA_BAO_CAO_SAN_PHAM',
+        'Báo cáo sản phẩm đã được xem xét',
+        trangThai === 'DA_XAC_NHAN'
+          ? 'Quản trị viên đã xác nhận báo cáo sản phẩm.'
+          : 'Quản trị viên kết luận báo cáo sản phẩm không vi phạm.',
+        `/auctions/${banGhi.phien_dau_gia_id}`,
+      );
+    }
+
     return {
       vi_pham: await khoBanGhi.layTheoId('vi_pham', id),
       hinh_thuc_xu_ly: hinhThuc,
@@ -167,4 +257,4 @@ async function duyetViPham(quanTri: NguoiDungDangNhap, id, duLieuNhap: unknown) 
   });
 }
 
-export { danhGiaDonHang, docThongBao, taoViPham, duyetViPham };
+export { danhGiaDonHang, baoCaoSanPham, docThongBao, taoViPham, duyetViPham };

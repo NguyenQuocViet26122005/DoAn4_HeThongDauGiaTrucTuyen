@@ -525,6 +525,11 @@ function danhSach(nguoiDung: NguoiDungDangNhap, truyVan: TruyVanDanhSach = {}, p
   if (phamVi === 'mine') {
     boLoc.sellerId = nguoiDung.id;
   }
+  if (truyVan.san_pham_id !== undefined) {
+    baoDam(phamVi === 'mine', 400, 'Bộ lọc này chỉ dùng cho sản phẩm của tôi');
+
+    boLoc.productId = kiemTra.id(truyVan.san_pham_id);
+  }
   if (truyVan.du_dieu_kien_dau_gia !== undefined) {
     baoDam(phamVi === 'mine', 400, 'Bộ lọc này chỉ dùng cho sản phẩm của tôi');
 
@@ -541,6 +546,8 @@ function danhSach(nguoiDung: NguoiDungDangNhap, truyVan: TruyVanDanhSach = {}, p
   return khoDuLieu.danhSachSanPham(kiemTra.phanTrang(truyVan), boLoc);
 }
 
+const sanPhamDuocTaoPhien = (id) => khoDuLieu.sanPhamDuocTaoPhien(kiemTra.id(id));
+
 export {
   luuDanhMuc,
   luuThuocTinh,
@@ -553,5 +560,6 @@ export {
   themAnh,
   chonAnhChinh,
   xoaAnh,
+  sanPhamDuocTaoPhien,
   danhSach,
 };

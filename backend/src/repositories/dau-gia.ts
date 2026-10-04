@@ -35,11 +35,6 @@ const nguoiTheoDoi = (id) =>
     'SELECT nguoi_dung_id FROM tham_gia_phien WHERE phien_dau_gia_id=? AND dang_theo_doi=1',
     [id],
   );
-const phienDaCoCuaSanPham = (id) =>
-  coSoDuLieu.layMot(
-    `SELECT id FROM phien_dau_gia WHERE san_pham_id=? AND trang_thai IN ('DA_LEN_LICH','HOAT_DONG','DA_KET_THUC') LIMIT 1`,
-    [id],
-  );
 const yeuCauHuyDangCho = (id) =>
   coSoDuLieu.layMot(
     "SELECT id FROM yeu_cau_xu_ly WHERE loai_yeu_cau='HUY_PHIEN' AND phien_dau_gia_id=? AND trang_thai IN ('CHO_XU_LY','DANG_XU_LY') LIMIT 1",
@@ -149,7 +144,6 @@ export {
   lichSu,
   nguoiThamGia,
   nguoiTheoDoi,
-  phienDaCoCuaSanPham,
   yeuCauHuyDangCho,
   yeuCauHuyMoiNhat,
   danhSach,

@@ -9,6 +9,33 @@ const danhSachDanhMuc = (tatCa = false) =>
     `SELECT * FROM danh_muc ${tatCa ? '' : 'WHERE dang_hoat_dong=1'} ORDER BY thu_tu,id`,
   );
 
+const dieuKienDuocTaoPhien = (maBang = 'p') => `
+  NOT EXISTS (
+    SELECT 1 FROM phien_dau_gia a
+    WHERE a.san_pham_id=${maBang}.id AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG')
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM phien_dau_gia a
+    WHERE a.san_pham_id=${maBang}.id
+      AND a.trang_thai IN ('DA_KET_THUC','THAT_BAI')
+      AND a.ly_do_ket_thuc IN ('CO_NGUOI_THANG','MUA_NGAY')
+      AND NOT EXISTS (SELECT 1 FROM don_hang d WHERE d.phien_dau_gia_id=a.id)
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM phien_dau_gia a
+    JOIN don_hang d ON d.phien_dau_gia_id=a.id
+    WHERE a.san_pham_id=${maBang}.id
+      AND (d.trang_thai<>'DA_HUY' OR COALESCE(d.ly_do_huy,'')<>'KHONG_THANH_TOAN')
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM phien_dau_gia a
+    JOIN de_nghi_mua_tiep_theo n ON n.phien_dau_gia_id=a.id
+    WHERE a.san_pham_id=${maBang}.id AND n.trang_thai IN ('CHO_XU_LY','DA_CHAP_NHAN')
+  )`;
+
+const sanPhamDuocTaoPhien = (id) =>
+  coSoDuLieu.layMot(`SELECT p.id FROM san_pham p WHERE p.id=? AND ${dieuKienDuocTaoPhien()}`, [id]);
+
 async function danhSachThuocTinh(id) {
   const dm = batBuocTonTai(await khoBanGhi.layTheoId('danh_muc', id));
 
@@ -114,7 +141,7 @@ const sanPhamDaCoPhien = (id) =>
 
 function danhSachSanPham(
   { limit, offset }: PhanTrang,
-  { sellerId, status, categoryId, search = '', duDieuKienDauGia = false }: BoLocDanhSach,
+  { sellerId, status, categoryId, search = '', duDieuKienDauGia = false, productId }: BoLocDanhSach,
 ) {
   const dk = ['p.tieu_de LIKE ?'],
     ts: unknown[] = [`%${search}%`];
@@ -122,6 +149,10 @@ function danhSachSanPham(
   if (sellerId) {
     dk.push('p.nguoi_ban_id=?');
     ts.push(sellerId);
+  }
+  if (productId) {
+    dk.push('p.id=?');
+    ts.push(productId);
   }
   if (status) {
     dk.push('p.trang_thai_duyet=?');
@@ -135,8 +166,7 @@ function danhSachSanPham(
   if (duDieuKienDauGia) {
     dk.push(
       "p.trang_thai_duyet='DA_DUYET'",
-      `NOT EXISTS (SELECT 1 FROM phien_dau_gia a WHERE a.san_pham_id=p.id
-        AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG','DA_KET_THUC'))`,
+      dieuKienDuocTaoPhien(),
       `(p.bat_buoc_kiem_dinh=0 OR EXISTS (
         SELECT 1 FROM kiem_dinh_san_pham k WHERE k.san_pham_id=p.id
           AND k.lan_kiem_dinh=(SELECT MAX(m.lan_kiem_dinh) FROM kiem_dinh_san_pham m WHERE m.san_pham_id=p.id)
@@ -150,6 +180,12 @@ function danhSachSanPham(
   return coSoDuLieu.truyVan(
     `SELECT p.id,p.nguoi_ban_id,p.danh_muc_id,p.tieu_de,p.duong_dan,
     p.tinh_trang_san_pham,p.thuong_hieu,p.trang_thai_duyet,p.ngay_tao,
+    ${
+      sellerId
+        ? `(${dieuKienDuocTaoPhien()}) AS co_the_tao_phien,
+      EXISTS (SELECT 1 FROM phien_dau_gia cu WHERE cu.san_pham_id=p.id) AS da_tung_dau_gia,`
+        : ''
+    }
     (SELECT h.duong_dan_tep FROM tep_dinh_kem h WHERE h.loai_tep='ANH_SAN_PHAM' AND h.san_pham_id=p.id
      ORDER BY h.la_anh_chinh DESC,h.thu_tu,h.id LIMIT 1) AS anh_chinh
     FROM san_pham p WHERE ${dk.join(' AND ')} ORDER BY p.id DESC LIMIT ${limit} OFFSET ${offset}`,
@@ -175,6 +211,7 @@ export {
   cacGiaTri,
   thayGiaTriThuocTinh,
   sanPhamDaCoPhien,
+  sanPhamDuocTaoPhien,
   danhSachSanPham,
   boAnhChinh,
   thuocTinhDaDung,

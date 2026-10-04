@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Alert, App, Button, Descriptions, Form, Input, InputNumber, Modal } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import ChonSanPhamPhien from '../components/chon-san-pham-phien';
 import QuyenNguoiBan from '../components/quyen-nguoi-ban';
 import { TieuDe } from '../components/dung-chung';
@@ -169,6 +169,8 @@ function TruongGiaVaThoiGian() {
 
 function BieuMauPhien() {
   const dieuHuong = useNavigate();
+  const [thamSo] = useSearchParams();
+  const sanPhamIdUuTien = thamSo.get('san_pham_id') || undefined;
   const { message } = App.useApp();
   const [bieuMau] = Form.useForm<BieuMauTaoPhien>();
   const [sanPham, datSanPham] = useState<SanPhamTrongDanhSach>();
@@ -176,6 +178,7 @@ function BieuMauPhien() {
   const [dangTao, datDangTao] = useState(false);
   const [loi, datLoi] = useState('');
   const [banDau] = useState(() => ({
+    san_pham_id: sanPhamIdUuTien,
     phi_van_chuyen: 0,
     thoi_gian_bat_dau: ngayNhapVietNam(Date.now() + 15 * 60000),
     thoi_gian_ket_thuc: ngayNhapVietNam(Date.now() + 24 * 3600000),
@@ -231,7 +234,11 @@ function BieuMauPhien() {
                 name="san_pham_id"
                 rules={[{ required: true, message: 'Chọn một sản phẩm để tạo phiên' }]}
               >
-                <ChonSanPhamPhien onChon={datSanPham} disabled={dangTao} />
+                <ChonSanPhamPhien
+                  onChon={datSanPham}
+                  disabled={dangTao}
+                  sanPhamIdUuTien={sanPhamIdUuTien}
+                />
               </Form.Item>
             </section>
             <TruongGiaVaThoiGian />

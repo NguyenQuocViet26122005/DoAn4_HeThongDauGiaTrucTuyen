@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Input } from 'antd';
 import { Link } from 'react-router-dom';
 import { AnhSanPham, ChoDuLieu, PhanTrang } from './dung-chung';
@@ -10,26 +10,39 @@ export default function ChonSanPhamPhien({
   onChange,
   onChon,
   disabled,
+  sanPhamIdUuTien,
 }: {
   value?: string;
   onChange?: (id: string) => void;
   onChon: (sanPham: SanPhamTrongDanhSach) => void;
   disabled: boolean;
+  sanPhamIdUuTien?: string;
 }) {
   const [tuKhoa, datTuKhoa] = useState('');
   const [trang, datTrang] = useState(1);
+  const [idLocUuTien, datIdLocUuTien] = useState(sanPhamIdUuTien);
   const sanPham = useDuLieu<SanPhamTrongDanhSach[]>('/products/mine', {
     du_dieu_kien_dau_gia: '1',
+    ...(idLocUuTien ? { san_pham_id: idLocUuTien } : {}),
     q: tuKhoa,
     page: trang,
     limit: 6,
   });
 
+  useEffect(() => {
+    const mucUuTien = sanPham.data?.find((muc) => String(muc.id) === sanPhamIdUuTien);
+
+    if (mucUuTien) {
+      onChange?.(String(mucUuTien.id));
+      onChon(mucUuTien);
+    }
+  }, [sanPham.data, sanPhamIdUuTien, onChange, onChon]);
+
   return (
     <div className="chon-san-pham-phien">
       <p className="chu-mo">
-        Chỉ hiển thị sản phẩm đã duyệt, đủ điều kiện kiểm định và chưa có phiên đang chờ, đang chạy
-        hoặc đã bán.
+        Chỉ hiển thị sản phẩm đã duyệt, đủ điều kiện kiểm định, không còn phiên/đơn đang xử lý và
+        không có Cơ hội mua tiếp đang chờ.
       </p>
       <Input.Search
         aria-label="Tìm sản phẩm đủ điều kiện"
@@ -56,6 +69,7 @@ export default function ChonSanPhamPhien({
               aria-pressed={String(value) === String(muc.id)}
               disabled={disabled}
               onClick={() => {
+                datIdLocUuTien(undefined);
                 onChange?.(String(muc.id));
                 onChon(muc);
               }}
@@ -63,7 +77,12 @@ export default function ChonSanPhamPhien({
               <AnhSanPham src={muc.anh_chinh} ten={muc.tieu_de} />
               <span>
                 <small>
-                  #{muc.id} · {String(value) === String(muc.id) ? 'Đã chọn' : 'Chọn sản phẩm'}
+                  #{muc.id} ·{' '}
+                  {String(value) === String(muc.id)
+                    ? 'Đã chọn'
+                    : Number(muc.da_tung_dau_gia)
+                      ? 'Đăng lại'
+                      : 'Chọn sản phẩm'}
                 </small>
                 <strong>{muc.tieu_de}</strong>
               </span>

@@ -63,10 +63,50 @@ const danhDauDaDoc = (nguoiDungId, id) =>
     `UPDATE thong_bao SET da_doc=1,ngay_doc=COALESCE(ngay_doc,NOW()) WHERE nguoi_dung_id=?${id ? ' AND id=?' : ''}`,
     id ? [nguoiDungId, id] : [nguoiDungId],
   );
-const cacViPham = (nguoiDungId, { limit: gioiHan, offset: viTriBatDau }) =>
+
+function cacViPham(nguoiDungId, { limit: gioiHan, offset: viTriBatDau }, quanTri = false) {
+  if (quanTri) {
+    return coSoDuLieu.truyVan(
+      `SELECT v.*,p.tieu_de AS tieu_de_san_pham
+       FROM vi_pham v
+       LEFT JOIN phien_dau_gia a ON a.id=v.phien_dau_gia_id
+       LEFT JOIN san_pham p ON p.id=a.san_pham_id
+       ${nguoiDungId ? 'WHERE v.nguoi_dung_id=?' : ''}
+       ORDER BY v.id DESC LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
+      nguoiDungId ? [nguoiDungId] : [],
+    );
+  }
+
+  return coSoDuLieu.truyVan(
+    `SELECT v.id,v.nguoi_dung_id,v.phien_dau_gia_id,v.don_hang_id,v.loai_vi_pham,
+            v.mo_ta,v.diem_vi_pham,v.trang_thai,v.ngay_xac_nhan,v.hinh_thuc_xu_ly,
+            v.ly_do_xu_ly,v.ngay_xu_ly,v.ngay_tao,p.tieu_de AS tieu_de_san_pham
+     FROM vi_pham v
+     LEFT JOIN phien_dau_gia a ON a.id=v.phien_dau_gia_id
+     LEFT JOIN san_pham p ON p.id=a.san_pham_id
+     WHERE v.nguoi_dung_id=? ORDER BY v.id DESC LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
+    [nguoiDungId],
+  );
+}
+
+const daBaoCaoSanPham = (nguoiDungId, sanPhamId) =>
+  coSoDuLieu.layMot(
+    `SELECT v.id FROM vi_pham v
+     JOIN phien_dau_gia a ON a.id=v.phien_dau_gia_id
+     WHERE v.nguoi_tao_id=? AND a.san_pham_id=? AND v.mo_ta LIKE '[BAO CAO SAN PHAM]%'
+     LIMIT 1`,
+    [nguoiDungId, sanPhamId],
+  );
+const baoCaoSanPhamCuaNguoiDung = (nguoiDungId, { limit: gioiHan, offset: viTriBatDau }) =>
   coSoDuLieu.truyVan(
-    `SELECT * FROM vi_pham ${nguoiDungId ? 'WHERE nguoi_dung_id=?' : ''} ORDER BY id DESC LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
-    nguoiDungId ? [nguoiDungId] : [],
+    `SELECT v.id,v.phien_dau_gia_id,v.loai_vi_pham,v.mo_ta,v.trang_thai,
+            v.hinh_thuc_xu_ly,v.ly_do_xu_ly,v.ngay_tao,v.ngay_xu_ly,p.tieu_de AS tieu_de_san_pham
+     FROM vi_pham v
+     JOIN phien_dau_gia a ON a.id=v.phien_dau_gia_id
+     JOIN san_pham p ON p.id=a.san_pham_id
+     WHERE v.nguoi_tao_id=? AND v.mo_ta LIKE '[BAO CAO SAN PHAM]%'
+     ORDER BY v.id DESC LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
+    [nguoiDungId],
   );
 const diemViPham = (nguoiDungId) =>
   coSoDuLieu.layMot(
@@ -136,6 +176,8 @@ export {
   demChuaDoc,
   danhDauDaDoc,
   cacViPham,
+  daBaoCaoSanPham,
+  baoCaoSanPhamCuaNguoiDung,
   diemViPham,
   nhatKy,
   thongKe,
