@@ -16,7 +16,7 @@ Bản xuất `dist` cần máy chủ web trả `index.html` cho đường dẫn 
 
 - Trang chủ, khám phá với tìm kiếm/lọc/phân trang, xem chi tiết phiên/sản phẩm/kiểm định/lịch sử trả giá bằng API thật.
 - Đăng nhập, đăng ký, kiểm tra biểu mẫu, trạng thái chờ gửi, lỗi API, khôi phục phiên và chặn trang cần đăng nhập/Admin.
-- Hồ sơ chỉ xem, danh sách theo dõi và phiên đã tham gia.
+- Hồ sơ xem/sửa, danh sách theo dõi và phiên đã tham gia.
 - Trang hướng dẫn, trang không tìm thấy, bố cục người mua/người bán/Admin, menu màn hình nhỏ.
 - Bảng màu, kiểu chữ, biểu mẫu, skeleton, dữ liệu rỗng, lỗi và ảnh dự phòng thống nhất. Các trang phụ được tải khi mở.
 - Khu vực người bán `/nguoi-ban/san-pham`: tìm/lọc/phân trang, tạo/sửa bản nháp, thuộc tính động, nhiều ảnh thật, ảnh đại diện, bỏ ảnh và gửi duyệt. Người bán chưa xác minh/Admin không có thao tác đăng bán.
@@ -37,7 +37,7 @@ Bản xuất `dist` cần máy chủ web trả `index.html` cho đường dẫn 
 - `/nguoi-ban/phien/moi`: chọn sản phẩm đã duyệt, đủ kiểm định/lưu giữ và chưa có phiên trùng; nhập giá khởi điểm, giá sàn/Mua ngay tùy chọn, phí vận chuyển và thời gian. Giao diện kiểm tra thứ tự giá/lịch và có xác nhận trước khi tạo qua API thật.
 - Lịch nhập theo giờ Việt Nam (UTC+7); backend kiểm tra lại theo giờ MySQL. Chính sách cọc do Admin cấu hình, phiên chụp chính sách khi tạo; người bán không tự đặt tỷ lệ cọc.
 - `/nguoi-ban/phien/:id`: xem giá công khai, lịch, kết quả, phí và cọc; gửi yêu cầu hủy có lý do, xem trạng thái/phản hồi mới nhất sau tải lại. Gửi yêu cầu không dừng phiên ngay. Khi có yêu cầu chờ xét hoặc phiên đã hết hạn/kết thúc, nút gửi bị khóa.
-- Chưa sửa giá/lịch phiên đã tạo hoặc cập nhật realtime trên các trang này; có nút làm mới. API riêng không trả giá sàn hoặc mức tối đa của người tham gia.
+- Không sửa giá/lịch phiên đã tạo; chi tiết phiên nhận sự kiện Socket.IO và có nút làm mới. API riêng không trả giá sàn hoặc mức tối đa của người tham gia.
 
 ## Người mua tham gia phiên
 
@@ -46,7 +46,7 @@ Bản xuất `dist` cần máy chủ web trả `index.html` cho đường dẫn 
 - Mua ngay hiển thị tiền hàng, phí và cọc được trừ; không cần đặt cọc trước. Kết quả mô phỏng thất bại không tạo thông báo thành công. Người bán không mua phiên của mình; Admin không được thao tác mua.
 - Khi mất phản hồi thanh toán, chọn **Kiểm tra lần thanh toán trước** để dùng lại cùng mã, kể cả sau tải lại trang. Chỉ lưu mã yêu cầu và lựa chọn mô phỏng trong `sessionStorage`, tách theo tài khoản/phiên/loại, không tự gửi lại; đóng tab có thể mất mã đang chờ.
 - Sau Mua ngay thành công, mở `/tai-khoan/don-hang/:id` để xem đơn, số tiền và địa chỉ đã chụp. Các thao tác tiếp theo phụ thuộc trạng thái và quyền người mua.
-- Chi tiết và lịch sử giá làm mới mỗi 10 giây khi phiên còn lên lịch/hoạt động; có nút làm mới thủ công. Chưa nối Socket.IO.
+- Chi tiết và lịch sử giá làm mới mỗi 10 giây khi phiên còn lên lịch/hoạt động; có nút làm mới thủ công. Đã nối Socket.IO và giữ chu kỳ dự phòng.
 
 ## Đơn hàng của người mua
 
@@ -54,7 +54,7 @@ Bản xuất `dist` cần máy chủ web trả `index.html` cho đường dẫn 
 - Chi tiết đơn hiển thị tiền hàng/phí/cọc, đã thu/còn phải trả, đang giữ/hoàn/giải ngân, địa chỉ riêng của đơn, vận đơn, các hạn và lịch sử thanh toán.
 - Chờ thanh toán và còn hạn: người mua được chọn lại địa chỉ của đơn từ sổ địa chỉ; xác nhận thanh toán phần còn lại. Thất bại giữ nguyên tiền/hạn. Mất phản hồi giữ mã yêu cầu và cho phép lấy lại cùng kết quả sau tải lại.
 - Đã gửi hàng: **Tôi đã nhận hàng** chỉ bắt đầu kiểm tra, tiền vẫn giữ. **Hàng phù hợp — hoàn tất** giải ngân mô phỏng sau xác nhận riêng; bị khóa khi cần Admin, có tranh chấp, thiếu tiền hoặc sai trạng thái.
-- Backend luôn kiểm tra lại quyền và điều kiện. Người bán/Admin xem chi tiết qua API có quyền nhưng không có thao tác mua. Nút làm mới và tải lại sau thao tác phản ánh dữ liệu máy chủ; chưa nối realtime.
+- Backend luôn kiểm tra lại quyền và điều kiện. Người bán/Admin xem chi tiết qua API có quyền nhưng không có thao tác mua. Nút làm mới và tải lại sau thao tác phản ánh dữ liệu máy chủ; thông báo Socket.IO kích hoạt tải lại dữ liệu đang mở.
 
 ## Gửi hàng, tranh chấp, thông báo và xác minh
 
@@ -84,6 +84,10 @@ Chế độ `dev:local` thay máy chủ xem trước chỉ đọc trước đây
 
 ## Kiểm tra giao diện bằng dữ liệu riêng
 
+Ngày 04/10/2026 đã hoàn tất kiểm tra trình duyệt luồng xác minh: gửi giấy tờ, Admin duyệt và người dùng nhận trạng thái đã xác minh. Các ca từ chối có lý do, nộp lại, CCCD/hộ chiếu và xem tệp riêng đã kiểm tra trong đợt 03–04/10. Thông báo đã thử lọc chưa đọc, phân trang, đánh dấu một/tất cả và liên kết về đúng hồ sơ. Đánh dấu tất cả đưa về trang đầu; nút làm mới cập nhật cả số chưa đọc trên thanh điều hướng. Hai nhánh quyết định tranh chấp đã kiểm tra trên UI, tiền đang giữ về 0 đúng theo hoàn tiền hoặc giải ngân. Bố cục PC đã kiểm tra; các trang mới còn cần kiểm tra lại màn hình nhỏ vì công cụ viewport không đổi được kích thước trong phiên 04/10.
+
+Kiểm tra cuối đợt 04/10/2026: 11/11 kiểm thử frontend, build, lint, kiểm tra kiểu backend và định dạng đạt. Vite vẫn cảnh báo gói dùng chung khoảng 611 kB. Đã dừng hai máy chủ thử, xác nhận CSDL kiểm thử không còn tài khoản/phiên/đơn và dọn 12 ảnh mẫu của các phiên thử bị ngắt. CSDL chính vẫn có 21 bảng, không thay đổi cấu trúc. Backend cục bộ và frontend chính mở lại tại 5000/5173; tác vụ nền tắt.
+
 Sau `npm run test:prepare` (chỉ khi CSDL kiểm thử chưa tồn tại), chạy `node scripts/kiem-thu-giao-dien.js` trong backend. Máy chủ thử dùng cổng 5001, có tài khoản Admin/người bán/người mua và hai sản phẩm chờ duyệt (có/không bắt buộc kiểm định). Tài khoản thử được in ở terminal; ảnh minh họa chỉ dùng kiểm thử, tệp nằm riêng trong `backend/uploads-kiem-thu`. Mở terminal frontend khác, đặt `$env:VITE_API_URL='http://127.0.0.1:5001/api'` rồi chạy `npm run dev -- --port 5174`. Dùng `http://localhost:5174` để không tác động dữ liệu chính. Nhấn Enter ở terminal backend để đóng và rollback dữ liệu, dọn ảnh thử; sau đó dừng Vite thử.
 
 Để thử luồng tạo phiên, thêm `--phien`: `node scripts/kiem-thu-giao-dien.js --phien`. Công cụ duyệt sẵn sản phẩm thử không bắt buộc kiểm định, vẫn giữ sản phẩm còn lại chờ xử lý. Phạm vi CSDL, cổng và cơ chế rollback giữ nguyên.
@@ -107,3 +111,9 @@ Kiểm tra ngày 03/10/2026: sáu kiểm thử frontend đạt. Trình duyệt �
 Kiểm tra cuối đợt 02/10/2026: formatter, kiểm tra kiểu, lint và build đạt; còn cảnh báo gói biểu tượng dùng chung khoảng 611 kB. Đã đóng máy chủ thử, kiểm tra không còn tài khoản/phiên/đơn thử và dọn hết ảnh trong `uploads-kiem-thu`. CSDL chính giữ 21 bảng; ứng dụng mở lại ở cổng 5000/5173, tác vụ nền tắt trong chế độ `dev:local`.
 
 Kiểm tra tổng cuối đợt ngày 01/10/2026: định dạng/kiểm tra kiểu/lint đạt; 18 kiểm thử cơ bản và 55 kiểm thử tích hợp đạt (bao phủ 104 API); bản build frontend thành công. Vite còn cảnh báo một gói dùng chung lớn hơn 500 kB, cần tối ưu dung lượng ở đợt hiệu năng. Đã dừng máy chủ thử, hoàn tác tài khoản/sản phẩm thử và dọn ảnh trong `backend/uploads-kiem-thu`. Máy chủ dùng CSDL chính chạy ở cổng 5000, giao diện ở 5173.
+
+## Chức năng bổ sung ngày 04/10/2026
+
+Đã nối API cho Cơ hội mua tiếp, đánh giá hai chiều, theo dõi/bỏ theo dõi, người dùng, vi phạm, danh mục/thuộc tính, duyệt hủy phiên, cấu hình thời hạn/cọc/bước giá, thống kê, nhật ký và quản lý cọc. Admin có trạng thái tác vụ tự động tại tổng quan. Chi tiết và điều kiện xem mục 3.1.4 trong tài liệu nghiệp vụ.
+
+Chủ đồ án yêu cầu tự kiểm thử từ đợt này: chưa nghiệm thu toàn bộ chức năng mới trên trình duyệt. Không coi trang đã nối API là đã kiểm thử đầy đủ. Chế độ dev:local tắt tác vụ, nên muốn chạy luồng mở/chốt phiên và quá hạn cần chạy backend ở chế độ có tác vụ theo hướng dẫn backend.
