@@ -637,6 +637,14 @@ async function theoDoi(nguoiDung: NguoiDungDangNhap, id, bat) {
     : khoDuLieu.boTheoDoi(nguoiDung.id, id).then(() => ({ dang_theo_doi: false }));
 }
 
+async function trangThaiTheoDoi(nguoiDung: NguoiDungDangNhap, id) {
+  batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id)));
+
+  const thamGia = await khoDuLieu.trangThaiTheoDoi(nguoiDung.id, id);
+
+  return { dang_theo_doi: Boolean(thamGia?.dang_theo_doi) };
+}
+
 async function nhacPhienSapKetThuc(id) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = await khoDuLieu.layTheoId(id, true);
@@ -682,6 +690,7 @@ export {
   chiTietCuaToi,
   lichSu,
   theoDoi,
+  trangThaiTheoDoi,
   nhacPhienSapKetThuc,
   kiemTraNguoiMua,
 };

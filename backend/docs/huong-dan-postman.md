@@ -1,6 +1,6 @@
 # Thử Backend bằng Postman
 
-Nếu muốn kiểm tra tự động trước khi dùng Postman, chạy `npm run test:api` trong `backend`. Hai bộ HTTP chạy trên cổng riêng, bao phủ 104 API, dùng tài khoản ngẫu nhiên rồi rollback và dọn tệp. Không cần khởi động server riêng hoặc lấy token thủ công. Dừng backend đang chạy tác vụ định kỳ trước khi chạy bộ tích hợp để tránh tiến trình khác cùng xử lý dữ liệu kiểm thử.
+Nếu muốn kiểm tra tự động trước khi dùng Postman, chạy `npm run test:api` trong `backend`. Hai bộ HTTP chạy trên cổng riêng, bao phủ 105 API, dùng tài khoản ngẫu nhiên rồi rollback và dọn tệp. Không cần khởi động server riêng hoặc lấy token thủ công. Dừng backend đang chạy tác vụ định kỳ trước khi chạy bộ tích hợp để tránh tiến trình khác cùng xử lý dữ liệu kiểm thử.
 
 Trong nhóm sản phẩm có yêu cầu **Chọn ảnh đại diện**. Sau khi tải và gắn ảnh, chọn đúng `sanPhamId` và `anhId` rồi gửi PATCH; phản hồi là danh sách ảnh với một ảnh chính. Sản phẩm chờ duyệt/đang kiểm định/đã có phiên không được đổi ảnh.
 

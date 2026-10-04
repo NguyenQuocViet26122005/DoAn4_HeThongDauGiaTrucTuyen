@@ -136,7 +136,14 @@ const danhSachYeuCauHuy = ({ limit: gioiHan, offset: viTriBatDau }) =>
      ORDER BY y.id DESC
      LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
   );
+const trangThaiTheoDoi = (nguoiDungId, phienId) =>
+  coSoDuLieu.layMot(
+    'SELECT dang_theo_doi FROM tham_gia_phien WHERE nguoi_dung_id=? AND phien_dau_gia_id=?',
+    [nguoiDungId, phienId],
+  );
+
 export {
+  trangThaiTheoDoi,
   layTheoId,
   cacMucToiDa,
   lichSu,

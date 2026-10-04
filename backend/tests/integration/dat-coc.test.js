@@ -285,6 +285,20 @@ kiemThu(
 
     const dn = await deNghi.tao(d.seller, don.id);
 
+    const chiTiet = await deNghi.chiTiet(d.b, dn.id);
+    const danhSach = await khoDon.cacDeNghi(d.seller, { limit: 10, offset: 0 });
+    const phien = await records.layTheoId('phien_dau_gia', id);
+
+    for (const hienThi of [chiTiet, danhSach[0]]) {
+      assert.equal(hienThi.phi_van_chuyen, phien.phi_van_chuyen);
+      assert.equal(String(hienThi.nguoi_ban_id), String(d.seller.id));
+      assert.ok(hienThi.tieu_de);
+      assert.equal('gia_toi_da' in hienThi, false);
+      assert.equal('gia_san' in hienThi, false);
+    }
+    await assert.rejects(deNghi.chiTiet(d.outsider, dn.id), { status: 403 });
+    assert.equal((await khoDon.cacDeNghi(d.outsider, { limit: 10, offset: 0 })).length, 0);
+
     assert.equal(dn.gia_de_nghi, (await khoDon.giaCongKhaiCuoi(id, d.b.id)).so_tien);
     await assert.rejects(deNghi.tao(d.seller, don.id), { status: 409 });
 

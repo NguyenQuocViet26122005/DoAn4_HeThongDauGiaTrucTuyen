@@ -148,7 +148,8 @@ const deNghiDangCho = (id) =>
   );
 const cacDeNghi = (nguoiDung, { limit: gioiHan, offset: viTriBatDau }) =>
   coSoDuLieu.truyVan(
-    `SELECT o.* FROM de_nghi_mua_tiep_theo o
+    `SELECT o.*, p.tieu_de, p.nguoi_ban_id, a.phi_van_chuyen
+     FROM de_nghi_mua_tiep_theo o
      JOIN phien_dau_gia a ON a.id=o.phien_dau_gia_id
      JOIN san_pham p ON p.id=a.san_pham_id
      WHERE o.nguoi_tra_gia_id=? OR p.nguoi_ban_id=?

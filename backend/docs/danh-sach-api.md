@@ -1,6 +1,6 @@
 # Danh sách API Backend
 
-Đã đối chiếu 104 cặp phương thức/đường dẫn với các tệp thật trong src/routes và ung-dung.ts. Bộ Postman có các biến thể đăng nhập, đặt giá và cấu hình để chạy từng kịch bản. Nghiệp vụ 3.0 dùng 21 bảng.
+Đã đối chiếu 105 cặp phương thức/đường dẫn với các tệp thật trong src/routes và ung-dung.ts. Bộ Postman có các biến thể đăng nhập, đặt giá và cấu hình để chạy từng kịch bản. Nghiệp vụ 3.0 dùng 21 bảng.
 
 Địa chỉ gốc: `http://localhost:5000/api`. `GET /` ngoài tiền tố `/api` trả thông tin máy chủ.
 
@@ -477,6 +477,10 @@ Quyền: Công khai.
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 
+### GET /watchlist/:id — Trạng thái theo dõi của tôi
+
+Quyền: đăng nhập. Trả `{ "dang_theo_doi": true }` hoặc `false` theo tài khoản trong token; không nhận ID người dùng từ client. Phiên không tồn tại trả 404. Không trả cam kết giá.
+
 ### POST /watchlist/:id — Theo dõi phiên
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
@@ -519,6 +523,8 @@ Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 ### GET /orders/:id — Chi tiết đơn và tiền đang giữ
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
+
+Chi tiết đơn bổ sung `danh_gia_cua_toi`: null nếu người đang xem chưa đánh giá, hoặc object gồm `id`, `so_sao`, `nhan_xet`, `ngay_tao`. Trường này chỉ được đọc sau kiểm tra quyền xem đơn.
 
 ### PATCH /orders/:id/address — Chọn địa chỉ trước thanh toán
 
@@ -584,6 +590,8 @@ Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 ### GET /second-chances/:id — Chi tiết đề nghị mua tiếp
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
+
+Danh sách và chi tiết đề nghị bổ sung `tieu_de`, `nguoi_ban_id`, `phi_van_chuyen` để hiển thị tổng cần thanh toán và phân biệt người gửi/nhận. Không trả giá sàn hoặc mức tối đa bí mật.
 
 ### POST /second-chances/:id/respond — Người nhận chấp nhận; đổi false để từ chối
 

@@ -59,7 +59,16 @@ module.exports = async function taoDonGiaoDien(duLieu) {
   ]) {
     const don = await taoDon(duLieu, duLieu.a, ten, true);
 
-    if (['CHO_GUI_HANG', 'TRUNG_TAM', 'DA_GUI_HANG', 'CAN_ADMIN', 'TRANH_CHAP', 'TRANH_CHAP_GIAI_NGAN'].includes(trangThai)) {
+    if (
+      [
+        'CHO_GUI_HANG',
+        'TRUNG_TAM',
+        'DA_GUI_HANG',
+        'CAN_ADMIN',
+        'TRANH_CHAP',
+        'TRANH_CHAP_GIAI_NGAN',
+      ].includes(trangThai)
+    ) {
       await donHang.thanhToan(duLieu.a, don.id, {});
     }
     if (trangThai === 'TRUNG_TAM') {
@@ -100,10 +109,12 @@ module.exports = async function taoDonGiaoDien(duLieu) {
     }
     if (trangThai.startsWith('TRANH_CHAP')) {
       await donHang.xacNhanDaGiao(duLieu.a, don.id);
+
       const hoSo = await require('../dist/services/tranh-chap').mo(duLieu.a, don.id, {
         ly_do: 'THIEU_PHU_KIEN',
         mo_ta: 'Hồ sơ riêng để kiểm thử quyết định hoàn tiền hoặc giải ngân.',
       });
+
       console.log(`Hồ sơ ${trangThai}: http://localhost:5174/quan-tri/tranh-chap/${hoSo.id}`);
     }
     if (trangThai === 'HET_HAN') {

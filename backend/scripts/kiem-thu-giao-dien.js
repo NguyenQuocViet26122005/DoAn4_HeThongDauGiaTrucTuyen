@@ -139,13 +139,19 @@ async function chay() {
       await require('./du-lieu-don-giao-dien')(duLieu);
     }
 
+    if (process.argv.includes('--de-nghi')) {
+      await require('./du-lieu-de-nghi-giao-dien')(duLieu);
+    }
+
     const ungDung = require('../dist/ung-dung');
     let daGiaLapMatPhanHoi = false;
     const mayChu = http.createServer((yeuCau, phanHoi) => {
       if (
         process.argv.includes('--mat-phan-hoi') &&
         yeuCau.method === 'POST' &&
-        (yeuCau.url.endsWith('/buy-now') || yeuCau.url.endsWith('/payments/simulate'))
+        (yeuCau.url.endsWith('/buy-now') ||
+          yeuCau.url.endsWith('/payments/simulate') ||
+          /^\/api\/second-chances\/\d+\/respond$/.test(yeuCau.url))
       ) {
         const ketThuc = phanHoi.end;
 
@@ -170,6 +176,11 @@ async function chay() {
       ungDung(yeuCau, phanHoi);
     });
 
+    const io = new (require('socket.io').Server)(mayChu, {
+      cors: { origin: 'http://localhost:5174' },
+    });
+
+    require('../dist/sockets/ket-noi').khoiTao(io);
     await new Promise((xong) => mayChu.listen(5001, '127.0.0.1', xong));
     console.log(
       'API kiểm thử giao diện: http://127.0.0.1:5001; dữ liệu riêng sẽ rollback khi dừng.',
@@ -187,7 +198,7 @@ async function chay() {
       process.stdin.once('data', xong);
     });
     process.stdin.pause();
-    await new Promise((xong) => mayChu.close(xong));
+    await new Promise((xong) => io.close(xong));
   });
 }
 

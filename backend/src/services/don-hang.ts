@@ -4,6 +4,7 @@ import { randomUUID as taoMaNgauNhien } from 'node:crypto';
 import coSoDuLieu = require('../repositories/ket-noi');
 import khoBanGhi = require('../repositories/ban-ghi');
 import khoDuLieu = require('../repositories/don-hang');
+import cacTuongTac = require('../repositories/tuong-tac');
 import cacPhienDauGia = require('../repositories/dau-gia');
 import cacNguoiDung = require('../repositories/nguoi-dung');
 import cauHinhNghiepVu = require('./cau-hinh');
@@ -143,6 +144,7 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
     giu_tien: await khoDuLieu.tienTrungGian(id),
     van_chuyen: await khoDuLieu.vanChuyen(id),
     tranh_chap: await khoDuLieu.cacTranhChap(id),
+    danh_gia_cua_toi: await cacTuongTac.danhGiaCuaDon(id, nguoiDung.id),
     kiem_dinh: banGhi.kiem_dinh_san_pham_id
       ? await require('./kiem-dinh').chiTiet(nguoiDung, banGhi.kiem_dinh_san_pham_id)
       : null,

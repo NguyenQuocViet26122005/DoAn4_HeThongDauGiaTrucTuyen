@@ -111,7 +111,12 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
     'Không có quyền xem đề nghị',
   );
 
-  return banGhi;
+  return {
+    ...banGhi,
+    tieu_de: phienDauGia.tieu_de,
+    nguoi_ban_id: phienDauGia.nguoi_ban_id,
+    phi_van_chuyen: phienDauGia.phi_van_chuyen,
+  };
 }
 
 async function phanHoiDeNghi(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {

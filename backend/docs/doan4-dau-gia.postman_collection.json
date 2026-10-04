@@ -2195,6 +2195,31 @@
               }
             }
           ]
+        },
+        {
+          "name": "Trạng thái theo dõi của tôi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/watchlist/{{phienId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập; trả dang_theo_doi của tài khoản hiện tại, không trả cam kết giá."
+          },
+          "response": []
         }
       ]
     },

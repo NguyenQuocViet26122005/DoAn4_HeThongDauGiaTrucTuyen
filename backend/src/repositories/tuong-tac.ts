@@ -33,10 +33,10 @@ const cacTranhChap = (nguoiDung, { limit: gioiHan, offset: viTriBatDau }, quanTr
     quanTri ? [] : [nguoiDung.id, nguoiDung.id],
   );
 const danhGiaCuaDon = (donHangId, nguoiDungId) =>
-  coSoDuLieu.layMot('SELECT id FROM danh_gia WHERE don_hang_id=? AND nguoi_danh_gia_id=?', [
-    donHangId,
-    nguoiDungId,
-  ]);
+  coSoDuLieu.layMot(
+    'SELECT id, so_sao, nhan_xet, ngay_tao FROM danh_gia WHERE don_hang_id=? AND nguoi_danh_gia_id=?',
+    [donHangId, nguoiDungId],
+  );
 const cacDanhGia = (nguoiDungId, { limit: gioiHan, offset: viTriBatDau }) =>
   coSoDuLieu.truyVan(
     `SELECT d.id, d.don_hang_id, d.nguoi_danh_gia_id, d.nguoi_duoc_danh_gia_id,

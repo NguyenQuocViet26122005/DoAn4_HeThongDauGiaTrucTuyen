@@ -38,7 +38,7 @@ async function cacRouteHienCo() {
 }
 
 kiemThu(
-  'HTTP: 88 API nền có kịch bản thành công và kiểm tra quyền; dữ liệu được rollback',
+  'HTTP: 89 API nền có kịch bản thành công và kiểm tra quyền; dữ liệu được rollback',
   async (boKiemThu) => {
     const cacRoute = await cacRouteHienCo();
     const daThanhCong = new Set();
@@ -544,12 +544,16 @@ kiemThu(
               await gui('GET', '/admin/auctions', 'admin');
               await gui('GET', '/bid-increments');
               await gui('POST', `/watchlist/${phien.id}`, 'a', {});
+              xacNhan.equal((await gui('GET', `/watchlist/${phien.id}`, 'a')).dang_theo_doi, true);
+              xacNhan.equal((await gui('GET', `/watchlist/${phien.id}`, 'b')).dang_theo_doi, false);
+              await gui('GET', `/watchlist/${phien.id}`, null, undefined, 401);
               xacNhan.ok(
                 (await gui('GET', '/watchlist', 'a')).some(
                   (x) => String(x.id) === String(phien.id),
                 ),
               );
               await gui('DELETE', `/watchlist/${phien.id}`, 'a');
+              xacNhan.equal((await gui('GET', `/watchlist/${phien.id}`, 'a')).dang_theo_doi, false);
 
               const phienHuy = await taoPhienMoi();
               const yc = await gui(
@@ -629,6 +633,18 @@ kiemThu(
               await gui('POST', `/orders/${don.id}/reviews`, 'b', { so_sao: 5 }, 201);
               await gui('POST', `/orders/${don.id}/reviews`, 'seller', { so_sao: 4 }, 201);
               await gui('POST', `/orders/${don.id}/reviews`, 'b', { so_sao: 5 }, 409);
+              xacNhan.equal(
+                (await gui('GET', `/orders/${don.id}`, 'b')).danh_gia_cua_toi.so_sao,
+                5,
+              );
+              xacNhan.equal(
+                (await gui('GET', `/orders/${don.id}`, 'seller')).danh_gia_cua_toi.so_sao,
+                4,
+              );
+              xacNhan.equal(
+                (await gui('GET', `/orders/${don.id}`, 'admin')).danh_gia_cua_toi,
+                null,
+              );
               xacNhan.ok((await gui('GET', `/users/${duLieu.seller.id}/reviews`)).length > 0);
             },
           );
