@@ -30,6 +30,13 @@ export default function TrangThongBao() {
   const [dangGui, datDangGui] = useState(false);
   const [loi, datLoi] = useState('');
 
+  function lamMoi() {
+    return boNho.invalidateQueries({
+      predicate: ({ queryKey }) =>
+        typeof queryKey[0] === 'string' && queryKey[0].startsWith('/notifications'),
+    });
+  }
+
   async function docThongBao(id?: string) {
     if (dangGui) {
       return;
@@ -38,10 +45,11 @@ export default function TrangThongBao() {
     datLoi('');
     try {
       await gui(id ? `/notifications/${id}/read` : '/notifications/read-all', {}, 'patch');
-      await boNho.invalidateQueries({
-        predicate: ({ queryKey }) =>
-          typeof queryKey[0] === 'string' && queryKey[0].startsWith('/notifications'),
-      });
+      await lamMoi();
+
+      if (!id) {
+        datThamSo(chuaDoc ? { unread: 'true' } : {});
+      }
     } catch (loiGui) {
       datLoi(loiDeDoc(loiGui));
     } finally {
@@ -66,12 +74,22 @@ export default function TrangThongBao() {
           ]}
           onChange={(giaTri) => datThamSo(giaTri === 'chua-doc' ? { unread: 'true' } : {})}
         />
-        <Button onClick={() => void truyVan.refetch()} loading={truyVan.isFetching}>
+        <Button onClick={() => void lamMoi()} loading={truyVan.isFetching}>
           Làm mới
         </Button>
       </div>
       {loi && <Alert type="error" title={loi} />}
-      <ChoDuLieu truyVan={truyVan} rong={truyVan.data?.length === 0}>
+      <ChoDuLieu
+        truyVan={truyVan}
+        rong={truyVan.data?.length === 0}
+        thongDiepRong={
+          trang > 1
+            ? 'Trang này không có thông báo. Bạn có thể quay về trang trước.'
+            : chuaDoc
+              ? 'Bạn đã đọc hết thông báo.'
+              : 'Bạn chưa có thông báo nào.'
+        }
+      >
         <div className="danh-sach-don">
           {truyVan.data?.map((muc) => {
             const lienKet = lienKetThongBao(muc.duong_dan_lien_ket, quanTri);

@@ -6,6 +6,8 @@ import type { DonHang } from '../types/don-hang';
 import { ngayGio, nhan, tien } from '../utils/dinh-dang';
 import ThaoTacDonHang from '../components/thao-tac-don-hang';
 import GiaoHangVaHoTro from '../components/giao-hang-va-ho-tro';
+import TaoDeNghiMuaTiep from '../components/tao-de-nghi-mua-tiep';
+import DanhGiaDon from '../components/danh-gia-don';
 import { lamMoiDon } from '../services/don-hang';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 
@@ -115,6 +117,8 @@ export default function BienNhanDon({ khuVuc = 'tai-khoan' }: { khuVuc?: string 
                 <ThaoTacDonHang key={`${don.id}:${nguoiDung?.id}`} don={don} />
               )}
               <GiaoHangVaHoTro key={`ho-tro:${don.id}:${nguoiDung?.id}`} don={don} />
+              <TaoDeNghiMuaTiep don={don} />
+              <DanhGiaDon don={don} />
             </div>
             <section className="tam-noi-dung thong-tin-don">
               <h2>Giao hàng và kiểm tra</h2>

@@ -5,6 +5,7 @@ import { BieuTuong } from './bieu-tuong';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { boNho } from '../services/api';
+import { useCapNhatThoiGianThuc } from '../hooks/cap-nhat-thoi-gian-thuc';
 
 export function ThuongHieu() {
   return (
@@ -20,6 +21,8 @@ export function ThuongHieu() {
 }
 
 export default function KhungTrang() {
+  useCapNhatThoiGianThuc();
+
   const { nguoiDung, dangXuat } = usePhienDangNhap();
   const [mo, datMo] = useState(false);
   const diDen = useNavigate();
@@ -27,6 +30,7 @@ export default function KhungTrang() {
     '/notifications/unread-count',
     undefined,
     !!nguoiDung,
+    30000,
   );
   const cacMuc = [
     {
@@ -217,6 +221,7 @@ const mucTaiKhoan = [
   ['thong-bao', 'chuong', 'Thông báo'],
   ['tranh-chap', 'khien', 'Hỗ trợ & tranh chấp'],
   ['vi-pham', 'thu', 'Vi phạm'],
+  ['danh-gia', 'nguoi', 'Đánh giá về tôi'],
   ['xac-minh', 'nguoi', 'Xác minh người bán'],
 ];
 const mucNguoiBan = [

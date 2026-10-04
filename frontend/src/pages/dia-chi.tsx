@@ -13,6 +13,7 @@ export default function SoDiaChi() {
   const { modal, message } = App.useApp();
   const [thamSo] = useSearchParams();
   const phienId = thamSo.get('phien');
+  const deNghiId = thamSo.get('de_nghi');
   const [dangSua, datDangSua] = useState<DiaChi | null>();
   const [dangLuu, datDangLuu] = useState(false);
   const [dangXoa, datDangXoa] = useState(false);
@@ -56,6 +57,11 @@ export default function SoDiaChi() {
           Thêm địa chỉ
         </Button>
       </TieuDe>
+      {deNghiId && /^[1-9]\d*$/.test(deNghiId) && (
+        <Link className="link-vang" to={`/tai-khoan/de-nghi/${deNghiId}`}>
+          ← Quay lại đề nghị mua tiếp
+        </Link>
+      )}
       {phienId && /^\d+$/.test(phienId) && (
         <Link className="link-vang" to={`/phien/${phienId}`}>
           ← Quay lại phiên đấu giá

@@ -453,6 +453,7 @@ export function TepRiengTu({ url, ten }: { url: string; ten: string }) {
 
           modal.info({
             title: ten,
+            okText: 'Đóng',
             width: 720,
             content:
               tep.data.type === 'application/pdf' ? (

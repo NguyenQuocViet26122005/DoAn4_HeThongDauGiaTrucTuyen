@@ -13,6 +13,19 @@ const SoDiaChi = lazy(() => import('../pages/dia-chi'));
 const BienNhanDon = lazy(() => import('../pages/bien-nhan-don'));
 const DonHangCuaToi = lazy(() => import('../pages/don-hang'));
 const ThongBao = lazy(() => import('../pages/thong-bao'));
+const DanhGiaNguoiDung = lazy(() => import('../pages/danh-gia'));
+const QuanLyNguoiDung = lazy(() => import('../pages/quan-ly-nguoi-dung'));
+const ViPhamTaiKhoan = lazy(() => import('../pages/vi-pham'));
+const TongQuanQuanTri = lazy(() => import('../pages/tong-quan-quan-tri'));
+const QuanLyDatCoc = lazy(() => import('../pages/quan-ly-dat-coc'));
+const NhatKyHoatDong = lazy(() => import('../pages/nhat-ky'));
+const QuanLyPhien = lazy(() => import('../pages/quan-ly-phien'));
+const CauHinhHeThong = lazy(() => import('../pages/cau-hinh'));
+const QuanLyDanhMuc = lazy(() => import('../pages/quan-ly-danh-muc'));
+const DeNghiMuaTiep = lazy(() => import('../pages/de-nghi-mua-tiep'));
+const ChiTietDeNghi = lazy(() =>
+  import('../pages/de-nghi-mua-tiep').then((muc) => ({ default: muc.ChiTietDeNghi })),
+);
 const XacMinh = lazy(() => import('../pages/xac-minh'));
 const DanhSachTranhChap = lazy(() => import('../pages/tranh-chap'));
 const ChiTietTranhChap = lazy(() => import('../pages/chi-tiet-tranh-chap'));
@@ -112,6 +125,7 @@ export default function DinhTuyen() {
             <Route index element={<TrangChu />} />
             <Route path="kham-pha" element={<KhamPha key={search} />} />
             <Route path="phien/:id" element={<ChiTietPhien />} />
+            <Route path="nguoi-dung/:id/danh-gia" element={<DanhGiaNguoiDung />} />
             <Route path="huong-dan" element={<HuongDan />} />
             <Route path="dang-nhap" element={<DangNhapDangKy key="dang-nhap" />} />
             <Route path="dang-ky" element={<DangNhapDangKy key="dang-ky" dangKy />} />
@@ -120,6 +134,10 @@ export default function DinhTuyen() {
                 <Route index element={<KhongGianNghiepVu loai="tai-khoan" />} />
                 <Route path="dia-chi" element={<SoDiaChi />} />
                 <Route path="thong-bao" element={<ThongBao />} />
+                <Route path="danh-gia" element={<DanhGiaNguoiDung />} />
+                <Route path="vi-pham" element={<ViPhamTaiKhoan />} />
+                <Route path="de-nghi" element={<DeNghiMuaTiep />} />
+                <Route path="de-nghi/:id" element={<ChiTietDeNghi />} />
                 <Route path="xac-minh" element={<XacMinh />} />
                 <Route path="don-hang/:id" element={<BienNhanDon />} />
                 <Route path="don-hang" element={<DonHangCuaToi />} />
@@ -144,7 +162,14 @@ export default function DinhTuyen() {
             </Route>
             <Route element={<BaoVeTrang quanTri />}>
               <Route path="quan-tri" element={<KhungLamViec loai="quan-tri" />}>
-                <Route index element={<KhongGianNghiepVu loai="quan-tri" />} />
+                <Route path="nguoi-dung" element={<QuanLyNguoiDung />} />
+                <Route path="vi-pham" element={<ViPhamTaiKhoan quanTri />} />
+                <Route index element={<TongQuanQuanTri />} />
+                <Route path="dat-coc" element={<QuanLyDatCoc />} />
+                <Route path="nhat-ky" element={<NhatKyHoatDong />} />
+                <Route path="phien" element={<QuanLyPhien />} />
+                <Route path="cau-hinh" element={<CauHinhHeThong />} />
+                <Route path="danh-muc" element={<QuanLyDanhMuc />} />
                 <Route path="san-pham" element={<DuyetSanPham />} />
                 <Route path="san-pham/:id" element={<ChiTietDuyetSanPham />} />
                 <Route path="kiem-dinh" element={<KiemDinh quanTri />} />

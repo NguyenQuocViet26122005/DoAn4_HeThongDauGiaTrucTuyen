@@ -1,4 +1,4 @@
-import { Alert, Descriptions, Result } from 'antd';
+import { Button, Descriptions, Result } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe } from '../components/dung-chung';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
@@ -9,6 +9,7 @@ import { ThePhien } from './kham-pha';
 import type { Phien } from '../types/du-lieu';
 import { useState } from 'react';
 import SuaHoSo from '../components/sua-ho-so';
+import TheoDoiPhien from '../components/theo-doi-phien';
 
 function DanhSachPhienCaNhan({ url }: { url: string }) {
   const [trang, datTrang] = useState(1);
@@ -16,10 +17,16 @@ function DanhSachPhienCaNhan({ url }: { url: string }) {
 
   return (
     <>
+      <Button loading={phien.isFetching} onClick={() => void phien.refetch()}>
+        Làm mới danh sách
+      </Button>
       <ChoDuLieu truyVan={phien} rong={phien.data?.length === 0}>
         <div className="luoi-phien">
           {phien.data?.map((p) => (
-            <ThePhien key={p.id} phien={p} />
+            <div key={p.id}>
+              <ThePhien phien={p} />
+              {url === '/watchlist' && <TheoDoiPhien id={p.id} />}
+            </div>
           ))}
         </div>
       </ChoDuLieu>
@@ -109,22 +116,11 @@ export default function KhongGianNghiepVu({ loai }: { loai: string }) {
           url={muc === 'theo-doi' ? '/watchlist' : '/auctions/my-bids'}
         />
       ) : (
-        <section className="tam-noi-dung">
-          <Alert
-            type="info"
-            showIcon
-            title="Giao diện chức năng đang được hoàn thiện"
-            description="Đây là phần bố cục và điều hướng. Các biểu mẫu xử lý nghiệp vụ của mục này sẽ được bổ sung ở bước tiếp theo."
-          />
-          <h2>Quy trình liên quan</h2>
-          <p>{thongTin[1]}</p>
-          {loai === 'nguoi-ban' && nguoiDung?.trang_thai_nguoi_ban !== 'DA_XAC_MINH' && (
-            <p>Bạn cần được Admin xác minh trước khi thực hiện thao tác bán hàng.</p>
-          )}
-          <Link className="link-vang" to={`/huong-dan${loai === 'nguoi-ban' ? '#nguoi-ban' : ''}`}>
-            Xem hướng dẫn giao dịch ↗
-          </Link>
-        </section>
+        <Result
+          status="404"
+          title="Không tìm thấy trang"
+          extra={<Link to={`/${loai}`}>Về tổng quan</Link>}
+        />
       )}
     </>
   );

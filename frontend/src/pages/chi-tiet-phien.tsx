@@ -13,6 +13,7 @@ import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import { ngayGio, nhan, tien } from '../utils/dinh-dang';
 import type { Phien, SanPham } from '../types/du-lieu';
 import ThamGiaPhien from '../components/tham-gia-phien';
+import TheoDoiPhien from '../components/theo-doi-phien';
 import { doc } from '../services/api';
 import { lamMoiThamGia } from '../services/tham-gia-phien';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
@@ -75,6 +76,10 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
           <span className="nhan-nho">PHIÊN #{phien.id}</span>
           <h1>{phien.tieu_de}</h1>
           <TrangThaiPhien phien={phien} />
+          <TheoDoiPhien key={`${phien.id}:${nguoiDung?.id}`} id={phien.id} />
+          <p>
+            <Link to={`/nguoi-dung/${phien.nguoi_ban_id}/danh-gia`}>Xem đánh giá về người bán</Link>
+          </p>
           <div className="gia-chi-tiet">
             <span>Giá trả công khai hiện tại</span>
             <strong>{tien(phien.gia_hien_tai)}</strong>

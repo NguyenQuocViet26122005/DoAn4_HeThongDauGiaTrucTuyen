@@ -33,4 +33,10 @@ export interface DonHang extends DonMua {
   ly_do_huy: string | null;
   thanh_toan: ThanhToanDon[];
   tranh_chap: { id: string; trang_thai: string }[];
+  danh_gia_cua_toi?: {
+    id: string;
+    so_sao: number;
+    nhan_xet: string | null;
+    ngay_tao: string;
+  } | null;
 }

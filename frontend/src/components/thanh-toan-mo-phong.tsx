@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import axios from 'axios';
 import { Alert, Button, Modal, Radio } from 'antd';
 import { gui, loiDeDoc } from '../services/api';
 import { thanhToanDon } from '../services/don-hang';
+import { chapNhanDeNghi } from '../services/de-nghi-mua-tiep';
 import { docLanThanhToan, luuLanThanhToan, tenLanThanhToan } from '../services/lan-thanh-toan';
 import type { KetQuaThanhToan, LanThanhToan } from '../types/tham-gia-phien';
 
@@ -15,14 +16,16 @@ export default function ThanhToanMoPhong({
   khoa,
   children,
   daXuLy,
+  onLanCho,
 }: {
   nguoiDungId: string;
   doiTuongId: string;
-  loai: 'coc' | 'mua-ngay' | 'don-hang';
+  loai: 'coc' | 'mua-ngay' | 'don-hang' | 'de-nghi';
   ten: string;
   khoa: boolean;
   children: ReactNode;
   daXuLy: (ketQua: KetQuaThanhToan) => void;
+  onLanCho?: (dangCho: boolean) => void;
 }) {
   const tenLuu = tenLanThanhToan(nguoiDungId, doiTuongId, loai);
   const [banDau] = useState(() => {
@@ -38,6 +41,10 @@ export default function ThanhToanMoPhong({
   const [loi, datLoi] = useState(banDau.loi);
   const [ketQua, datKetQua] = useState<LanThanhToan['ket_qua_mo_phong']>('THANH_CONG');
   const dangXuLy = useRef(false);
+
+  useEffect(() => {
+    onLanCho?.(!!lan || !!banDau.loi);
+  }, [lan, banDau.loi, onLanCho]);
 
   async function thanhToan() {
     if (dangXuLy.current || (!lan && khoa) || banDau.loi) {
@@ -58,7 +65,9 @@ export default function ThanhToanMoPhong({
       const phanHoi =
         loai === 'don-hang'
           ? await thanhToanDon(doiTuongId, lanGui)
-          : await gui<KetQuaThanhToan>(`/auctions/${doiTuongId}/${duongDan}`, lanGui);
+          : loai === 'de-nghi'
+            ? await chapNhanDeNghi(doiTuongId, lanGui)
+            : await gui<KetQuaThanhToan>(`/auctions/${doiTuongId}/${duongDan}`, lanGui);
 
       sessionStorage.removeItem(tenLuu);
       datLan(null);

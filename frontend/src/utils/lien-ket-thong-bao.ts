@@ -24,9 +24,10 @@ export function lienKetThongBao(giaTri: string | null, quanTri = false): string 
     disputes: `${goc}/tranh-chap`,
     inspections: `${quanTri ? '/quan-tri' : '/nguoi-ban'}/kiem-dinh`,
     products: `${quanTri ? '/quan-tri' : '/nguoi-ban'}/san-pham`,
+    'second-chances': '/tai-khoan/de-nghi',
   };
 
-  return loai === 'second-chances' ? '/tai-khoan/de-nghi' : `${cacGoc[loai]}/${id}`;
+  return `${cacGoc[loai]}/${id}`;
 }
 
 export function noiDungThongBao(giaTri: string) {

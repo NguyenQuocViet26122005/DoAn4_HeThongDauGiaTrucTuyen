@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import { Alert, Button, Form, Modal } from 'antd';
 import { loiDeDoc } from '../services/api';
 
@@ -18,6 +18,7 @@ export default function BieuMauThaoTac<T extends object>({
   khoa?: boolean;
 }) {
   const [bieuMau] = Form.useForm<T>();
+  const maBieuMau = useId();
   const [mo, datMo] = useState(false);
   const [duLieu, datDuLieu] = useState<T>();
   const [dangGui, datDangGui] = useState(false);
@@ -84,6 +85,7 @@ export default function BieuMauThaoTac<T extends object>({
       >
         <div hidden={!!duLieu}>
           <Form
+            name={maBieuMau}
             form={bieuMau}
             layout="vertical"
             initialValues={banDau}
