@@ -1,0 +1,23 @@
+---
+description: Quy tắc trình bày code dễ đọc cho toàn bộ dự án đấu giá
+alwaysApply: true
+---
+
+# Code dễ đọc
+
+- Lấy `TAI-LIEU-NGHIEP-VU-VA-CONG-NGHE.md` làm đặc tả chính. Bám sát nghiệp vụ đã chốt; khi bổ sung hoặc thay đổi nghiệp vụ, cập nhật tài liệu cùng code, hợp đồng API và kiểm thử liên quan.
+- Tên website là VietBid; giao diện tiếng Việt, đen–vàng, ưu tiên web PC. Ghi rõ phần đã triển khai và phần còn là bố cục trong tài liệu, không dùng số liệu/giao dịch giả để trình bày như dữ liệu thật.
+- Áp dụng cho code do dự án quản lý: backend, frontend, kiểm thử và công cụ CSDL; bỏ qua thư viện, tệp build và bản sao dữ liệu.
+- Giữ cách đặt tên tiếng Việt và cấu trúc hiện có. Không tạo mobile/admin-web chỉ vì tài liệu mẫu của dự án khác có các ứng dụng này.
+- Backend TypeScript + Zod; controller ngắn, nghiệp vụ trong service, truy vấn trong repository; giữ transaction ở lớp xử lý nghiệp vụ.
+- Frontend React/Vite/TypeScript; tách hiển thị, gọi API và logic dùng lại theo thư mục hiện có.
+- Dùng cấu hình Prettier chung, thụt lề 2 khoảng trắng; không viết nhiều câu lệnh trên một dòng.
+- Luôn có ngoặc nhọn cho if và else; else-if được viết thành chuỗi điều kiện rõ ràng.
+- Xuống dòng điều kiện dài, lời gọi nhiều tham số, object nhiều thuộc tính và JSX nhiều phần tử.
+- Chèn dòng trống khi chuyển bước: lấy dữ liệu → kiểm tra quyền/điều kiện → cập nhật → nhật ký/thông báo → trả kết quả.
+- Tách đoạn có nhiệm vụ riêng hoặc điều kiện phức tạp thành hàm có tên rõ nghĩa; không tách vụn chỉ để giảm số dòng.
+- Comment giải thích quy tắc nghiệp vụ hoặc lý do xử lý, không nhắc lại câu lệnh.
+- Khi chỉnh trình bày, giữ hành vi, thứ tự side effect, thứ tự khóa và phạm vi transaction.
+- Chạy formatter và kiểm tra định dạng ở gốc dự án; kiểm tra kiểu/build và test phù hợp khi sửa chức năng.
+- Không đọc/hiển thị bí mật trong `.env`; dùng cấu hình runtime, SQL có tham số và dữ liệu kiểm thử riêng.
+- Thay đổi schema qua công cụ migration có sao lưu/đối chiếu; không tự tạo thêm hoặc xóa dữ liệu chính.
