@@ -80,7 +80,7 @@ Bộ lập lịch chạy mỗi 60 giây, mỗi nhóm lấy tối đa 100 bản g
 
 `GET /api/admin/jobs` trả trạng thái bật/tắt, đang chạy, thời gian gần nhất và số bản ghi xử lý/thất bại. Lỗi từng bản ghi được ghi bằng ID/mã lỗi để các bản ghi khác vẫn được xử lý.
 
-Các giới hạn còn lại: giao hàng được cập nhật thủ công, không có theo dõi vận đơn thật; chưa có xử lý rút giá đặc biệt bởi Admin; chưa có quy trình đăng bán lại sau khi tất cả Second Chance thất bại; chưa có dọn tệp upload không được gắn vào dữ liệu. Giới hạn request và bộ lập lịch ở trong tiến trình; Socket.IO chưa có adapter chia sẻ giữa nhiều máy chủ. Đây là các phần mở rộng vận hành, cần triển khai riêng khi mở rộng phạm vi.
+Các giới hạn còn lại: giao hàng được cập nhật thủ công, không có theo dõi vận đơn thật; chưa có xử lý rút giá đặc biệt bởi Admin; chưa có dọn tệp upload không được gắn vào dữ liệu. Người bán đã có thể đăng lại sản phẩm sau phiên không có người thắng hoặc đơn không thanh toán khi mọi Cơ hội mua tiếp đã bị từ chối/hết hạn; backend kiểm tra lại điều kiện lúc tạo phiên. Giới hạn request và bộ lập lịch ở trong tiến trình; Socket.IO chưa có adapter chia sẻ giữa nhiều máy chủ. Đây là các phần mở rộng vận hành, cần triển khai riêng khi mở rộng phạm vi.
 
 ## Kiểm định và cọc — phiên bản 3.0
 

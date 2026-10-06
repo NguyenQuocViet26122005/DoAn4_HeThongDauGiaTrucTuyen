@@ -88,7 +88,7 @@ Lệnh `npm run format` từ gốc, backend hoặc frontend đều dùng cùng c
 
 ## Các giới hạn cần biết
 
-Thanh toán và giải ngân là mô phỏng; phí vận chuyển cố định được công bố từ phiên và chụp sang đơn. Chưa tích hợp đơn vị vận chuyển, cổng thanh toán thật, email/SMS, khôi phục mật khẩu hoặc refresh token. Frontend đã có trang công khai, đăng nhập/đăng ký, quản lý sản phẩm người bán, Admin duyệt sản phẩm, luồng kiểm định và người bán tạo/quản lý phiên, gửi yêu cầu hủy. Các màn hình tài khoản bổ sung, Admin xét yêu cầu hủy và giao dịch trên web còn phải hoàn thiện theo tài liệu nghiệp vụ.
+Thanh toán và giải ngân là mô phỏng; phí vận chuyển cố định được công bố từ phiên và chụp sang đơn. Chưa tích hợp đơn vị vận chuyển, cổng thanh toán thật, email/SMS, khôi phục mật khẩu hoặc refresh token. Frontend đã có các luồng công khai, tài khoản, người bán và Admin theo API, gồm báo cáo sản phẩm và đăng lại có điều kiện. Các luồng này vẫn cần được nghiệm thu đầy đủ trên trình duyệt; không xem build thành công là bằng chứng mọi nhánh nghiệp vụ đã hoạt động đúng.
 
 Tác vụ chạy mỗi 60 giây và bắt đầu sau chu kỳ đầu tiên, nên chuyển trạng thái hiển thị có thể chậm khoảng một phút. API đặt giá/thanh toán vẫn tự kiểm tra giờ và trạng thái khi nhận yêu cầu.
 

@@ -6,15 +6,17 @@
 
 Cập nhật giao diện người dùng, quản trị và kiểm tra luồng mua tiếp ngày 05/10/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
 
+Cập nhật danh mục ngày 06/10/2026: MySQL chính bật 10 danh mục hàng giá trị cao, ngừng hoạt động mềm 12 danh mục phổ thông cũ; API công khai lọc sản phẩm và phiên theo danh mục đang hoạt động. Giữ nguyên sản phẩm, phiên và giao dịch cũ để bảo toàn lịch sử; đồng bộ SQL khởi tạo và tài liệu nghiệp vụ. Đã đạt kiểm tra định dạng, kiểu backend và lint frontend; chưa chạy lại bộ test nghiệp vụ.
+
 Đây là đặc tả chính của project. Phiên bản này thay thế các mô tả cũ về phạm vi hàng phổ thông, đặt cọc ngoài phạm vi, Mua ngay tạo đơn chưa thanh toán và Second Chance thanh toán sau. Khi triển khai phải đồng bộ tài liệu, SQL, backend, hợp đồng API và kiểm thử.
 
-**Trạng thái triển khai:** SQL và backend dùng 21 bảng; CSDL chính không đổi trong đợt hoàn thiện giao diện. Bộ kiểm thử trước đợt này đạt 57/57 kiểm thử tích hợp, có kịch bản HTTP cho 105 API; frontend đạt build, lint và 13 kiểm thử. Ngày 05/10/2026 đã kiểm tra trên trình duyệt các nhánh chính của Cơ hội mua tiếp trong CSDL kiểm thử riêng. Toàn bộ giao diện chưa được nghiệm thu; chi tiết phạm vi kiểm tra nằm ở mục 3.1.4.
+**Trạng thái triển khai:** SQL và backend dùng 21 bảng; cấu trúc MySQL chính giữ nguyên, đã bổ sung dữ liệu demo và đồng bộ danh mục công khai. Sau khi bổ sung báo cáo sản phẩm và đăng lại có điều kiện, kiểm thử backend đạt 57/57; bộ HTTP bao phủ 107/107 API và 45 phản hồi lỗi quyền/trạng thái có mã đúng; frontend đạt build, lint và 13 kiểm thử. Đã kiểm tra trên trình duyệt các nhánh chính của Cơ hội mua tiếp trong CSDL kiểm thử riêng; báo cáo sản phẩm và đăng lại chưa được nghiệm thu trực tiếp trên trình duyệt. Toàn bộ giao diện chưa được nghiệm thu; chi tiết phạm vi kiểm tra nằm ở mục 3.1.4.
 
 ## 1. Mục tiêu và phạm vi
 
 Xây dựng nền tảng đấu giá dành cho hàng hiếm, hàng sưu tầm và tài sản có giá trị cao. Hệ thống hỗ trợ xác minh danh tính người bán, kiểm định vật lý tại trung tâm, đấu giá tự động với mức tối đa bí mật, cọc tham gia, thanh toán mô phỏng và giữ tiền trung gian.
 
-Nhóm sản phẩm định hướng: đồ cổ/cổ vật, đồ sưu tầm, tranh/nghệ thuật, đồng hồ cao cấp, trang sức, hàng hiệu hiếm hoặc limited, xe cổ/đặc biệt, sách/bản thảo/tài liệu hiếm, kỷ vật và nhạc cụ vintage. Việc thuộc danh mục không tự chứng minh tính xác thực hoặc quyền sở hữu hàng hóa.
+VietBid chỉ phục vụ hàng hiếm, hàng sưu tầm và tài sản có giá trị cao: đồ cổ/cổ vật, tranh/tác phẩm nghệ thuật, đồng hồ cao cấp, trang sức/đá quý, hàng hiệu hiếm hoặc phiên bản giới hạn, xe cổ/phương tiện sưu tầm, sách/bản thảo/tài liệu lịch sử hiếm, kỷ vật, nhạc cụ vintage giá trị cao và máy ảnh cổ/thiết bị quang học sưu tầm. Không định hướng bán điện tử phổ thông, đồ gia dụng, thời trang đại trà hoặc hàng tiêu dùng thông thường. Việc thuộc danh mục không tự chứng minh tính xác thực hoặc quyền sở hữu; sản phẩm vẫn phải qua duyệt và chính sách kiểm định tương ứng.
 
 Bản đồ án mô phỏng tiền và vận chuyển. Không tích hợp cổng thanh toán thật, eKYC thật hoặc hãng vận chuyển thật; không có ví nội bộ, nạp/rút/chuyển số dư. Không xây quy trình trả hàng nhiều chặng trên website trong bản đầu. Việc gửi trả/tái kiểm định nếu cần được xử lý ngoài website; website lưu bằng chứng và quyết định cuối.
 
@@ -48,12 +50,14 @@ Các thư mục hiện có gồm `pages`, `components`, `services`, `socket`, `s
 
 ### 3.1.1. Phạm vi giao diện nền VietBid
 
-- Trang chủ: ảnh bìa, bốn phiên mới nhất từ API, danh mục, hướng dẫn ngắn và liên kết xác minh người bán.
-- Khám phá: tìm tên, lọc danh mục/trạng thái và phân trang theo hợp đồng API. Thứ tự hiện tại là phiên mới nhất trước; chưa đưa lên giao diện các kiểu sắp xếp chưa được backend hỗ trợ.
+- Trang chủ: ảnh bìa, phiên đang diễn ra và phiên sắp mở lấy riêng theo trạng thái từ API, đối chiếu cả thời gian bắt đầu/kết thúc trước khi đưa vào khu vực cơ hội hiện tại; danh mục thật, hướng dẫn ngắn và liên kết xác minh người bán. Không đưa phiên đã hết hạn vào hai nhóm này.
+- Khám phá: tìm tên, lọc danh mục/trạng thái và phân trang theo hợp đồng API. Thứ tự hiện tại là phiên mới nhất trước; chưa đưa lên giao diện các kiểu sắp xếp chưa được backend hỗ trợ. Thẻ và trang chi tiết đổi nhãn giá theo trạng thái để phân biệt giá khởi điểm, giá công khai hiện tại, giá trúng, giá cuối phiên và giá tại thời điểm hủy.
+- Nguồn dữ liệu công khai: phiên, giá, lượt trả, trạng thái và danh mục lấy từ API/MySQL; không tự dựng dữ liệu thay thế khi API trống. Ảnh thiếu hoặc không tải được phải được báo đúng là chưa có ảnh khả dụng. Chỉ danh mục đang hoạt động xuất hiện trong khám phá; sản phẩm thuộc danh mục đã ngừng hoạt động không xuất hiện trong danh sách công khai.
 - Chi tiết phiên: xem ảnh, mô tả, thuộc tính, giá công khai, thời gian, phí vận chuyển, yêu cầu cọc, tóm tắt kiểm định và lịch sử giá. Người mua có địa chỉ được đăng ký/thanh toán cọc, đặt mức giá tối đa bí mật và Mua ngay qua API thật. Hiển thị điều kiện còn thiếu, trạng thái đang gửi, lỗi và xác nhận trước khi giao dịch; người bán không thao tác mua trên phiên của mình, Admin không tham gia mua.
 - Đăng nhập/đăng ký: kiểm tra đầu vào, báo lỗi từng trường, nút đang xử lý, gọi API thật và quay lại trang cần đăng nhập. Đăng ký thành công chuyển về đăng nhập. Không thêm đăng nhập mạng xã hội, quên mật khẩu hoặc ví khi chưa có trong đặc tả/API.
 - Tài khoản: xem/sửa hồ sơ, nộp xác minh người bán, danh sách theo dõi, phiên đã tham gia; sổ địa chỉ cho phép thêm/sửa/chọn mặc định/xóa theo điều kiện API. Danh sách đơn có phân trang, phân biệt bạn mua/bạn bán theo API hiện có; chi tiết hiển thị số tiền, giữ/hoàn/giải ngân, địa chỉ chụp, vận đơn, hạn và lịch sử thanh toán. Người mua đổi địa chỉ đơn khi còn chờ thanh toán và còn hạn; thanh toán phần còn lại; xác nhận nhận hàng rồi hoàn tất qua hai bước riêng. Đã có giao diện gửi hàng, tranh chấp và thông báo theo mục 3.1.3. Second Chance và đánh giá đã có giao diện theo mục 3.1.4; chưa nghiệm thu toàn bộ luồng trên trình duyệt. Phạm vi đã có của người bán và Admin được liệt kê riêng bên dưới.
 - Người bán — sản phẩm: đã có danh sách riêng, tìm kiếm/lọc/phân trang, tạo/sửa bản nháp, thuộc tính theo danh mục, tải nhiều ảnh, chọn ảnh đại diện, bỏ ảnh và gửi duyệt qua API thật. Chỉ người bán đã xác minh, tài khoản hoạt động mới vào luồng này. Màn hình hiển thị lý do từ chối và lý do khóa sửa; không tự mở khóa sản phẩm đã kiểm định hoặc có phiên.
+- Đăng lại sản phẩm: danh sách người bán chỉ hiện nút đăng lại khi sản phẩm đã duyệt, không còn phiên đang chờ/chạy, không còn đơn cần xử lý và không còn đề nghị Mua tiếp đang chờ/đã chấp nhận. Phiên cũ không có người thắng hoặc đơn cũ bị hủy vì không thanh toán có thể đăng lại sau khi mọi đề nghị Mua tiếp đã bị từ chối/hết hạn. Backend kiểm tra lại điều kiện trong transaction khi tạo phiên.
 - Người bán — phiên đấu giá: danh sách riêng có tìm kiếm/lọc/phân trang; tạo phiên từ sản phẩm đủ điều kiện với giá khởi điểm, giá sàn/Mua ngay tùy chọn, phí vận chuyển và lịch giờ Việt Nam. Có kiểm tra biểu mẫu và xác nhận trước khi tạo. Chi tiết hiển thị giá công khai, lịch, kết quả, cọc đã chụp theo cấu hình và yêu cầu hủy mới nhất. Gửi yêu cầu hủy phải có lý do; phiên tiếp tục cho đến khi Admin duyệt hoặc có kết quả. Chưa có thao tác sửa giá/lịch sau khi tạo. Có làm mới qua API và tham gia phòng Socket.IO khi mở chi tiết phiên.
 - Admin — duyệt sản phẩm: danh sách mặc định chờ xử lý, tìm tên/lọc trạng thái/danh mục/phân trang; xem ảnh, mô tả, thuộc tính; duyệt hoặc từ chối có lý do. Sản phẩm bắt buộc kiểm định chưa đạt/không còn được trung tâm giữ/thiếu báo cáo bị khóa nút duyệt. Admin mở hồ sơ kiểm định từ sản phẩm và quay lại duyệt nội dung khi đủ điều kiện.
 - Kiểm định — Admin: danh sách tìm theo mã hoặc tên sản phẩm, lọc trạng thái và phân trang; ghi tiếp nhận (tình trạng, serial, số kiện, ghi chú), bắt đầu kiểm định, đính kèm ảnh/PDF, ghi kết quả chuyên gia và ghi nhận trả hàng khi được phép. Kết quả đạt chuyển sang lưu giữ, không tự duyệt nội dung. Màn hình hiển thị riêng thời điểm hàng rời trung tâm để không hiểu nhầm trạng thái lưu giữ cũ.
@@ -109,6 +113,7 @@ Kiểm tra giao diện ngày 03–04/10/2026 trên CSDL riêng: người bán g�
 Ưu tiên hoàn thiện các chức năng theo đặc tả trước khi chỉnh đẹp. Ngày 05/10/2026, tiếp tục kiểm tra luồng Cơ hội mua tiếp trên trình duyệt bằng CSDL kiểm thử riêng và hoàn tác toàn bộ dữ liệu khi kết thúc. Các màn hình còn lại chưa được nghiệm thu toàn bộ trên trình duyệt.
 
 - **Cơ hội mua tiếp:** người bán gửi từ đơn bị hủy do không thanh toán; hệ thống chọn ứng viên và giá công khai hợp lệ. Danh sách phân biệt đề nghị nhận/gửi, có hạn và trạng thái; chi tiết cho phép người nhận từ chối hoặc thanh toán ngay giá đề nghị cộng phí. Không đặt lại cọc và không dùng cọc đã hoàn. Yêu cầu chưa rõ kết quả giữ nguyên khóa để người dùng chủ động lấy lại; không cho từ chối khi còn lần thanh toán chưa xác định.
+- **Báo cáo sản phẩm:** người dùng đăng nhập báo cáo từ chi tiết phiên, chọn lý do và mô tả; người bán không thể báo cáo sản phẩm của mình và mỗi người chỉ gửi một báo cáo cho cùng sản phẩm. Báo cáo vào hàng chờ vi phạm của Admin, không tự kết luận hoặc tự áp dụng chế tài. Người gửi xem trạng thái/kết quả trong mục Vi phạm của tài khoản; Admin xem tiêu đề sản phẩm và ghi quyết định có lý do. Người bị báo cáo không thấy danh tính người gửi.
 - **Đánh giá:** người mua/người bán đánh giá đối tác từ đơn hoàn tất, 1–5 sao và nhận xét tối đa 1.000 ký tự. Chi tiết đơn hiển thị đánh giá đã gửi của người đang xem; trang công khai theo người nhận có phân trang. Có liên kết từ phiên, đơn và hồ sơ cá nhân. Backend giữ quyền đối tác và giới hạn một lần mỗi bên.
 - **Theo dõi:** thêm/bỏ theo dõi trên chi tiết phiên, bỏ theo dõi từ danh sách cá nhân. Trạng thái được đọc theo tài khoản đang đăng nhập; thao tác theo dõi không tạo cam kết giá hoặc ưu tiên đấu giá.
 - **Người dùng:** Admin tìm tên/email, xem quyền bán và trạng thái, chuyển hoạt động/tạm ngừng/khóa có lý do và xác nhận. Không cho đổi trạng thái tài khoản Admin qua chức năng này. Có liên kết tới vi phạm và đánh giá của tài khoản.
@@ -151,7 +156,9 @@ Luồng xác minh: người dùng gửi giấy tờ, selfie và thông tin ngân
 
 ## 5. Danh mục, sản phẩm và chính sách kiểm định
 
-Admin quản lý danh mục, thuộc tính động, trạng thái hoạt động và `yeu_cau_kiem_dinh`. Chính sách dựa vào loại hàng, không chỉ dựa trên giá seller tự khai. Ví dụ đồ cổ, tranh, đồng hồ cao cấp và trang sức có thể được Admin đặt bắt buộc kiểm định.
+Admin chỉ tạo và bật danh mục phù hợp với phạm vi hàng hiếm, sưu tầm hoặc tài sản có giá trị cao ở phần đầu tài liệu. Danh mục có thuộc tính động, trạng thái hoạt động và `yeu_cau_kiem_dinh`; chính sách kiểm định dựa vào loại hàng, không chỉ dựa trên giá seller tự khai. Bộ SQL khởi tạo VietBid có mười danh mục chuyên biệt, không gồm điện tử, gia dụng, thời trang đại trà hoặc hàng tiêu dùng phổ thông. Tên danh mục không phải chứng nhận tính xác thực.
+
+MySQL chính đã bật mười danh mục chuyên biệt và ngừng hoạt động mềm mười hai danh mục phổ thông cũ. Sản phẩm, phiên và giao dịch gắn với danh mục cũ được giữ nguyên để bảo toàn lịch sử; chúng không xuất hiện trong danh sách sản phẩm/phiên công khai. SQL khởi tạo chỉ dùng cho CSDL mới và không tự cập nhật, xóa hoặc di chuyển dữ liệu hiện có.
 
 Seller tạo sản phẩm nháp với danh mục, tên, mô tả, tình trạng, thương hiệu, thuộc tính và ảnh. Gửi duyệt phải có ảnh và đủ thuộc tính bắt buộc. Backend kiểm tra thuộc tính thuộc đúng danh mục và đúng kiểu.
 
@@ -189,7 +196,7 @@ Biên bản, serial và tệp nội bộ chỉ cho Admin, seller liên quan ho�
 
 ## 7. Tạo và vận hành phiên đấu giá
 
-Điều kiện tạo: seller hoạt động và đã xác minh; sở hữu sản phẩm; sản phẩm đã duyệt; không có phiên hoặc nghĩa vụ bán trùng. Nếu bắt buộc kiểm định, lần kiểm định hợp lệ phải có kết quả đạt và trung tâm vẫn giữ đúng sản phẩm.
+Điều kiện tạo: seller hoạt động và đã xác minh; sở hữu sản phẩm; sản phẩm đã duyệt; không có phiên đang chờ/chạy, không có đơn đang xử lý và không có đề nghị Mua tiếp đang chờ/đã chấp nhận. Mọi đơn cũ phải đã hủy vì người thắng không thanh toán; các đề nghị Mua tiếp cũ phải bị từ chối hoặc hết hạn trước khi đăng lại. Phiên không có người thắng có thể đăng lại. Nếu bắt buộc kiểm định, lần kiểm định hợp lệ phải có kết quả đạt và trung tâm vẫn giữ đúng sản phẩm.
 
 Phiên có giá khởi điểm, giá sàn tùy chọn, Mua ngay tùy chọn, phí vận chuyển cố định, thời gian bắt đầu/kết thúc. Giá sàn không thấp hơn giá khởi điểm; Mua ngay không thấp hơn giá sàn hoặc khởi điểm. Không hard-code tỷ lệ chênh lệch giá Mua ngay.
 
@@ -197,7 +204,7 @@ Bước giá do Admin cấu hình thành các khoảng liên tục, không chồ
 
 Trạng thái chính: `DA_LEN_LICH`, `HOAT_DONG`, `DA_KET_THUC`, `THAT_BAI`, `DA_HUY`. Tác vụ mở/đóng theo giờ MySQL; API tự kiểm tra hạn ngay khi nhận yêu cầu, không chờ tác vụ quét.
 
-Giao diện chọn sản phẩm dùng `GET /products/mine?du_dieu_kien_dau_gia=1`: lọc trước phân trang, chỉ lấy sản phẩm của chính chủ đã duyệt, không có phiên chờ/chạy/đã kết thúc thành công. Nếu bắt buộc kiểm định, hồ sơ mới nhất phải đạt, còn lưu giữ, chưa rời trung tâm và có báo cáo. Kết quả chỉ phản ánh lúc đọc; API tạo vẫn kiểm tra lại điều kiện và khóa dữ liệu trong transaction.
+Giao diện chọn sản phẩm dùng `GET /products/mine?du_dieu_kien_dau_gia=1`: lọc trước phân trang, chỉ lấy sản phẩm của chính chủ đã duyệt và thỏa các điều kiện phiên, đơn, đề nghị Mua tiếp nêu trên. Nếu bắt buộc kiểm định, hồ sơ mới nhất phải đạt, còn lưu giữ, chưa rời trung tâm và có báo cáo. Kết quả chỉ phản ánh lúc đọc; API tạo vẫn kiểm tra lại điều kiện và khóa dữ liệu trong transaction.
 
 `GET /auctions/mine/:id` dành riêng cho người bán đã xác minh sở hữu phiên; trả thông tin công khai cùng yêu cầu hủy mới nhất, khả năng gửi yêu cầu và lý do bị khóa. Không trả giá sàn hoặc mức tối đa bí mật. Giao diện nhập lịch theo UTC+7 và gửi ISO có múi giờ; không tự chốt phiên theo đồng hồ trình duyệt. Đợt bổ sung giao diện này không đổi cấu trúc CSDL.
 
@@ -402,8 +409,8 @@ Chi tiết thực hiện ở `co-so-du-lieu/KE-HOACH-21-BANG.md`, SQL trong `co-
 
 ## 23. Giới hạn và việc tiếp theo
 
-Hoàn thiện các màn hình công khai, tài khoản, seller và Admin theo API thật; kiểm thử đầu cuối trên trình duyệt và thiết bị nhỏ. Không coi bản build frontend thành công là giao diện đã hoàn tất.
+Các màn hình và API chính cho khách mua, người bán và Admin đã được triển khai, gồm báo cáo sản phẩm và đăng lại có điều kiện. Việc còn lại là nghiệm thu đầu cuối trên trình duyệt các nhánh báo cáo/đăng lại và toàn bộ luồng trên thiết bị nhỏ; không coi bản build frontend thành công là giao diện đã hoàn tất.
 
-Các phần ngoài đợt này: tiền/vận chuyển/eKYC thật, ví nội bộ, quy trình trả hàng nhiều chặng, actor chuyên gia, cam kết xác thực tuyệt đối, hoàn một phần cho giao dịch mới. API báo cáo sản phẩm và đăng lại có điều kiện cần hoàn thiện riêng; việc schema có chỗ hỗ trợ không có nghĩa API đã tồn tại.
+Các phần ngoài đợt này: tiền/vận chuyển/eKYC thật, ví nội bộ, quy trình trả hàng nhiều chặng, actor chuyên gia, cam kết xác thực tuyệt đối, hoàn một phần cho giao dịch mới. Báo cáo sản phẩm và đăng lại có điều kiện đã có API/giao diện; chưa được nghiệm thu trực tiếp đầy đủ trên trình duyệt.
 
 Mọi thay đổi sau này phải giữ cùng một đặc tả chính, cập nhật hợp đồng và kiểm thử. Không dùng kết quả kiểm thử phiên bản trước để khẳng định nghiệp vụ mới đã chạy đúng.

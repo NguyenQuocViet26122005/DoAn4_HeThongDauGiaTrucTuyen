@@ -1,6 +1,6 @@
 # Thử Backend bằng Postman
 
-Nếu muốn kiểm tra tự động trước khi dùng Postman, chạy `npm run test:api` trong `backend`. Hai bộ HTTP chạy trên cổng riêng, bao phủ 105 API, dùng tài khoản ngẫu nhiên rồi rollback và dọn tệp. Không cần khởi động server riêng hoặc lấy token thủ công. Dừng backend đang chạy tác vụ định kỳ trước khi chạy bộ tích hợp để tránh tiến trình khác cùng xử lý dữ liệu kiểm thử.
+Nếu muốn kiểm tra tự động trước khi dùng Postman, chạy `npm run test:api` trong `backend`. Hai bộ HTTP chạy trên cổng riêng, bao phủ 107 API, dùng tài khoản ngẫu nhiên rồi rollback và dọn tệp. Không cần khởi động server riêng hoặc lấy token thủ công. Dừng backend đang chạy tác vụ định kỳ trước khi chạy bộ tích hợp để tránh tiến trình khác cùng xử lý dữ liệu kiểm thử.
 
 Trong nhóm sản phẩm có yêu cầu **Chọn ảnh đại diện**. Sau khi tải và gắn ảnh, chọn đúng `sanPhamId` và `anhId` rồi gửi PATCH; phản hồi là danh sách ảnh với một ảnh chính. Sản phẩm chờ duyệt/đang kiểm định/đã có phiên không được đổi ảnh.
 
@@ -96,6 +96,15 @@ Second Chance chỉ có sau khi đơn bị hủy do không thanh toán. Hệ th�
 Để kiểm tra nhanh các hạn 48 giờ/3 ngày/24 giờ mà không sửa dữ liệu mẫu bằng tay, chạy `npm run test:integration` khi dừng backend đang chạy tác vụ. Bộ kiểm thử tạo dữ liệu riêng với các mốc đến hạn, kiểm tra đóng phiên, hủy đơn, Second Chance chủ động, quá hạn và giải ngân rồi hoàn tác/dọn đúng dữ liệu đó. Không cần nhập lại SQL hoặc đổi cấu hình chung để tăng tốc thử nghiệm.
 
 API `/admin/jobs` chỉ đọc trạng thái, không kích hoạt tác vụ bằng HTTP. Khi chạy backend bình thường, chu kỳ đầu bắt đầu sau 60 giây.
+
+## Báo cáo sản phẩm và đăng lại
+
+1. Đăng nhập bằng tài khoản người mua, lấy một `phienId` công khai và gửi `POST /auctions/{{phienId}}/reports` với `ly_do` và `mo_ta`. Không dùng tài khoản người bán của sản phẩm đó; mỗi tài khoản chỉ gửi một báo cáo cho cùng sản phẩm, kể cả khi sản phẩm được đăng lại.
+2. Dùng `GET /product-reports/me` để xem trạng thái báo cáo của tài khoản gửi. Danh tính người gửi không được trả cho tài khoản bị báo cáo.
+3. Admin dùng `GET /admin/violations` để xem hồ sơ, rồi `PATCH /admin/violations/{{viPhamId}}/review` với trạng thái, hình thức xử lý và lý do. Kết luận không vi phạm dùng `trang_thai: "DA_HUY"` và `hinh_thuc_xu_ly: "KHONG_VI_PHAM"`.
+4. Để đăng lại, người bán đã xác minh lấy danh sách `GET /products/mine?du_dieu_kien_dau_gia=1`. Sản phẩm đủ điều kiện xuất hiện trong danh sách này; tạo phiên mới bằng `POST /auctions` với cùng `san_pham_id` và thông tin giá/lịch mới. Không có API đăng lại riêng. Phiên chưa có người thắng được đăng lại; đơn cũ phải đã hủy do không thanh toán và mọi Cơ hội mua tiếp trước đó phải bị từ chối/hết hạn. API tạo phiên kiểm tra lại các điều kiện trong transaction.
+
+Các thao tác trên ghi dữ liệu thật trong CSDL đang cấu hình. Chỉ thực hiện với tài khoản, phiên và sản phẩm thử nghiệm phù hợp; không dùng API ghi để thử trên dữ liệu giao dịch thật.
 
 ## Kiểm tra quyền và lỗi mong đợi
 

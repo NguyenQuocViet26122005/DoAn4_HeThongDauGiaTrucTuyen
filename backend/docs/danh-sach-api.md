@@ -1,6 +1,6 @@
 # Danh sách API Backend
 
-Đã đối chiếu 105 cặp phương thức/đường dẫn với các tệp thật trong src/routes và ung-dung.ts. Bộ Postman có các biến thể đăng nhập, đặt giá và cấu hình để chạy từng kịch bản. Nghiệp vụ 3.0 dùng 21 bảng.
+Đã đối chiếu 107 cặp phương thức/đường dẫn với các tệp thật trong src/routes và ung-dung.ts. Bộ Postman có các biến thể đăng nhập, đặt giá và cấu hình để chạy từng kịch bản. Nghiệp vụ 3.0 dùng 21 bảng.
 
 Địa chỉ gốc: `http://localhost:5000/api`. `GET /` ngoài tiền tố `/api` trả thông tin máy chủ.
 
@@ -16,7 +16,7 @@ Giao diện người mua ngày 02/10/2026 dùng các API hiện có: `/users/me/
 
 ## 01. Kết nối và đăng nhập
 
-Các thay đổi của bản 19 bảng:
+Các quy tắc nghiệp vụ hiện tại:
 
 - `POST /auctions` nhận thêm `phi_van_chuyen`, mặc định 0; chỉ nhận số tiền VND nguyên cho giao dịch mới. Phí được công bố trên phiên và chụp sang đơn.
 - `POST /orders/:id/payments/simulate` nhận `{ "ket_qua_mo_phong": "THANH_CONG", "khoa_yeu_cau": "ma-yeu-cau-01" }`. Kết quả có thể là `THAT_BAI`; cùng khóa sẽ trả lần xử lý cũ. Lần thử mới cần khóa mới. Không truyền tổng tiền từ client.
@@ -226,7 +226,7 @@ Quyền: Công khai.
 
 Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
 
-Thêm query `du_dieu_kien_dau_gia=1` để chỉ lấy sản phẩm đã duyệt và chưa có phiên `DA_LEN_LICH`, `HOAT_DONG` hoặc `DA_KET_THUC`. Nếu bắt buộc kiểm định, hồ sơ mới nhất phải đạt, đang lưu giữ, chưa rời trung tâm và có báo cáo. Bộ lọc chạy trước phân trang; `0` hoặc bỏ qua giữ danh sách thông thường. Giá trị khác hoặc dùng tham số này trên danh sách công khai/Admin trả 400. Điều kiện được kiểm tra lại trong transaction khi tạo phiên.
+Thêm query `du_dieu_kien_dau_gia=1` để chỉ lấy sản phẩm đã duyệt, không có phiên chờ/chạy, không có đơn đang xử lý và không có đề nghị Mua tiếp đang chờ/đã chấp nhận. Đơn cũ chỉ cho phép đăng lại nếu bị hủy do người thắng không thanh toán; đề nghị Mua tiếp cũ phải bị từ chối/hết hạn. Nếu bắt buộc kiểm định, hồ sơ mới nhất phải đạt, đang lưu giữ, chưa rời trung tâm và có báo cáo. Có thể giới hạn một sản phẩm bằng `san_pham_id`; tham số này chỉ dùng trong danh sách của người bán. Bộ lọc chạy trước phân trang; `0` hoặc bỏ qua giữ danh sách thông thường. Giá trị sai hoặc dùng bộ lọc riêng tư trên danh sách công khai/Admin trả 400. Điều kiện được kiểm tra lại trong transaction khi tạo phiên.
 
 ### GET /products/:id — Chi tiết sản phẩm của người bán
 
@@ -401,6 +401,19 @@ Quyền: Công khai.
 ### GET /auctions/:id/bids — Lịch sử giá công khai
 
 Quyền: Công khai.
+
+### POST /auctions/:id/reports — Báo cáo sản phẩm trong phiên
+
+Quyền: Đăng nhập; người bán của sản phẩm không được tự báo cáo. Mỗi người dùng chỉ gửi một báo cáo cho cùng sản phẩm, kể cả khi sản phẩm có nhiều phiên. Báo cáo tạo hồ sơ chờ Admin xem xét trong bảng vi phạm hiện có; không tự áp dụng chế tài.
+
+```json
+{
+  "ly_do": "THONG_TIN_SAI",
+  "mo_ta": "Thông tin nguồn gốc sản phẩm cần được kiểm tra."
+}
+```
+
+`ly_do`: `HANG_GIA`, `THONG_TIN_SAI`, `HANG_CAM`, `QUYEN_SO_HUU` hoặc `KHAC`. Nội dung tối đa 850 ký tự. Gửi lại báo cáo trùng trả 409.
 
 ### POST /auctions — Tạo phiên cho sản phẩm đã duyệt
 
@@ -726,6 +739,10 @@ Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 ### GET /violations/me — Vi phạm của tôi
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
+
+### GET /product-reports/me — Báo cáo sản phẩm tôi đã gửi
+
+Quyền: Đăng nhập; chỉ trả báo cáo của người dùng hiện tại, kèm trạng thái và quyết định của Admin. Danh tính người gửi không xuất hiện trong hồ sơ vi phạm mà người bị báo cáo xem được.
 
 ### GET /admin/violations — Admin xem vi phạm
 

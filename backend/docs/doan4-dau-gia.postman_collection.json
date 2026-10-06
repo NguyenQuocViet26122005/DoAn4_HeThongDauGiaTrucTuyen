@@ -3327,6 +3327,89 @@
           ]
         },
         {
+          "name": "Báo cáo sản phẩm trong phiên",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/reports",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Đăng nhập người mua; không báo cáo sản phẩm của chính mình. Mỗi tài khoản chỉ gửi một báo cáo cho cùng sản phẩm, kể cả khi sản phẩm có phiên mới.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ly_do\": \"THONG_TIN_SAI\",\n  \"mo_ta\": \"Mô tả nội dung cần Admin xem xét\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "  if (duLieu?.id != null) pm.collectionVariables.set('viPhamId', String(duLieu.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Báo cáo sản phẩm tôi đã gửi",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/product-reports/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập bằng cùng tài khoản đã gửi báo cáo. Chỉ trả báo cáo của người dùng hiện tại, không để lộ danh tính người gửi cho người bị báo cáo."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Vi phạm của tôi",
           "request": {
             "method": "GET",
@@ -3467,7 +3550,7 @@
             "description": "QUAN_TRI. Admin xác nhận vi phạm. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"trang_thai\": \"DA_XAC_NHAN\"\n}",
+              "raw": "{\n  \"trang_thai\": \"DA_XAC_NHAN\",\n  \"hinh_thuc_xu_ly\": \"CANH_CAO\",\n  \"ly_do_xu_ly\": \"Đã xem xét và xác nhận hồ sơ vi phạm.\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

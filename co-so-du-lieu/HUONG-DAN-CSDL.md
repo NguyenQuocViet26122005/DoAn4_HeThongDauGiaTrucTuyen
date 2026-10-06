@@ -13,7 +13,7 @@ Lần trước đã gộp 27 xuống 19 bảng; lần này bổ sung `kiem_dinh_
 - `tep_dinh_kem` giữ ảnh sản phẩm, bằng chứng tranh chấp và tệp kiểm định; ràng buộc loại/đối tượng, quyền đọc riêng theo hồ sơ.
 - `danh_muc`/`san_pham` dùng JSON cho cấu hình/giá trị thuộc tính; backend kiểm tra đúng loại và trường bắt buộc.
 - `cau_hinh_he_thong` lưu bước giá và chính sách cọc. `nhat_ky_hoat_dong` ghi sự kiện, gia hạn và khóa chống xử lý thanh toán lặp.
-- `yeu_cau_xu_ly` gộp yêu cầu hủy/báo cáo. API báo cáo sản phẩm chưa triển khai; có bảng không đồng nghĩa chức năng đã hoàn tất.
+- `yeu_cau_xu_ly` gộp yêu cầu hủy; báo cáo sản phẩm được lưu trong `vi_pham` để dùng hàng đợi xử lý hiện có, không tạo thêm bảng. Backend kiểm tra người gửi, sản phẩm công khai và báo cáo trùng theo sản phẩm.
 
 Giảm bảng không tự bảo đảm truy vấn nhanh hơn. Để sơ đồ dễ đọc, chia theo nghiệp vụ và thu gọn cột hiển thị; vẫn giữ khóa ngoại cần thiết.
 
@@ -77,4 +77,4 @@ Nếu dữ liệu chính đã có giao dịch mới so với bản sao trước 
 
 ## Phạm vi tiếp theo
 
-Hoàn thiện giao diện theo tài liệu nghiệp vụ 3.0 và API thật. Thanh toán/vận chuyển hiện mô phỏng; chưa có ví, cổng tiền thật, chuyên gia đăng nhập hoặc quy trình trả hàng nhiều chặng. API báo cáo sản phẩm và đăng lại sau Second Chance cần triển khai riêng.
+Giao diện báo cáo sản phẩm và đăng lại sau Cơ hội mua tiếp đã được nối với API hiện có; cần nghiệm thu đầy đủ trên trình duyệt. Thanh toán/vận chuyển hiện mô phỏng; chưa có ví, cổng tiền thật, chuyên gia đăng nhập hoặc quy trình trả hàng nhiều chặng. SQL khởi tạo không tự sửa dữ liệu danh mục/sản phẩm đang có trong MySQL chính.
