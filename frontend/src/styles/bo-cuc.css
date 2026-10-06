@@ -272,6 +272,13 @@
   align-items: center;
   margin-bottom: 32px;
 }
+.hanh-dong-tieu-de {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
 .tieu-de-trang h1 {
   margin: 12px 0;
 }
@@ -464,7 +471,12 @@
     grid-column: 1 / -1;
   }
   .tieu-de-trang {
-    display: block;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .hanh-dong-tieu-de {
+    flex-shrink: 1;
   }
   .khoi-cho,
   .trong {

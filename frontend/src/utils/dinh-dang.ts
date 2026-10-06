@@ -1,3 +1,5 @@
+import type { Phien } from '../types/du-lieu';
+
 export const tien = (giaTri: unknown) =>
   new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -17,6 +19,24 @@ export const ngayGio = (giaTri: unknown) =>
         timeStyle: 'short',
       })
     : 'Chưa cập nhật';
+
+export function tenGiaPhien(phien: Pick<Phien, 'trang_thai' | 'ly_do_ket_thuc'>) {
+  if (phien.trang_thai === 'DA_LEN_LICH') {
+    return 'Giá khởi điểm';
+  }
+  if (phien.trang_thai === 'DA_KET_THUC') {
+    return phien.ly_do_ket_thuc === 'MUA_NGAY' ? 'Giá Mua ngay' : 'Giá trúng công khai';
+  }
+  if (phien.trang_thai === 'THAT_BAI') {
+    return 'Giá cuối phiên';
+  }
+  if (phien.trang_thai === 'DA_HUY') {
+    return 'Giá trước khi hủy';
+  }
+
+  return 'Giá công khai hiện tại';
+}
+
 export const nhanTrangThai: Record<string, string> = {
   CCCD: 'Căn cước công dân',
   HO_CHIEU: 'Hộ chiếu',

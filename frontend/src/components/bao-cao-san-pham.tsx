@@ -59,6 +59,10 @@ export default function BaoCaoSanPham({
         message.success('Đã gửi báo cáo sản phẩm');
       }}
     >
+      <p className="chu-mo">
+        Mỗi tài khoản chỉ gửi một báo cáo cho cùng sản phẩm, kể cả khi sản phẩm được đăng lại.
+      </p>
+      <p className="chu-mo">Quản trị viên xem xét nội dung; báo cáo không tự kết luận vi phạm.</p>
       <Form.Item
         name="ly_do"
         label="Lý do báo cáo"

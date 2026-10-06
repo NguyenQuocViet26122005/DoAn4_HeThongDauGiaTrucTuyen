@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Button, Input, Select } from 'antd';
+import { useEffect, useState } from 'react';
+import { Alert, Button, Input, Select } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { DanhMuc, Phien } from '../types/du-lieu';
 import {
@@ -13,8 +13,8 @@ import {
 import { BieuTuong } from '../components/bieu-tuong';
 import { bieuTuongDanhMuc } from '../utils/bieu-tuong';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
-import { tien } from '../utils/dinh-dang';
-import anhBia from '../assets/khong-gian-dau-gia.png';
+import { mocThoiGian, tenGiaPhien, tien } from '../utils/dinh-dang';
+import anhBia from '../assets/khong-gian-dau-gia.webp';
 
 export function ThePhien({ phien }: { phien: Phien }) {
   return (
@@ -30,14 +30,14 @@ export function ThePhien({ phien }: { phien: Phien }) {
         </span>
       </div>
       <div className="noi-dung-the">
-        <span className="danh-muc-the">{phien.ten_danh_muc || 'Bộ sưu tập VietBid'}</span>
+        {phien.ten_danh_muc && <span className="danh-muc-the">{phien.ten_danh_muc}</span>}
         <h3>{phien.tieu_de}</h3>
         <div className="gia-the">
           <div>
-            <small>Giá hiện tại</small>
+            <small>{tenGiaPhien(phien)}</small>
             <strong>{tien(phien.gia_hien_tai)}</strong>
           </div>
-          <small>{phien.tong_luot_tra_gia} lượt trả</small>
+          <small>{phien.tong_luot_tra_gia} lượt trả giá</small>
         </div>
         <div className="chan-the">
           <DemNguoc batDau={phien.thoi_gian_bat_dau} ketThuc={phien.thoi_gian_ket_thuc} />
@@ -49,8 +49,55 @@ export function ThePhien({ phien }: { phien: Phien }) {
 }
 
 export function TrangChu() {
-  const phien = useDuLieu<Phien[]>('/auctions', { limit: 4 });
+  const [hienTai, datHienTai] = useState(Date.now);
+  const phienDangDienRa = useDuLieu<Phien[]>(
+    '/auctions',
+    {
+      trang_thai: 'HOAT_DONG',
+      limit: 100,
+    },
+    true,
+    60000,
+  );
+  const phienSapDienRa = useDuLieu<Phien[]>(
+    '/auctions',
+    {
+      trang_thai: 'DA_LEN_LICH',
+      limit: 100,
+    },
+    true,
+    60000,
+  );
   const danhMuc = useDuLieu<DanhMuc[]>('/categories');
+  const cacPhienDangDienRa = (phienDangDienRa.data || [])
+    .filter(
+      (phien) =>
+        mocThoiGian(phien.thoi_gian_bat_dau) <= hienTai &&
+        mocThoiGian(phien.thoi_gian_ket_thuc) > hienTai,
+    )
+    .slice(0, 4);
+  const cacPhienSapDienRa = (phienSapDienRa.data || [])
+    .filter(
+      (phien) =>
+        mocThoiGian(phien.thoi_gian_bat_dau) > hienTai &&
+        mocThoiGian(phien.thoi_gian_ket_thuc) > hienTai,
+    )
+    .slice(0, 4);
+  const coNoiDungChuaTaiDuoc =
+    (phienDangDienRa.isError && !phienDangDienRa.data) ||
+    (phienSapDienRa.isError && !phienSapDienRa.data) ||
+    (danhMuc.isError && !danhMuc.data);
+  const dangTaiLai = phienDangDienRa.isFetching || phienSapDienRa.isFetching || danhMuc.isFetching;
+
+  function taiLaiNoiDung() {
+    void Promise.all([phienDangDienRa.refetch(), phienSapDienRa.refetch(), danhMuc.refetch()]);
+  }
+
+  useEffect(() => {
+    const boDem = setInterval(() => datHienTai(Date.now()), 15000);
+
+    return () => clearInterval(boDem);
+  }, []);
 
   return (
     <>
@@ -93,7 +140,7 @@ export function TrangChu() {
           {[
             ['khien', 'Người bán được xác minh', 'Danh tính được kiểm tra trước khi bán'],
             ['bua', 'Đấu giá minh bạch', 'Giới hạn của bạn luôn được giữ kín'],
-            ['the', 'Thanh toán có bảo vệ', 'Giữ tiền trung gian đến khi hoàn tất'],
+            ['the', 'Giao dịch theo từng bước', 'Theo dõi thanh toán, vận chuyển và nhận hàng'],
           ].map(([icon, ten, phu]) => (
             <div key={ten}>
               <BieuTuong ten={icon} size={25} />
@@ -104,29 +151,65 @@ export function TrangChu() {
             </div>
           ))}
         </div>
-        <section className="khu-vuc">
+        {coNoiDungChuaTaiDuoc && (
+          <Alert
+            className="loi-noi-dung-trang-chu"
+            type="warning"
+            showIcon
+            title="Một số nội dung chưa tải được"
+            description="Kết nối dữ liệu đang gián đoạn. Bạn có thể thử tải lại các phiên và danh mục."
+            action={
+              <Button loading={dangTaiLai} onClick={taiLaiNoiDung}>
+                Tải lại nội dung
+              </Button>
+            }
+          />
+        )}
+        <section className="khu-vuc" hidden={phienDangDienRa.isError && !phienDangDienRa.data}>
           <div className="tieu-de-muc">
             <div>
-              <span className="nhan-nho">CÁC PHIÊN MỚI NHẤT</span>
-              <h2>Những phiên đáng khám phá</h2>
+              <span className="nhan-nho">ĐANG TRONG PHIÊN</span>
+              <h2>Những phiên đang diễn ra</h2>
             </div>
-            <Link className="link-vang" to="/kham-pha">
-              Xem tất cả <BieuTuong ten="muiTen" size={18} />
+            <Link className="link-vang" to="/kham-pha?trang_thai=HOAT_DONG">
+              Xem phiên đang diễn ra <BieuTuong ten="muiTen" size={18} />
             </Link>
           </div>
           <ChoDuLieu
-            truyVan={phien}
-            rong={phien.data?.length === 0}
-            thongDiepRong="Chưa có phiên được công bố. Các phiên mới sẽ xuất hiện tại đây."
+            truyVan={phienDangDienRa}
+            rong={cacPhienDangDienRa.length === 0}
+            thongDiepRong="Hiện chưa có phiên nào đang diễn ra. Hãy xem các phiên sắp mở."
           >
             <div className="luoi-phien">
-              {phien.data?.map((p) => (
+              {cacPhienDangDienRa.map((p) => (
                 <ThePhien key={p.id} phien={p} />
               ))}
             </div>
           </ChoDuLieu>
         </section>
-        <section className="khu-vuc khu-danh-muc">
+        <section className="khu-vuc" hidden={phienSapDienRa.isError && !phienSapDienRa.data}>
+          <div className="tieu-de-muc">
+            <div>
+              <span className="nhan-nho">SẮP ĐƯỢC MỞ</span>
+              <h2>Đón phiên sắp bắt đầu</h2>
+            </div>
+            <Link className="link-vang" to="/kham-pha?trang_thai=DA_LEN_LICH">
+              Xem lịch phiên <BieuTuong ten="muiTen" size={18} />
+            </Link>
+          </div>
+          <ChoDuLieu
+            truyVan={phienSapDienRa}
+            rong={cacPhienSapDienRa.length === 0}
+            thongDiepRong="Chưa có phiên nào được lên lịch."
+          >
+            <div className="luoi-phien">
+              {cacPhienSapDienRa.map((p) => (
+                <ThePhien key={p.id} phien={p} />
+              ))}
+            </div>
+          </ChoDuLieu>
+        </section>
+        <section className="khu-vuc khu-danh-muc" hidden={danhMuc.isError && !danhMuc.data}>
           <div className="tieu-de-muc">
             <div>
               <span className="nhan-nho">TÌM ĐIỀU BẠN YÊU THÍCH</span>
@@ -204,7 +287,7 @@ export function TrangChu() {
 
 export default function KhamPha() {
   const [thamSo, datThamSo] = useSearchParams();
-  const [tuKhoa, datTuKhoa] = useState(thamSo.get('q') || '');
+  const tuKhoaTrenUrl = thamSo.get('q') || '';
   const trang = Math.max(1, Math.floor(Number(thamSo.get('page')) || 1));
   const danhMuc = useDuLieu<DanhMuc[]>('/categories');
   const phien = useDuLieu<Phien[]>('/auctions', {
@@ -214,6 +297,7 @@ export default function KhamPha() {
     page: trang,
     limit: 12,
   });
+
   const doiLoc = (khoa: string, giaTri: string) => {
     const moi = new URLSearchParams(thamSo);
 
@@ -245,11 +329,11 @@ export default function KhamPha() {
           </h3>
           <label htmlFor="tim-san-pham">Tìm sản phẩm</label>
           <Input.Search
-            value={tuKhoa}
+            key={tuKhoaTrenUrl}
+            defaultValue={tuKhoaTrenUrl}
             id="tim-san-pham"
             maxLength={100}
-            onChange={(e) => datTuKhoa(e.target.value)}
-            onSearch={(q) => doiLoc('q', q)}
+            onSearch={(q) => doiLoc('q', q.trim())}
             placeholder="Tên sản phẩm…"
             aria-label="Tìm sản phẩm"
           />
@@ -288,13 +372,13 @@ export default function KhamPha() {
               { value: 'DA_LEN_LICH', label: 'Sắp diễn ra' },
               { value: 'DA_KET_THUC', label: 'Đã kết thúc' },
               { value: 'THAT_BAI', label: 'Không thành công' },
+              { value: 'DA_HUY', label: 'Đã hủy' },
             ]}
           />
           <Button
             type="text"
             onClick={() => {
               datThamSo({});
-              datTuKhoa('');
             }}
           >
             Xóa bộ lọc

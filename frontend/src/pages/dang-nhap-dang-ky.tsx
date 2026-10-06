@@ -76,7 +76,7 @@ export default function DangNhapDangKy({ dangKy = false }: { dangKy?: boolean })
           <span>
             Giá tối đa được giữ kín.
             <br />
-            Giao dịch được bảo vệ qua tiền giữ trung gian.
+            Theo dõi thanh toán và giao nhận theo từng bước.
           </span>
         </div>
       </section>

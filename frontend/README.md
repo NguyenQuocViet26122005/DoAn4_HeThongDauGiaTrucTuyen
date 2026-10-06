@@ -64,7 +64,7 @@ Bản xuất `dist` cần máy chủ web trả `index.html` cho đường dẫn 
 - `/tai-khoan/xac-minh`: tải giấy tờ và nộp hồ sơ, xem kết quả/lịch sử. `/quan-tri/xac-minh`: lọc, xem hồ sơ và duyệt/từ chối. Tệp giấy tờ chỉ đọc qua API có xác thực.
 - Nhãn giao diện không dùng chữ “mô phỏng”. Backend vẫn chỉ phục vụ giao dịch mô phỏng của đồ án. Bộ chọn kết quả thanh toán chỉ hiện khi chạy frontend với `VITE_CHE_DO_KIEM_THU=true`; mặc định ẩn, không phải tích hợp cổng thanh toán thật.
 
-Second Chance, đánh giá, vi phạm, các mục quản trị người dùng/phiên/cọc/danh mục/cấu hình/thống kê/nhật ký và realtime vẫn cần hoàn thiện. Các mục chưa triển khai không hiển thị số liệu hoặc kết quả giả.
+Second Chance, đánh giá, báo cáo sản phẩm, vi phạm, các mục quản trị người dùng/phiên/cọc/danh mục/cấu hình/thống kê/nhật ký và realtime đã có giao diện kết nối API. Người bán chỉ thấy thao tác đăng lại khi sản phẩm đủ điều kiện; backend kiểm tra lại điều kiện trong transaction. Các luồng báo cáo sản phẩm và đăng lại chưa được nghiệm thu đầy đủ trên trình duyệt. Các mục chưa triển khai không hiển thị số liệu hoặc kết quả giả.
 
 Khóa phiên đang giữ tên lưu trữ `lac-viet-token` để tương thích phiên trước khi đổi thương hiệu; toàn bộ tên hiển thị là VietBid. Khóa nằm trong sessionStorage của tab, được xóa khi đăng xuất hoặc hết phiên. Không lưu mức tối đa bí mật của các thành viên khác.
 

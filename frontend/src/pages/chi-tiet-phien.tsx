@@ -10,7 +10,7 @@ import {
   TrangThaiPhien,
 } from '../components/dung-chung';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
-import { ngayGio, nhan, tien } from '../utils/dinh-dang';
+import { ngayGio, nhan, tenGiaPhien, tien } from '../utils/dinh-dang';
 import type { Phien, SanPham } from '../types/du-lieu';
 import ThamGiaPhien from '../components/tham-gia-phien';
 import TheoDoiPhien from '../components/theo-doi-phien';
@@ -46,6 +46,7 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
     true,
     ['DA_LEN_LICH', 'HOAT_DONG'].includes(phien.trang_thai) ? 10000 : false,
   );
+  const thongTinDauGia = layThongTinDauGia(phien, nguoiDung?.id);
 
   return (
     <>
@@ -82,7 +83,7 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
             <Link to={`/nguoi-dung/${phien.nguoi_ban_id}/danh-gia`}>Xem đánh giá về người bán</Link>
           </p>
           <div className="gia-chi-tiet">
-            <span>Giá trả công khai hiện tại</span>
+            <span>{tenGiaPhien(phien)}</span>
             <strong>{tien(phien.gia_hien_tai)}</strong>
             <small>{phien.tong_luot_tra_gia} lượt trả giá</small>
           </div>
@@ -112,23 +113,15 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
               </div>
             )}
           </dl>
-          <Alert
-            type={phien.nguoi_dan_dau === `ND-${nguoiDung?.id}` ? 'success' : 'info'}
-            title={
-              phien.nguoi_dan_dau
-                ? `Người dẫn đầu: ${phien.nguoi_dan_dau === `ND-${nguoiDung?.id}` ? 'Bạn' : phien.nguoi_dan_dau}`
-                : 'Chưa có người dẫn đầu'
-            }
-            description={
-              !Number(phien.tong_luot_tra_gia)
-                ? 'Phiên chưa có lượt trả giá.'
-                : Number(phien.dat_gia_san)
-                  ? 'Giá hiện tại đã đáp ứng điều kiện giá sàn (hoặc phiên không đặt giá sàn).'
-                  : 'Giá hiện tại chưa đạt giá sàn. Dẫn đầu chưa đồng nghĩa với thắng phiên.'
-            }
-          />
-          <Button onClick={() => void lamMoiThamGia(phien.id)}>Làm mới giá và trạng thái</Button>
-          <ThamGiaPhien phien={phien} />
+          <div className="nhom-thao-tac-dau-gia">
+            <Alert
+              type={thongTinDauGia.type}
+              title={thongTinDauGia.title}
+              description={thongTinDauGia.description}
+            />
+            <Button onClick={() => void lamMoiThamGia(phien.id)}>Làm mới giá và trạng thái</Button>
+            <ThamGiaPhien phien={phien} />
+          </div>
           <Link className="link-vang" to="/huong-dan">
             Xem quy tắc tham gia ↗
           </Link>
@@ -253,6 +246,79 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
       </section>
     </>
   );
+}
+
+function layThongTinDauGia(phien: Phien, nguoiDungId?: string) {
+  const nguoiDanDau = phien.nguoi_dan_dau
+    ? phien.nguoi_dan_dau === `ND-${nguoiDungId}`
+      ? 'Bạn'
+      : phien.nguoi_dan_dau
+    : null;
+
+  if (phien.trang_thai === 'DA_KET_THUC') {
+    const muaNgay = phien.ly_do_ket_thuc === 'MUA_NGAY';
+
+    return {
+      type: 'success' as const,
+      title: muaNgay
+        ? `Đã Mua ngay${nguoiDanDau ? ` · ${nguoiDanDau}` : ''}`
+        : `Người thắng: ${nguoiDanDau || 'đã được ghi nhận'}`,
+      description: muaNgay
+        ? 'Phiên đã kết thúc theo giá Mua ngay.'
+        : 'Phiên đã kết thúc với giá trúng công khai.',
+    };
+  }
+
+  if (phien.trang_thai === 'THAT_BAI') {
+    return {
+      type: 'warning' as const,
+      title: 'Phiên kết thúc, chưa thành công',
+      description:
+        phien.ly_do_ket_thuc === 'KHONG_DAT_GIA_SAN'
+          ? 'Giá cuối phiên chưa đạt giá sàn; không phát sinh người thắng.'
+          : 'Phiên không có lượt trả giá hợp lệ.',
+    };
+  }
+
+  if (phien.trang_thai === 'DA_HUY') {
+    return {
+      type: 'warning' as const,
+      title: 'Phiên đã bị hủy',
+      description: 'Phiên không tiếp tục nhận trả giá.',
+    };
+  }
+
+  if (phien.trang_thai === 'DA_LEN_LICH') {
+    return {
+      type: 'info' as const,
+      title: 'Phiên sắp bắt đầu',
+      description: `Giá khởi điểm ${tien(phien.gia_khoi_diem)}.`,
+    };
+  }
+
+  if (!Number(phien.tong_luot_tra_gia)) {
+    return {
+      type: 'info' as const,
+      title: 'Chưa có lượt trả giá',
+      description: `Phiên đang nhận trả giá từ ${tien(phien.gia_khoi_diem)}.`,
+    };
+  }
+
+  if (!Number(phien.dat_gia_san)) {
+    return {
+      type: 'warning' as const,
+      title: nguoiDanDau ? `Đang dẫn đầu: ${nguoiDanDau}` : 'Giá chưa đạt giá sàn',
+      description: 'Giá công khai chưa đạt giá sàn. Dẫn đầu chưa đồng nghĩa với thắng phiên.',
+    };
+  }
+
+  return {
+    type: nguoiDanDau === 'Bạn' ? ('success' as const) : ('info' as const),
+    title: nguoiDanDau ? `Đang dẫn đầu: ${nguoiDanDau}` : 'Giá đã đạt điều kiện giá sàn',
+    description: nguoiDanDau
+      ? 'Mức giá đang dẫn đầu đã đáp ứng điều kiện giá sàn.'
+      : 'Giá công khai đã đáp ứng điều kiện giá sàn.',
+  };
 }
 
 export default function ChiTietPhien() {

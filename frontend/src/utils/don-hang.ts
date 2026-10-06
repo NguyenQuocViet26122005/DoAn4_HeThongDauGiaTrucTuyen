@@ -21,7 +21,8 @@ export function duocHoanTatDon(don: DonHang) {
 export function ketQuaThanhToanDon(don: DonHang, lan: LanThanhToan) {
   // API đơn trả hồ sơ đơn, không trả ket_qua_mo_phong như API Mua ngay.
   if (
-    don.thanh_toan.some((muc) => muc.trang_thai === 'DA_THANH_TOAN') &&
+    (don.thanh_toan.some((muc) => muc.trang_thai === 'DA_THANH_TOAN') ||
+      don.trang_thai_giu_tien === 'DANG_GIU') &&
     donViNho(don.so_tien_da_thu) === donViNho(don.tong_tien)
   ) {
     return 'THANH_CONG' as const;

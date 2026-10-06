@@ -64,6 +64,10 @@ function SuaDanhMuc({ muc, danhSach }: { muc?: DanhMucQuanTri; danhSach: DanhMuc
       xacNhan={(giaTri) => (
         <>
           <p>
+            VietBid chỉ nhận danh mục dành cho hàng hiếm, hàng sưu tầm hoặc tài sản có giá trị cao;
+            không thêm hàng tiêu dùng phổ thông.
+          </p>
+          <p>
             Lưu danh mục “{giaTri.ten}” · {giaTri.dang_hoat_dong ? 'Đang sử dụng' : 'Ngừng sử dụng'}
             ?
           </p>

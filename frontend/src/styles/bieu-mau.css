@@ -13,7 +13,7 @@
   flex-direction: column;
   background:
     linear-gradient(0deg, #11140df5 6%, #11140d70 70%),
-    url('../assets/khong-gian-dau-gia.png') 67% center / cover;
+    url('../assets/khong-gian-dau-gia.webp') 67% center / cover;
   min-height: 570px;
 }
 .cau-chuyen-xac-thuc h1 {

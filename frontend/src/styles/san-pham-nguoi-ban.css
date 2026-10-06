@@ -218,7 +218,10 @@
   .hanh-dong-san-pham-ban {
     grid-column: 1 / -1;
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
+    gap: 14px;
   }
   .thong-tin-san-pham-ban h2 {
     font-size: 20px;

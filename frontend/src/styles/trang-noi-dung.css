@@ -90,6 +90,16 @@
 .tam-noi-dung > .ant-alert {
   margin-bottom: 28px;
 }
+.thong-tin-tai-khoan > .ant-btn {
+  margin-top: 18px;
+}
+.danh-sach-phien-ca-nhan {
+  display: grid;
+  gap: 16px;
+}
+.danh-sach-phien-ca-nhan > .ant-btn {
+  justify-self: start;
+}
 .luoi-loi-tat {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -152,6 +162,13 @@
 .thong-tin-phien h1 {
   font-size: 37px;
   margin: 16px 0 20px;
+}
+.nhom-thao-tac-dau-gia {
+  display: grid;
+  gap: 12px;
+}
+.nhom-thao-tac-dau-gia > .ant-btn {
+  justify-self: start;
 }
 .gia-chi-tiet {
   display: grid;

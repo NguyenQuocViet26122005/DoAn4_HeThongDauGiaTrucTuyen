@@ -16,7 +16,7 @@ function DanhSachPhienCaNhan({ url }: { url: string }) {
   const phien = useDuLieu<Phien[]>(url, { page: trang, limit: 9 });
 
   return (
-    <>
+    <div className="danh-sach-phien-ca-nhan">
       <Button loading={phien.isFetching} onClick={() => void phien.refetch()}>
         Làm mới danh sách
       </Button>
@@ -38,7 +38,7 @@ function DanhSachPhienCaNhan({ url }: { url: string }) {
           gioiHan={9}
         />
       )}
-    </>
+    </div>
   );
 }
 
@@ -65,7 +65,7 @@ export default function KhongGianNghiepVu({ loai }: { loai: string }) {
       <TieuDe nhanNho="KHÔNG GIAN CỦA BẠN" ten={thongTin[0]} moTa={thongTin[1]} />
       {laHoSo ? (
         <>
-          <section className="tam-noi-dung">
+          <section className="tam-noi-dung thong-tin-tai-khoan">
             <h2>Thông tin tài khoản</h2>
             <Descriptions
               column={1}

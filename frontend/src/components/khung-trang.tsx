@@ -90,7 +90,7 @@ export default function KhungTrang() {
       </a>
       <div className="thanh-thong-diep">
         <span>NHỮNG GIÁ TRỊ ĐẶC BIỆT, ĐANG CHỜ CHỦ NHÂN MỚI</span>
-        <span>Đấu giá minh bạch · Giao dịch có bảo vệ</span>
+        <span>Đấu giá minh bạch · Theo dõi tiến trình giao dịch</span>
       </div>
       <header className="dau-trang">
         <div className="khung thanh-dieu-huong">
@@ -196,7 +196,7 @@ export default function KhungTrang() {
               <p>
                 Người bán được xác minh.
                 <br />
-                Tiền được giữ đến khi giao dịch hoàn tất.
+                Theo dõi tiến trình từ thanh toán đến nhận hàng.
               </p>
             </div>
           </div>

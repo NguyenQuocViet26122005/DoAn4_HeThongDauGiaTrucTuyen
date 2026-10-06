@@ -76,7 +76,7 @@ export function TieuDe({
         <h1>{ten}</h1>
         {moTa && <p>{moTa}</p>}
       </div>
-      {children}
+      {children && <div className="hanh-dong-tieu-de">{children}</div>}
     </div>
   );
 }
@@ -140,7 +140,7 @@ export function AnhSanPham({
       ) : (
         <div className="anh-thay-the">
           <BieuTuong ten={bieuTuongDanhMuc(ten)} size={lon ? 120 : 68} />
-          <span>Ảnh đang được cập nhật</span>
+          <span>Chưa có ảnh khả dụng</span>
         </div>
       )}
     </div>
@@ -195,7 +195,7 @@ export function PhanTrang({
   return (
     <div className="phan-trang">
       <span className="chu-mo">
-        Trang {trang} · {soLuong} kết quả
+        Trang {trang} · {soLuong} kết quả trên trang này
       </span>
       <div>
         <Button disabled={trang === 1} onClick={() => datTrang(trang - 1)}>

@@ -42,7 +42,7 @@ export default function ChonSanPhamPhien({
     <div className="chon-san-pham-phien">
       <p className="chu-mo">
         Chỉ hiển thị sản phẩm đã duyệt, đủ điều kiện kiểm định, không còn phiên/đơn đang xử lý và
-        không có Cơ hội mua tiếp đang chờ.
+        không có Cơ hội mua tiếp đang chờ hoặc đã được chấp nhận.
       </p>
       <Input.Search
         aria-label="Tìm sản phẩm đủ điều kiện"
