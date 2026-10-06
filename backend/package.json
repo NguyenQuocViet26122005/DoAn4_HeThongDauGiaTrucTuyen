@@ -13,6 +13,8 @@
     "dev": "tsx watch src/may-chu.ts",
     "dev:local": "tsx scripts/chay-cuc-bo.js",
     "start": "node dist/may-chu.js",
+    "du-lieu:demo": "npm run build && node scripts/du-lieu-demo-vietbid.js",
+    "du-lieu:demo:verify": "npm run build && node scripts/du-lieu-demo-vietbid.js --verify",
     "check:schema": "node scripts/kiem-tra-cau-truc.js",
     "build": "tsc -p tsconfig.json",
     "pretest": "npm run build",
