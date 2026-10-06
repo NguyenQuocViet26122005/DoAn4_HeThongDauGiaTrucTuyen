@@ -217,9 +217,11 @@ async function thongKeNguoiBan(nguoiDung: NguoiDungDangNhap, phienId) {
 }
 
 async function cuaToi(nguoiDung: NguoiDungDangNhap, phienId) {
-  batBuocTonTai(await cacPhien.layTheoId(kiemTra.id(phienId)));
+  const id = kiemTra.id(phienId);
 
-  return khoCoc.cuaNguoiDung(phienId, nguoiDung.id);
+  batBuocTonTai(await cacPhien.layTheoId(id));
+
+  return khoCoc.cuaNguoiDung(id, nguoiDung.id);
 }
 
 export {

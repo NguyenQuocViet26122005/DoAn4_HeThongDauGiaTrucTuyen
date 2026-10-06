@@ -105,25 +105,38 @@ async function taoDonNguoiThang(
     );
   }
 
-  await taoThongBao(
-    nguoiMuaId,
-    'CAN_THANH_TOAN',
-    'Bạn có đơn hàng cần thanh toán',
-    'Hoàn tất thanh toán mô phỏng trước hạn của đơn.',
-    `/orders/${id}`,
-  );
-  await taoThongBao(
-    phienDauGia.nguoi_ban_id,
-    'CO_DON_HANG',
-    'Phiên đã tạo đơn hàng',
-    'Đơn đang chờ người mua thanh toán.',
-    `/orders/${id}`,
-  );
+  const daTao = batBuocTonTai(await khoBanGhi.layTheoId('don_hang', id));
+  const daDuocThanhToanBangCoc =
+    donViTienNho(daTao.tien_coc_da_chuyen) > 0 &&
+    donViTienNho(daTao.so_tien_da_thu) === donViTienNho(daTao.tong_tien);
+
+  if (!daDuocThanhToanBangCoc) {
+    await taoThongBao(
+      nguoiMuaId,
+      'CAN_THANH_TOAN',
+      'Bạn có đơn hàng cần thanh toán',
+      'Hoàn tất thanh toán mô phỏng trước hạn của đơn.',
+      `/orders/${id}`,
+    );
+    await taoThongBao(
+      phienDauGia.nguoi_ban_id,
+      'CO_DON_HANG',
+      'Phiên đã tạo đơn hàng',
+      'Đơn đang chờ người mua thanh toán.',
+      `/orders/${id}`,
+    );
+  }
+
   await ghiNhatKy(null, 'TAO_DON_HANG', 'don_hang', id, { nguon_don: nguon });
 
-  const daTao = batBuocTonTai(await khoBanGhi.layTheoId('don_hang', id));
-
-  if (donViTienNho(daTao.so_tien_da_thu) === donViTienNho(daTao.tong_tien)) {
+  if (daDuocThanhToanBangCoc) {
+    await hoanTatThanhToanDon(
+      { id: String(nguoiMuaId) } as NguoiDungDangNhap,
+      daTao,
+      await coSoDuLieu.thoiGianHienTai(),
+      true,
+    );
+  } else if (donViTienNho(daTao.so_tien_da_thu) === donViTienNho(daTao.tong_tien)) {
     await thanhToan({ id: String(nguoiMuaId) } as NguoiDungDangNhap, id, {});
   }
 
@@ -208,7 +221,7 @@ async function thanhToan(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown =
         'DANG_TRANH_CHAP',
         'HOAN_THANH',
       ].includes(banGhi.trang_thai) &&
-      (await khoDuLieu.cacThanhToan(id)).some((p) => p.trang_thai === 'DA_THANH_TOAN')
+      donViTienNho(banGhi.so_tien_da_thu) === donViTienNho(banGhi.tong_tien)
     ) {
       return chiTiet(nguoiDung, id);
     }
@@ -270,46 +283,55 @@ async function thanhToan(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown =
       await khoBanGhi.them('thanh_toan', { ...duLieu, don_hang_id: id });
     }
 
-    const tienTrungGian = await khoDuLieu.tienTrungGian(id, true);
-
-    baoDam(
-      !tienTrungGian ||
-        tienTrungGian.trang_thai === 'CHO_GIU_TIEN' ||
-        (tienTrungGian.trang_thai === 'DANG_GIU' &&
-          donViTienNho(banGhi.so_tien_da_thu) === donViTienNho(banGhi.tien_coc_da_chuyen)),
-      409,
-      'Đơn đã có giao dịch giữ tiền',
-    );
-
-    await khoBanGhi.capNhat('don_hang', id, {
-      so_tien_da_thu: banGhi.tong_tien,
-      trang_thai_giu_tien: 'DANG_GIU',
-      ngay_bat_dau_giu: thoiGianHienTai,
-      trang_thai: 'CHO_GUI_HANG',
-      han_nguoi_ban_gui_hang: thoiGian.congGiay(
-        thoiGianHienTai,
-        (await cauHinhNghiepVu.docSoCauHinh('SELLER_SHIP_DEADLINE_DAYS')) * 86400,
-      ),
-    });
-
-    await ghiNhatKy(nguoiDung.id, 'THANH_TOAN_MO_PHONG', 'don_hang', id);
-    await taoThongBao(
-      banGhi.nguoi_ban_id,
-      'CAN_GUI_HANG',
-      'Đơn đã thanh toán — cần gửi hàng',
-      'Tiền đang được hệ thống giữ trung gian.',
-      `/orders/${id}`,
-    );
-    await taoThongBao(
-      nguoiDung.id,
-      'DA_THANH_TOAN',
-      'Thanh toán mô phỏng thành công',
-      'Tiền được giữ đến khi giao dịch hoàn thành.',
-      `/orders/${id}`,
-    );
+    await hoanTatThanhToanDon(nguoiDung, banGhi, thoiGianHienTai);
 
     return chiTiet(nguoiDung, id);
   });
+}
+
+async function hoanTatThanhToanDon(nguoiDung, banGhi, thoiGianHienTai, bangCoc = false) {
+  const tienTrungGian = await khoDuLieu.tienTrungGian(banGhi.id, true);
+
+  baoDam(
+    !tienTrungGian ||
+      tienTrungGian.trang_thai === 'CHO_GIU_TIEN' ||
+      (tienTrungGian.trang_thai === 'DANG_GIU' &&
+        donViTienNho(banGhi.so_tien_da_thu) === donViTienNho(banGhi.tien_coc_da_chuyen)),
+    409,
+    'Đơn đã có giao dịch giữ tiền',
+  );
+
+  await khoBanGhi.capNhat('don_hang', banGhi.id, {
+    so_tien_da_thu: banGhi.tong_tien,
+    trang_thai_giu_tien: 'DANG_GIU',
+    ngay_bat_dau_giu: thoiGianHienTai,
+    trang_thai: 'CHO_GUI_HANG',
+    han_nguoi_ban_gui_hang: thoiGian.congGiay(
+      thoiGianHienTai,
+      (await cauHinhNghiepVu.docSoCauHinh('SELLER_SHIP_DEADLINE_DAYS')) * 86400,
+    ),
+  });
+
+  await ghiNhatKy(
+    nguoiDung.id,
+    bangCoc ? 'XAC_NHAN_DON_DUOC_THANH_TOAN_BANG_COC' : 'THANH_TOAN_MO_PHONG',
+    'don_hang',
+    banGhi.id,
+  );
+  await taoThongBao(
+    banGhi.nguoi_ban_id,
+    'CAN_GUI_HANG',
+    'Đơn đã thanh toán — cần gửi hàng',
+    'Tiền đang được hệ thống giữ trung gian.',
+    `/orders/${banGhi.id}`,
+  );
+  await taoThongBao(
+    nguoiDung.id,
+    bangCoc ? 'COC_DU_TIEN_DON' : 'DA_THANH_TOAN',
+    bangCoc ? 'Đơn đã được thanh toán bằng tiền cọc' : 'Thanh toán mô phỏng thành công',
+    'Tiền được giữ đến khi giao dịch hoàn thành.',
+    `/orders/${banGhi.id}`,
+  );
 }
 
 async function guiHang(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
