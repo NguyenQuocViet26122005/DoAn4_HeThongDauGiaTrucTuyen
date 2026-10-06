@@ -307,6 +307,12 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
 
   baoDam(coQuyenRieng || banGhi.trang_thai_duyet === 'DA_DUYET', 404, 'Không tìm thấy sản phẩm');
 
+  if (!coQuyenRieng) {
+    const danhMuc = await khoBanGhi.layTheoId('danh_muc', banGhi.danh_muc_id);
+
+    baoDam(Number(danhMuc?.dang_hoat_dong) === 1, 404, 'Không tìm thấy sản phẩm');
+  }
+
   const sanPham = coQuyenRieng
     ? banGhi
     : chonTruong(banGhi, [
@@ -520,6 +526,7 @@ function danhSach(nguoiDung: NguoiDungDangNhap, truyVan: TruyVanDanhSach = {}, p
   const boLoc: BoLocDanhSach = {
     search: truyVan.q ? kiemTra.chuoi(truyVan.q, 'Tìm kiếm', 100) : '',
     categoryId: truyVan.danh_muc_id ? kiemTra.id(truyVan.danh_muc_id) : undefined,
+    chiDanhMucDangHoatDong: phamVi === 'public',
   };
 
   if (phamVi === 'mine') {

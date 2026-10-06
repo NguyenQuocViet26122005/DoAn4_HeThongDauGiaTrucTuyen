@@ -65,6 +65,9 @@ function danhSach({ limit: gioiHan, offset: viTriBatDau }: PhanTrang, boLoc: BoL
     dieuKienLoc.push('p.danh_muc_id=?');
     thamSo.push(boLoc.categoryId);
   }
+  if (boLoc.chiDanhMucDangHoatDong) {
+    dieuKienLoc.push('c.dang_hoat_dong=1');
+  }
   if (boLoc.search) {
     dieuKienLoc.push('p.tieu_de LIKE ?');
     thamSo.push(`%${boLoc.search}%`);

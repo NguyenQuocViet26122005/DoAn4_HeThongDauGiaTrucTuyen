@@ -1078,12 +1078,144 @@ INSERT INTO cau_hinh_he_thong (khoa_cau_hinh, gia_tri_cau_hinh, kieu_du_lieu, mo
 ('BUYER_NON_RECEIPT_DAYS', '7', 'SO', 'Mốc khiếu nại chưa nhận tính từ khai báo gửi'),
 ('BUOC_GIA', '[{"gia_tu":"0.00","gia_den":"999999.99","muc_tang_gia":"10000.00"},{"gia_tu":"1000000.00","gia_den":"9999999.99","muc_tang_gia":"100000.00"},{"gia_tu":"10000000.00","gia_den":"99999999.99","muc_tang_gia":"500000.00"},{"gia_tu":"100000000.00","gia_den":null,"muc_tang_gia":"1000000.00"}]', 'JSON', 'Bộ bước giá minh họa. Backend kiểm tra khoảng liên tục và khóa khi có phiên chờ/hoạt động');
 
-INSERT INTO danh_muc (ten, duong_dan, cau_hinh_thuoc_tinh, thu_tu) VALUES
-('Điện tử', 'dien-tu', '[{"khoa":"thuong_hieu","ten":"Thương hiệu","kieu":"VAN_BAN","bat_buoc":true},{"khoa":"dung_luong","ten":"Dung lượng","kieu":"SO","don_vi":"GB","bat_buoc":false}]', 1),
-('Đồng hồ', 'dong-ho', '[{"khoa":"loai_may","ten":"Loại máy","kieu":"LUA_CHON","lua_chon":["Cơ","Quartz","Thông minh"],"bat_buoc":true}]', 2),
-('Thời trang', 'thoi-trang', NULL, 3),
-('Đồ sưu tầm', 'do-suu-tam', NULL, 4),
-('Gia dụng', 'gia-dung', NULL, 5);
+-- Danh mục VietBid chỉ dành cho hàng hiếm, sưu tầm hoặc tài sản giá trị cao.
+-- Danh mục không tự chứng minh tính xác thực; sản phẩm vẫn qua duyệt và kiểm định theo chính sách.
+INSERT INTO danh_muc (
+  ten,
+  duong_dan,
+  mo_ta,
+  cau_hinh_thuoc_tinh,
+  thu_tu,
+  yeu_cau_kiem_dinh
+) VALUES
+(
+  'Đồ cổ và cổ vật',
+  'do-co-co-vat',
+  'Cổ vật, đồ cổ có giá trị sưu tầm; không nhận hàng trang trí phổ thông.',
+  '[
+    {"khoa":"nien_dai","ten":"Niên đại hoặc thời kỳ","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"chat_lieu","ten":"Chất liệu","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"nguon_goc","ten":"Có hồ sơ nguồn gốc","kieu":"DUNG_SAI","bat_buoc":true}
+  ]',
+  1,
+  1
+),
+(
+  'Tranh và tác phẩm nghệ thuật',
+  'tranh-tac-pham-nghe-thuat',
+  'Tác phẩm nguyên bản, có giá trị nghệ thuật hoặc sưu tầm; không nhận đồ trang trí đại trà.',
+  '[
+    {"khoa":"tac_gia","ten":"Tác giả hoặc nghệ sĩ","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"chat_lieu","ten":"Chất liệu và kỹ thuật","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"kich_thuoc","ten":"Kích thước","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"nam_sang_tac","ten":"Năm sáng tác","kieu":"SO","bat_buoc":false}
+  ]',
+  2,
+  1
+),
+(
+  'Đồng hồ cao cấp',
+  'dong-ho-cao-cap',
+  'Đồng hồ cơ hoặc đồng hồ xa xỉ có giá trị; không nhận thiết bị thông minh phổ thông.',
+  '[
+    {"khoa":"dong_san_pham","ten":"Dòng sản phẩm","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"ma_tham_chieu","ten":"Mã tham chiếu","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"nam_san_xuat","ten":"Năm sản xuất","kieu":"SO","bat_buoc":false},
+    {"khoa":"hop_va_chung_tu","ten":"Có hộp và chứng từ","kieu":"DUNG_SAI","bat_buoc":true}
+  ]',
+  3,
+  1
+),
+(
+  'Trang sức và đá quý',
+  'trang-suc-da-quy',
+  'Trang sức vàng, bạch kim, kim cương hoặc đá quý có giá trị sưu tầm.',
+  '[
+    {"khoa":"kim_loai","ten":"Kim loại quý","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"loai_da","ten":"Đá quý","kieu":"VAN_BAN","bat_buoc":false},
+    {"khoa":"trong_luong","ten":"Trọng lượng","kieu":"SO","don_vi":"g","bat_buoc":true},
+    {"khoa":"chung_thu","ten":"Có chứng thư giám định","kieu":"DUNG_SAI","bat_buoc":true}
+  ]',
+  4,
+  1
+),
+(
+  'Hàng hiệu hiếm và phiên bản giới hạn',
+  'hang-hieu-hiem-phien-ban-gioi-han',
+  'Túi, phụ kiện và sản phẩm xa xỉ hiếm hoặc giới hạn; không nhận thời trang phổ thông.',
+  '[
+    {"khoa":"dong_san_pham","ten":"Dòng sản phẩm","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"ma_phien_ban","ten":"Mã hoặc số phiên bản","kieu":"VAN_BAN","bat_buoc":false},
+    {"khoa":"nam_phat_hanh","ten":"Năm phát hành","kieu":"SO","bat_buoc":false},
+    {"khoa":"phu_kien_chung_tu","ten":"Có phụ kiện và chứng từ","kieu":"DUNG_SAI","bat_buoc":true}
+  ]',
+  5,
+  1
+),
+(
+  'Xe cổ và phương tiện sưu tầm',
+  'xe-co-phuong-tien-suu-tam',
+  'Xe cổ, xe giới hạn hoặc phương tiện có giá trị lịch sử và sưu tầm.',
+  '[
+    {"khoa":"hang_xe","ten":"Hãng xe","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"dong_xe","ten":"Dòng xe","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"nam_san_xuat","ten":"Năm sản xuất","kieu":"SO","bat_buoc":true},
+    {"khoa":"so_khung","ten":"Số khung","kieu":"VAN_BAN","bat_buoc":true}
+  ]',
+  6,
+  1
+),
+(
+  'Sách hiếm, bản thảo và tài liệu lịch sử',
+  'sach-hiem-ban-thao-tai-lieu-lich-su',
+  'Ấn bản hiếm, bản thảo hoặc tư liệu có giá trị lịch sử và sưu tầm.',
+  '[
+    {"khoa":"tac_gia","ten":"Tác giả hoặc đơn vị phát hành","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"nam_xuat_ban","ten":"Năm xuất bản hoặc sáng tác","kieu":"SO","bat_buoc":true},
+    {"khoa":"an_ban","ten":"Lần in hoặc ấn bản","kieu":"VAN_BAN","bat_buoc":false},
+    {"khoa":"nguon_goc","ten":"Có hồ sơ nguồn gốc","kieu":"DUNG_SAI","bat_buoc":true}
+  ]',
+  7,
+  1
+),
+(
+  'Kỷ vật và hiện vật sưu tầm',
+  'ky-vat-hien-vat-suu-tam',
+  'Kỷ vật văn hóa, thể thao hoặc lịch sử có nguồn gốc và giá trị sưu tầm.',
+  '[
+    {"khoa":"su_kien","ten":"Sự kiện hoặc nhân vật liên quan","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"thoi_ky","ten":"Thời kỳ","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"nguon_goc","ten":"Có hồ sơ nguồn gốc","kieu":"DUNG_SAI","bat_buoc":true}
+  ]',
+  8,
+  1
+),
+(
+  'Nhạc cụ vintage giá trị cao',
+  'nhac-cu-vintage-gia-tri-cao',
+  'Nhạc cụ vintage, phiên bản giới hạn hoặc có giá trị lịch sử và sưu tầm.',
+  '[
+    {"khoa":"nha_san_xuat","ten":"Nhà sản xuất","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"dong_san_pham","ten":"Dòng sản phẩm","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"nam_san_xuat","ten":"Năm sản xuất","kieu":"SO","bat_buoc":false},
+    {"khoa":"ma_dinh_danh","ten":"Mã định danh hoặc số seri","kieu":"VAN_BAN","bat_buoc":false}
+  ]',
+  9,
+  1
+),
+(
+  'Máy ảnh cổ và thiết bị quang học',
+  'may-anh-co-thiet-bi-quang-hoc',
+  'Máy ảnh cơ, ống kính cổ và thiết bị quang học sưu tầm.',
+  '[
+    {"khoa":"he_may","ten":"Hệ máy","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"ma_mau","ten":"Mã mẫu","kieu":"VAN_BAN","bat_buoc":true},
+    {"khoa":"nam_san_xuat","ten":"Năm sản xuất","kieu":"SO","bat_buoc":false},
+    {"khoa":"ong_kinh_kem_theo","ten":"Có ống kính đi kèm","kieu":"DUNG_SAI","bat_buoc":true}
+  ]',
+  10,
+  1
+);
 
 INSERT INTO cau_hinh_he_thong (khoa_cau_hinh, gia_tri_cau_hinh, kieu_du_lieu, mo_ta) VALUES
   ('DEPOSIT_POLICY', '{"bat":false,"kieu":"TY_LE","gia_tri":10}', 'JSON', 'Admin cấu hình rồi bật; chỉ áp dụng phiên mới');

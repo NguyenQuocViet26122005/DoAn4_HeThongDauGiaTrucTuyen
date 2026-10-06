@@ -141,7 +141,15 @@ const sanPhamDaCoPhien = (id) =>
 
 function danhSachSanPham(
   { limit, offset }: PhanTrang,
-  { sellerId, status, categoryId, search = '', duDieuKienDauGia = false, productId }: BoLocDanhSach,
+  {
+    sellerId,
+    status,
+    categoryId,
+    search = '',
+    duDieuKienDauGia = false,
+    productId,
+    chiDanhMucDangHoatDong,
+  }: BoLocDanhSach,
 ) {
   const dk = ['p.tieu_de LIKE ?'],
     ts: unknown[] = [`%${search}%`];
@@ -161,6 +169,9 @@ function danhSachSanPham(
   if (categoryId) {
     dk.push('p.danh_muc_id=?');
     ts.push(categoryId);
+  }
+  if (chiDanhMucDangHoatDong) {
+    dk.push('EXISTS (SELECT 1 FROM danh_muc c WHERE c.id=p.danh_muc_id AND c.dang_hoat_dong=1)');
   }
 
   if (duDieuKienDauGia) {

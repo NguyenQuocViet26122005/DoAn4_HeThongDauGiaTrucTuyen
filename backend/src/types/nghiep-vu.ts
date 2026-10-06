@@ -19,6 +19,7 @@ export interface BoLocDanhSach {
   bidderId?: DinhDanh;
   productId?: DinhDanh;
   duDieuKienDauGia?: boolean;
+  chiDanhMucDangHoatDong?: boolean;
 }
 export type TruyVanDanhSach = Record<string, unknown>;
 export interface NguoiDungDangNhap {

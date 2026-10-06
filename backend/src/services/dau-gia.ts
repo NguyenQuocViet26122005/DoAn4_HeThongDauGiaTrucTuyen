@@ -571,6 +571,7 @@ async function danhSach(
 ) {
   const boLoc: BoLocDanhSach = {
     search: truyVan.q ? kiemTra.chuoi(truyVan.q, 'Tìm kiếm', 100) : undefined,
+    chiDanhMucDangHoatDong: phamVi === 'public',
     status: truyVan.trang_thai
       ? kiemTra.giaTriLuaChon(
           truyVan.trang_thai,
