@@ -567,8 +567,12 @@ async function duyetHuyPhien(quanTri: NguoiDungDangNhap, yeuCauId, duLieuNhap: u
 async function danhSach(
   nguoiDung: NguoiDungDangNhap,
   truyVan: TruyVanDanhSach = {},
-  phamVi = 'public',
+  phamVi: 'public' | 'admin' | 'mine' | 'watchlist' | 'bids' = 'public',
 ) {
+  if (phamVi === 'admin') {
+    baoDam(nguoiDung?.vai_tro === 'QUAN_TRI', 403, 'Chỉ quản trị viên được xem toàn bộ phiên');
+  }
+
   const boLoc: BoLocDanhSach = {
     search: truyVan.q ? kiemTra.chuoi(truyVan.q, 'Tìm kiếm', 100) : undefined,
     chiDanhMucDangHoatDong: phamVi === 'public',

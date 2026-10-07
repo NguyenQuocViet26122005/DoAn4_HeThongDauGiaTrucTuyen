@@ -638,16 +638,20 @@ async function xuLyDenHan(id) {
 async function nhacThanhToan(id) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = await khoDuLieu.khoaDuLieu(id);
+    const hienTai = await coSoDuLieu.thoiGianHienTai();
 
     if (
       banGhi?.trang_thai === 'CHO_THANH_TOAN' &&
-      !thoiGian.daHetHan(banGhi.han_thanh_toan, await coSoDuLieu.thoiGianHienTai())
+      !thoiGian.daHetHan(banGhi.han_thanh_toan, hienTai) &&
+      thoiGian.doiThanhNgay(banGhi.han_thanh_toan).getTime() -
+        thoiGian.doiThanhNgay(hienTai).getTime() <=
+        6 * 3600000
     ) {
       await thongBaoMotLan(
         banGhi.nguoi_mua_id,
         'SAP_HET_HAN_THANH_TOAN',
         'Sắp hết hạn thanh toán',
-        'Hãy hoàn tất thanh toán mô phỏng trước thời hạn.',
+        'Hãy hoàn tất thanh toán trước thời hạn.',
         `/orders/${id}`,
       );
     }

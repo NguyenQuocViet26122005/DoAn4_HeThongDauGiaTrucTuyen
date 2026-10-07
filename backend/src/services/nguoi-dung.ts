@@ -155,6 +155,22 @@ async function luuDiaChi(nguoiDung: NguoiDungDangNhap, idCanSua, dauVao) {
     if (!daCo.length) {
       duLieu.la_mac_dinh = 1;
     }
+    if (
+      id &&
+      !duLieu.la_mac_dinh &&
+      daCo.some((diaChi) => cungId(diaChi.id, id) && diaChi.la_mac_dinh)
+    ) {
+      const diaChiKhac = daCo.find((diaChi) => !cungId(diaChi.id, id));
+
+      if (diaChiKhac) {
+        // Bỏ mặc định ở địa chỉ đang sửa phải chuyển sang một địa chỉ còn lại.
+        await cacNguoiDung.boDiaChiMacDinh(nguoiDung.id);
+
+        await khoBanGhi.capNhat('dia_chi_nguoi_dung', diaChiKhac.id, { la_mac_dinh: 1 });
+      } else {
+        duLieu.la_mac_dinh = 1;
+      }
+    }
     if (duLieu.la_mac_dinh) {
       await cacNguoiDung.boDiaChiMacDinh(nguoiDung.id);
     }
