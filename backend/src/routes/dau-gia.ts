@@ -24,7 +24,7 @@ boDinhTuyen.get('/watchlist', yeuCauDangNhap(), dieuKhien.danhSachTheoDoi);
 boDinhTuyen.get('/watchlist/:id', yeuCauDangNhap(), dieuKhien.trangThaiTheoDoi);
 boDinhTuyen.post('/watchlist/:id', yeuCauDangNhap(), dieuKhien.theoDoi);
 boDinhTuyen.delete('/watchlist/:id', yeuCauDangNhap(), dieuKhien.boTheoDoi);
-boDinhTuyen.get('/admin/auctions', yeuCauDangNhap(), quanTri, dieuKhien.danhSach);
+boDinhTuyen.get('/admin/auctions', yeuCauDangNhap(), quanTri, dieuKhien.danhSachQuanTri);
 boDinhTuyen.get(
   '/admin/cancellation-requests',
   yeuCauDangNhap(),
