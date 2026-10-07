@@ -12,6 +12,22 @@ Cập nhật danh mục ngày 06/10/2026: MySQL chính bật 10 danh mục hàng
 
 **Trạng thái triển khai:** SQL và backend dùng 21 bảng; cấu trúc MySQL chính giữ nguyên, đã bổ sung dữ liệu demo và đồng bộ danh mục công khai. Sau khi bổ sung báo cáo sản phẩm và đăng lại có điều kiện, kiểm thử backend đạt 57/57; bộ HTTP bao phủ 107/107 API và 45 phản hồi lỗi quyền/trạng thái có mã đúng; frontend đạt build, lint và 13 kiểm thử. Đã kiểm tra trên trình duyệt các nhánh chính của Cơ hội mua tiếp trong CSDL kiểm thử riêng; báo cáo sản phẩm và đăng lại chưa được nghiệm thu trực tiếp trên trình duyệt. Toàn bộ giao diện chưa được nghiệm thu; chi tiết phạm vi kiểm tra nằm ở mục 3.1.4.
 
+## Cập nhật bộ dữ liệu ngày 07/10/2026
+
+Đã thay dữ liệu nghiệp vụ trong MySQL chính `doan4_daugia` sau khi sao lưu có checksum, thử trên `doan4_daugia_rebuild` và xác minh thành công. Giữ nguyên cấu trúc 21 bảng, view, trigger và 28 sản phẩm hiện có. Chỉ hiển thị 10 danh mục người dùng chốt; 12 bản ghi danh mục cũ được lưu ở trạng thái không hoạt động.
+
+Bộ mới có 1 Admin, 5 người bán đã xác minh, 10 người mua; 10 phiên, 27 lượt trả giá, 12 khoản cọc, 7 đơn, 5 thanh toán, 2 tranh chấp và 4 đánh giá. Các chuỗi thành công, quá hạn/không hoàn cọc/Second Chance, Mua ngay, tranh chấp và không đạt giá sàn được liên kết từ hồ sơ kiểm định đến tiền và nhật ký. Đây là dữ liệu tổng hợp được lưu thật trong MySQL, không phải giao dịch thương mại thật.
+
+Đã kiểm tra 23 nhóm ràng buộc dữ liệu không có lỗi; 16 tài khoản và 203 yêu cầu HTTP trên bộ mới đều đạt. Backend đạt 18 kiểm thử nền và 57 kiểm thử tích hợp; frontend đạt lint, build và 13 kiểm thử. Đã render và kiểm tra bố cục 26 PDF hồ sơ. 34 ảnh sản phẩm có tệp cục bộ; hiện 5 sản phẩm có nhiều ảnh, chưa đạt mục tiêu 10–12 sản phẩm đều có 2–3 ảnh đúng mẫu.
+
+Danh sách tài khoản, ID phiên/đơn, trạng thái từng câu chuyện, nguồn ảnh và cách kiểm tra lại được cập nhật trong [Bộ dữ liệu thực hành VietBid](backend/docs/DU-LIEU-DEMO-VIETBID.md). Quy tắc nghiệp vụ không thay đổi. Khi bộ lập lịch chạy, thời hạn và trạng thái sẽ tiếp tục được xử lý theo đồng hồ thực.
+
+### Biểu đồ tổng quan quản trị — 07/10/2026
+
+Trang tổng quan bổ sung bốn thẻ tổng số (người dùng, sản phẩm, phiên, đơn), biểu đồ vòng trạng thái phiên và hai biểu đồ cột ngang về trạng thái đơn hàng, duyệt sản phẩm. Nguồn dữ liệu là API có sẵn `GET /api/admin/statistics`, lấy tổng hợp từ MySQL theo quyền Admin. Không thêm bảng, cột, dữ liệu mẫu hoặc thay quy tắc nghiệp vụ.
+
+Các biểu đồ phản ánh tổng số theo trạng thái hiện tại, không phải thống kê theo ngày hay doanh thu. Nhấn trạng thái trong chú giải biểu đồ vòng để xem số lượng/tỷ trọng; nút Làm mới tải lại cùng nguồn dữ liệu cho thẻ, biểu đồ và bảng chi tiết. Trường hợp chưa có dữ liệu hiển thị thông báo thay vì vẽ tỷ lệ giả. Bảng thanh toán/giữ tiền/tranh chấp vẫn được giữ trong phần số liệu chi tiết; tác vụ tự động nằm cuối trang. Bố cục tự xếp lại trên màn hình nhỏ, nhãn và số lượng vẫn đọc được bằng bàn phím/trình đọc màn hình.
+
 ## 1. Mục tiêu và phạm vi
 
 Xây dựng nền tảng đấu giá dành cho hàng hiếm, hàng sưu tầm và tài sản có giá trị cao. Hệ thống hỗ trợ xác minh danh tính người bán, kiểm định vật lý tại trung tâm, đấu giá tự động với mức tối đa bí mật, cọc tham gia, thanh toán mô phỏng và giữ tiền trung gian.
