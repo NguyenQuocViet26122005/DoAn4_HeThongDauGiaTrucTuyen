@@ -94,7 +94,15 @@ const denHan = () =>
   );
 const canNhacNho = () =>
   coSoDuLieu.truyVan(
-    "SELECT id FROM don_hang WHERE trang_thai='CHO_THANH_TOAN' AND han_thanh_toan>NOW() AND han_thanh_toan<=DATE_ADD(NOW(),INTERVAL 6 HOUR) ORDER BY id LIMIT 100",
+    `SELECT d.id FROM don_hang d
+     WHERE d.trang_thai='CHO_THANH_TOAN' AND d.han_thanh_toan>NOW()
+       AND d.han_thanh_toan<=DATE_ADD(NOW(),INTERVAL 6 HOUR)
+       AND NOT EXISTS (
+         SELECT 1 FROM thong_bao t WHERE t.nguoi_dung_id=d.nguoi_mua_id
+           AND t.loai='SAP_HET_HAN_THANH_TOAN'
+           AND t.duong_dan_lien_ket=CONCAT('/orders/',d.id)
+       )
+     ORDER BY d.han_thanh_toan,d.id LIMIT 100`,
   );
 const viPhamCuaDon = (id, loai) =>
   coSoDuLieu.layMot('SELECT id FROM vi_pham WHERE don_hang_id=? AND loai_vi_pham=? LIMIT 1', [

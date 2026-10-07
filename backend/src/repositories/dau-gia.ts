@@ -120,10 +120,19 @@ const denHan = () =>
   );
 const sapKetThuc = () =>
   coSoDuLieu.truyVan(
-    `SELECT id FROM phien_dau_gia
-     WHERE trang_thai='HOAT_DONG' AND thoi_gian_ket_thuc>NOW()
-       AND thoi_gian_ket_thuc<=DATE_ADD(NOW(),INTERVAL 10 MINUTE)
-     ORDER BY thoi_gian_ket_thuc LIMIT 100`,
+    `SELECT a.id FROM phien_dau_gia a
+     WHERE a.trang_thai='HOAT_DONG' AND a.thoi_gian_ket_thuc>NOW()
+       AND a.thoi_gian_ket_thuc<=DATE_ADD(NOW(),INTERVAL 10 MINUTE)
+       AND EXISTS (
+         SELECT 1 FROM tham_gia_phien g WHERE g.phien_dau_gia_id=a.id
+           AND (g.dang_theo_doi=1 OR g.gia_toi_da IS NOT NULL)
+           AND NOT EXISTS (
+             SELECT 1 FROM thong_bao t WHERE t.nguoi_dung_id=g.nguoi_dung_id
+               AND t.loai='PHIEN_SAP_KET_THUC'
+               AND t.duong_dan_lien_ket=CONCAT('/auctions/',a.id)
+           )
+       )
+     ORDER BY a.thoi_gian_ket_thuc,a.id LIMIT 100`,
   );
 const danhSachYeuCauHuy = ({ limit: gioiHan, offset: viTriBatDau }) =>
   coSoDuLieu.truyVan(
