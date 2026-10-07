@@ -52,7 +52,7 @@
             "description": "Công khai. Đăng nhập Admin. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@daugia.local\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
+              "raw": "{\n  \"email\": \"admin@vietbid.test\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -94,7 +94,7 @@
             "description": "Công khai. Đăng nhập Người bán. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"minh.nb@daugia.local\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
+              "raw": "{\n  \"email\": \"hoang@vietbid.test\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -136,7 +136,7 @@
             "description": "Công khai. Đăng nhập Người mua A. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"nam.nm@daugia.local\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
+              "raw": "{\n  \"email\": \"duc.anh@vietbid.test\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -179,7 +179,7 @@
             "description": "Công khai. Đăng nhập Người mua B. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"hoanganh@daugia.local\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
+              "raw": "{\n  \"email\": \"bao.ngoc@vietbid.test\",\n  \"mat_khau\": \"{{matKhauMau}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -4405,7 +4405,7 @@
     },
     {
       "key": "matKhauMau",
-      "value": "123456",
+      "value": "VietBid@2026",
       "type": "string"
     },
     {

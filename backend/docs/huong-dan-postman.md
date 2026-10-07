@@ -13,14 +13,15 @@ Trong nhóm đấu giá có **Chi tiết phiên của tôi**: dùng token ngư�
 3. Gửi yêu cầu “Kiểm tra backend và MySQL”. Kết quả mong đợi: 200.
 4. Gửi bốn yêu cầu đăng nhập có sẵn. Mã đăng nhập được lưu trong các biến collection; không ghi token ra console.
 
-Các tài khoản mẫu đã xác nhận đăng nhập được với mật khẩu mẫu công khai trong SQL là `123456`:
+Bộ dữ liệu thực hành hiện tại dùng mật khẩu chung `VietBid@2026`:
 
-- `admin@daugia.local`: Admin.
-- `minh.nb@daugia.local`: người bán đã xác minh, dùng cho ví dụ.
-- `ha.nb@daugia.local`: một người bán đã xác minh khác.
-- `nam.nm@daugia.local`: người mua A.
-- `hoanganh@daugia.local`: người mua B.
-- `long.pending@daugia.local`: hồ sơ người bán đang chờ duyệt.
+- `admin@vietbid.test`: Admin.
+- `hoang@vietbid.test`: người bán dùng cho ví dụ.
+- `ha@vietbid.test`: người bán khác.
+- `duc.anh@vietbid.test`: người mua A.
+- `bao.ngoc@vietbid.test`: người mua B.
+
+Xem đủ 16 tài khoản và các tình huống tại [Bộ dữ liệu thực hành](DU-LIEU-DEMO-VIETBID.md). Bộ mới có 5 người bán đã xác minh; để thử duyệt xác minh mới, đăng ký một tài khoản riêng qua API.
 
 Đây là tài khoản/dữ liệu mẫu của SQL, không lấy mật khẩu từ `.env`. Nếu đã tự đổi mật khẩu tài khoản mẫu, sửa biến `matKhauMau` trên máy. Đăng ký mới yêu cầu mật khẩu ít nhất 8 ký tự; điền biến `matKhauDangKy` trước khi gửi yêu cầu đăng ký.
 
