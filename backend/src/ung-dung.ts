@@ -4,6 +4,8 @@ import { cauHinh } from './config/moi-truong';
 import coSoDuLieu = require('./repositories/ket-noi');
 import { LoiUngDung } from './utils/loi';
 import { khongTimThay, xuLyLoi } from './middlewares/xu-ly-loi';
+import swaggerUi = require('swagger-ui-express');
+import { taoTaiLieuSwagger } from './docs/swagger';
 const ungDung = express();
 ungDung.disable('x-powered-by');
 ungDung.use(
@@ -24,6 +26,16 @@ ungDung.use((yeuCau, phanHoi, tiepTheo) => {
   tiepTheo();
 });
 ungDung.use(express.json({ limit: '128kb' }));
+const taiLieuSwagger = taoTaiLieuSwagger();
+ungDung.get('/api-docs.json', (yeuCau, phanHoi) => phanHoi.json(taiLieuSwagger));
+ungDung.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(taiLieuSwagger, {
+    customSiteTitle: 'VietBid API - Swagger',
+    swaggerOptions: { persistAuthorization: true, displayRequestDuration: true },
+  }),
+);
 ungDung.get('/', (yeuCau, phanHoi) =>
   phanHoi.json({
     success: true,
