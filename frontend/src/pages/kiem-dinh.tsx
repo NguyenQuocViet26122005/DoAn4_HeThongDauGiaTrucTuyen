@@ -1,7 +1,7 @@
 import { Button, Input, Select } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { trangThaiKiemDinh, type HoSoKiemDinh } from '../types/kiem-dinh';
 import { ngayGio, nhan } from '../utils/dinh-dang';
 
@@ -10,7 +10,7 @@ export default function KiemDinh({ quanTri = false }: { quanTri?: boolean }) {
   const trang = Math.max(1, Number(thamSo.get('page')) || 1);
   const tuKhoa = thamSo.get('q') || '';
   const goc = quanTri ? '/quan-tri' : '/nguoi-ban';
-  const hoSo = useDuLieu<HoSoKiemDinh[]>(quanTri ? '/admin/inspections' : '/inspections', {
+  const hoSo = useDanhSachDuLieu<HoSoKiemDinh[]>(quanTri ? '/admin/inspections' : '/inspections', {
     page: trang,
     limit: 12,
     q: tuKhoa,
@@ -96,7 +96,8 @@ export default function KiemDinh({ quanTri = false }: { quanTri?: boolean }) {
           trang={trang}
           datTrang={(so) => loc('page', String(so))}
           soLuong={hoSo.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={hoSo.coTrangSau}
+          dangTai={hoSo.isFetching}
         />
       )}
     </>

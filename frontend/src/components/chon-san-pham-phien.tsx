@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button, Input } from 'antd';
 import { Link } from 'react-router-dom';
 import { AnhSanPham, ChoDuLieu, PhanTrang } from './dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import type { SanPhamTrongDanhSach } from '../types/san-pham';
 
 export default function ChonSanPhamPhien({
@@ -21,7 +21,7 @@ export default function ChonSanPhamPhien({
   const [tuKhoa, datTuKhoa] = useState('');
   const [trang, datTrang] = useState(1);
   const [idLocUuTien, datIdLocUuTien] = useState(sanPhamIdUuTien);
-  const sanPham = useDuLieu<SanPhamTrongDanhSach[]>('/products/mine', {
+  const sanPham = useDanhSachDuLieu<SanPhamTrongDanhSach[]>('/products/mine', {
     du_dieu_kien_dau_gia: '1',
     ...(idLocUuTien ? { san_pham_id: idLocUuTien } : {}),
     q: tuKhoa,
@@ -95,7 +95,8 @@ export default function ChonSanPhamPhien({
           trang={trang}
           datTrang={datTrang}
           soLuong={sanPham.data?.length || 0}
-          gioiHan={6}
+          coTrangSau={sanPham.coTrangSau}
+          dangTai={sanPham.isFetching}
         />
       )}
       <div className="cac-nut-kiem-dinh">

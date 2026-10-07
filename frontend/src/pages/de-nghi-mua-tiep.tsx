@@ -3,7 +3,7 @@ import { Alert, Button, Descriptions, Tag } from 'antd';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import PhanHoiDeNghi from '../components/phan-hoi-de-nghi';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDuLieu, useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { lamMoiDeNghi } from '../services/de-nghi-mua-tiep';
 import { mocThoiGian, ngayGio, tien } from '../utils/dinh-dang';
@@ -30,7 +30,7 @@ function trangThai(deNghi: DeNghiMuaTiep, hienTai: number) {
 export default function DanhSachDeNghi() {
   const [thamSo, datThamSo] = useSearchParams();
   const trang = Math.max(1, Math.floor(Number(thamSo.get('page')) || 1));
-  const truyVan = useDuLieu<DeNghiMuaTiep[]>('/second-chances', { page: trang, limit: 12 });
+  const truyVan = useDanhSachDuLieu<DeNghiMuaTiep[]>('/second-chances', { page: trang, limit: 12 });
   const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
   const hienTai = useThoiGian();
 
@@ -78,7 +78,8 @@ export default function DanhSachDeNghi() {
           trang={trang}
           datTrang={(so) => datThamSo({ page: String(so) })}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

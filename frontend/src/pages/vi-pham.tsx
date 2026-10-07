@@ -3,7 +3,7 @@ import { Button, Form, Input, InputNumber, Select } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import BieuMauThaoTac from '../components/bieu-mau-thao-tac';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { boNho, gui } from '../services/api';
 import { ngayGio, nhan } from '../utils/dinh-dang';
 
@@ -188,7 +188,7 @@ function XetViPham({ muc }: { muc: ViPham }) {
 
 function BaoCaoSanPhamDaGui() {
   const [trang, datTrang] = useState(1);
-  const truyVan = useDuLieu<BaoCaoSanPham[]>('/product-reports/me', {
+  const truyVan = useDanhSachDuLieu<BaoCaoSanPham[]>('/product-reports/me', {
     page: trang,
     limit: 12,
   });
@@ -226,7 +226,8 @@ function BaoCaoSanPhamDaGui() {
           trang={trang}
           datTrang={datTrang}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </section>
@@ -257,7 +258,7 @@ function DanhSachViPham({
   xoaLoc: () => void;
 }) {
   const [trang, datTrang] = useState(1);
-  const truyVan = useDuLieu<ViPham[]>(quanTri ? '/admin/violations' : '/violations/me', {
+  const truyVan = useDanhSachDuLieu<ViPham[]>(quanTri ? '/admin/violations' : '/violations/me', {
     page: trang,
     limit: 12,
     ...(nguoiDungId ? { nguoi_dung_id: nguoiDungId } : {}),
@@ -328,7 +329,8 @@ function DanhSachViPham({
           trang={trang}
           datTrang={datTrang}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

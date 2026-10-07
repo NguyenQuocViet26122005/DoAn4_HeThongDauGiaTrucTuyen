@@ -1,14 +1,14 @@
 import { Button } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import type { TranhChap } from '../types/tranh-chap';
 import { ngayGio, nhan } from '../utils/dinh-dang';
 
 export default function DanhSachTranhChap({ quanTri = false }: { quanTri?: boolean }) {
   const [thamSo, datThamSo] = useSearchParams();
   const trang = Math.max(1, Math.floor(Number(thamSo.get('page')) || 1));
-  const truyVan = useDuLieu<TranhChap[]>(quanTri ? '/admin/disputes' : '/disputes', {
+  const truyVan = useDanhSachDuLieu<TranhChap[]>(quanTri ? '/admin/disputes' : '/disputes', {
     page: trang,
     limit: 12,
   });
@@ -65,7 +65,8 @@ export default function DanhSachTranhChap({ quanTri = false }: { quanTri?: boole
           trang={trang}
           datTrang={(so) => datThamSo({ page: String(so) })}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

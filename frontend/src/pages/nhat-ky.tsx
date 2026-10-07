@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from 'antd';
 import { ChoDuLieu, PhanTrang, TieuDe } from '../components/dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { ngayGio } from '../utils/dinh-dang';
 
 interface NhatKy {
@@ -15,7 +15,7 @@ interface NhatKy {
 
 export default function NhatKyHoatDong() {
   const [trang, datTrang] = useState(1);
-  const truyVan = useDuLieu<NhatKy[]>('/admin/activity-logs', { page: trang, limit: 20 });
+  const truyVan = useDanhSachDuLieu<NhatKy[]>('/admin/activity-logs', { page: trang, limit: 20 });
 
   return (
     <>
@@ -60,7 +60,8 @@ export default function NhatKyHoatDong() {
           trang={trang}
           datTrang={datTrang}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={20}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, Button, Form, Input, Switch } from 'antd';
 import { boNho, loiDeDoc } from '../services/api';
 import { luuDiaChi } from '../services/tham-gia-phien';
@@ -24,8 +24,14 @@ export default function BieuMauDiaChi({
 }) {
   const [dangLuu, datDangLuu] = useState(false);
   const [loi, datLoi] = useState('');
+  const dangGui = useRef(false);
 
   async function luu(duLieu: BieuMauDiaChi) {
+    if (dangGui.current) {
+      return;
+    }
+
+    dangGui.current = true;
     datDangLuu(true);
     dangXuLy(true);
     datLoi('');
@@ -43,6 +49,7 @@ export default function BieuMauDiaChi({
     } catch (loiLuu) {
       datLoi(loiDeDoc(loiLuu));
     } finally {
+      dangGui.current = false;
       datDangLuu(false);
       dangXuLy(false);
     }
@@ -82,7 +89,12 @@ export default function BieuMauDiaChi({
           </Form.Item>
         ))}
       </div>
-      <Form.Item name="la_mac_dinh" label="Dùng làm địa chỉ mặc định" valuePropName="checked">
+      <Form.Item
+        name="la_mac_dinh"
+        label="Dùng làm địa chỉ mặc định"
+        valuePropName="checked"
+        extra="Bạn luôn có một địa chỉ mặc định. Nếu chỉ có một địa chỉ, hệ thống sẽ dùng địa chỉ đó."
+      >
         <Switch />
       </Form.Item>
       {loi && <Alert className="loi-bieu-mau" type="error" title={loi} />}

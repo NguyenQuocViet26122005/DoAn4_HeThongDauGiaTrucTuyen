@@ -12,7 +12,7 @@ import {
 } from '../components/dung-chung';
 import { BieuTuong } from '../components/bieu-tuong';
 import { bieuTuongDanhMuc } from '../utils/bieu-tuong';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDuLieu, useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { mocThoiGian, tenGiaPhien, tien } from '../utils/dinh-dang';
 import anhBia from '../assets/khong-gian-dau-gia.webp';
 
@@ -290,7 +290,7 @@ export default function KhamPha() {
   const tuKhoaTrenUrl = thamSo.get('q') || '';
   const trang = Math.max(1, Math.floor(Number(thamSo.get('page')) || 1));
   const danhMuc = useDuLieu<DanhMuc[]>('/categories');
-  const phien = useDuLieu<Phien[]>('/auctions', {
+  const phien = useDanhSachDuLieu<Phien[]>('/auctions', {
     q: thamSo.get('q') || undefined,
     danh_muc_id: thamSo.get('danh_muc_id') || undefined,
     trang_thai: thamSo.get('trang_thai') || undefined,
@@ -413,7 +413,8 @@ export default function KhamPha() {
               trang={trang}
               datTrang={(v) => doiLoc('page', String(v))}
               soLuong={phien.data?.length || 0}
-              gioiHan={12}
+              coTrangSau={phien.coTrangSau}
+              dangTai={phien.isFetching}
             />
           )}
         </div>

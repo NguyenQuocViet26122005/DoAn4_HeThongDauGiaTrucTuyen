@@ -2,7 +2,7 @@ import { Button, Descriptions, Result } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe } from '../components/dung-chung';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { khuVucNghiepVu } from '../constants/khu-vuc-nghiep-vu';
 import { nhan } from '../utils/dinh-dang';
 import { ThePhien } from './kham-pha';
@@ -13,7 +13,7 @@ import TheoDoiPhien from '../components/theo-doi-phien';
 
 function DanhSachPhienCaNhan({ url }: { url: string }) {
   const [trang, datTrang] = useState(1);
-  const phien = useDuLieu<Phien[]>(url, { page: trang, limit: 9 });
+  const phien = useDanhSachDuLieu<Phien[]>(url, { page: trang, limit: 9 });
 
   return (
     <div className="danh-sach-phien-ca-nhan">
@@ -35,7 +35,8 @@ function DanhSachPhienCaNhan({ url }: { url: string }) {
           trang={trang}
           datTrang={datTrang}
           soLuong={phien.data?.length || 0}
-          gioiHan={9}
+          coTrangSau={phien.coTrangSau}
+          dangTai={phien.isFetching}
         />
       )}
     </div>

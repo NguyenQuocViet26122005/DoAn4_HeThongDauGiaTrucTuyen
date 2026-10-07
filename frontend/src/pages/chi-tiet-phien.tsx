@@ -9,7 +9,7 @@ import {
   PhanTrang,
   TrangThaiPhien,
 } from '../components/dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDuLieu, useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { ngayGio, nhan, tenGiaPhien, tien } from '../utils/dinh-dang';
 import type { Phien, SanPham } from '../types/du-lieu';
 import ThamGiaPhien from '../components/tham-gia-phien';
@@ -40,7 +40,7 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
   const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
   const sanPham = useDuLieu<SanPham>(`/products/${phien.san_pham_id}`);
   const kiemDinh = useDuLieu<KiemDinhCongKhai | null>(`/products/${phien.san_pham_id}/inspection`);
-  const lichSu = useDuLieu<LuotGia[]>(
+  const lichSu = useDanhSachDuLieu<LuotGia[]>(
     `/auctions/${phien.id}/bids`,
     { page: trang, limit: 10 },
     true,
@@ -240,7 +240,8 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
             trang={trang}
             datTrang={datTrang}
             soLuong={lichSu.data?.length || 0}
-            gioiHan={10}
+            coTrangSau={lichSu.coTrangSau}
+            dangTai={lichSu.isFetching}
           />
         )}
       </section>

@@ -1,7 +1,7 @@
 import { Button, Tag } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import type { DonHang } from '../types/don-hang';
 import { ngayGio, tien } from '../utils/dinh-dang';
@@ -12,7 +12,7 @@ export default function DonHangCuaToi({ khuVuc = 'tai-khoan' }: { khuVuc?: strin
   const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
   const quanTri = khuVuc === 'quan-tri';
   const nguoiBan = khuVuc === 'nguoi-ban';
-  const truyVan = useDuLieu<DonHang[]>(quanTri ? '/admin/orders' : '/orders', {
+  const truyVan = useDanhSachDuLieu<DonHang[]>(quanTri ? '/admin/orders' : '/orders', {
     page: trang,
     limit: 12,
     ...(nguoiBan ? { vai_tro: 'NGUOI_BAN' } : {}),
@@ -85,7 +85,8 @@ export default function DonHangCuaToi({ khuVuc = 'tai-khoan' }: { khuVuc?: strin
           trang={trang}
           datTrang={(so) => datThamSo({ page: String(so) })}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

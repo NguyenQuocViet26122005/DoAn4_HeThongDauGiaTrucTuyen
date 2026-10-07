@@ -388,6 +388,8 @@ Mở phiên đến giờ, đóng phiên đến hạn, hoàn cọc không thắng
 
 Lịch quét mặc định mỗi 60 giây. Trạng thái hiển thị có thể trễ đến chu kỳ tiếp theo nhưng API vẫn kiểm tra thời hạn tức thời. Trong kiểm thử phải tắt jobs ngoài transaction để không tác động dữ liệu thật.
 
+Lịch quét cũng gửi một thông báo nhắc khi phiên đang hoạt động còn không quá 10 phút cho người theo dõi/người đã đặt mức tối đa, và khi đơn chờ thanh toán còn không quá 6 giờ cho người mua. Chỉ nhắc khi còn hạn; mỗi người nhận được nhắc một lần cho từng phiên/đơn. Các bản ghi đã nhắc không chiếm hàng đợi của bản ghi chưa nhắc.
+
 ## 21. Migration, bản sao và tương thích
 
 Không reset database hoặc xóa lịch sử 19 bảng. Migration thêm hai bảng và cột mặc định, mở rộng enum/ràng buộc có kiểm soát. Sản phẩm cũ mặc định không bắt buộc kiểm định; phiên cũ không yêu cầu cọc; đơn cũ cọc 0 và gửi từ seller. Không tự chứng nhận kiểm định cho sản phẩm cũ.
@@ -424,6 +426,19 @@ Chi tiết thực hiện ở `co-so-du-lieu/KE-HOACH-21-BANG.md`, SQL trong `co-
 22. Báo cáo thiếu, sai quyền, trạng thái sai hoặc tệp giả bị chặn.
 
 ## 23. Giới hạn và việc tiếp theo
+
+### Cập nhật triển khai ngày 07/10/2026
+
+- Tách phạm vi danh sách phiên Admin khỏi danh sách công khai để quản trị vẫn xem được lịch sử thuộc danh mục ngừng hoạt động.
+- Nối tác vụ nhắc phiên và thanh toán vào lịch quét, giữ kiểm tra thời hạn và chống thông báo lặp trong transaction.
+- Bổ sung thông tin có trang sau cho các danh sách phân trang; frontend khóa nút chuyển trang trong lúc tải và chỉ cho chuyển tiếp khi backend xác nhận còn dữ liệu.
+- Khi sửa địa chỉ mặc định, hệ thống chuyển mặc định sang địa chỉ khác nếu có; địa chỉ duy nhất vẫn giữ mặc định. Quyền sở hữu và cập nhật địa chỉ tiếp tục được kiểm tra trong transaction.
+- Biểu mẫu thao tác xóa bước xác nhận cũ khi mở lại; biểu mẫu địa chỉ ngăn gửi lặp trong lúc đang lưu.
+- Bổ sung mẫu cấu hình backend, để trống bí mật JWT và mật khẩu MySQL; không thay đổi cấu hình riêng hoặc dữ liệu MySQL.
+
+Đã chạy kiểm thử ngày 07/10/2026: 18/18 kiểm thử backend cơ bản, 13/13 kiểm thử logic frontend và 59/59 kiểm thử tích hợp đạt trên `doan4_daugia_kiem_thu`. Bộ HTTP nền kiểm tra 91 API, bộ kiểm định/cọc kiểm tra thêm 16 API. Đã bổ sung hồi quy cho phân trang (kể cả trang cuối đủ số bản ghi và trang rỗng), địa chỉ mặc định, phạm vi Admin khi ẩn danh mục và lịch nhắc đúng hạn/không lặp/người theo dõi mới. Các kết quả này không thay thế nghiệm thu tương tác trên trình duyệt.
+
+Frontend đã xử lý kết thúc phiên cục bộ khi `/users/me` trả 403 vì tài khoản bị khóa/tạm ngưng, tránh giữ trạng thái khởi tạo vô hạn. Tài liệu API đã đồng bộ tài khoản demo với bộ Postman hiện tại. Không thay đổi cấu trúc hoặc dữ liệu CSDL chính trong đợt kiểm thử.
 
 Các màn hình và API chính cho khách mua, người bán và Admin đã được triển khai, gồm báo cáo sản phẩm và đăng lại có điều kiện. Việc còn lại là nghiệm thu đầu cuối trên trình duyệt các nhánh báo cáo/đăng lại và toàn bộ luồng trên thiết bị nhỏ; không coi bản build frontend thành công là giao diện đã hoàn tất.
 

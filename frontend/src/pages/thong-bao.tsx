@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, Button, Select, Tag } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe } from '../components/dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { boNho, gui, loiDeDoc } from '../services/api';
 import { ngayGio } from '../utils/dinh-dang';
@@ -21,7 +21,7 @@ export default function TrangThongBao() {
   const [thamSo, datThamSo] = useSearchParams();
   const trang = Math.max(1, Math.floor(Number(thamSo.get('page')) || 1));
   const chuaDoc = thamSo.get('unread') === 'true';
-  const truyVan = useDuLieu<ThongBao[]>('/notifications', {
+  const truyVan = useDanhSachDuLieu<ThongBao[]>('/notifications', {
     page: trang,
     limit: 12,
     unread: chuaDoc,
@@ -126,7 +126,8 @@ export default function TrangThongBao() {
           trang={trang}
           datTrang={(so) => datThamSo({ page: String(so), ...(chuaDoc ? { unread: 'true' } : {}) })}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

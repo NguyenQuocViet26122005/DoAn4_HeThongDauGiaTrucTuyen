@@ -9,7 +9,7 @@ import {
   TrangThaiPhien,
 } from '../components/dung-chung';
 import QuyenNguoiBan from '../components/quyen-nguoi-ban';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import type { Phien } from '../types/du-lieu';
 import { ngayGio, nhan, tien } from '../utils/dinh-dang';
 
@@ -18,7 +18,7 @@ function DanhSachPhien() {
   const trang = Math.max(1, Number(thamSo.get('page')) || 1);
   const tuKhoa = thamSo.get('q') || '';
   const trangThai = thamSo.get('trang_thai') || undefined;
-  const phien = useDuLieu<Phien[]>('/auctions/mine', {
+  const phien = useDanhSachDuLieu<Phien[]>('/auctions/mine', {
     q: tuKhoa,
     trang_thai: trangThai,
     page: trang,
@@ -111,7 +111,8 @@ function DanhSachPhien() {
           trang={trang}
           datTrang={(so) => loc('page', String(so))}
           soLuong={phien.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={phien.coTrangSau}
+          dangTai={phien.isFetching}
         />
       )}
     </>

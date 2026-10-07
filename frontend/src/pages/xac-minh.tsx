@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TepRiengTu, TieuDe, TrangThai } from '../components/dung-chung';
 import BieuMauThaoTac from '../components/bieu-mau-thao-tac';
 import GuiXacMinh from '../components/gui-xac-minh';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { boNho, doc, gui } from '../services/api';
 import { ngayGio, nhan } from '../utils/dinh-dang';
@@ -138,7 +138,7 @@ export default function XacMinh({ quanTri = false }: { quanTri?: boolean }) {
   const trangThai = ['CHO_XU_LY', 'DA_XAC_MINH', 'TU_CHOI'].includes(thamSo.get('trang_thai') || '')
     ? thamSo.get('trang_thai')!
     : 'CHO_XU_LY';
-  const truyVan = useDuLieu<HoSoXacMinh[]>(
+  const truyVan = useDanhSachDuLieu<HoSoXacMinh[]>(
     quanTri ? '/admin/seller-verifications' : '/seller-verifications/me',
     quanTri
       ? {
@@ -222,7 +222,8 @@ export default function XacMinh({ quanTri = false }: { quanTri?: boolean }) {
           trang={trang}
           datTrang={(so) => datThamSo({ page: String(so), trang_thai: trangThai })}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={10}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

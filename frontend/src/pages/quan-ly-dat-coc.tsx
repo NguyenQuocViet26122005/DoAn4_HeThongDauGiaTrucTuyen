@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { ngayGio, tien } from '../utils/dinh-dang';
 
 interface Coc {
@@ -21,7 +21,7 @@ interface Coc {
 
 export default function QuanLyDatCoc() {
   const [trang, datTrang] = useState(1);
-  const truyVan = useDuLieu<Coc[]>('/admin/deposits', { page: trang, limit: 12 });
+  const truyVan = useDanhSachDuLieu<Coc[]>('/admin/deposits', { page: trang, limit: 12 });
 
   return (
     <>
@@ -92,7 +92,8 @@ export default function QuanLyDatCoc() {
           trang={trang}
           datTrang={datTrang}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

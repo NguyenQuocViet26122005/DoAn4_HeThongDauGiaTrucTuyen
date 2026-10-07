@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, App, Button, Descriptions, Form, Input, Modal, Select, Tag } from 'antd';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AnhSanPham, ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDuLieu, useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { gui, loiDeDoc } from '../services/api';
 import { lamMoiDuyetVaKiemDinh, moHoSo } from '../services/kiem-dinh';
 import type { DanhMuc, SanPham } from '../types/du-lieu';
@@ -15,7 +15,7 @@ export default function DuyetSanPham() {
   const tuKhoa = thamSo.get('q') || '';
   const trangThai = thamSo.get('trang_thai') || 'CHO_XU_LY';
   const danhMuc = useDuLieu<DanhMuc[]>('/admin/categories');
-  const sanPham = useDuLieu<SanPhamTrongDanhSach[]>('/admin/products', {
+  const sanPham = useDanhSachDuLieu<SanPhamTrongDanhSach[]>('/admin/products', {
     page: trang,
     limit: 12,
     q: tuKhoa,
@@ -122,7 +122,8 @@ export default function DuyetSanPham() {
           trang={trang}
           datTrang={(so) => loc('page', String(so))}
           soLuong={sanPham.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={sanPham.coTrangSau}
+          dangTai={sanPham.isFetching}
         />
       )}
     </>

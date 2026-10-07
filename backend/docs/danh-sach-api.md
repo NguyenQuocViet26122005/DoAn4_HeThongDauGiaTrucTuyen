@@ -10,6 +10,10 @@ Gửi `Authorization: Bearer <token>` cho API riêng tư. Tiền nên truyền b
 
 Các danh sách có phân trang dùng `page=1&limit=20` (limit tối đa 100); data là mảng, chưa có tổng số trang. Danh mục, thuộc tính, địa chỉ và bước giá là danh sách đầy đủ. Sản phẩm/phiên hỗ trợ `q`, `danh_muc_id`, `trang_thai`; trạng thái sản phẩm chỉ lọc ở phạm vi người bán/Admin. Người dùng Admin hỗ trợ `q`; hồ sơ xác minh hỗ trợ `trang_thai`; vi phạm Admin hỗ trợ `nguoi_dung_id`; thông báo hỗ trợ `unread=true`.
 
+Với các danh sách có phân trang, gửi thêm `phan_trang=true` để nhận trường `pagination: { page, limit, has_more }` bên cạnh `data`. Backend lấy thêm một bản ghi để xác định `has_more`, nhưng chỉ trả tối đa `limit` bản ghi trong `data`. Frontend dùng `has_more` để bật nút trang sau; không suy đoán từ độ dài mảng và không dựng tổng giả. Không gửi cờ này cho danh sách đầy đủ như danh mục, địa chỉ và bước giá. Client không gửi cờ vẫn nhận hợp đồng cũ.
+
+`GET /admin/auctions` dùng phạm vi quản trị, bao gồm lịch sử phiên thuộc danh mục đã ngừng hoạt động; danh sách công khai vẫn chỉ hiển thị danh mục đang hoạt động.
+
 Body dưới đây là mẫu hợp lệ sau khi điền biến. `{}` là JSON rỗng; không tự thêm trường như vai trò, số tiền thanh toán hay người thắng. Các thao tác PUT sản phẩm/địa chỉ/danh mục nhận đủ trường bắt buộc như mẫu. HTTP GET tải tệp trả dữ liệu nhị phân.
 
 Giao diện người mua ngày 02/10/2026 dùng các API hiện có: `/users/me/addresses`, `/auctions/:id/deposit`, `/auctions/:id/deposit/register`, `/auctions/:id/deposit/pay`, `/auctions/:id/bids`, `/auctions/:id/buy-now` và `GET /orders/:id`. Khi thanh toán mô phỏng trả HTTP 200, client phải đọc `ket_qua_mo_phong`; `THAT_BAI` không có nghĩa đã thu tiền. Nếu chưa nhận đủ phản hồi, giữ nguyên `khoa_yeu_cau` và kết quả mô phỏng đã gửi để lấy lại lần xử lý trước. Không tự sinh khóa mới khi chưa rõ kết quả. Không có API đọc lại mức tối đa bí mật.
@@ -36,7 +40,7 @@ Quyền: Công khai.
 
 ```json
 {
-  "email": "admin@daugia.local",
+  "email": "admin@vietbid.test",
   "mat_khau": "{{matKhauMau}}"
 }
 ```
@@ -49,7 +53,7 @@ Quyền: Công khai.
 
 ```json
 {
-  "email": "minh.nb@daugia.local",
+  "email": "hoang@vietbid.test",
   "mat_khau": "{{matKhauMau}}"
 }
 ```
@@ -62,7 +66,7 @@ Quyền: Công khai.
 
 ```json
 {
-  "email": "nam.nm@daugia.local",
+  "email": "duc.anh@vietbid.test",
   "mat_khau": "{{matKhauMau}}"
 }
 ```
@@ -75,7 +79,7 @@ Quyền: Công khai.
 
 ```json
 {
-  "email": "hoanganh@daugia.local",
+  "email": "bao.ngoc@vietbid.test",
   "mat_khau": "{{matKhauMau}}"
 }
 ```

@@ -185,12 +185,14 @@ export function PhanTrang({
   trang,
   datTrang,
   soLuong,
-  gioiHan = 20,
+  coTrangSau,
+  dangTai = false,
 }: {
   trang: number;
   datTrang: (trang: number) => void;
   soLuong: number;
-  gioiHan?: number;
+  coTrangSau: boolean;
+  dangTai?: boolean;
 }) {
   return (
     <div className="phan-trang">
@@ -198,10 +200,10 @@ export function PhanTrang({
         Trang {trang} · {soLuong} kết quả trên trang này
       </span>
       <div>
-        <Button disabled={trang === 1} onClick={() => datTrang(trang - 1)}>
+        <Button disabled={trang === 1 || dangTai} onClick={() => datTrang(trang - 1)}>
           Trang trước
         </Button>
-        <Button disabled={soLuong < gioiHan} onClick={() => datTrang(trang + 1)}>
+        <Button disabled={!coTrangSau || dangTai} onClick={() => datTrang(trang + 1)}>
           Trang sau
         </Button>
       </div>

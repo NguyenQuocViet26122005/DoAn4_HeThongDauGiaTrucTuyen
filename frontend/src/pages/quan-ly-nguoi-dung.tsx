@@ -3,7 +3,7 @@ import { Button, Form, Input, Select } from 'antd';
 import { Link } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import BieuMauThaoTac from '../components/bieu-mau-thao-tac';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { boNho, gui } from '../services/api';
 import { nhan } from '../utils/dinh-dang';
 
@@ -20,7 +20,7 @@ interface TaiKhoan {
 export default function QuanLyNguoiDung() {
   const [tuKhoa, datTuKhoa] = useState('');
   const [trang, datTrang] = useState(1);
-  const truyVan = useDuLieu<TaiKhoan[]>('/admin/users', {
+  const truyVan = useDanhSachDuLieu<TaiKhoan[]>('/admin/users', {
     q: tuKhoa,
     page: trang,
     limit: 12,
@@ -140,7 +140,8 @@ export default function QuanLyNguoiDung() {
           trang={trang}
           datTrang={datTrang}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

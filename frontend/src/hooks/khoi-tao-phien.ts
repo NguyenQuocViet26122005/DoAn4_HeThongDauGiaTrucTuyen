@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { boNho, doc, loiDeDoc } from '../services/api';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import type { NguoiDung } from '../types/du-lieu';
@@ -26,6 +27,14 @@ export function useKhoiTaoPhien() {
         }
       } catch (loiKhoiTao) {
         if (conHieuLuc) {
+          // /users/me trả 403 khi tài khoản bị khóa; không giữ màn hình chờ vô hạn.
+          if (axios.isAxiosError(loiKhoiTao) && loiKhoiTao.response?.status === 403) {
+            hetPhien();
+            datLoi('');
+
+            return;
+          }
+
           datLoi(loiDeDoc(loiKhoiTao));
         }
       }

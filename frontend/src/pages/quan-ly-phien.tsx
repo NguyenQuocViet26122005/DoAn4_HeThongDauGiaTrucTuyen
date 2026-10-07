@@ -3,7 +3,7 @@ import { Button, Form, Input, Select, Tabs } from 'antd';
 import { Link } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import BieuMauThaoTac from '../components/bieu-mau-thao-tac';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { boNho, gui } from '../services/api';
 import { ngayGio, nhan, tien } from '../utils/dinh-dang';
 import type { Phien } from '../types/du-lieu';
@@ -22,7 +22,7 @@ function DanhSachPhien() {
   const [trang, datTrang] = useState(1);
   const [trangThai, datTrangThai] = useState<string>();
   const [tuKhoa, datTuKhoa] = useState('');
-  const truyVan = useDuLieu<Phien[]>('/admin/auctions', {
+  const truyVan = useDanhSachDuLieu<Phien[]>('/admin/auctions', {
     page: trang,
     limit: 12,
     trang_thai: trangThai,
@@ -91,7 +91,8 @@ function DanhSachPhien() {
           trang={trang}
           datTrang={datTrang}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>
@@ -100,7 +101,7 @@ function DanhSachPhien() {
 
 function YeuCauHuyPhien() {
   const [trang, datTrang] = useState(1);
-  const truyVan = useDuLieu<YeuCauHuy[]>('/admin/cancellation-requests', {
+  const truyVan = useDanhSachDuLieu<YeuCauHuy[]>('/admin/cancellation-requests', {
     page: trang,
     limit: 12,
   });
@@ -183,7 +184,8 @@ function YeuCauHuyPhien() {
           trang={trang}
           datTrang={datTrang}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </>

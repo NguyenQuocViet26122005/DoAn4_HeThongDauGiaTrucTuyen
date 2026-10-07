@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Rate } from 'antd';
 import { useParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe } from '../components/dung-chung';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { ngayGio } from '../utils/dinh-dang';
 
@@ -24,7 +24,7 @@ export default function DanhGiaNguoiDung() {
 
 function DanhSachDanhGia({ id }: { id: string }) {
   const [trang, datTrang] = useState(1);
-  const truyVan = useDuLieu<DanhGia[]>(`/users/${id}/reviews`, { page: trang, limit: 12 });
+  const truyVan = useDanhSachDuLieu<DanhGia[]>(`/users/${id}/reviews`, { page: trang, limit: 12 });
 
   return (
     <div className="tam-noi-dung">
@@ -51,7 +51,8 @@ function DanhSachDanhGia({ id }: { id: string }) {
           trang={trang}
           datTrang={datTrang}
           soLuong={truyVan.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={truyVan.coTrangSau}
+          dangTai={truyVan.isFetching}
         />
       )}
     </div>

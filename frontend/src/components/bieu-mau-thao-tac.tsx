@@ -25,6 +25,16 @@ export default function BieuMauThaoTac<T extends object>({
   const [loi, datLoi] = useState('');
   const dangXuLy = useRef(false);
 
+  function dong() {
+    if (dangXuLy.current) {
+      return;
+    }
+
+    datMo(false);
+    datDuLieu(undefined);
+    datLoi('');
+  }
+
   async function gui() {
     if (!duLieu || khoa || dangXuLy.current) {
       return;
@@ -52,6 +62,7 @@ export default function BieuMauThaoTac<T extends object>({
       <Button
         disabled={khoa}
         onClick={() => {
+          datDuLieu(undefined);
           datLoi('');
           datMo(true);
         }}
@@ -61,14 +72,23 @@ export default function BieuMauThaoTac<T extends object>({
       <Modal
         title={ten}
         open={mo}
-        onCancel={() => !dangGui && datMo(false)}
+        onCancel={dong}
+        keyboard={!dangGui}
         closable={!dangGui}
         mask={{ closable: !dangGui }}
         footer={
           <>
             <Button
               disabled={dangGui}
-              onClick={() => (duLieu ? datDuLieu(undefined) : datMo(false))}
+              onClick={() => {
+                datLoi('');
+
+                if (duLieu) {
+                  datDuLieu(undefined);
+                } else {
+                  dong();
+                }
+              }}
             >
               {duLieu ? 'Sửa thông tin' : 'Đóng'}
             </Button>

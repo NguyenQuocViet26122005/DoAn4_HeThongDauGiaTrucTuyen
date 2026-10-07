@@ -240,6 +240,31 @@ kiemThu(
               });
               xacNhan.equal((await gui('GET', '/users/me', 'a')).id, duLieu.a.id);
 
+              const cacTrang = [];
+
+              for (const trang of [1, 2, 3, 4]) {
+                const phanHoi = await fetch(
+                  `${diaChiGoc}/api/admin/users?q=${encodeURIComponent(duLieu.prefix)}&page=${trang}&limit=2&phan_trang=true`,
+                  { headers: { Authorization: `Bearer ${ma.admin}` } },
+                );
+
+                soYeuCau++;
+                xacNhan.equal(phanHoi.status, 200);
+
+                const ketQua = await phanHoi.json();
+
+                kiemTraDuLieuCongKhai(ketQua);
+                xacNhan.deepEqual(ketQua.pagination, {
+                  page: trang,
+                  limit: 2,
+                  has_more: trang < 3,
+                });
+                xacNhan.equal(ketQua.data.length, trang <= 3 ? 2 : 0);
+                cacTrang.push(...ketQua.data.map((muc) => String(muc.id)));
+              }
+
+              xacNhan.equal(new Set(cacTrang).size, 6, 'Phân trang không trùng hoặc bỏ tài khoản');
+
               const avatar = await taiAnh('avatar', 'a');
 
               await gui('PATCH', '/users/me', 'a', {
@@ -265,6 +290,24 @@ kiemThu(
               const cacDiaChi = await gui('GET', '/users/me/addresses', 'a');
 
               xacNhan.ok(cacDiaChi.some((x) => String(x.id) === String(dc.id)));
+              await gui('PUT', `/users/me/addresses/${dc.id}`, 'a', {
+                ...noiDungDiaChi,
+                la_mac_dinh: false,
+              });
+
+              const sauKhiBoMacDinh = await gui('GET', '/users/me/addresses', 'a');
+              const macDinh = sauKhiBoMacDinh.filter((muc) => muc.la_mac_dinh);
+
+              xacNhan.equal(macDinh.length, 1);
+              xacNhan.notEqual(String(macDinh[0].id), String(dc.id));
+
+              const diaChiDuyNhat = (await gui('GET', '/users/me/addresses', 'b'))[0];
+              const daSua = await gui('PUT', `/users/me/addresses/${diaChiDuyNhat.id}`, 'b', {
+                ...noiDungDiaChi,
+                la_mac_dinh: false,
+              });
+
+              xacNhan.equal(Number(daSua.la_mac_dinh), 1, 'Địa chỉ duy nhất vẫn là mặc định');
             },
           );
 

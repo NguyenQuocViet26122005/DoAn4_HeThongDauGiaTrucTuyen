@@ -210,4 +210,80 @@ kiemThu(
     }),
 );
 
+kiemThu('Lịch nhắc chỉ gửi khi gần hạn, không lặp và nhận thêm người theo dõi mới', async () =>
+  hoanTac(async () => {
+    const duLieu = await taoDuLieuKiemThu();
+    const hienTai = await coSoDuLieu.thoiGianHienTai();
+    const phien = await phienDauGia(duLieu);
+
+    await cacPhienDauGia.theoDoi(duLieu.a, phien, true);
+
+    const phienChot = await phienDauGia(duLieu);
+
+    await cacPhienDauGia.datGia(duLieu.b, phienChot, { gia_toi_da: '20000000' });
+
+    await khoBanGhi.capNhat('phien_dau_gia', phienChot, {
+      thoi_gian_ket_thuc: thoiGian.congGiay(hienTai, -1),
+    });
+
+    await cacPhienDauGia.xuLyDenHan(phienChot);
+
+    const don = await khoDonHang.donDangXuLyCuaPhien(phienChot);
+    const demNhac = async (loai, lienKet) =>
+      Number(
+        (
+          await coSoDuLieu.layMot(
+            'SELECT COUNT(*) AS so_luong FROM thong_bao WHERE loai=? AND duong_dan_lien_ket=?',
+            [loai, lienKet],
+          )
+        ).so_luong,
+      );
+
+    await khoBanGhi.capNhat('don_hang', don.id, {
+      han_thanh_toan: thoiGian.congGiay(hienTai, 7 * 3600),
+    });
+
+    await lichChay.chayMotLuot();
+    xacNhan.equal(await demNhac('PHIEN_SAP_KET_THUC', `/auctions/${phien}`), 0);
+    xacNhan.equal(await demNhac('SAP_HET_HAN_THANH_TOAN', `/orders/${don.id}`), 0);
+
+    await khoBanGhi.capNhat('phien_dau_gia', phien, {
+      thoi_gian_ket_thuc: thoiGian.congGiay(hienTai, 300),
+    });
+    await khoBanGhi.capNhat('don_hang', don.id, {
+      han_thanh_toan: thoiGian.congGiay(hienTai, 3600),
+    });
+
+    for (let lan = 0; lan < 2; lan++) {
+      xacNhan.equal((await lichChay.chayMotLuot()).failed, 0);
+    }
+
+    xacNhan.equal(await demNhac('PHIEN_SAP_KET_THUC', `/auctions/${phien}`), 1);
+    xacNhan.equal(await demNhac('SAP_HET_HAN_THANH_TOAN', `/orders/${don.id}`), 1);
+
+    await cacPhienDauGia.theoDoi(duLieu.b, phien, true);
+    await lichChay.chayMotLuot();
+    xacNhan.equal(await demNhac('PHIEN_SAP_KET_THUC', `/auctions/${phien}`), 2);
+  }),
+);
+
+kiemThu(
+  'Admin xem lịch sử danh mục đã ẩn, công khai không thấy và buyer không dùng phạm vi Admin',
+  async () =>
+    hoanTac(async () => {
+      const duLieu = await taoDuLieuKiemThu();
+      const phien = await phienDauGia(duLieu);
+
+      await khoBanGhi.capNhat('danh_muc', duLieu.categoryId, { dang_hoat_dong: 0 });
+
+      const loc = { danh_muc_id: duLieu.categoryId };
+      const congKhai = await cacPhienDauGia.danhSach(null, loc);
+      const quanTri = await cacPhienDauGia.danhSach(duLieu.admin, loc, 'admin');
+
+      xacNhan.equal(congKhai.length, 0);
+      xacNhan.ok(quanTri.some((muc) => String(muc.id) === String(phien)));
+      await xacNhan.rejects(cacPhienDauGia.danhSach(duLieu.a, loc, 'admin'), { status: 403 });
+    }),
+);
+
 sauKhi(require('../helpers/dong-ket-noi').dongKetNoiMotLan);

@@ -2,7 +2,7 @@ import { Button, Input, Select } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AnhSanPham, ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import QuyenNguoiBan from '../components/quyen-nguoi-ban';
-import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { useDuLieu, useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import type { SanPhamTrongDanhSach } from '../types/san-pham';
 import type { DanhMuc } from '../types/du-lieu';
 import { ngayGio, nhan } from '../utils/dinh-dang';
@@ -14,7 +14,7 @@ function DanhSachSanPham() {
   const trangThai = thamSo.get('trang_thai') || undefined;
   const danhMucId = thamSo.get('danh_muc_id') || undefined;
   const danhMuc = useDuLieu<DanhMuc[]>('/categories');
-  const sanPham = useDuLieu<SanPhamTrongDanhSach[]>('/products/mine', {
+  const sanPham = useDanhSachDuLieu<SanPhamTrongDanhSach[]>('/products/mine', {
     page: trang,
     limit: 12,
     q: tuKhoa,
@@ -133,7 +133,8 @@ function DanhSachSanPham() {
           trang={trang}
           datTrang={(so) => loc('page', String(so))}
           soLuong={sanPham.data?.length || 0}
-          gioiHan={12}
+          coTrangSau={sanPham.coTrangSau}
+          dangTai={sanPham.isFetching}
         />
       )}
     </>
