@@ -110,7 +110,8 @@ export function phanTrang(truyVan: Record<string, unknown> = {}) {
 
   return {
     page: trang,
-    limit: gioiHan,
+    // Lấy dư một bản ghi để xác định trang tiếp; offset vẫn theo kích thước trang gốc.
+    limit: gioiHan + (truyVan.phan_trang === 'true' ? 1 : 0),
     offset: (trang - 1) * gioiHan,
   };
 }
