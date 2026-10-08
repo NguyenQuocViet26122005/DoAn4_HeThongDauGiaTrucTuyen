@@ -38,6 +38,7 @@ test('Tranh chấp chưa nhận hàng chỉ mở từ mốc cho phép; hết h�
 
   const kiemTra = { ...don, trang_thai: 'DANG_KIEM_TRA', han_kiem_tra: '2026-10-03 10:00:00' };
   assert.ok(lyDoDuocMo(kiemTra, mua, hienTai - 1).includes('NGHI_NGO_TINH_XAC_THUC'));
+  assert.equal(lyDoDuocMo(kiemTra, mua, hienTai - 1).includes('CHUA_NHAN_HANG'), false);
   assert.deepEqual(lyDoDuocMo(kiemTra, mua, hienTai), []);
   assert.ok(lyDoDuocMo(kiemTra, admin, hienTai).length);
 });

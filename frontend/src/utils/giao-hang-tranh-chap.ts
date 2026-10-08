@@ -57,7 +57,7 @@ export function lyDoDuocMo(don: DonHang, nguoiDung: NguoiDung, hienTai: number):
     don.han_kiem_tra &&
     mocThoiGian(don.han_kiem_tra) > hienTai
   ) {
-    return lyDoTranhChap;
+    return lyDoTranhChap.filter((lyDo) => lyDo !== 'CHUA_NHAN_HANG');
   }
 
   return don.trang_thai === 'DA_GUI_HANG' &&

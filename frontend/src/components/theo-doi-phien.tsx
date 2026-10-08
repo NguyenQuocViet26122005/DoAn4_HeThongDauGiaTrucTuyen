@@ -42,7 +42,7 @@ export default function TheoDoiPhien({ id }: { id: string }) {
   }
 
   return (
-    <div>
+    <div className="nhom-theo-doi-phien">
       <Button
         loading={dangGui || truyVan.isPending}
         disabled={

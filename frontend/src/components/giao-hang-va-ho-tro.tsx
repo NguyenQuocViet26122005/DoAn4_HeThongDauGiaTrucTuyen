@@ -29,6 +29,10 @@ export default function GiaoHangVaHoTro({ don }: { don: DonHang }) {
   const quanTri = nguoiDung.vai_tro === 'QUAN_TRI';
   const gocTranhChap = quanTri ? '/quan-tri/tranh-chap' : '/tai-khoan/tranh-chap';
   const cacLyDo = lyDoDuocMo(don, nguoiDung, hienTai);
+  const coTheBaoChuaNhan = !quanTri && cacLyDo.includes('CHUA_NHAN_HANG');
+  const cacLyDoKhac = quanTri
+    ? cacLyDo
+    : cacLyDo.filter((lyDo) => lyDo !== 'CHUA_NHAN_HANG');
   const choGui = ['CHO_GUI_HANG', 'DA_THANH_TOAN'].includes(don.trang_thai);
 
   return (
@@ -126,7 +130,54 @@ export default function GiaoHangVaHoTro({ don }: { don: DonHang }) {
           Tranh chấp #{hoSo.id} · {nhan(hoSo.trang_thai)} →
         </Link>
       ))}
-      {cacLyDo.length > 0 ? (
+      {coTheBaoChuaNhan && (
+        <BieuMauThaoTac<{ mo_ta: string }>
+          ten="Báo chưa nhận hàng"
+          xacNhan={(duLieu) => (
+            <>
+              <p>
+                <strong>Mã vận đơn:</strong> {don.ma_van_don || 'Chưa khai báo'}
+              </p>
+              <p className="van-ban-dai">{duLieu.mo_ta}</p>
+              <p>
+                Yêu cầu sẽ được chuyển cho Admin kiểm tra. Tiền vẫn được giữ trong lúc xử lý;
+                thao tác này không gửi đề nghị Second Chance.
+              </p>
+            </>
+          )}
+          onGui={async (duLieu) => {
+            try {
+              const hoSo = await moTranhChap(don.id, {
+                ...duLieu,
+                ly_do: 'CHUA_NHAN_HANG',
+              });
+
+              chuyenTrang(`${gocTranhChap}/${hoSo.id}`);
+            } finally {
+              await lamMoiTranhChap();
+            }
+          }}
+        >
+          <p>
+            Đã qua mốc khiếu nại nhưng bạn vẫn chưa nhận được hàng? Hãy gửi yêu cầu để Admin kiểm
+            tra mã vận đơn.
+          </p>
+          <Form.Item
+            name="mo_ta"
+            label="Thông tin cần Admin kiểm tra"
+            rules={[
+              {
+                required: true,
+                whitespace: true,
+                message: 'Mô tả tình trạng giao hàng',
+              },
+            ]}
+          >
+            <Input.TextArea rows={5} maxLength={20000} showCount />
+          </Form.Item>
+        </BieuMauThaoTac>
+      )}
+      {cacLyDoKhac.length > 0 ? (
         <BieuMauThaoTac<{ ly_do: string; mo_ta: string }>
           ten={quanTri ? 'Mở hồ sơ can thiệp' : 'Báo vấn đề với đơn hàng'}
           xacNhan={(duLieu) => (
@@ -158,13 +209,13 @@ export default function GiaoHangVaHoTro({ don }: { don: DonHang }) {
               { required: true, message: 'Chọn lý do' },
               {
                 validator: (_, giaTri) =>
-                  !giaTri || cacLyDo.includes(giaTri)
+                  !giaTri || cacLyDoKhac.includes(giaTri)
                     ? Promise.resolve()
                     : Promise.reject(new Error('Lý do không còn phù hợp với trạng thái đơn')),
               },
             ]}
           >
-            <Select options={cacLyDo.map((value) => ({ value, label: nhan(value) }))} />
+            <Select options={cacLyDoKhac.map((value) => ({ value, label: nhan(value) }))} />
           </Form.Item>
           <Form.Item
             name="mo_ta"
@@ -180,12 +231,12 @@ export default function GiaoHangVaHoTro({ don }: { don: DonHang }) {
             <Input.TextArea rows={5} maxLength={20000} showCount />
           </Form.Item>
         </BieuMauThaoTac>
-      ) : (
+      ) : cacLyDo.length === 0 ? (
         <p className="chu-mo">
           Mở tranh chấp trong thời gian kiểm tra hàng; nếu chưa nhận hàng, chờ đến mốc khiếu nại ghi
           trên đơn. Admin xem xét các trường hợp cần can thiệp khi tiền còn được giữ.
         </p>
-      )}
+      ) : null}
     </section>
   );
 }
