@@ -27,7 +27,11 @@ const thongKe = (phienId) =>
 
 const danhSach = ({ limit, offset }) =>
   coSoDuLieu.truyVan(
-    `SELECT * FROM dat_coc_dau_gia ORDER BY id DESC LIMIT ${limit} OFFSET ${offset}`,
+    `SELECT c.*, a.trang_thai AS trang_thai_phien,
+            a.thoi_gian_ket_thuc AS thoi_gian_ket_thuc_phien
+     FROM dat_coc_dau_gia c
+     JOIN phien_dau_gia a ON a.id = c.phien_dau_gia_id
+     ORDER BY c.id DESC LIMIT ${limit} OFFSET ${offset}`,
   );
 
 export { cuaNguoiDung, chuaXuLyCuoi, thongKe, danhSach };

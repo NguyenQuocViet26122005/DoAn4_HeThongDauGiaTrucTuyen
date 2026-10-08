@@ -64,14 +64,13 @@ function batDau() {
     return async () => {};
   }
 
-  const boHenGio = setInterval(
-    () => chayMotLuot().catch(() => console.error('Lỗi chu kỳ tác vụ')),
-    cauHinh.jobIntervalMs,
-  );
+  const chayVaGhiLoi = () => chayMotLuot().catch(() => console.error('Lỗi chu kỳ tác vụ'));
+  const boHenGio = setInterval(chayVaGhiLoi, cauHinh.jobIntervalMs);
 
   boHenGio.unref();
+  void chayVaGhiLoi();
 
-  // Chu kỳ đầu bắt đầu sau một khoảng hẹn; không quét dữ liệu ngay khi vừa khởi động.
+  // Quét ngay khi khởi động để phiên và đơn đã quá hạn được xử lý sớm.
   return async () => {
     clearInterval(boHenGio);
     while (dangChay) {
