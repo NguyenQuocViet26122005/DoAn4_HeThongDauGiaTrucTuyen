@@ -30,8 +30,8 @@ function chuanBiMoiTruongCucBo(moiTruong, thuMucRieng) {
     throw new Error('JWT_SECRET cần ít nhất 32 byte');
   }
 
-  // Xem và thử giao diện không tự đóng các phiên cũ trong dữ liệu thật.
-  moiTruong.JOBS_ENABLED = 'false';
+  // Chạy nghiệp vụ đúng hạn khi phát triển; có thể tắt bằng JOBS_ENABLED=false.
+  moiTruong.JOBS_ENABLED ??= 'true';
 }
 
 module.exports = { chuanBiMoiTruongCucBo };

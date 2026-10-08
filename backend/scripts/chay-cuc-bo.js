@@ -9,7 +9,9 @@ async function chayCucBo() {
   const { khoiDongMayChu } = require('../src/may-chu');
 
   await khoiDongMayChu('127.0.0.1');
-  console.log('Chế độ cục bộ: đăng nhập/API đầy đủ, tác vụ tự động tắt.');
+  console.log(
+    `Chế độ cục bộ: đăng nhập/API đầy đủ, tác vụ tự động ${process.env.JOBS_ENABLED === 'false' ? 'tắt' : 'bật'}.`,
+  );
 }
 
 chayCucBo().catch(async (loi) => {

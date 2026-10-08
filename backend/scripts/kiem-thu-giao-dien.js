@@ -63,12 +63,12 @@ async function chay() {
       hop: 'false',
       ngay: '2024-06-01',
     };
-    const tenAnh = require('node:crypto').randomUUID() + '.png';
+    const tenAnh = require('node:crypto').randomUUID() + '.webp';
     const thuMucAnh = duongDan.join(cauHinh.uploadRoot, 'product', String(duLieu.seller.id));
 
     await tepTin.mkdir(thuMucAnh, { recursive: true });
     await tepTin.copyFile(
-      duongDan.join(__dirname, '../../frontend/src/assets/khong-gian-dau-gia.png'),
+      duongDan.join(__dirname, '../../frontend/src/assets/khong-gian-dau-gia.webp'),
       duongDan.join(thuMucAnh, tenAnh),
     );
 
@@ -128,11 +128,13 @@ async function chay() {
 
         console.log(`${ten}: http://localhost:5174/phien/${id}`);
       }
-      // Người mua B bắt đầu chưa có địa chỉ để kiểm tra luồng bổ sung trên web.
-      await require('../dist/repositories/ket-noi').truyVan(
-        'DELETE FROM dia_chi_nguoi_dung WHERE nguoi_dung_id = ?',
-        [duLieu.b.id],
-      );
+      // Chỉ bỏ địa chỉ khi B chưa có cam kết trong bộ thử Second Chance.
+      if (!process.argv.includes('--de-nghi')) {
+        await require('../dist/repositories/ket-noi').truyVan(
+          'DELETE FROM dia_chi_nguoi_dung WHERE nguoi_dung_id = ?',
+          [duLieu.b.id],
+        );
+      }
     }
 
     if (process.argv.includes('--don-hang')) {

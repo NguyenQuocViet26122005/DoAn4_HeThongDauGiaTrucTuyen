@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const { nhanDangLoaiTep } = require('../../dist/services/tai-tep');
 const { danhMuc, taiKhoan } = require('./ke-hoach');
 
-async function kiemTra(c, nguon) {
+async function kiemTra(c, nguon, { moRong = false } = {}) {
   const sql = async (q, v = []) => (await c.execute(q, v))[0];
   const loi = {};
 
@@ -39,7 +39,7 @@ async function kiemTra(c, nguon) {
     `SELECT COUNT(*) n FROM kiem_dinh_san_pham k JOIN san_pham s ON s.id=k.san_pham_id
     WHERE k.ngay_tao>k.ngay_gui_trung_tam OR k.ngay_gui_trung_tam>=k.ngay_nhan_trung_tam
     OR k.ngay_nhan_trung_tam>=k.ngay_kiem_dinh OR k.ngay_kiem_dinh>=s.ngay_duyet
-    OR (k.ket_qua='DAT' AND (k.ngay_kiem_dinh IS NULL OR NOT EXISTS
+    OR (k.ket_qua IN ('DAT','CAN_BO_SUNG','KHONG_DAT') AND (k.ngay_kiem_dinh IS NULL OR NOT EXISTS
       (SELECT 1 FROM tep_dinh_kem t WHERE t.kiem_dinh_san_pham_id=k.id AND t.loai_tep='BAO_CAO_KIEM_DINH')))`,
   );
   await dem(
@@ -107,7 +107,9 @@ async function kiemTra(c, nguon) {
   await dem(
     'trung_tam_giu_gui_sai',
     `SELECT COUNT(*) n FROM don_hang d JOIN kiem_dinh_san_pham k ON k.id=d.kiem_dinh_san_pham_id
-    WHERE d.nguon_gui_hang<>'TRUNG_TAM' OR k.ket_qua<>'DAT' OR NOT (d.ngay_gui_hang<=>k.ngay_roi_trung_tam)`,
+    WHERE d.nguon_gui_hang<>'TRUNG_TAM' OR k.ket_qua<>'DAT'
+    OR (d.ngay_gui_hang IS NOT NULL AND NOT (d.ngay_gui_hang<=>k.ngay_roi_trung_tam))
+    OR (d.trang_thai IN ('CHO_THANH_TOAN','CHO_GUI_HANG') AND k.ngay_roi_trung_tam IS NOT NULL)`,
   );
   await dem(
     'trang_thai_tien_sai',
@@ -151,11 +153,62 @@ async function kiemTra(c, nguon) {
     (SELECT COUNT(*) FROM tep_dinh_kem t WHERE t.san_pham_id=s.id AND t.la_anh_chinh=1)<>1`,
   );
 
+  if (moRong) {
+    await dem(
+      'don_khong_khop_san_pham',
+      `SELECT COUNT(*) n FROM don_hang d
+      JOIN phien_dau_gia p ON p.id=d.phien_dau_gia_id JOIN san_pham s ON s.id=p.san_pham_id
+      JOIN kiem_dinh_san_pham k ON k.id=d.kiem_dinh_san_pham_id
+      WHERE d.nguoi_ban_id<>s.nguoi_ban_id OR k.san_pham_id<>s.id
+      OR d.nguoi_mua_id=d.nguoi_ban_id OR
+      (d.nguon_don='THANG_DAU_GIA' AND (d.nguoi_mua_id<>p.nguoi_dan_dau_id OR d.gia_san_pham<>p.gia_hien_tai))`,
+    );
+    await dem(
+      'thanh_toan_sai_chu_so_huu',
+      `SELECT COUNT(*) n FROM thanh_toan t JOIN don_hang d ON d.id=t.don_hang_id
+      WHERE t.so_tien<=0 OR t.ngay_tao<d.ngay_tao
+      OR (t.trang_thai IN ('DA_THANH_TOAN','DA_HOAN_TIEN') AND t.ngay_thanh_toan>d.han_thanh_toan)`,
+    );
+    await dem(
+      'xac_minh_khong_khop',
+      `SELECT COUNT(*) n FROM nguoi_dung n WHERE n.trang_thai_nguoi_ban='DA_XAC_MINH'
+      AND NOT EXISTS (SELECT 1 FROM xac_minh_nguoi_ban x WHERE x.nguoi_dung_id=n.id AND x.trang_thai='DA_XAC_MINH'
+      AND x.ngay_duyet>=x.ngay_tao AND x.ngay_tao>=n.ngay_tao AND x.ngay_duyet<=NOW()
+      AND x.anh_mat_truoc IS NOT NULL AND x.anh_selfie IS NOT NULL)`,
+    );
+    await dem(
+      'san_pham_truoc_xac_minh',
+      `SELECT COUNT(*) n FROM san_pham s WHERE NOT EXISTS
+      (SELECT 1 FROM xac_minh_nguoi_ban x WHERE x.nguoi_dung_id=s.nguoi_ban_id AND x.trang_thai='DA_XAC_MINH' AND x.ngay_duyet<=s.ngay_tao)`,
+    );
+    await dem(
+      'coc_sai_thoi_gian',
+      `SELECT COUNT(*) n FROM dat_coc_dau_gia c JOIN phien_dau_gia p ON p.id=c.phien_dau_gia_id
+      WHERE c.ngay_tao<c.ngay_dat_coc AND c.ngay_dat_coc>p.thoi_gian_ket_thuc
+      OR c.ngay_dat_coc<c.ngay_tao OR c.ngay_hoan<c.ngay_dat_coc OR c.ngay_chuyen_vao_don<c.ngay_dat_coc
+      OR c.ngay_khong_hoan<c.ngay_chuyen_vao_don`,
+    );
+    await dem(
+      'hoan_tien_tranh_chap_sai',
+      `SELECT COUNT(*) n FROM tranh_chap t JOIN don_hang d ON d.id=t.don_hang_id
+      WHERE t.trang_thai='GIAI_QUYET_CHO_NGUOI_MUA' AND (d.trang_thai<>'DA_HUY'
+      OR d.ly_do_huy<>'HOAN_TIEN_TRANH_CHAP' OR d.so_tien_da_hoan<>d.tong_tien
+      OR t.so_tien_hoan<>d.tong_tien OR d.so_tien_da_giai_ngan<>0 OR d.so_tien_dang_giu<>0)`,
+    );
+    await dem(
+      'tep_sai_chu_so_huu',
+      `SELECT COUNT(*) n FROM tep_dinh_kem t WHERE
+      CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(t.duong_dan_tep,'/',6),'/',-1) AS UNSIGNED)<>t.nguoi_tai_len_id`,
+    );
+  }
+
   const duongDan = [
     ...(await sql('SELECT duong_dan_tep url FROM tep_dinh_kem')),
     ...(await sql(
       'SELECT anh_mat_truoc url FROM xac_minh_nguoi_ban WHERE anh_mat_truoc IS NOT NULL',
     )),
+    ...(await sql('SELECT anh_mat_sau url FROM xac_minh_nguoi_ban WHERE anh_mat_sau IS NOT NULL')),
+    ...(await sql('SELECT anh_selfie url FROM xac_minh_nguoi_ban WHERE anh_selfie IS NOT NULL')),
   ];
 
   loi.tep_thieu_hoac_sai_mime = 0;
@@ -189,7 +242,36 @@ async function kiemTra(c, nguon) {
     'SELECT id,danh_muc_id,tieu_de,duong_dan,mo_ta,tinh_trang_san_pham,thuong_hieu,thuoc_tinh_json FROM san_pham ORDER BY id',
   );
 
-  if (nguon) {
+  if (moRong) {
+    const dmDayDu = await sql('SELECT id,cau_hinh_thuoc_tinh FROM danh_muc');
+
+    loi.thuoc_tinh_san_pham_sai = 0;
+
+    const doc = (v) => (typeof v === 'string' ? JSON.parse(v) : v);
+
+    for (const p of sp) {
+      const cauHinh =
+        doc(dmDayDu.find((d) => String(d.id) === String(p.danh_muc_id)).cau_hinh_thuoc_tinh) || [];
+      const giaTri = doc(p.thuoc_tinh_json);
+
+      if (
+        !cauHinh.every((d) => !d.bat_buoc || giaTri[d.khoa]?.gia_tri != null) ||
+        !Object.entries(giaTri).every(([khoa, v]) =>
+          cauHinh.some(
+            (d) =>
+              d.khoa === khoa &&
+              String(d.id) === String(v.thuoc_tinh_id) &&
+              String(v.san_pham_id) === String(p.id),
+          ),
+        )
+      ) {
+        loi.thuoc_tinh_san_pham_sai++;
+      }
+    }
+    assert.equal(sp.length, 50, 'Phải giữ đủ 50 sản phẩm đã thống nhất');
+  }
+
+  if (nguon && !moRong) {
     const goc = nguon.bang.find((x) => x.ten === 'san_pham').dong;
     const chon = (x) =>
       Object.fromEntries(
@@ -206,10 +288,16 @@ async function kiemTra(c, nguon) {
 
   const tk = await sql('SELECT id,email FROM nguoi_dung ORDER BY id');
 
-  assert.deepEqual(
-    tk.map((x) => [Number(x.id), x.email]),
-    taiKhoan.map((x) => [x.id, x.email]),
-  );
+  if (moRong) {
+    assert.equal(tk.length, 51, 'Phải giữ 50 tài khoản người dùng và một quản trị');
+  }
+
+  if (!moRong) {
+    assert.deepEqual(
+      tk.map((x) => [Number(x.id), x.email]),
+      taiKhoan.map((x) => [x.id, x.email]),
+    );
+  }
 
   const soLuong = {};
 
@@ -221,11 +309,13 @@ async function kiemTra(c, nguon) {
   for (const [k, v] of Object.entries(loi)) {
     assert.equal(v, 0, `Kiểm tra ${k}: ${v} lỗi`);
   }
-  assert.equal(soLuong.phien_dau_gia, 10);
-  assert.equal(soLuong.don_hang, 7);
-  assert.equal(soLuong.luot_tra_gia, 27);
-  assert(soLuong.nhat_ky_hoat_dong >= 30 && soLuong.nhat_ky_hoat_dong <= 60);
-  assert(soLuong.thong_bao >= 20 && soLuong.thong_bao <= 40);
+  if (!moRong) {
+    assert.equal(soLuong.phien_dau_gia, 10);
+    assert.equal(soLuong.don_hang, 7);
+    assert.equal(soLuong.luot_tra_gia, 27);
+    assert(soLuong.nhat_ky_hoat_dong >= 30 && soLuong.nhat_ky_hoat_dong <= 60);
+    assert(soLuong.thong_bao >= 20 && soLuong.thong_bao <= 40);
+  }
 
   const anh = await sql(
     "SELECT san_pham_id,COUNT(*) n FROM tep_dinh_kem WHERE loai_tep='ANH_SAN_PHAM' GROUP BY san_pham_id",

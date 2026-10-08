@@ -1,0 +1,248 @@
+{
+  "cap_nhat": "2026-10-08T00:22:23.769Z",
+  "mo_ta": "Ảnh bổ sung cho bộ dữ liệu báo cáo, lấy từ Wikimedia Commons; xem từng trang nguồn và giấy phép.",
+  "anh": [
+    {
+      "san_pham_id": 123,
+      "duong_dan": "/api/uploads/files/product/1106/cfaee458-6b3f-4c77-81bb-5b48e15a8e3f.jpg",
+      "tieu_de_nguon": "File:Bronze basket vase with swinging handles MET DP20887.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Bronze_basket_vase_with_swinging_handles_MET_DP20887.jpg",
+      "tac_gia": "Wikimedia Commons",
+      "giay_phep": "CC0",
+      "mime": "image/jpeg",
+      "dung_luong": 221154,
+      "sha256": "370423f2f1d7395eedbadb0e15c642d95adb1b6b633e8affecf91f474dedb1f5"
+    },
+    {
+      "san_pham_id": 124,
+      "duong_dan": "/api/uploads/files/product/1107/b891f0db-5737-4d2c-82e7-5d2897ebc4a9.jpg",
+      "tieu_de_nguon": "File:Korean covered lacquer box, mid to late 18th century, lacquer, mother of pearl, tortoise shell and silk, HAA.JPG",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Korean_covered_lacquer_box,_mid_to_late_18th_century,_lacquer,_mother_of_pearl,_tortoise_shell_and_silk,_HAA.JPG",
+      "tac_gia": "Hiart",
+      "giay_phep": "CC0",
+      "mime": "image/jpeg",
+      "dung_luong": 297034,
+      "sha256": "75a9884530710b3d39f74942ac53e312c387e0060d5194976c88f0aeaa6d98c9"
+    },
+    {
+      "san_pham_id": 125,
+      "duong_dan": "/api/uploads/files/product/1108/27fd6be1-a7d0-487f-9ed0-3ed2965d5e2f.jpg",
+      "tieu_de_nguon": "File:Antique clock in Katowice shop.JPG",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Antique_clock_in_Katowice_shop.JPG",
+      "tac_gia": "myself (User:Piotrus)",
+      "giay_phep": "CC BY-SA 3.0",
+      "mime": "image/jpeg",
+      "dung_luong": 609921,
+      "sha256": "6ea6c8b6e20372c1fb0b39f9e38afadfdaab95d504dee7bf74bb61c84f04d90b"
+    },
+    {
+      "san_pham_id": 126,
+      "duong_dan": "/api/uploads/files/product/1109/f7fdc0f4-02f2-488b-87cb-0c368e5b115a.jpg",
+      "tieu_de_nguon": "File:Edward Bailey painting of Wailuku and Iao Valley.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Edward_Bailey_painting_of_Wailuku_and_Iao_Valley.jpg",
+      "tac_gia": "Edward Bailey",
+      "giay_phep": "Public domain",
+      "mime": "image/jpeg",
+      "dung_luong": 168254,
+      "sha256": "781c0661b2bd077812f39a00da996134a52424ea9af9ccf273a1dc29545fa1b9"
+    },
+    {
+      "san_pham_id": 127,
+      "duong_dan": "/api/uploads/files/product/1110/c46c830e-b079-460b-a68d-ce78ce81174a.jpg",
+      "tieu_de_nguon": "File:Richmond town hall lithograph 1870.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Richmond_town_hall_lithograph_1870.jpg",
+      "tac_gia": "Wikimedia Commons",
+      "giay_phep": "Public domain",
+      "mime": "image/jpeg",
+      "dung_luong": 38629,
+      "sha256": "93a1a80018507ef44245c4d9a65daeab5ec7c34504cb159063d47c527fbe9d11"
+    },
+    {
+      "san_pham_id": 128,
+      "duong_dan": "/api/uploads/files/product/1111/03c473a0-6998-44ff-9485-260ae9ff4baa.jpg",
+      "tieu_de_nguon": "File:Bronze Woman, Stockwell.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Bronze_Woman,_Stockwell.jpg",
+      "tac_gia": "David Sim from London, United Kingdom",
+      "giay_phep": "CC BY 2.0",
+      "mime": "image/jpeg",
+      "dung_luong": 609663,
+      "sha256": "6bd41afaf1be6310598dbc6b98688db52f8c4e65e944a47ecb08d06a3be59d52"
+    },
+    {
+      "san_pham_id": 129,
+      "duong_dan": "/api/uploads/files/product/1112/b2422eb2-fe0f-4cb7-a6c5-ae5690b3bd0e.jpg",
+      "tieu_de_nguon": "File:Rolex GMTIIC.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Rolex_GMTIIC.jpg",
+      "tac_gia": "Michael de Silva (bsodmike.com)",
+      "giay_phep": "CC BY 3.0",
+      "mime": "image/jpeg",
+      "dung_luong": 367009,
+      "sha256": "7914290d543e6feb9dca9e4b865df65fdc4d3154ee82164bc54f1af8c8d5c119"
+    },
+    {
+      "san_pham_id": 130,
+      "duong_dan": "/api/uploads/files/product/1113/64bc10b1-e772-4dc0-bb57-ac490d2a1784.jpg",
+      "tieu_de_nguon": "File:Cartier Tank.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Cartier_Tank.jpg",
+      "tac_gia": "Guy Sie",
+      "giay_phep": "CC BY-SA 2.0",
+      "mime": "image/jpeg",
+      "dung_luong": 150095,
+      "sha256": "98faa5055efd04cd285114d6f42cac1161fdd4479f9f1757577ce5518c180fc6"
+    },
+    {
+      "san_pham_id": 131,
+      "duong_dan": "/api/uploads/files/product/1114/eeeedf13-c2be-4645-9e0a-93a9542fbc37.png",
+      "tieu_de_nguon": "File:Vacheron Constantin.svg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Vacheron_Constantin.svg",
+      "tac_gia": "Vacheron Constantin",
+      "giay_phep": "Public domain",
+      "mime": "image/png",
+      "dung_luong": 37917,
+      "sha256": "5286c95cab14c9eacd79d63c06a02cbfbae53bbeb328686c7a00005372905bb7"
+    },
+    {
+      "san_pham_id": 132,
+      "duong_dan": "/api/uploads/files/product/1115/a0f5c01b-08e8-4553-a36a-752f760bcf55.jpg",
+      "tieu_de_nguon": "File:Sapphire ring photo by Mark Somma.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Sapphire_ring_photo_by_Mark_Somma.jpg",
+      "tac_gia": "Mark Somma from Greenfield Park, Canada",
+      "giay_phep": "CC BY 2.0",
+      "mime": "image/jpeg",
+      "dung_luong": 334236,
+      "sha256": "b5df95a9a5eb0a812492267aac1cd9bfb9934a1a883ce7aa7ad90fddf48be240"
+    },
+    {
+      "san_pham_id": 133,
+      "duong_dan": "/api/uploads/files/product/1116/bcef0d32-b1ea-4d35-9ce4-92b6fbf934d3.jpg",
+      "tieu_de_nguon": "File:Crassulaceae - Crassula marnieriana.JPG",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Crassulaceae_-_Crassula_marnieriana.JPG",
+      "tac_gia": "Hectonichus",
+      "giay_phep": "CC BY-SA 3.0",
+      "mime": "image/jpeg",
+      "dung_luong": 230057,
+      "sha256": "dee20b7f5044a071ac7f14905427fe45253b982be7f0e78fb566113b8a12b93f"
+    },
+    {
+      "san_pham_id": 134,
+      "duong_dan": "/api/uploads/files/product/1117/897ca909-59d1-4cb8-9da7-981d140b4dee.jpg",
+      "tieu_de_nguon": "File:History of Art in Phœnicia and Its Dependencies Vol 2.djvu",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:History_of_Art_in_Ph%C5%93nicia_and_Its_Dependencies_Vol_2.djvu",
+      "tac_gia": "\nPerrot, Georges, 1832-1914",
+      "giay_phep": "Public domain",
+      "mime": "image/jpeg",
+      "dung_luong": 398810,
+      "sha256": "425f18431d6c294eae4926a9a0bdcd3a875c839ad74ade72ea64c1d3f51c0814"
+    },
+    {
+      "san_pham_id": 135,
+      "duong_dan": "/api/uploads/files/product/1118/90be8ae6-e797-4992-93d0-89d2f03df0ac.jpg",
+      "tieu_de_nguon": "File:Famille-Vuitton 1888.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Famille-Vuitton_1888.jpg",
+      "tac_gia": "Unknown authorUnknown author",
+      "giay_phep": "Public domain",
+      "mime": "image/jpeg",
+      "dung_luong": 303503,
+      "sha256": "1809d39d5b647bf041c1ceed9501808042914b5cf4e1dbd3178603ba99539997"
+    },
+    {
+      "san_pham_id": 136,
+      "duong_dan": "/api/uploads/files/product/1119/dec8f5fe-d574-4fc8-be02-7276331dc74a.jpg",
+      "tieu_de_nguon": "File:Verne - Une ville flottante, 1872.djvu",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Verne_-_Une_ville_flottante,_1872.djvu",
+      "tac_gia": "Jules Verne",
+      "giay_phep": "Public domain",
+      "mime": "image/jpeg",
+      "dung_luong": 592375,
+      "sha256": "ae5b5ae81e36888ce3b6fb5d63d0c23a536c108d4689049da6004beb90fe1cf1"
+    },
+    {
+      "san_pham_id": 137,
+      "duong_dan": "/api/uploads/files/product/1120/d2999b7b-0b65-4c14-a01f-e54c5f271f74.jpg",
+      "tieu_de_nguon": "File:Porsche1.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Porsche1.jpg",
+      "tac_gia": "Lothar Spurzem",
+      "giay_phep": "CC BY-SA 2.0 de",
+      "mime": "image/jpeg",
+      "dung_luong": 570177,
+      "sha256": "75bfe29a7e931a20e4d98698f213d36ccba00e754bec24e82b0149a9b8ef2295"
+    },
+    {
+      "san_pham_id": 138,
+      "duong_dan": "/api/uploads/files/product/1106/920c656c-b13c-41a4-ab26-4735e9650008.jpg",
+      "tieu_de_nguon": "File:Vintage Yamaha sportbike and Vespa scooter.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Vintage_Yamaha_sportbike_and_Vespa_scooter.jpg",
+      "tac_gia": "kindergentler2001",
+      "giay_phep": "CC BY 2.0",
+      "mime": "image/jpeg",
+      "dung_luong": 533674,
+      "sha256": "03859188ca94f540b0771f7132a80298ec28f0cad002d29c1071c494f0c8d09f"
+    },
+    {
+      "san_pham_id": 139,
+      "duong_dan": "/api/uploads/files/product/1107/211b68a6-c0fc-47ed-a907-90b2676da8ca.jpg",
+      "tieu_de_nguon": "File:15th century egyptian anatomy of horse.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:15th_century_egyptian_anatomy_of_horse.jpg",
+      "tac_gia": "Unknown authorUnknown author",
+      "giay_phep": "Public domain",
+      "mime": "image/jpeg",
+      "dung_luong": 408307,
+      "sha256": "115861b9c43848b3a15b34df2cd5f0b81c588eec313379f98693b54756831fe7"
+    },
+    {
+      "san_pham_id": 140,
+      "duong_dan": "/api/uploads/files/product/1108/c2a8a385-e335-4ff1-a88c-6fee83800d26.jpg",
+      "tieu_de_nguon": "File:Indochina 1954.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Indochina_1954.jpg",
+      "tac_gia": "Wikimedia Commons",
+      "giay_phep": "Public domain",
+      "mime": "image/jpeg",
+      "dung_luong": 179005,
+      "sha256": "f2d18741406ab1b8c313696adad57d8821caa8d51614bd825b8f98d5e04111d0"
+    },
+    {
+      "san_pham_id": 141,
+      "duong_dan": "/api/uploads/files/product/1109/f2cbd030-643a-448c-86e9-0f951b598d21.jpg",
+      "tieu_de_nguon": "File:The Journal v. 30, no. 10, March 15, 2018 (IA Journal180315).pdf",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:The_Journal_v._30,_no._10,_March_15,_2018_(IA_Journal180315).pdf",
+      "tac_gia": "\nU.S. Navy. Naval Support Activity (NSA) Bethesda",
+      "giay_phep": "Public domain",
+      "mime": "image/jpeg",
+      "dung_luong": 390826,
+      "sha256": "152023f0e4dedb125d15a04aa6dfdae5db696a3cf40d07e1b8a0f4d25abcb5ce"
+    },
+    {
+      "san_pham_id": 142,
+      "duong_dan": "/api/uploads/files/product/1110/63ac474e-c292-4cf5-ade2-a9e5ca4229a6.jpg",
+      "tieu_de_nguon": "File:Gibson Les Paul Classic.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Gibson_Les_Paul_Classic.jpg",
+      "tac_gia": "Prokopenya Viktor",
+      "giay_phep": "CC BY-SA 3.0",
+      "mime": "image/jpeg",
+      "dung_luong": 52343,
+      "sha256": "dad375c1ecfbf4340ffd76415838aa2237354ed01cec7bc2f030345b5324963d"
+    },
+    {
+      "san_pham_id": 143,
+      "duong_dan": "/api/uploads/files/product/1111/cb3dcc1a-f4e0-4363-a1f9-24015e30fa88.jpg",
+      "tieu_de_nguon": "File:Hasselblad 500C.jpg",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Hasselblad_500C.jpg",
+      "tac_gia": "Holger Ellgaard ",
+      "giay_phep": "Public domain",
+      "mime": "image/jpeg",
+      "dung_luong": 273089,
+      "sha256": "61fd89a46e6bd86a049f24843d3f7ee47b6a31ff856f4d9b80b86bc4711e1ca8"
+    },
+    {
+      "san_pham_id": 144,
+      "duong_dan": "/api/uploads/files/product/1112/2e29cb35-5c15-4026-b952-a4d5df62ede2.jpg",
+      "tieu_de_nguon": "File:Carl Zeiss TELITA-I 6x18.JPG",
+      "trang_nguon": "https://commons.wikimedia.org/wiki/File:Carl_Zeiss_TELITA-I_6x18.JPG",
+      "tac_gia": "Senshu",
+      "giay_phep": "CC BY-SA 3.0",
+      "mime": "image/jpeg",
+      "dung_luong": 137674,
+      "sha256": "161867fc973680f631a2536b5817d9e28c4b0294a0a845bb5076f8701d47c6e1"
+    }
+  ]
+}
