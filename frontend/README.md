@@ -4,7 +4,7 @@
 
 ## Chạy trên máy
 
-1. Trong `backend`, chạy `npm run dev:local` để dùng MySQL hiện có, đăng nhập/API đầy đủ và tắt tác vụ nền khi thử giao diện. Nếu thiếu khóa JWT, chế độ này tạo khóa ngẫu nhiên riêng trong `backend/.local/` đã bỏ qua bởi Git; không sửa `.env`. Xem `backend/HUONG-DAN.md` để chạy chế độ thông thường có tác vụ.
+1. Trong `backend`, chạy `npm run dev:local` để dùng MySQL hiện có, đăng nhập/API đầy đủ và chạy tác vụ tự động khi thử giao diện. Nếu thiếu khóa JWT, chế độ này tạo khóa ngẫu nhiên riêng trong `backend/.local/` đã bỏ qua bởi Git; không sửa `.env`. Đặt `JOBS_ENABLED=false` trong `.env` nếu muốn tạm dừng tác vụ. Xem `backend/HUONG-DAN.md` để biết thêm.
 2. Trong thư mục `frontend`, chạy `npm run dev`.
 3. Mở **http://localhost:5173**. Địa chỉ này khớp nguồn truy cập mặc định của backend. Vite chuyển `/api` và `/socket.io` tới `127.0.0.1:5000`.
 
@@ -64,11 +64,11 @@ Bản xuất `dist` cần máy chủ web trả `index.html` cho đường dẫn 
 - `/tai-khoan/xac-minh`: tải giấy tờ và nộp hồ sơ, xem kết quả/lịch sử. `/quan-tri/xac-minh`: lọc, xem hồ sơ và duyệt/từ chối. Tệp giấy tờ chỉ đọc qua API có xác thực.
 - Nhãn giao diện không dùng chữ “mô phỏng”. Backend vẫn chỉ phục vụ giao dịch mô phỏng của đồ án. Bộ chọn kết quả thanh toán chỉ hiện khi chạy frontend với `VITE_CHE_DO_KIEM_THU=true`; mặc định ẩn, không phải tích hợp cổng thanh toán thật.
 
-Second Chance, đánh giá, báo cáo sản phẩm, vi phạm, các mục quản trị người dùng/phiên/cọc/danh mục/cấu hình/thống kê/nhật ký và realtime đã có giao diện kết nối API. Người bán chỉ thấy thao tác đăng lại khi sản phẩm đủ điều kiện; backend kiểm tra lại điều kiện trong transaction. Các luồng báo cáo sản phẩm và đăng lại chưa được nghiệm thu đầy đủ trên trình duyệt. Các mục chưa triển khai không hiển thị số liệu hoặc kết quả giả.
+Second Chance, đánh giá, báo cáo sản phẩm, vi phạm, các mục quản trị người dùng/phiên/cọc/danh mục/cấu hình/thống kê/nhật ký và realtime đã có giao diện kết nối API. Người bán chỉ thấy thao tác đăng lại khi sản phẩm đủ điều kiện; backend kiểm tra lại điều kiện trong transaction. Ngày 08/10/2026 đã kiểm tra trực tiếp báo cáo sản phẩm → Admin xét/đóng, yêu cầu hủy → Admin duyệt → đăng lại cùng sản phẩm, cùng các luồng cọc, trả giá giữa hai người mua, cập nhật Socket.IO, đơn hàng, đánh giá, Second Chance và tranh chấp. Chi tiết phạm vi và giới hạn ở tài liệu nghiệp vụ chính; không suy ra mọi thiết bị hoặc tổ hợp đầu vào đều đã được thử. Các mục chưa triển khai không hiển thị số liệu hoặc kết quả giả.
 
 Khóa phiên đang giữ tên lưu trữ `lac-viet-token` để tương thích phiên trước khi đổi thương hiệu; toàn bộ tên hiển thị là VietBid. Khóa nằm trong sessionStorage của tab, được xóa khi đăng xuất hoặc hết phiên. Không lưu mức tối đa bí mật của các thành viên khác.
 
-Chế độ `dev:local` thay máy chủ xem trước chỉ đọc trước đây. Nó cho phép API ghi dữ liệu theo quyền tài khoản, nhưng không tự đóng phiên/xử lý quá hạn. Không dùng chế độ này để nghiệm thu đồng hồ/tác vụ đấu giá hoặc triển khai production.
+Chế độ `dev:local` thay máy chủ xem trước chỉ đọc trước đây. Nó cho phép API ghi dữ liệu theo quyền tài khoản và chạy tác vụ tự động như môi trường phát triển. Không dùng chế độ này để triển khai production.
 
 ## Tổ chức mã nguồn
 
@@ -116,4 +116,4 @@ Kiểm tra tổng cuối đợt ngày 01/10/2026: định dạng/kiểm tra ki�
 
 Đã nối API cho Cơ hội mua tiếp, đánh giá hai chiều, theo dõi/bỏ theo dõi, người dùng, vi phạm, danh mục/thuộc tính, duyệt hủy phiên, cấu hình thời hạn/cọc/bước giá, thống kê, nhật ký và quản lý cọc. Admin có trạng thái tác vụ tự động tại tổng quan. Chi tiết và điều kiện xem mục 3.1.4 trong tài liệu nghiệp vụ.
 
-Chủ đồ án yêu cầu tự kiểm thử từ đợt này: chưa nghiệm thu toàn bộ chức năng mới trên trình duyệt. Không coi trang đã nối API là đã kiểm thử đầy đủ. Chế độ dev:local tắt tác vụ, nên muốn chạy luồng mở/chốt phiên và quá hạn cần chạy backend ở chế độ có tác vụ theo hướng dẫn backend.
+Chủ đồ án yêu cầu tự kiểm thử từ đợt này: chưa nghiệm thu toàn bộ chức năng mới trên trình duyệt. Không coi trang đã nối API là đã kiểm thử đầy đủ. Chế độ dev:local chạy tác vụ tự động mặc định: chốt phiên, xử lý cọc và đơn quá hạn ngay từ chu kỳ đầu khi backend khởi động. Danh sách quản trị tự làm mới để phản ánh kết quả. Đặt `JOBS_ENABLED=false` trong `backend/.env` nếu cần tạm dừng xử lý tự động.

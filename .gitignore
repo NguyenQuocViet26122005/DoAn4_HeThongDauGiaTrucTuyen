@@ -35,3 +35,7 @@ pnpm-debug.log*
 *.sln
 *.sw?
 .DS_Store
+
+# Bản render kiểm tra báo cáo và tệp khóa tạm của Word.
+bao-cao/**/.kiem-tra/
+~$*.docx

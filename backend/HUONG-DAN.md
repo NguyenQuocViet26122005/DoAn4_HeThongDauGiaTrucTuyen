@@ -13,7 +13,7 @@ npm run dev
 
 Đã kiểm thử bằng Node.js 24.13.0. `npm run dev` chạy TypeScript bằng tsx. Khi chạy bản biên dịch, dùng `npm run build` rồi `npm start`. Điểm khởi động là `src/may-chu.ts`; cấu hình Express ở `src/ung-dung.ts`. Khi có lỗi `EADDRINUSE`, dừng phiên backend cũ đang dùng cổng 5000 trước khi chạy lại.
 
-**Thử giao diện trên máy:** dùng `npm run dev:local`. Chế độ này chỉ lắng nghe `127.0.0.1`, dùng MySQL hiện có, cho phép API đầy đủ và luôn tắt jobs để không tự xử lý phiên mẫu quá hạn. Nếu thiếu `JWT_SECRET`, tạo khóa ngẫu nhiên 48 byte trong `backend/.local/jwt.key` (bỏ qua bởi Git), tái sử dụng khi khởi động lại; không xuất khóa ra log và không sửa `.env`. Khóa đã cấu hình được giữ nguyên, khóa quá ngắn bị từ chối. Lệnh từ chối `NODE_ENV=production`. Sau khi đổi mã backend, dừng và chạy lại. Chạy thông thường/production vẫn cần `JWT_SECRET` riêng; dùng `npm run dev` hoặc `npm start` với `JOBS_ENABLED` phù hợp khi cần tác vụ đúng lịch.
+**Thử giao diện trên máy:** dùng `npm run dev:local`. Chế độ này chỉ lắng nghe `127.0.0.1`, dùng MySQL hiện có, cho phép API đầy đủ và chạy tác vụ nền để tự mở/chốt phiên, xử lý cọc và đơn quá hạn. Tác vụ quét ngay khi khởi động rồi chạy mỗi 60 giây. Để tạm dừng, đặt `JOBS_ENABLED=false` trong `backend/.env`. Nếu thiếu `JWT_SECRET`, tạo khóa ngẫu nhiên 48 byte trong `backend/.local/jwt.key` (bỏ qua bởi Git), tái sử dụng khi khởi động lại; không xuất khóa ra log và không sửa `.env`. Khóa đã cấu hình được giữ nguyên, khóa quá ngắn bị từ chối. Lệnh từ chối `NODE_ENV=production`. Sau khi đổi mã backend, dừng và chạy lại.
 
 Ứng dụng tự nạp `backend/.env`. Không cần gửi nội dung tệp này cho người khác. Các tên cấu hình ứng dụng sử dụng:
 
@@ -23,7 +23,7 @@ npm run dev
 - `PORT`: mặc định 5000.
 - `FRONTEND_URL`: mặc định `http://localhost:5173`; nhiều nguồn được phân cách bằng dấu phẩy.
 - `DB_TIMEZONE`: mặc định `+07:00`, cần khớp cách hiểu thời gian DATETIME hiện có.
-- `JOBS_ENABLED`: mặc định bật; đặt `false` khi muốn tạm dừng tác vụ tự động lúc kiểm tra dữ liệu.
+- `JOBS_ENABLED`: mặc định bật trong mọi chế độ; đặt `false` khi muốn tạm dừng tác vụ tự động.
 
 Các lệnh trên không tạo lại database, không chạy tệp SQL gốc và không thay schema. File SQL gốc hiện là bản khởi tạo 21 bảng cho database chưa tồn tại. Database trên máy đã chuyển xong; không cần chạy lại SQL. Xem `../co-so-du-lieu/HUONG-DAN-CSDL.md` để tra sơ đồ và bản sao.
 
@@ -72,7 +72,7 @@ npm run format:check
 
 Kiểm tra lại ngày 01/10/2026: 18 kiểm thử đơn vị/HTTP và 55 kiểm thử tích hợp đạt. 29 kiểm tra ràng buộc MySQL đã đạt ở đợt nâng cấp 21 bảng. Bộ tích hợp gồm các giao dịch được rollback, kiểm thử HTTP tải tệp và nhiều kết nối MySQL thật cùng thao tác. Ca nhiều kết nối tạo dữ liệu riêng có UUID, commit để các kết nối nhìn thấy nhau, rồi dọn đúng các bản ghi kiểm thử. Tệp tải lên trong kiểm thử cũng được dọn. Các dữ liệu mẫu có sẵn không bị xóa/reset; số tự tăng có thể có khoảng trống sau kiểm thử.
 
-Riêng `npm run test:api` chạy hai bộ HTTP đối chiếu route thật: đủ 104/104 API có ít nhất một trường hợp thành công. Bộ nền gửi 180 yêu cầu (38 trường hợp lỗi), gồm đổi ảnh đại diện, không gắn ảnh trùng và khóa sửa; bộ còn lại kiểm tra thêm 16 API kiểm định/cọc và các nhánh sai quyền, thiếu báo cáo, sai số tiền, tệp riêng tư. Bộ test đối chiếu đường dẫn với route trong mã nguồn, kiểm tra dữ liệu phản hồi, phân quyền, bí mật đầu ra và các chuyển trạng thái nghiệp vụ. Kết quả này không thay thế kiểm thử tải hoặc chứng minh mọi tổ hợp đầu vào đều đúng. Tất cả thay đổi dữ liệu của bộ test API, kể cả cấu hình nghiệp vụ, nằm trong transaction được rollback; tệp tải lên được dọn sau đó.
+Ngày 08/10/2026, `npm test` đạt 18/18 và `npm run test:integration` đạt 59/59 kiểm thử. Bộ tích hợp đã chạy cả hai bộ HTTP đối chiếu route thật: đủ 107/107 API có ít nhất một trường hợp thành công, gồm 91 API nền và 16 API kiểm định/cọc. Bộ nền gửi 219 yêu cầu, đối chiếu 45 phản hồi lỗi, gồm phân trang, địa chỉ mặc định, danh mục ẩn, đổi ảnh đại diện, không gắn ảnh trùng và khóa sửa. Bộ test kiểm tra dữ liệu phản hồi, phân quyền, bí mật đầu ra và các chuyển trạng thái nghiệp vụ. Kết quả này không thay thế kiểm thử tải hoặc chứng minh mọi tổ hợp đầu vào đều đúng. Thay đổi của bộ API, kể cả cấu hình nghiệp vụ, được rollback; tệp tải lên được dọn sau đó. Kiểm thử nhiều kết nối có dữ liệu UUID riêng và dọn sau khi hoàn tất.
 
 Bộ `test:api` đã chạy lại thành công ngày 02/10/2026 khi nối giao diện người mua. Máy chủ kiểm thử giao diện cũng đã xác nhận thao tác lấy lại kết quả Mua ngay sau mất phản hồi và tải lại trang. Không thay đổi transaction hoặc quy tắc đấu giá/thanh toán trong backend ở đợt giao diện này.
 

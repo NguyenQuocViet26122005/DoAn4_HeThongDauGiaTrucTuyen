@@ -1,6 +1,6 @@
 # Bộ dữ liệu thực hành VietBid
 
-Cập nhật ngày 07/10/2026. Đây là dữ liệu được lưu trong MySQL và đọc qua API thật của dự án. Tài khoản và giao dịch là tình huống tổng hợp cho đồ án, không phải giao dịch thương mại đã xảy ra ngoài đời.
+Cập nhật ngày 08/10/2026. Đây là dữ liệu được lưu trong MySQL và đọc qua API thật của dự án. Tài khoản và giao dịch là tình huống tổng hợp cho đồ án, không phải giao dịch thương mại đã xảy ra ngoài đời.
 
 ## Danh mục và sản phẩm
 
@@ -17,7 +17,7 @@ Chỉ hiển thị đúng 10 danh mục đã thống nhất:
 - Nhạc cụ Vintage giá trị cao (ID 72).
 - Máy ảnh cổ & Thiết bị quang học sưu tầm (ID 73).
 
-Giữ 28 sản phẩm (ID 95–122), tên, mô tả, thương hiệu, thuộc tính và danh mục đã có. 12 danh mục cũ được giữ ở trạng thái không hoạt động để bảo toàn bản ghi; tổng số bản ghi danh mục là 22. Có 10 sản phẩm tham gia các câu chuyện đấu giá, phần còn lại ở bước bản nháp hoặc kiểm định.
+Giữ 50 sản phẩm ID 95–144, thuộc 20 người bán đã xác minh và 10 danh mục. Có 56 ảnh, mỗi sản phẩm có đúng một ảnh chính. Đã sửa thông tin và ảnh sai đối tượng trong bộ mở rộng; tất cả thuộc tính dùng đúng cấu hình của danh mục. Mười hai danh mục cũ không hoạt động được giữ để bảo toàn lịch sử. Có 18 phiên, 57 lượt trả giá, 30 cọc, 13 đơn, 9 thanh toán, 3 tranh chấp và 8 đánh giá; các sản phẩm còn lại phục vụ các bước vận hành trước đấu giá.
 
 ## Tài khoản đăng nhập
 
@@ -40,6 +40,40 @@ Mật khẩu thực hành chung: **VietBid@2026**. MySQL lưu hash bcrypt, khôn
 - Vũ Quỳnh Anh: **quynh.anh@vietbid.test** — người mua (ID 1209).
 - Phan Minh Tùng: **minh.tung@vietbid.test** — người mua (ID 1210).
 
+Bộ mở rộng có thêm 35 tài khoản, dùng cùng mật khẩu thực hành ở trên:
+
+- Người bán đã xác minh: **nguoi.ban.06@vietbid.test** đến **nguoi.ban.20@vietbid.test** (ID 1106–1120).
+- Người mua: **nguoi.mua.11@vietbid.test** đến **nguoi.mua.30@vietbid.test** (ID 1211–1230).
+
+Mỗi tài khoản mới có hồ sơ, số điện thoại và một địa chỉ mặc định. Mười lăm tài khoản người bán mới có hồ sơ xác minh đã duyệt; sản phẩm của họ được phân bố theo các danh mục giá trị cao thay vì tạo ngẫu nhiên không có quan hệ.
+
+`nguoi.mua.19@vietbid.test` và `nguoi.mua.30@vietbid.test` có yêu cầu xác minh người bán đang chờ; `nguoi.mua.23@vietbid.test` có hồ sơ bán bị từ chối để bổ sung thông tin. Các tài khoản này vẫn được mua theo quyền người dùng.
+
+## Các câu chuyện bổ sung đã lưu ngày 08/10/2026
+
+11. **Sản phẩm 129, phiên 2068, đơn 3050:** người bán 1112; ba người mua 1211–1213 đặt cọc và trả giá; 1211 thắng, cọc chuyển vào đơn, thanh toán phần còn lại, trung tâm giao, buyer nhận và xác nhận hoàn thành. Giải ngân toàn bộ và đánh giá hai chiều.
+12. **Sản phẩm 130, phiên 2069:** người thắng 1214 không thanh toán đơn 3051 đúng hạn; đơn hủy, cọc không hoàn, vi phạm được ghi nhận. Đề nghị 5009 gửi cho 1215 bằng giá công khai của người này; chấp nhận, thanh toán, tạo đơn 3052, giao nhận và hoàn thành, đánh giá hai chiều.
+13. **Sản phẩm 131, phiên 2070, đơn 3053:** 1217 thắng và thanh toán; sau giao nhận phát hiện thiếu phụ kiện. Tranh chấp 7010 có bằng chứng của buyer/seller, seller phản hồi và Admin đối chiếu rồi hoàn toàn bộ tiền sản phẩm lẫn vận chuyển. Không tạo đánh giá cho đơn đã hủy.
+14. **Sản phẩm 133, phiên 2071:** ba người mua 1220–1222 trả giá. 1221 và 1222 có cùng mức tối đa; 1221 đặt trước nên dẫn đầu. Mức tối đa chỉ lưu riêng theo người tham gia, không đưa vào nhật ký hoặc dữ liệu công khai.
+15. **Sản phẩm 136, phiên 2072:** đã duyệt và trung tâm đang giữ; phiên bắt đầu ngày 10/10, ba tài khoản theo dõi, chưa có lượt trả giá trước giờ mở.
+16. **Sản phẩm 137, phiên 2073, đơn 3054:** 1224 Mua ngay và thanh toán đủ, trung tâm giao; buyer đã nhận và còn trong thời hạn kiểm tra hàng.
+17. **Sản phẩm 143, phiên 2074, đơn 3055:** 1226 thắng; cọc được chuyển vào đơn, phần còn lại đang chờ thanh toán trong hạn.
+18. **Sản phẩm 144, phiên 2075:** 1227–1229 đặt cọc và trả giá; 1230 theo dõi. Phiên còn hoạt động.
+
+Hồ sơ thực hành và các mốc thời gian được tạo qua service backend trong một transaction. Thời gian lịch sử chỉ được đặt cho kết nối dựng dữ liệu và được trả về đồng hồ thực trước commit; không đổi thời gian của máy chủ. Trạng thái đang diễn ra có thể đổi khi tác vụ tự động chạy theo đồng hồ thực.
+
+## Kiểm tra bộ 50 sản phẩm
+
+Chạy trong thư mục backend:
+
+```powershell
+node scripts/hoan-thien-du-lieu-vietbid.js --verify
+```
+
+Ngày 08/10/2026: 31 nhóm đối soát đạt sau commit, 160 đường dẫn tệp đã kiểm tra. Có bản sao riêng trước khi cập nhật; bảng, view, trigger và khóa ngoại giữ nguyên. `--dry-run` thực thi rồi rollback, `--apply` sao lưu và áp dụng khi chưa có dấu mốc; chạy lại không tạo trùng câu chuyện. Dữ liệu dùng ảnh tư liệu có nguồn và hồ sơ thực hành, không phải chứng thư kiểm định hoặc giấy tờ của người thật. Thông số đo đạc trong hồ sơ tổng hợp không phải kết quả đo hiện vật từ nguồn ảnh.
+
+Metadata ảnh đã sửa nằm trong `demo-assets/du-lieu-chuan-vietbid.json`. Tệp `du-lieu-mo-rong-bao-cao.json` là nguồn lịch sử của lần mở rộng đầu; không dùng ảnh sai đã ghi trong đó để nạp lại bộ đã chuẩn hóa.
+
 ## Chuỗi nghiệp vụ
 
 1. **Phiên 2001, Rolex Submariner, sản phẩm 95:** Nguyễn Minh Hoàng bán; ba người trả giá; Đức Anh thắng. Cọc 18 triệu chuyển vào đơn 3001; thanh toán phần còn lại, trung tâm giao, người mua nhận, giải ngân và hai bên đánh giá.
@@ -57,20 +91,25 @@ Mốc thời gian được tính tương đối theo thời điểm bản sao ng
 
 ## Quy mô
 
-- 16 tài khoản: 1 Admin, 5 người bán, 10 người mua; 15 địa chỉ.
-- 10 phiên, 27 lượt trả giá công khai được tính bằng bộ máy đấu giá của backend, 19 bản ghi tham gia/theo dõi.
-- 12 khoản cọc, 7 đơn, 5 thanh toán, 1 đề nghị mua tiếp, 1 vi phạm.
-- 12 hồ sơ kiểm định: 10 đạt, 1 đang kiểm định, 1 cần bổ sung.
-- 2 tranh chấp, 4 đánh giá, 29 thông báo, 56 nhật ký và 2 yêu cầu xử lý.
-- 34 ảnh sản phẩm, 26 hồ sơ PDF và 5 ảnh xác minh tổng hợp. Đã kiểm tra tồn tại/nội dung 65 đường dẫn tệp qua API.
+- 51 tài khoản: 1 Admin và 50 người mua/người bán; 20 người bán đã xác minh, 30 tài khoản mua chưa được cấp quyền bán, 50 địa chỉ mặc định.
+- 50 sản phẩm, 50 ảnh chính và 6 ảnh bổ sung; 18 sản phẩm có phiên liên kết. Các sản phẩm còn lại có hồ sơ ở những bước vận hành trước đấu giá.
+- 18 phiên, 57 lượt trả giá công khai và 43 bản ghi tham gia/theo dõi.
+- 30 khoản cọc, 13 đơn, 9 thanh toán, 2 đề nghị mua tiếp, 2 vi phạm.
+- 32 hồ sơ kiểm định: 21 đạt, 2 đang kiểm định, 2 cần bổ sung, 2 đã tiếp nhận, 1 đang vận chuyển, 3 chờ gửi, 1 không đạt/đã trả.
+- 3 tranh chấp, 8 đánh giá, 167 thông báo, 342 nhật ký và 2 yêu cầu xử lý tại thời điểm chốt dữ liệu.
+- 56 ảnh sản phẩm, 58 hồ sơ PDF đã gắn quan hệ và 46 đường dẫn ảnh hồ sơ xác minh. Tổng cộng 160 đường dẫn tệp được đối soát.
 
 ## Ảnh và hồ sơ
 
-Ảnh thật được lưu tại backend/uploads; MySQL lưu đường dẫn, người tải và quan hệ với sản phẩm/hồ sơ. Không lưu byte ảnh trong SQL. Nguồn ảnh cũ: demo-assets/nguon-anh.json; ảnh bổ sung và giấy phép: demo-assets/bo-moi.json. Đã thay ảnh chính sai mẫu của Rolex 95 bằng ảnh đúng tham chiếu 14060M, giữ nguyên tệp cũ trên đĩa.
+Ảnh thật được lưu tại backend/uploads; MySQL lưu đường dẫn, người tải và quan hệ với sản phẩm/hồ sơ. Không lưu byte ảnh trong SQL. Nguồn ảnh ban đầu: demo-assets/nguon-anh.json và demo-assets/bo-moi.json. Bộ mở rộng đã đối chiếu lại đối tượng, tiêu đề, tác giả, giấy phép và SHA-256 trong demo-assets/du-lieu-chuan-vietbid.json; tệp du-lieu-mo-rong-bao-cao.json chỉ ghi nguồn lịch sử của lần mở rộng đầu. MySQL đã cập nhật ảnh chính và nguồn tương ứng. Các tệp cũ cần để phục hồi bản sao được giữ trên đĩa.
 
-Hiện 5 sản phẩm có từ 2 ảnh trở lên; các sản phẩm khác có một ảnh. Chưa đạt mục tiêu 10–12 sản phẩm đều có 2–3 ảnh đúng mẫu; không dùng ảnh khác sản phẩm hay ảnh lặp để đủ số lượng. Ảnh Wikimedia là ảnh tham khảo hiện vật. Các PDF và ảnh xác minh đều ghi rõ là hồ sơ thực hành, không phải chứng thư hay giấy tờ danh tính thật.
+Hiện 5 sản phẩm có từ 2 ảnh trở lên; các sản phẩm khác có một ảnh. Không dùng ảnh lặp chỉ để đủ số lượng. Ảnh Wikimedia là ảnh tham khảo hiện vật và được kiểm tra định dạng, dung lượng trước khi lưu. Các PDF và ảnh xác minh đều ghi rõ là hồ sơ thực hành, không phải chứng thư hay giấy tờ danh tính thật.
+
+Script `scripts/bo-sung-du-lieu-bao-cao.js` là bước mở rộng ban đầu từ 28 lên 50 sản phẩm. Bước chuẩn hóa và nối luồng là `scripts/hoan-thien-du-lieu-vietbid.js`, có dấu mốc chống chạy trùng, sao lưu trước khi ghi và 31 nhóm đối soát trước commit. Dùng `--verify` của script hoàn thiện để kiểm tra bộ hiện tại.
 
 ## Nạp dữ liệu an toàn
+
+Các lệnh tái tạo dưới đây dành cho bộ gốc 28 sản phẩm từ bản sao nguồn, không phải lệnh nạp lại bộ 50 sản phẩm đã hoàn thiện. Bộ hiện tại được kiểm tra bằng `hoan-thien-du-lieu-vietbid.js --verify`; bản sao trước khi hoàn thiện được giữ riêng và có checksum.
 
 Script không tạo/xóa bảng và không thay đổi cấu trúc 21 bảng, view, trigger hoặc migration. Trước mỗi lần ghi có bản sao riêng được kiểm tra SHA-256. Dữ liệu được thay trong transaction, xác minh rồi mới commit; lỗi thì rollback. Không xóa uploads.
 

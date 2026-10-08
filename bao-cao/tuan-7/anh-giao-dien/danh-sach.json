@@ -1,0 +1,194 @@
+[
+  {
+    "ten": "01-trang-chu",
+    "duongDan": "/"
+  },
+  {
+    "ten": "02-kham-pha",
+    "duongDan": "/kham-pha"
+  },
+  {
+    "ten": "03-chi-tiet-phien",
+    "duongDan": "/phien/2007"
+  },
+  {
+    "ten": "04-huong-dan",
+    "duongDan": "/huong-dan"
+  },
+  {
+    "ten": "05-dang-nhap",
+    "duongDan": "/dang-nhap"
+  },
+  {
+    "ten": "06-dang-ky",
+    "duongDan": "/dang-ky"
+  },
+  {
+    "ten": "07-danh-gia-cong-khai",
+    "duongDan": "/nguoi-dung/1101/danh-gia"
+  },
+  {
+    "ten": "08-ho-so-ca-nhan",
+    "duongDan": "/tai-khoan"
+  },
+  {
+    "ten": "09-so-dia-chi",
+    "duongDan": "/tai-khoan/dia-chi"
+  },
+  {
+    "ten": "10-dang-theo-doi",
+    "duongDan": "/tai-khoan/theo-doi"
+  },
+  {
+    "ten": "11-phien-da-tham-gia",
+    "duongDan": "/tai-khoan/da-dau-gia"
+  },
+  {
+    "ten": "12-don-mua-hang",
+    "duongDan": "/tai-khoan/don-hang"
+  },
+  {
+    "ten": "13-chi-tiet-don-mua",
+    "duongDan": "/tai-khoan/don-hang/3001"
+  },
+  {
+    "ten": "14-co-hoi-mua-tiep",
+    "duongDan": "/tai-khoan/de-nghi"
+  },
+  {
+    "ten": "15-chi-tiet-co-hoi-mua-tiep",
+    "duongDan": "/tai-khoan/de-nghi/5001"
+  },
+  {
+    "ten": "16-thong-bao",
+    "duongDan": "/tai-khoan/thong-bao"
+  },
+  {
+    "ten": "17-tranh-chap-cua-toi",
+    "duongDan": "/tai-khoan/tranh-chap"
+  },
+  {
+    "ten": "18-chi-tiet-tranh-chap",
+    "duongDan": "/tai-khoan/tranh-chap/7002"
+  },
+  {
+    "ten": "19-vi-pham-cua-toi",
+    "duongDan": "/tai-khoan/vi-pham"
+  },
+  {
+    "ten": "20-danh-gia-ve-toi",
+    "duongDan": "/tai-khoan/danh-gia"
+  },
+  {
+    "ten": "21-xac-minh-nguoi-ban",
+    "duongDan": "/tai-khoan/xac-minh"
+  },
+  {
+    "ten": "22-san-pham-nguoi-ban",
+    "duongDan": "/nguoi-ban/san-pham"
+  },
+  {
+    "ten": "23-tao-san-pham",
+    "duongDan": "/nguoi-ban/san-pham/moi"
+  },
+  {
+    "ten": "24-chinh-sua-san-pham",
+    "duongDan": "/nguoi-ban/san-pham/100"
+  },
+  {
+    "ten": "25-phien-nguoi-ban",
+    "duongDan": "/nguoi-ban/phien"
+  },
+  {
+    "ten": "26-tao-phien",
+    "duongDan": "/nguoi-ban/phien/moi"
+  },
+  {
+    "ten": "27-chi-tiet-phien-nguoi-ban",
+    "duongDan": "/nguoi-ban/phien/2001"
+  },
+  {
+    "ten": "28-kiem-dinh-nguoi-ban",
+    "duongDan": "/nguoi-ban/kiem-dinh"
+  },
+  {
+    "ten": "29-chi-tiet-kiem-dinh-nguoi-ban",
+    "duongDan": "/nguoi-ban/kiem-dinh/4124"
+  },
+  {
+    "ten": "30-don-ban-hang",
+    "duongDan": "/nguoi-ban/don-hang"
+  },
+  {
+    "ten": "31-chi-tiet-don-ban",
+    "duongDan": "/nguoi-ban/don-hang/3001"
+  },
+  {
+    "ten": "32-tong-quan-quan-tri",
+    "duongDan": "/quan-tri"
+  },
+  {
+    "ten": "33-quan-ly-nguoi-dung",
+    "duongDan": "/quan-tri/nguoi-dung"
+  },
+  {
+    "ten": "34-xac-minh-nguoi-ban-admin",
+    "duongDan": "/quan-tri/xac-minh"
+  },
+  {
+    "ten": "35-duyet-san-pham",
+    "duongDan": "/quan-tri/san-pham"
+  },
+  {
+    "ten": "36-chi-tiet-duyet-san-pham",
+    "duongDan": "/quan-tri/san-pham/141"
+  },
+  {
+    "ten": "37-kiem-dinh-admin",
+    "duongDan": "/quan-tri/kiem-dinh"
+  },
+  {
+    "ten": "38-chi-tiet-kiem-dinh-admin",
+    "duongDan": "/quan-tri/kiem-dinh/4219"
+  },
+  {
+    "ten": "39-quan-ly-dat-coc",
+    "duongDan": "/quan-tri/dat-coc"
+  },
+  {
+    "ten": "40-quan-ly-phien",
+    "duongDan": "/quan-tri/phien"
+  },
+  {
+    "ten": "41-quan-ly-danh-muc",
+    "duongDan": "/quan-tri/danh-muc"
+  },
+  {
+    "ten": "42-quan-ly-don-hang",
+    "duongDan": "/quan-tri/don-hang"
+  },
+  {
+    "ten": "43-chi-tiet-don-hang-admin",
+    "duongDan": "/quan-tri/don-hang/3005"
+  },
+  {
+    "ten": "44-quan-ly-tranh-chap",
+    "duongDan": "/quan-tri/tranh-chap"
+  },
+  {
+    "ten": "45-chi-tiet-tranh-chap-admin",
+    "duongDan": "/quan-tri/tranh-chap/7002"
+  },
+  {
+    "ten": "46-quan-ly-vi-pham",
+    "duongDan": "/quan-tri/vi-pham"
+  },
+  {
+    "ten": "47-cau-hinh-he-thong",
+    "duongDan": "/quan-tri/cau-hinh"
+  },
+  {
+    "ten": "48-nhat-ky-hoat-dong",
+    "duongDan": "/quan-tri/nhat-ky"
+  }
+]

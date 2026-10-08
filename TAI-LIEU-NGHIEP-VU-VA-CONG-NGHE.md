@@ -10,7 +10,7 @@ Cập nhật danh mục ngày 06/10/2026: MySQL chính bật 10 danh mục hàng
 
 Đây là đặc tả chính của project. Phiên bản này thay thế các mô tả cũ về phạm vi hàng phổ thông, đặt cọc ngoài phạm vi, Mua ngay tạo đơn chưa thanh toán và Second Chance thanh toán sau. Khi triển khai phải đồng bộ tài liệu, SQL, backend, hợp đồng API và kiểm thử.
 
-**Trạng thái triển khai:** SQL và backend dùng 21 bảng; cấu trúc MySQL chính giữ nguyên, đã bổ sung dữ liệu demo và đồng bộ danh mục công khai. Sau khi bổ sung báo cáo sản phẩm và đăng lại có điều kiện, kiểm thử backend đạt 57/57; bộ HTTP bao phủ 107/107 API và 45 phản hồi lỗi quyền/trạng thái có mã đúng; frontend đạt build, lint và 13 kiểm thử. Đã kiểm tra trên trình duyệt các nhánh chính của Cơ hội mua tiếp trong CSDL kiểm thử riêng; báo cáo sản phẩm và đăng lại chưa được nghiệm thu trực tiếp trên trình duyệt. Toàn bộ giao diện chưa được nghiệm thu; chi tiết phạm vi kiểm tra nằm ở mục 3.1.4.
+**Trạng thái triển khai:** SQL và backend dùng 21 bảng. Lượt kiểm tra mới nhất ngày 08/10/2026 đạt 18/18 kiểm thử backend cơ bản, 59/59 kiểm thử tích hợp và 13/13 kiểm thử frontend. Bộ HTTP nền bao phủ 91 API và bộ kiểm định/cọc bao phủ thêm 16 API. Đã mở rộng kịch bản cùng một tài khoản vừa mua vừa bán, kiểm tra quyền theo từng đơn đến khi giải ngân và đánh giá. Báo cáo sản phẩm, đăng lại và các nhánh chính của Cơ hội mua tiếp đã được kiểm tra trên trình duyệt trong CSDL kiểm thử riêng. Phạm vi, kết quả và phần còn chờ được cập nhật tại mục 23; các số liệu có ngày ở phần dưới là lịch sử từng đợt, không phải số lượng cố định khi hệ thống tiếp tục có người dùng mới.
 
 ## Cập nhật bộ dữ liệu ngày 07/10/2026
 
@@ -21,6 +21,18 @@ Bộ mới có 1 Admin, 5 người bán đã xác minh, 10 người mua; 10 phi�
 Đã kiểm tra 23 nhóm ràng buộc dữ liệu không có lỗi; 16 tài khoản và 203 yêu cầu HTTP trên bộ mới đều đạt. Backend đạt 18 kiểm thử nền và 57 kiểm thử tích hợp; frontend đạt lint, build và 13 kiểm thử. Đã render và kiểm tra bố cục 26 PDF hồ sơ. 34 ảnh sản phẩm có tệp cục bộ; hiện 5 sản phẩm có nhiều ảnh, chưa đạt mục tiêu 10–12 sản phẩm đều có 2–3 ảnh đúng mẫu.
 
 Danh sách tài khoản, ID phiên/đơn, trạng thái từng câu chuyện, nguồn ảnh và cách kiểm tra lại được cập nhật trong [Bộ dữ liệu thực hành VietBid](backend/docs/DU-LIEU-DEMO-VIETBID.md). Quy tắc nghiệp vụ không thay đổi. Khi bộ lập lịch chạy, thời hạn và trạng thái sẽ tiếp tục được xử lý theo đồng hồ thực.
+
+### Mở rộng dữ liệu trình bày ngày 08/10/2026
+
+Giữ nguyên 21 bảng và các chuỗi giao dịch đã có. CSDL chính hiện có 50 tài khoản người mua/người bán ngoài Admin, 50 sản phẩm, 50 địa chỉ mặc định, 56 ảnh sản phẩm và 10 danh mục đang hoạt động. Bộ dữ liệu gồm 20 người bán đã xác minh và 30 tài khoản mua; hai tài khoản mua đang xin quyền bán, một tài khoản có hồ sơ bán bị từ chối. Có 18 phiên, 57 lượt trả giá, 30 khoản cọc, 13 đơn hàng, 9 thanh toán, 3 tranh chấp, 2 vi phạm và 8 đánh giá. Đây là tình huống tổng hợp lưu thật trong MySQL; không phải giao dịch thương mại ngoài đời.
+
+Đã sửa ảnh và thông tin không khớp của bộ mở rộng; thuộc tính của cả 50 sản phẩm dùng đúng cấu hình danh mục. Bổ sung tám câu chuyện bằng các service nghiệp vụ hiện có, bao gồm hoàn thành giao dịch, người thắng không thanh toán rồi Second Chance, tranh chấp hoàn toàn bộ, bằng mức tối đa ưu tiên người trước, phiên sắp mở, Mua ngay và đơn đang chờ thanh toán. Hồ sơ kiểm định có các trạng thái chờ gửi, đang vận chuyển, đã nhận, đang kiểm định, cần bổ sung, không đạt/đã trả và đạt/đang lưu giữ. Các tệp thuộc đúng chủ sở hữu; người bán đã xác minh có hồ sơ đối chiếu đầy đủ.
+
+Đã chạy thử trong transaction rồi rollback, sao lưu CSDL chính với checksum trước khi áp dụng, và kiểm tra lại sau commit: 31 nhóm đối soát đạt, gồm khóa ngoại, quyền, thời gian, thuộc tính, cọc, thanh toán, tiền giữ, vận chuyển, Second Chance, tranh chấp, đánh giá và tệp. Không sửa schema. Chính sách cọc mặc định vẫn do Admin bật; các phiên trong câu chuyện lưu chính sách tại thời điểm tạo. Script kiểm tra là `backend/scripts/hoan-thien-du-lieu-vietbid.js --verify`; các mốc đang hoạt động sẽ tiếp tục thay đổi khi tác vụ tự động chạy.
+
+Đã đối chiếu hash mật khẩu thực hành của 51 tài khoản, kiểm tra đăng nhập bằng các vai trò và 116 yêu cầu HTTP đọc 18 phiên, 13 đơn, 56 ảnh cùng quyền của hồ sơ tranh chấp/Second Chance. Kết quả đạt; phản hồi công khai không chứa mức tối đa bí mật. Đã chụp 48 giao diện ở thu phóng 100% bằng đúng tài khoản tham gia giao dịch, theo thứ tự dùng chung → người mua → người bán → Admin để cập nhật báo cáo tuần 7.
+
+Ảnh mới lấy từ Wikimedia Commons, được kiểm tra định dạng và dung lượng trước khi lưu; tệp metadata ghi trang nguồn, tác giả, giấy phép và SHA-256. Trước khi ghi đã tạo bản sao riêng, sau khi ghi đã đối chiếu số lượng, khóa ngoại, ảnh chính và địa chỉ mặc định. Phần mở rộng không thay đổi quy tắc đấu giá, tiền, trạng thái hoặc cấu trúc MySQL.
 
 ### Biểu đồ tổng quan quản trị — 07/10/2026
 
@@ -440,8 +452,49 @@ Chi tiết thực hiện ở `co-so-du-lieu/KE-HOACH-21-BANG.md`, SQL trong `co-
 
 Frontend đã xử lý kết thúc phiên cục bộ khi `/users/me` trả 403 vì tài khoản bị khóa/tạm ngưng, tránh giữ trạng thái khởi tạo vô hạn. Tài liệu API đã đồng bộ tài khoản demo với bộ Postman hiện tại. Không thay đổi cấu trúc hoặc dữ liệu CSDL chính trong đợt kiểm thử.
 
-Các màn hình và API chính cho khách mua, người bán và Admin đã được triển khai, gồm báo cáo sản phẩm và đăng lại có điều kiện. Việc còn lại là nghiệm thu đầu cuối trên trình duyệt các nhánh báo cáo/đăng lại và toàn bộ luồng trên thiết bị nhỏ; không coi bản build frontend thành công là giao diện đã hoàn tất.
+### Kiểm tra lại ngày 08/10/2026
 
-Các phần ngoài đợt này: tiền/vận chuyển/eKYC thật, ví nội bộ, quy trình trả hàng nhiều chặng, actor chuyên gia, cam kết xác thực tuyệt đối, hoàn một phần cho giao dịch mới. Báo cáo sản phẩm và đăng lại có điều kiện đã có API/giao diện; chưa được nghiệm thu trực tiếp đầy đủ trên trình duyệt.
+Đã chạy lại 18/18 kiểm thử backend cơ bản, 13/13 kiểm thử logic frontend và 59/59 kiểm thử tích hợp: không có ca thất bại hoặc bỏ qua. Bộ HTTP nền bao phủ 91 API với 219 yêu cầu, gồm 45 phản hồi lỗi được đối chiếu; bộ kiểm định/cọc bao phủ thêm 16 API, tổng cộng 107 API. Kiểm thử nhiều kết nối xác nhận ưu tiên người đặt trước khi bằng mức tối đa, cạnh tranh BID/Mua ngay, chốt một đơn, thu tiền một lần và Socket.IO không lộ mức tối đa. Các ca gia hạn, hạn thanh toán, lịch nhắc và tự giải ngân cũng đạt. Kiểm tra định dạng, kiểu dữ liệu, lint và build đều đạt; frontend còn cảnh báo một gói biểu tượng lớn hơn 500 kB, cần theo dõi khi tối ưu tải trang.
+
+Trên trình duyệt, đã đăng nhập riêng Admin, người bán và hai người mua trong CSDL kiểm thử. Các thao tác đã xác nhận:
+
+- Theo dõi/bỏ theo dõi lưu sau tải lại; bỏ theo dõi vẫn giữ cam kết và phiên xuất hiện trong danh sách đã tham gia, kể cả ở trang tiếp theo.
+- Hai người mua nộp cọc và đặt cùng mức tối đa 22 triệu; người đặt trước dẫn đầu, giá công khai cập nhật sang cửa sổ còn lại, ô mức tối đa được xóa.
+- Thanh toán đơn 18.050.000 đồng trừ cọc 1.800.000 đồng, chỉ thu thêm 16.250.000 đồng; tải lại vẫn có đúng lịch sử thanh toán. Người bán khai báo vận đơn, người mua nhận hàng vẫn giữ tiền, xác nhận hoàn tất mới giải ngân và lưu đánh giá 5 sao.
+- Admin tải và xem ảnh bằng chứng riêng, tiếp nhận tranh chấp, hoàn toàn bộ hoặc giải ngân toàn bộ 18.050.000 đồng; tiền đang giữ về 0 và hồ sơ đóng không còn thao tác xử lý.
+- Người bán gửi Second Chance, người nhận thanh toán theo giá công khai 21 triệu cộng phí 50.000 đồng; đơn mới đã trả đủ, cọc bằng 0 và không thu cọc lại.
+- Admin gửi hàng từ trung tâm; người bán không có thao tác gửi thay. Người mua bị chặn khi mở khu vực Admin hoặc đơn của người khác.
+- Người mua báo cáo sản phẩm, Admin quyết định không vi phạm và đóng hồ sơ. Người bán xin hủy phiên chưa có cam kết, Admin duyệt hủy, sau đó đăng lại cùng sản phẩm thành phiên mới; sản phẩm có Second Chance đã chấp nhận không có liên kết đăng lại.
+- Cả 12 khu vực quản trị tải được, gồm biểu đồ tổng quan, danh mục, cọc, vi phạm, cấu hình và nhật ký. Bố cục PC không tràn ngang; tổng quan, danh mục, đơn, tranh chấp và phiên công khai cũng không tràn ngang ở chiều rộng thực tế 424 px, thu phóng 100%. Đây chưa phải kiểm tra toàn bộ thiết bị và trình duyệt.
+
+Máy chủ thử tắt jobs và hoàn tác toàn bộ dữ liệu khi dừng. Đã sửa đường dẫn ảnh WebP và điều kiện kết hợp các bộ dữ liệu trong công cụ kiểm thử giao diện; không thay đổi nghiệp vụ hoặc phạm vi transaction ứng dụng. Không còn tài khoản giao diện thử; ảnh thử được dọn, kể cả hai ảnh cũ đã xác minh không còn chủ sở hữu/tham chiếu. CSDL chính `doan4_daugia` vẫn đạt 21 bảng, 322 cột được đối chiếu, 31 nhóm liên kết và 160 đường dẫn tệp; giữ nguyên 51 tài khoản, 50 sản phẩm, 18 phiên và 13 đơn.
+
+Các màn hình và API chính cho khách mua, người bán và Admin đã được triển khai. Việc còn lại là bổ sung 7 biểu đồ tuần tự vào mục 3.2.3 theo hình người dùng cung cấp, kiểm tra toàn bộ màn hình trên các thiết bị nhỏ và trình duyệt khác, cùng kiểm thử tải nếu triển khai thực tế. Không dùng kết quả của các luồng đã thử để khẳng định mọi tổ hợp đầu vào đều đúng.
+
+Các phần ngoài đợt này: tiền/vận chuyển/eKYC thật, ví nội bộ, quy trình trả hàng nhiều chặng, actor chuyên gia, cam kết xác thực tuyệt đối, hoàn một phần cho giao dịch mới. Báo cáo sản phẩm và đăng lại có điều kiện đã được thử trực tiếp theo các nhánh nêu trên; các nhánh khóa sản phẩm có giao dịch đang xử lý tiếp tục được kiểm tra qua bộ tích hợp.
+
+### Rà soát từng tác nhân và tài khoản kiêm mua/bán — 08/10/2026
+
+Lượt rà soát tiếp theo chạy lại 90/90 kiểm thử đạt (18 backend, 59 tích hợp, 13 frontend). Đã mở rộng ca HTTP trong `backend/tests/integration/tep-va-san-pham.test.js` để kiểm tra một người dùng có cả đơn mua và đơn bán; số ca cấp ngoài vẫn là 59, số bước bên trong tăng. Tất cả giao dịch thử được hoàn tác trong `doan4_daugia_kiem_thu`.
+
+**Các bước người mua được đối chiếu qua bộ kiểm thử:** đăng ký không tự nâng quyền → đăng nhập → địa chỉ của chính mình → theo dõi riêng với cam kết → đăng ký/cọc nếu phiên yêu cầu → đặt mức tối đa bí mật → xác định người thắng và chuyển cọc → thanh toán phần còn lại → nhận hàng, vẫn giữ tiền → hoàn tất, giải ngân → đánh giá đối tác. Các nhánh không đủ cọc, thiếu địa chỉ, thanh toán lỗi/lặp, quá hạn, không đạt sàn, Mua ngay, Second Chance và tranh chấp đều có ca kiểm tra riêng trong bộ tích hợp.
+
+**Các bước người bán được đối chiếu:** chưa xác minh bị chặn đăng sản phẩm → gửi hồ sơ/tệp riêng → Admin duyệt → token đang dùng nhận đúng quyền mới từ MySQL → tạo sản phẩm, gắn ảnh, gửi duyệt → kiểm định và lưu giữ nếu bắt buộc → duyệt sản phẩm → mở phiên → người khác mua → khai báo vận chuyển nếu nguồn gửi là người bán → người mua xác nhận/hoàn tất → giải ngân và đánh giá. Hàng ở trung tâm chỉ Admin được ghi nhận gửi; seller không tự duyệt sản phẩm, tự đặt cọc, trả giá hoặc Mua ngay hàng của mình.
+
+**Các bước quản trị được đối chiếu:** xét hồ sơ người bán → mở/nhận/bắt đầu kiểm định → yêu cầu báo cáo trước khi ghi đạt → duyệt sản phẩm → quản lý phiên, cọc và yêu cầu hủy → theo dõi đơn, ghi nhận trung tâm gửi → tiếp nhận tranh chấp và quyết toán toàn bộ một lần → xử lý vi phạm → xem cấu hình, thống kê và nhật ký. Người mua/bán bị từ chối API quản trị; Admin không được dùng quyền quản trị để Mua ngay.
+
+**Kịch bản hai vai trò mới:** cùng tài khoản đã xác minh bán một món cho B và mua món khác từ C. Danh sách đơn mua/bán lọc đúng trước phân trang. Người này không được khai báo gửi trên đơn mình mua hoặc xác nhận nhận/hoàn tất trên đơn mình bán. Hai đơn đều thanh toán 24 triệu, giữ nguyên tiền khi vừa nhận hàng, chỉ giải ngân sau xác nhận hoàn tất; đánh giá gửi đúng đối tác tương ứng và lần đánh giá thứ hai bị chặn. Đầu ra HTTP tiếp tục được kiểm tra không chứa mật khẩu băm hoặc mức tối đa bí mật.
+
+**Kiểm tra trên dữ liệu chính:** đã đăng ký và đăng nhập tài khoản cá nhân theo yêu cầu qua giao diện, đối chiếu trong MySQL và danh sách Admin; kiểm tra thêm 15 yêu cầu API của tài khoản mới, đúng dữ liệu/quyền và không có trường bí mật. Chưa nộp địa chỉ hoặc hồ sơ xác minh thay người dùng vì còn chờ thông tin nhận hàng và lựa chọn hồ sơ kiểm thử. Tài khoản mới hiện chưa có quyền bán; không coi kịch bản tài khoản giả lập trong bộ test là đã hoàn tất xác minh cho tài khoản cá nhân.
+
+Trên trình duyệt đã kiểm tra chặn hồ sơ xác minh rỗng và chặn tài khoản chưa xác minh mở trang đăng bán; đăng nhập riêng người bán đã xác minh để đọc bốn nhóm sản phẩm/kiểm định/phiên/đơn và biểu mẫu tạo sản phẩm; đăng nhập Admin để mở các khu vực quản trị. Đây là kiểm tra điều hướng và điều kiện giao diện trong lượt này; các thao tác thay đổi giao dịch đầy đủ được xác nhận qua HTTP trên CSDL kiểm thử và bằng lượt trình duyệt trước đó.
+
+Sau khi thêm tài khoản, MySQL chính có 52 tài khoản, vẫn 50 sản phẩm, 18 phiên và 13 đơn. Đối chiếu 53 liên kết khóa ngoại không có bản ghi mồ côi; không có đơn lệch giữa tiền đã thu với tổng tiền đang giữ, đã hoàn và đã giải ngân. Các con số 51 tài khoản ở phần lịch sử mô tả mốc trước đăng ký mới. Công cụ kiểm tra bộ seed hiện chốt đúng 51 tài khoản nên không dùng điều kiện số lượng đó để kết luận dữ liệu vận hành bị lỗi khi có người dùng đăng ký thêm. Không sửa schema hoặc tạo giao dịch trên dữ liệu chính trong lượt này.
+
+### Hoàn tất tài khoản thực hành cá nhân — 08/10/2026
+
+Sau khi người dùng đồng ý dùng thông tin giả lập, đã bổ sung địa chỉ mặc định tại khu vực Phố Hiến và hồ sơ CCCD kiểm thử với số giấy tờ 12 chữ số, số tài khoản ngân hàng dạng số, chủ tài khoản và ba tệp PNG ghi rõ không phải giấy tờ thật. Dữ liệu được gửi qua API hiện có, tệp thuộc đúng tài khoản; Admin xét duyệt bằng luồng xác minh, có nhật ký và thông báo. Tài khoản đã ở trạng thái `DA_XAC_MINH`, vẫn giữ vai trò `NGUOI_DUNG` để cùng mua và bán; không cấp quyền quản trị. Trạng thái chờ bổ sung ở đoạn trên là mốc trước khi hoàn tất bước này.
+
+Đã đọc lại hồ sơ sau duyệt bằng cùng token, truy cập danh sách phiên bán và cả hai phạm vi đơn mua/bán thành công. Tệp xác minh không đăng nhập trả 401; giao diện hồ sơ sau tải lại hiển thị Đã xác minh. Địa chỉ và giấy tờ chỉ phục vụ đồ án; không tích hợp xác minh danh tính hoặc chuyển tiền thật. Không thay schema hoặc nới lỏng quy tắc xác minh chung của hệ thống.
 
 Mọi thay đổi sau này phải giữ cùng một đặc tả chính, cập nhật hợp đồng và kiểm thử. Không dùng kết quả kiểm thử phiên bản trước để khẳng định nghiệp vụ mới đã chạy đúng.
