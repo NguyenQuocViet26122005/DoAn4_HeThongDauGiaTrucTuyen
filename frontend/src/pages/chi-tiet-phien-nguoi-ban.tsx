@@ -160,7 +160,7 @@ function YeuCauHuy({ phien, hetGio }: { phien: PhienNguoiBan; hetGio: boolean })
 }
 
 function NoiDungPhien({ id }: { id: string }) {
-  const truyVan = useDuLieu<PhienNguoiBan>(`/auctions/mine/${id}`);
+  const truyVan = useDuLieu<PhienNguoiBan>(`/auctions/mine/${id}`, undefined, true, 10000);
   const phien = truyVan.data;
   const [hienTai, datHienTai] = useState(Date.now);
 

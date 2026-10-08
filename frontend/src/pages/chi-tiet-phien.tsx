@@ -77,8 +77,10 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
         <section className="thong-tin-phien">
           <span className="nhan-nho">PHIÊN #{phien.id}</span>
           <h1>{phien.tieu_de}</h1>
-          <TrangThaiPhien phien={phien} />
-          <TheoDoiPhien key={`${phien.id}:${nguoiDung?.id}`} id={phien.id} />
+          <div className="trang-thai-va-theo-doi">
+            <TrangThaiPhien phien={phien} />
+            <TheoDoiPhien key={`${phien.id}:${nguoiDung?.id}`} id={phien.id} />
+          </div>
           <p>
             <Link to={`/nguoi-dung/${phien.nguoi_ban_id}/danh-gia`}>Xem đánh giá về người bán</Link>
           </p>

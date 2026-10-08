@@ -22,12 +22,17 @@ function DanhSachPhien() {
   const [trang, datTrang] = useState(1);
   const [trangThai, datTrangThai] = useState<string>();
   const [tuKhoa, datTuKhoa] = useState('');
-  const truyVan = useDanhSachDuLieu<Phien[]>('/admin/auctions', {
-    page: trang,
-    limit: 12,
-    trang_thai: trangThai,
-    q: tuKhoa,
-  });
+  const truyVan = useDanhSachDuLieu<Phien[]>(
+    '/admin/auctions',
+    {
+      page: trang,
+      limit: 12,
+      trang_thai: trangThai,
+      q: tuKhoa,
+    },
+    true,
+    15000,
+  );
 
   return (
     <>
