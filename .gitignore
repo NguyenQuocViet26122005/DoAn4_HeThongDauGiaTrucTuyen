@@ -36,6 +36,9 @@ pnpm-debug.log*
 *.sw?
 .DS_Store
 
-# Bản render kiểm tra báo cáo và tệp khóa tạm của Word.
-bao-cao/**/.kiem-tra/
+# Báo cáo, ảnh chụp và công cụ soạn báo cáo chỉ giữ trên máy.
+/bao-cao/
+/11023276-NguyenQuocViet-DoAn4-Tuan7-Chot.docx
+/tools/bo_sung_thiet_ke_csdl.py
+# Tệp khóa tạm của Word.
 ~$*.docx
