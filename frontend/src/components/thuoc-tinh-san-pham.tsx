@@ -4,6 +4,15 @@ import type { Dayjs } from 'dayjs';
 import type { ThuocTinhDanhMuc } from '../types/san-pham';
 
 export default function ThuocTinhSanPham({ danhSach }: { danhSach: ThuocTinhDanhMuc[] }) {
+  const giaTri = Form.useWatch('gia_tri', Form.useFormInstance()) as
+    Record<string, unknown> | undefined;
+  // Chỉ nhắc với trường bắt buộc còn trống, không lặp lại khi đã điền.
+  const conTrong = (id: string) => {
+    const v = giaTri?.[id];
+
+    return v == null || String(v).trim() === '';
+  };
+
   return (
     <div className="luoi-truong-san-pham">
       {danhSach.map((muc) => (
@@ -11,7 +20,9 @@ export default function ThuocTinhSanPham({ danhSach }: { danhSach: ThuocTinhDanh
           key={muc.id}
           name={['gia_tri', String(muc.id)]}
           label={`${muc.ten_thuoc_tinh}${muc.don_vi ? ` (${muc.don_vi})` : ''}`}
-          extra={muc.bat_buoc ? 'Cần điền trước khi gửi duyệt' : undefined}
+          extra={
+            muc.bat_buoc && conTrong(String(muc.id)) ? 'Cần điền trước khi gửi duyệt' : undefined
+          }
           getValueProps={
             muc.kieu_nhap === 'NGAY'
               ? (giaTri: string) => ({ value: giaTri ? dayjs(giaTri) : null })

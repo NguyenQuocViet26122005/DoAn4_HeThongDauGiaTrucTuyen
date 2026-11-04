@@ -210,7 +210,15 @@ export default function XacMinh({ quanTri = false }: { quanTri?: boolean }) {
             />
           </div>
         )}
-      <ChoDuLieu truyVan={truyVan} rong={truyVan.data?.length === 0}>
+      <ChoDuLieu
+        truyVan={truyVan}
+        rong={truyVan.data?.length === 0}
+        thongDiepRong={
+          quanTri
+            ? 'Không có hồ sơ xác minh phù hợp.'
+            : 'Bạn chưa nộp hồ sơ xác minh. Chọn “Nộp hồ sơ xác minh” để bắt đầu.'
+        }
+      >
         <div className="danh-sach-don">
           {truyVan.data?.map((hoSo) => (
             <HoSo key={hoSo.id} hoSo={hoSo} quanTri={quanTri} />

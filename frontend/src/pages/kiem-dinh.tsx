@@ -1,4 +1,5 @@
-import { Button, Input, Select } from 'antd';
+import { Button, Select } from 'antd';
+import OTimKiem from '../components/o-tim-kiem';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
@@ -42,7 +43,7 @@ export default function KiemDinh({ quanTri = false }: { quanTri?: boolean }) {
         }
       />
       <div className="bo-loc-kiem-dinh">
-        <Input.Search
+        <OTimKiem
           key={tuKhoa}
           defaultValue={tuKhoa}
           maxLength={100}
@@ -83,8 +84,13 @@ export default function KiemDinh({ quanTri = false }: { quanTri?: boolean }) {
                 <small className="chu-mo">Ngày mở: {ngayGio(muc.ngay_tao)}</small>
               </div>
               <div className="hanh-dong-san-pham-ban">
-                <TrangThai giaTri={muc.trang_thai} />
-                {muc.ngay_roi_trung_tam && <small>Hàng đã rời trung tâm</small>}
+                <TrangThai
+                  giaTri={
+                    muc.trang_thai === 'DANG_LUU_GIU' && muc.ngay_roi_trung_tam
+                      ? 'DA_ROI_TRUNG_TAM'
+                      : muc.trang_thai
+                  }
+                />
                 <Link to={`${goc}/kiem-dinh/${muc.id}`}>Mở hồ sơ ↗</Link>
               </div>
             </article>

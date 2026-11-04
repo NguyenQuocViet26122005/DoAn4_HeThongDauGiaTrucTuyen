@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Form, Input, Select, Tabs } from 'antd';
+import OTimKiem from '../components/o-tim-kiem';
 import { Link } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import BieuMauThaoTac from '../components/bieu-mau-thao-tac';
@@ -36,7 +37,7 @@ function DanhSachPhien() {
 
   return (
     <>
-      <Input.Search
+      <OTimKiem
         aria-label="Tìm phiên"
         placeholder="Tìm phiên đấu giá"
         allowClear
@@ -120,7 +121,9 @@ function YeuCauHuyPhien() {
         {truyVan.data?.map((muc) => (
           <section key={muc.id} className="tam-noi-dung">
             <h2>
-              <Link to={`/phien/${muc.phien_dau_gia_id}`}>{muc.tieu_de}</Link>
+              <Link to={`/phien/${muc.phien_dau_gia_id}`}>
+                Phiên #{muc.phien_dau_gia_id} · {muc.tieu_de}
+              </Link>
             </h2>
             <TrangThai giaTri={muc.trang_thai} />
             <p>{ngayGio(muc.ngay_tao)}</p>

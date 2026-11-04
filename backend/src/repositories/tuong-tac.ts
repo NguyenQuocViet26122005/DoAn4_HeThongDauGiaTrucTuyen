@@ -89,13 +89,17 @@ function cacViPham(nguoiDungId, { limit: gioiHan, offset: viTriBatDau }, quanTri
   );
 }
 
+// Xét theo món hàng gốc để hồ sơ đăng lại không mở thêm lượt báo cáo.
 const daBaoCaoSanPham = (nguoiDungId, sanPhamId) =>
   coSoDuLieu.layMot(
     `SELECT v.id FROM vi_pham v
      JOIN phien_dau_gia a ON a.id=v.phien_dau_gia_id
-     WHERE v.nguoi_tao_id=? AND a.san_pham_id=? AND v.mo_ta LIKE '[BAO CAO SAN PHAM]%'
+     JOIN san_pham s ON s.id=a.san_pham_id
+     JOIN san_pham p ON p.id=?
+     WHERE v.nguoi_tao_id=? AND COALESCE(s.san_pham_goc_id,s.id)=COALESCE(p.san_pham_goc_id,p.id)
+       AND v.mo_ta LIKE '[BAO CAO SAN PHAM]%'
      LIMIT 1`,
-    [nguoiDungId, sanPhamId],
+    [sanPhamId, nguoiDungId],
   );
 const baoCaoSanPhamCuaNguoiDung = (nguoiDungId, { limit: gioiHan, offset: viTriBatDau }) =>
   coSoDuLieu.truyVan(

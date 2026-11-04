@@ -24,6 +24,15 @@ export = {
     khoDuLieu.danhSach(yeuCau.user, kiemTra.phanTrang(yeuCau.query), 'admin'),
   ),
   chiTiet: xuLyHTTP((yeuCau) => dichVu.chiTiet(yeuCau.user, yeuCau.params.id)),
+  quyetToanCoc: xuLyHTTP((r) =>
+    require('../services/xu-ly-ngoai-le-don').quyetToanCoc(r.user, r.params.id, r.body),
+  ),
+  giaiToaCanhBao: xuLyHTTP((r) =>
+    require('../services/xu-ly-ngoai-le-don').giaiToaCanhBao(r.user, r.params.id, r.body),
+  ),
+  xuLyHang: xuLyHTTP((yeuCau) =>
+    require('../services/hang-hoan').xuLy(yeuCau.user, yeuCau.params.id, yeuCau.body),
+  ),
   diaChi: xuLyHTTP((yeuCau) => dichVu.capNhatDiaChi(yeuCau.user, yeuCau.params.id, yeuCau.body)),
   thanhToan: xuLyHTTP((yeuCau) => dichVu.thanhToan(yeuCau.user, yeuCau.params.id, yeuCau.body)),
   guiHang: xuLyHTTP((yeuCau) => dichVu.guiHang(yeuCau.user, yeuCau.params.id, yeuCau.body)),

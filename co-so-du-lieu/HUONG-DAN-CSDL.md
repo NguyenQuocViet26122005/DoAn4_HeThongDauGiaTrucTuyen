@@ -78,3 +78,9 @@ Nếu dữ liệu chính đã có giao dịch mới so với bản sao trước 
 ## Phạm vi tiếp theo
 
 Giao diện báo cáo sản phẩm và đăng lại sau Cơ hội mua tiếp đã được nối với API hiện có; cần nghiệm thu đầy đủ trên trình duyệt. Thanh toán/vận chuyển hiện mô phỏng; chưa có ví, cổng tiền thật, chuyên gia đăng nhập hoặc quy trình trả hàng nhiều chặng. SQL khởi tạo không tự sửa dữ liệu danh mục/sản phẩm đang có trong MySQL chính.
+
+## Nâng cấp hàng hoàn — 17/10/2026
+
+Giữ 21 bảng, bổ sung 2 cột nullable và khóa ngoại tự tham chiếu sản phẩm: tổng 324 cột bảng cơ sở. SQL chuẩn khởi tạo mới đã đồng bộ. Migration 005 không xóa dữ liệu. Công cụ cong-cu/nang-cap-hang-hoan.cjs mặc định nâng cấp doan4_daugia_kiem_thu; thêm --chinh-thuc chọn đúng doan4_daugia. Mỗi lần cần nâng cấp sẽ sao lưu riêng có SHA-256 và đối chiếu toàn bộ dữ liệu cũ. Đã áp dụng cả hai CSDL trên máy này; không cần nhập lại SQL chuẩn.
+
+Từ backend, npm run migrate:hang-hoan dùng cho CSDL kiểm thử; npm run migrate:hang-hoan -- --chinh-thuc dùng cho CSDL chính. Công cụ đọc cấu trúc để tránh thêm cột trùng. Bản sao nằm trong ban-sao-rieng và được loại khỏi Git.

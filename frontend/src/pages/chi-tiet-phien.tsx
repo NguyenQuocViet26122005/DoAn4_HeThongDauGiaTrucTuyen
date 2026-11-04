@@ -1,3 +1,4 @@
+import SoChuyenDong from '../components/so-chuyen-dong';
 import { useState } from 'react';
 import { Alert, Button, Descriptions } from 'antd';
 import { useQuery } from '@tanstack/react-query';
@@ -86,7 +87,7 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
           </p>
           <div className="gia-chi-tiet">
             <span>{tenGiaPhien(phien)}</span>
-            <strong>{tien(phien.gia_hien_tai)}</strong>
+            <SoChuyenDong giaTri={Number(phien.gia_hien_tai)} dinhDang={tien} />
             <small>{phien.tong_luot_tra_gia} lượt trả giá</small>
           </div>
           <div className="thoi-gian-phien">
@@ -152,7 +153,7 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
                   .map((t) => ({
                     key: t.thuoc_tinh_id,
                     label: t.ten_thuoc_tinh,
-                    children: `${t.gia_tri} ${t.don_vi || ''}`,
+                    children: `${t.kieu_nhap === 'DUNG_SAI' ? (['true', '1'].includes(t.gia_tri) ? 'Có' : 'Không') : t.gia_tri} ${t.don_vi || ''}`,
                   })),
               ]}
             />

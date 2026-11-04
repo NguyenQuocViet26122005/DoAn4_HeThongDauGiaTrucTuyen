@@ -24,6 +24,9 @@ export interface TranhChap {
 }
 
 export interface ChiTietTranhChap extends TranhChap {
+  nguoi_mua_id?: string;
+  nguoi_ban_id?: string;
+  co_the_them_bang_chung?: boolean;
   bang_chung: BangChung[];
   ho_so_kiem_dinh: HoSoKiemDinh | null;
 }

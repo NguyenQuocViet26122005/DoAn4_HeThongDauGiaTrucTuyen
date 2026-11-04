@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Form, Input, Select } from 'antd';
+import OTimKiem from '../components/o-tim-kiem';
 import { Link } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import BieuMauThaoTac from '../components/bieu-mau-thao-tac';
@@ -33,7 +34,7 @@ export default function QuanLyNguoiDung() {
           Làm mới
         </Button>
       </TieuDe>
-      <Input.Search
+      <OTimKiem
         placeholder="Tìm theo tên hoặc email"
         aria-label="Tìm người dùng"
         allowClear

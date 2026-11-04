@@ -349,6 +349,7 @@ kiemThu('tranh chấp hoàn đủ cọc, phần trả thêm và phí vận chuy�
   });
 
   await assert.rejects(donHang.xacNhanHoanThanh(d.a, don.id), { status: 409 });
+  await require('../helpers/du-lieu-mau').thuHoiVaKiemKe(d, don.id);
   await tranhChap.giaiQuyet(d.admin, tc.id, {
     ket_qua: 'NGUOI_MUA',
     ket_qua_xu_ly: 'Đã kiểm tra đầy đủ hồ sơ',

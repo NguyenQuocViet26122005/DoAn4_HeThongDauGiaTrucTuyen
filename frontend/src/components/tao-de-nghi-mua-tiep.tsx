@@ -3,6 +3,7 @@ import BieuMauThaoTac from './bieu-mau-thao-tac';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { lamMoiDeNghi, taoDeNghi } from '../services/de-nghi-mua-tiep';
 import type { DonHang } from '../types/don-hang';
+import { tien } from '../utils/dinh-dang';
 
 export default function TaoDeNghiMuaTiep({ don }: { don: DonHang }) {
   const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
@@ -28,11 +29,20 @@ export default function TaoDeNghiMuaTiep({ don }: { don: DonHang }) {
       </p>
       <BieuMauThaoTac<Record<string, never>>
         ten="Gửi đề nghị mua tiếp"
+        khoa={!!don.ly_do_khong_gui_de_nghi}
         xacNhan={() => (
-          <p>
-            Xác nhận gửi một đề nghị cho ứng viên tiếp theo theo giá công khai hợp lệ. Hệ thống
-            quyết định ứng viên và giá; bạn không nhập giá mới.
-          </p>
+          <>
+            {don.ung_vien_de_nghi && (
+              <p>
+                Ứng viên: <strong>{don.ung_vien_de_nghi.ma_cong_khai}</strong> · Giá đề nghị:{' '}
+                <strong>{tien(don.ung_vien_de_nghi.gia)}</strong> (chưa gồm phí vận chuyển).
+              </p>
+            )}
+            <p>
+              Hệ thống chọn ứng viên và giá từ lượt trả giá công khai hợp lệ; bạn không nhập giá
+              mới.
+            </p>
+          </>
         )}
         onGui={async () => {
           const deNghi = await taoDeNghi(don.id);
@@ -41,12 +51,19 @@ export default function TaoDeNghiMuaTiep({ don }: { don: DonHang }) {
           diChuyen(`/tai-khoan/de-nghi/${deNghi.id}`);
         }}
       >
+        {don.ung_vien_de_nghi && (
+          <p>
+            Ứng viên tiếp theo: <strong>{don.ung_vien_de_nghi.ma_cong_khai}</strong> với giá{' '}
+            <strong>{tien(don.ung_vien_de_nghi.gia)}</strong>.
+          </p>
+        )}
         <p>
           Mỗi phiên chỉ có một đề nghị chờ xử lý. Nếu người nhận từ chối hoặc hết hạn, bạn cần chủ
           động gửi đề nghị tiếp theo.
         </p>
         <p>Nếu đã gửi nhưng chưa nhận được phản hồi, hãy kiểm tra danh sách trước khi thử lại.</p>
       </BieuMauThaoTac>
+      {don.ly_do_khong_gui_de_nghi && <p className="chu-mo">{don.ly_do_khong_gui_de_nghi}</p>}
       <Link className="link-vang" to="/tai-khoan/de-nghi">
         Xem đề nghị đã gửi và đã nhận →
       </Link>

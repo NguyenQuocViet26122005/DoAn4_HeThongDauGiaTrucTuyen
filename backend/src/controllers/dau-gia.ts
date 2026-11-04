@@ -29,6 +29,7 @@ export = {
   theoDoi: xuLyHTTP((yeuCau) => dichVu.theoDoi(yeuCau.user, yeuCau.params.id, true)),
   boTheoDoi: xuLyHTTP((yeuCau) => dichVu.theoDoi(yeuCau.user, yeuCau.params.id, false)),
   cacBuocGia: xuLyHTTP(() => heThong.cacBuocGia()),
+  chinhSachCoc: xuLyHTTP(() => cauHinhNghiepVu.chinhSachCoc()),
   danhSachCauHinh: xuLyHTTP(() => heThong.danhSachCauHinh()),
   luuCauHinh: xuLyHTTP((yeuCau) =>
     cauHinhNghiepVu.luu(yeuCau.user, yeuCau.params.key, yeuCau.body),

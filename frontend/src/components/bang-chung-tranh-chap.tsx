@@ -5,9 +5,12 @@ import { loiDeDoc, taiTep } from '../services/api';
 import { lamMoiTranhChap, xuLyTranhChap } from '../services/tranh-chap';
 import { tranhChapDangMo } from '../utils/giao-hang-tranh-chap';
 import { ngayGio } from '../utils/dinh-dang';
+import { vaiTroGiaoDich } from '../utils/vai-tro-giao-dich';
+import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import type { ChiTietTranhChap } from '../types/tranh-chap';
 
 export default function BangChungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap }) {
+  const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
   const [bieuMau] = Form.useForm();
   const [tep, datTep] = useState<File>();
   const [duongDan, datDuongDan] = useState('');
@@ -16,7 +19,9 @@ export default function BangChungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap })
   const [loi, datLoi] = useState('');
   const dangXuLy = useRef(false);
   const { message } = App.useApp();
-  const duocThem = tranhChapDangMo(hoSo.trang_thai) && hoSo.bang_chung.length < 30;
+  const duocThem =
+    (hoSo.co_the_them_bang_chung ?? tranhChapDangMo(hoSo.trang_thai)) &&
+    hoSo.bang_chung.length < 30;
 
   async function them(noiDung: { mo_ta?: string }) {
     if (!tep || dangXuLy.current || !duocThem) {
@@ -57,7 +62,8 @@ export default function BangChungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap })
               <strong>Bằng chứng #{muc.id}</strong>
               <p className="van-ban-dai">{muc.mo_ta || 'Không có mô tả bổ sung'}</p>
               <small>
-                Tài khoản #{muc.nguoi_tai_len_id} · {ngayGio(muc.ngay_tao)}
+                {vaiTroGiaoDich(muc.nguoi_tai_len_id, hoSo, nguoiDung?.id)} ·{' '}
+                {ngayGio(muc.ngay_tao)}
               </small>
             </div>
             <TepRiengTu url={muc.duong_dan_tep} ten={`Xem bằng chứng #${muc.id}`} />
@@ -68,7 +74,8 @@ export default function BangChungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap })
       {duocThem && (
         <Form form={bieuMau} layout="vertical" disabled={dangGui} onFinish={them}>
           <label className="chon-tep-kiem-dinh">
-            Chọn ảnh hoặc PDF · tối đa 10 MiB
+            <span>{tep ? `Đã chọn: ${tep.name} · Chọn lại` : '+ Chọn ảnh hoặc PDF'}</span>
+            <small>JPG, PNG, WebP hoặc PDF · tối đa 10 MB</small>
             <input
               key={lanChon}
               type="file"
@@ -88,7 +95,7 @@ export default function BangChungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap })
                   moi.size > 10 * 1024 * 1024 ||
                   !['image/png', 'image/jpeg', 'image/webp', 'application/pdf'].includes(moi.type)
                 ) {
-                  datLoi('Chỉ nhận JPG, PNG, WebP hoặc PDF, tối đa 10 MiB.');
+                  datLoi('Chỉ nhận JPG, PNG, WebP hoặc PDF, tối đa 10 MB.');
                   suKien.target.value = '';
 
                   return;

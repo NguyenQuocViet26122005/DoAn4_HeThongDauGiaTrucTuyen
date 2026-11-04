@@ -55,6 +55,38 @@ function SoLuongDatCoc({ id }: { id: string }) {
   );
 }
 
+function KetQuaPhien({ phien }: { phien: PhienNguoiBan }) {
+  const ketQua = phien.ket_qua_sau_phien;
+
+  if (!ketQua) {
+    return null;
+  }
+
+  return (
+    <section className="tam-noi-dung">
+      <h2>Sau phiên đấu giá</h2>
+      {ketQua.don_hang && (
+        <p>
+          <TrangThai giaTri={ketQua.don_hang.trang_thai} />{' '}
+          <Link className="link-vang" to={`/nguoi-ban/don-hang/${ketQua.don_hang.id}`}>
+            Mở đơn {ketQua.don_hang.ma_don_hang} ↗
+          </Link>
+        </p>
+      )}
+      <p>{ketQua.buoc_tiep_theo}</p>
+      {ketQua.co_the_dang_lai ? (
+        <Link className="nut-vang" to={`/nguoi-ban/phien/moi?san_pham_id=${phien.san_pham_id}`}>
+          Đăng lại sản phẩm ↗
+        </Link>
+      ) : (
+        ketQua.ly_do_khong_dang_lai && (
+          <p className="chu-mo">Chưa thể đăng lại: {ketQua.ly_do_khong_dang_lai}</p>
+        )
+      )}
+    </section>
+  );
+}
+
 function YeuCauHuy({ phien, hetGio }: { phien: PhienNguoiBan; hetGio: boolean }) {
   const { message } = App.useApp();
   const [mo, datMo] = useState(false);
@@ -277,6 +309,7 @@ function NoiDungPhien({ id }: { id: string }) {
                 </section>
               </div>
               <div className="cac-buoc-san-pham">
+                <KetQuaPhien phien={phien} />
                 <YeuCauHuy
                   phien={phien}
                   hetGio={mocThoiGian(phien.thoi_gian_ket_thuc) <= hienTai}

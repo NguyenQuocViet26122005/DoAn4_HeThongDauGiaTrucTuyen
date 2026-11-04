@@ -2,7 +2,11 @@
 
 **Tên website: VietBid.** Ưu tiên trải nghiệm web trên máy tính; giao diện tự điều chỉnh theo màn hình nhỏ, không tạo ứng dụng điện thoại riêng.
 
-**Tài liệu nghiệp vụ chi tiết và công nghệ — phiên bản 3.0, ngày 25/09/2026.**
+**Tài liệu nghiệp vụ chi tiết và công nghệ — phiên bản 3.2, ngày 17/10/2026.**
+
+**Bổ sung phiên bản 3.2:** quyết toán cọc bỏ thanh toán theo quyết định Admin; giải tỏa cảnh báo đơn không tự giải ngân; đồng bộ bàn giao hàng đang ở trung tâm; biên bản trách nhiệm, phí hoàn và đối soát bồi thường ngoài đơn. Chi tiết và trình tự sử dụng tại mục 24.13. Không thêm bảng/cột hoặc nạp lại dữ liệu chính trong đợt này.
+
+**Cập nhật ngày 17/10/2026:** đã triển khai hàng hoàn/kiểm kê, đăng bán lại liên kết sản phẩm gốc, khóa bán trùng và chọn cọc từng phiên. Mục 24.1 lưu hiện trạng trước sửa; mục 24.12 ghi phần đã hoàn thiện và cách kiểm thử lại. Kết quả kiểm thử cũ không thay cho kiểm thử phần mở rộng.
 
 Cập nhật giao diện người dùng, quản trị và kiểm tra luồng mua tiếp ngày 05/10/2026; giữ phạm vi nghiệp vụ phiên bản 3.0 và cấu trúc 21 bảng.
 
@@ -10,7 +14,7 @@ Cập nhật danh mục ngày 06/10/2026: MySQL chính bật 10 danh mục hàng
 
 Đây là đặc tả chính của project. Phiên bản này thay thế các mô tả cũ về phạm vi hàng phổ thông, đặt cọc ngoài phạm vi, Mua ngay tạo đơn chưa thanh toán và Second Chance thanh toán sau. Khi triển khai phải đồng bộ tài liệu, SQL, backend, hợp đồng API và kiểm thử.
 
-**Trạng thái triển khai:** SQL và backend dùng 21 bảng. Lượt kiểm tra mới nhất ngày 08/10/2026 đạt 18/18 kiểm thử backend cơ bản, 59/59 kiểm thử tích hợp và 13/13 kiểm thử frontend. Bộ HTTP nền bao phủ 91 API và bộ kiểm định/cọc bao phủ thêm 16 API. Đã mở rộng kịch bản cùng một tài khoản vừa mua vừa bán, kiểm tra quyền theo từng đơn đến khi giải ngân và đánh giá. Báo cáo sản phẩm, đăng lại và các nhánh chính của Cơ hội mua tiếp đã được kiểm tra trên trình duyệt trong CSDL kiểm thử riêng. Phạm vi, kết quả và phần còn chờ được cập nhật tại mục 23; các số liệu có ngày ở phần dưới là lịch sử từng đợt, không phải số lượng cố định khi hệ thống tiếp tục có người dùng mới.
+**Trạng thái triển khai:** SQL và backend dùng 21 bảng. Lượt kiểm tra nền ngày 08/10/2026 đạt 18/18 kiểm thử backend cơ bản, 59/59 kiểm thử tích hợp và 13/13 kiểm thử frontend. Bộ HTTP nền bao phủ 91 API và bộ kiểm định/cọc bao phủ thêm 16 API. Đã mở rộng kịch bản cùng một tài khoản vừa mua vừa bán, kiểm tra quyền theo từng đơn đến khi giải ngân và đánh giá. Báo cáo sản phẩm, đăng lại và các nhánh chính của Cơ hội mua tiếp đã được kiểm tra trên trình duyệt trong CSDL kiểm thử riêng. Phạm vi và kết quả đợt nền ở mục 23; đợt khép ngoại lệ ngày 18/10/2026 ở mục 24.13; các số liệu có ngày ở phần dưới là lịch sử từng đợt, không phải số lượng cố định khi hệ thống tiếp tục có người dùng mới.
 
 ## Cập nhật bộ dữ liệu ngày 07/10/2026
 
@@ -46,7 +50,7 @@ Xây dựng nền tảng đấu giá dành cho hàng hiếm, hàng sưu tầm v�
 
 VietBid chỉ phục vụ hàng hiếm, hàng sưu tầm và tài sản có giá trị cao: đồ cổ/cổ vật, tranh/tác phẩm nghệ thuật, đồng hồ cao cấp, trang sức/đá quý, hàng hiệu hiếm hoặc phiên bản giới hạn, xe cổ/phương tiện sưu tầm, sách/bản thảo/tài liệu lịch sử hiếm, kỷ vật, nhạc cụ vintage giá trị cao và máy ảnh cổ/thiết bị quang học sưu tầm. Không định hướng bán điện tử phổ thông, đồ gia dụng, thời trang đại trà hoặc hàng tiêu dùng thông thường. Việc thuộc danh mục không tự chứng minh tính xác thực hoặc quyền sở hữu; sản phẩm vẫn phải qua duyệt và chính sách kiểm định tương ứng.
 
-Bản đồ án mô phỏng tiền và vận chuyển. Không tích hợp cổng thanh toán thật, eKYC thật hoặc hãng vận chuyển thật; không có ví nội bộ, nạp/rút/chuyển số dư. Không xây quy trình trả hàng nhiều chặng trên website trong bản đầu. Việc gửi trả/tái kiểm định nếu cần được xử lý ngoài website; website lưu bằng chứng và quyết định cuối.
+Bản đồ án mô phỏng tiền và vận chuyển. Không tích hợp cổng thanh toán thật, eKYC thật hoặc hãng vận chuyển thật; không có ví nội bộ, nạp/rút/chuyển số dư. Website quản lý thu hồi, tiếp nhận, kiểm kê, kiểm định lại, trả người bán hoặc gửi lại người mua; đúng tác nhân ghi nhận từng mốc. Chuyên gia kiểm định ngoài website, Admin nhập báo cáo và kết quả.
 
 ## 2. Tác nhân và quyền hạn
 
@@ -70,7 +74,11 @@ Một tài khoản có thể vừa mua vừa bán khi đã được xác minh b�
 - **Axios:** gọi HTTP API; **TanStack Query:** tải, lưu tạm và làm mới dữ liệu máy chủ.
 - **Zustand:** trạng thái phiên đăng nhập dùng chung.
 - **Socket.IO Client:** đã nối nhận biến động phiên và thông báo; sự kiện kích hoạt đọc lại API, không dùng dữ liệu sự kiện để tự xác định kết quả giao dịch.
-- **Day.js:** hiển thị thời gian; **Framer Motion:** chuyển động giao diện.
+- **Day.js:** hiển thị thời gian; **Framer Motion:** đã cài, chưa dùng.
+- **React Bits — LiquidChrome (`components/react-bits/LiquidChrome.tsx`):** nền 3D kim loại vàng lỏng phủ kín khối bìa ở trang chủ và trang đăng nhập, gợn sóng theo con trỏ; viết bằng WebGL2 thuần, không cần three.js. Có lớp phủ tối phía trên để chữ luôn đọc rõ. Tải lười, dừng vẽ khi cuộn khỏi màn hình, tự tắt khi trình duyệt không có WebGL hoặc người dùng chọn giảm chuyển động (khi đó chỉ còn nền gradient).
+- **Phông chữ tự lưu trữ (@fontsource):** Be Vietnam Pro cho chữ thân, Cormorant Garamond cho tiêu đề; cả hai có đủ dấu tiếng Việt và không phụ thuộc Google Fonts lúc chạy.
+- **Hệ thống giao diện chung (`styles/he-thong.css`, theme Ant Design trong `App.tsx`):** một thang bo góc (thẻ 12px, nút 6px), một khoảng cách lưới, mục đang chọn ở thanh bên dùng nền trung tính, nhãn viết thường thay cho nhãn chữ hoa giãn cách, số trong bảng thẳng cột. Quy tắc lấy theo các skill thiết kế Impeccable và Taste.
+- **GSAP + @gsap/react (ScrollTrigger):** chữ hero trồi lên khi mở trang, thẻ phiên hiện dần khi cuộn, số liệu tổng quan đếm lên, giá phiên lóe vàng khi có lượt giá mới. Mọi chuyển động tắt khi giảm chuyển động.
 - **React Hook Form + Zod:** đã cài, định hướng dùng cho biểu mẫu nghiệp vụ; không để hai thư viện cùng quản lý một bộ giá trị biểu mẫu.
 - **ESLint, TypeScript, Prettier:** kiểm tra và thống nhất cách trình bày.
 
@@ -224,7 +232,7 @@ Biên bản, serial và tệp nội bộ chỉ cho Admin, seller liên quan ho�
 
 ## 7. Tạo và vận hành phiên đấu giá
 
-Điều kiện tạo: seller hoạt động và đã xác minh; sở hữu sản phẩm; sản phẩm đã duyệt; không có phiên đang chờ/chạy, không có đơn đang xử lý và không có đề nghị Mua tiếp đang chờ/đã chấp nhận. Mọi đơn cũ phải đã hủy vì người thắng không thanh toán; các đề nghị Mua tiếp cũ phải bị từ chối hoặc hết hạn trước khi đăng lại. Phiên không có người thắng có thể đăng lại. Nếu bắt buộc kiểm định, lần kiểm định hợp lệ phải có kết quả đạt và trung tâm vẫn giữ đúng sản phẩm.
+Điều kiện tạo: seller hoạt động và đã xác minh; sở hữu sản phẩm; sản phẩm đã duyệt; không có phiên đang chờ/chạy, không có đơn đang xử lý và không có đề nghị Mua tiếp đang chờ/đã chấp nhận. Đơn cũ có thể hủy vì không thanh toán, hoặc hoàn tiền tranh chấp và đã được duyệt hàng đủ điều kiện bán lại theo mục 24.12. Không còn đề nghị Mua tiếp đang chờ; đề nghị đã chấp nhận được xét theo nghĩa vụ thực tế của đơn sinh ra, không khóa vĩnh viễn bằng trạng thái lịch sử. Phiên không có người thắng có thể đăng lại. Nếu bắt buộc kiểm định, lần kiểm định hợp lệ phải có kết quả đạt và trung tâm vẫn giữ đúng sản phẩm.
 
 Phiên có giá khởi điểm, giá sàn tùy chọn, Mua ngay tùy chọn, phí vận chuyển cố định, thời gian bắt đầu/kết thúc. Giá sàn không thấp hơn giá khởi điểm; Mua ngay không thấp hơn giá sàn hoặc khởi điểm. Không hard-code tỷ lệ chênh lệch giá Mua ngay.
 
@@ -238,7 +246,7 @@ Giao diện chọn sản phẩm dùng `GET /products/mine?du_dieu_kien_dau_gia=1
 
 ## 8. Chính sách cọc và đăng ký tham gia
 
-**Lựa chọn đã chốt: Admin cấu hình rồi bật cọc.** Ban đầu chính sách tắt; không tự áp 10% hoặc một số tiền cho phiên đang có. Cấu hình `DEPOSIT_POLICY` gồm bật/tắt, kiểu `TY_LE` hoặc `CO_DINH`, giá trị. Tỷ lệ tính theo giá khởi điểm, làm tròn lên một đồng. Tiền cọc dương và không vượt giá khởi điểm. Chính sách mới chỉ áp dụng khi tạo phiên mới; phiên lưu số tiền cuối cùng làm snapshot.
+**Admin cấu hình rồi bật cọc; có thể cho người bán chọn bật/tắt từng phiên bằng cho_phep_nguoi_ban_chon.** Nếu bật cọc nhưng không cho chọn, người bán phải tuân thủ yêu cầu cọc. Ban đầu chính sách tắt; không tự áp 10% hoặc một số tiền cho phiên đang có. Cấu hình `DEPOSIT_POLICY` gồm bật/tắt, kiểu `TY_LE` hoặc `CO_DINH`, giá trị. Tỷ lệ tính theo giá khởi điểm, làm tròn lên một đồng. Tiền cọc dương và không vượt giá khởi điểm. Chính sách mới chỉ áp dụng khi tạo phiên mới; phiên lưu số tiền cuối cùng làm snapshot.
 
 Phiên yêu cầu cọc: người mua đăng ký → kiểm tra tài khoản hoạt động, địa chỉ, không phải seller, phiên còn hiệu lực → hiển thị số tiền cọc → thanh toán mô phỏng → thành công mới được BID. Có thể đăng ký/cọc khi phiên đã lên lịch; BID chỉ mở khi bắt đầu.
 
@@ -323,7 +331,7 @@ Lý do mới: `CHUA_NHAN_HANG`, `KHONG_DUNG_MO_TA`, `HONG_HOC`, `KHONG_KHOP_HO_S
 
 Mở tranh chấp → tiền tiếp tục giữ → buyer gửi bằng chứng → seller phản hồi → Admin xem hồ sơ sản phẩm, tiếp nhận, báo cáo, serial/ảnh, vận đơn và bằng chứng hai bên → ghi quyết định. Không mặc định seller có lỗi vì có nghi ngờ xác thực đối với hàng do trung tâm giữ.
 
-Tái kiểm định và vận chuyển trở lại nếu cần được xử lý ngoài workflow website bản đầu. Website lưu trạng thái tranh chấp, tệp kết quả cuối và quyết định; không thêm actor chuyên gia.
+Đã có workflow nhận hàng hoàn, kiểm kê, kiểm định lại, duyệt bán lại, gửi trả seller và xác nhận nhận lại theo mục 24.12. Khi cần hoàn tiền, Admin phải có kết quả kiểm kê hoặc căn cứ thất lạc; không thêm actor chuyên gia.
 
 Chỉ hai kết quả tiền mới:
 
@@ -498,3 +506,233 @@ Sau khi người dùng đồng ý dùng thông tin giả lập, đã bổ sung �
 Đã đọc lại hồ sơ sau duyệt bằng cùng token, truy cập danh sách phiên bán và cả hai phạm vi đơn mua/bán thành công. Tệp xác minh không đăng nhập trả 401; giao diện hồ sơ sau tải lại hiển thị Đã xác minh. Địa chỉ và giấy tờ chỉ phục vụ đồ án; không tích hợp xác minh danh tính hoặc chuyển tiền thật. Không thay schema hoặc nới lỏng quy tắc xác minh chung của hệ thống.
 
 Mọi thay đổi sau này phải giữ cùng một đặc tả chính, cập nhật hợp đồng và kiểm thử. Không dùng kết quả kiểm thử phiên bản trước để khẳng định nghiệp vụ mới đã chạy đúng.
+
+## 24. Rà soát luồng sau đấu giá và đề xuất hoàn thiện — 17/10/2026
+
+Phần này lưu kết quả rà soát và thiết kế ngày 17/10/2026. Sau khi người dùng đồng ý triển khai, kết quả được ghi ở mục 24.12. Các mô tả chưa có ở mục 24.1 là hiện trạng trước sửa. Thời hạn mặc định không thay cho cấu hình/thời hạn đã lưu của từng đối tượng.
+
+### 24.1. Hiện trạng trước đợt hoàn thiện và khoảng trống đã xác định
+
+1. Chốt phiên có người thắng tạo đơn theo giá công khai và chuyển cọc vào đơn; tác vụ quá hạn hủy đơn chưa thanh toán với lý do `KHONG_THANH_TOAN`. Xem `backend/src/services/dau-gia.ts` và `backend/src/services/don-hang.ts`.
+2. Second Chance đã có API và nút ở chi tiết đơn bán, nhưng **chỉ nhận đơn hủy vì không thanh toán**. Nút không xuất hiện với đơn hoàn tiền tranh chấp. Đây là giới hạn có chủ ý của luồng hiện tại, không thể kết luận tính năng hoàn toàn chưa có. Xem `backend/src/services/de-nghi-mua-tiep.ts` và `frontend/src/components/tao-de-nghi-mua-tiep.tsx`.
+3. Giải quyết tranh chấp cho người mua hiện hoàn toàn bộ tiền, hủy đơn với lý do `HOAN_TIEN_TRANH_CHAP` và đóng tranh chấp. Chưa có điều kiện bắt buộc ghi nhận thu hồi/kiểm kê hàng trước quyết toán. Xem `backend/src/services/tranh-chap.ts`.
+4. Chưa có chuỗi hàng từ người mua/đơn vị vận chuyển hoàn về trung tâm, kiểm kê lại, quyết định lưu giữ bán tiếp hoặc trả người bán. Thao tác trả hàng kiểm định hiện chỉ dùng cho hàng kiểm định không đạt/cần bổ sung trước bán; không dùng được để thu hồi hàng sau giao dịch.
+5. Điều kiện đăng lại hiện cho phép trường hợp không bán được hoặc đơn hủy do không thanh toán. Đơn hoàn tiền tranh chấp khóa sản phẩm; hồ sơ đã ghi ngày rời trung tâm cũng không còn đủ điều kiện tạo phiên. Ngoài ra, truy vấn kiểm định vẫn xem mọi phiên `DA_KET_THUC` là nghĩa vụ, và điều kiện đăng lại vẫn chặn mọi đề nghị `DA_CHAP_NHAN` trong lịch sử. Cần xét nghĩa vụ thực tế còn tồn tại, không chỉ trạng thái lịch sử. Xem `backend/src/repositories/danh-muc-san-pham.ts` và `backend/src/repositories/kiem-dinh.ts`.
+6. Khi tạo phiên, backend tự chụp `DEPOSIT_POLICY` từ Admin. Form/API chưa có lựa chọn bật/tắt cọc riêng của người bán. Giá Mua ngay đã là tùy chọn của người bán.
+7. Lý do tranh chấp đang dùng danh sách chung, chưa ràng buộc `KHONG_KHOP_HO_SO_KIEM_DINH` với việc đơn có hồ sơ kiểm định. Giao diện đã tách nút “Báo chưa nhận hàng”, nhưng backend còn cho mọi lý do khi đơn đang trong hạn kiểm tra; cần đồng bộ điều kiện cả hai phía.
+8. Kiểm tra Second Chance hiện tập trung vào đơn và đề nghị của phiên gốc. Khi bổ sung bán lại, cần kiểm tra toàn bộ nghĩa vụ của cùng món hàng, kể cả phiên mới hoặc hồ sơ đăng ký lại, ở cả lúc gửi và chấp nhận đề nghị để tránh bán trùng.
+
+### 24.2. Phân biệt các nghĩa của “không nhận hàng”
+
+- **Không thanh toán sau khi thắng:** chưa đủ tiền, hàng chưa được gửi. Sau quá hạn mới hủy đơn và xét Second Chance. Không phát sinh vận chuyển hoàn nếu hàng vẫn ở trung tâm.
+- **Chưa nhận được hàng:** người mua báo hàng chưa tới. Đây là yêu cầu kiểm tra giao nhận, chưa phải chứng cứ người mua từ chối hay lỗi của người bán. Tiền tiếp tục được giữ; tra vận đơn và xác minh.
+- **Từ chối nhận/đổi ý:** người mua chủ động không nhận hoặc đơn vị vận chuyển ghi nhận từ chối. Cần yêu cầu hủy, bằng chứng giao hàng và quyết định Admin; không cho một nút bấm tự hủy, hoàn tiền hoặc xác nhận vi phạm.
+- **Đã nhận nhưng hàng có vấn đề:** hàng thiếu phụ kiện, hỏng, sai mô tả/serial hoặc không khớp báo cáo. Mở tranh chấp; kiểm tra hàng hoàn về khi cần. Không kết luận người bán có lỗi chỉ từ lý do người mua chọn.
+
+Nút đề xuất cho người mua gồm “Báo chưa nhận hàng”, “Yêu cầu hủy/không tiếp tục nhận hàng” và “Báo vấn đề với hàng đã nhận”, hiển thị theo đúng giai đoạn. “Đã nhận hàng” và “Xác nhận hàng phù hợp/Hoàn tất” là hai thao tác khác nhau. Backend phải kiểm tra lại quyền và điều kiện khi nhận yêu cầu.
+
+### 24.3. Luồng thành công từ lúc kết thúc phiên
+
+1. Hết giờ sau mọi lần gia hạn: khóa phiên, kiểm tra lượt hợp lệ và giá sàn, xác định đúng một người thắng theo giá công khai. Nếu không có giá hợp lệ hoặc chưa đạt sàn, kết thúc thất bại và hoàn cọc; không tạo đơn.
+2. Có người thắng: kết thúc phiên, tạo đúng một đơn còn nghĩa vụ, chụp giá/phí/địa chỉ/hạn; chuyển cọc người thắng vào đơn và hoàn cọc người không thắng. Cọc trước khi chốt chưa gắn đơn là bình thường.
+3. Người thắng trả phần còn thiếu trong hạn mặc định 48 giờ. Nếu cọc đã đủ tổng đơn thì ghi nhận đủ tiền, không thu thêm. Thanh toán lỗi không kéo dài hạn; gửi lại cùng khóa không thu trùng.
+4. Tiền được giữ trung gian, đơn chờ gửi; người bán chưa được giải ngân. Với hàng trung tâm giữ, Admin ghi nhận trung tâm đóng gói và gửi trong hạn mặc định 3 ngày. Với đơn nguồn người bán, người bán ghi nhận gửi.
+5. Khi có bằng chứng đã giao, người mua hoặc Admin ghi nhận nhận hàng; bắt đầu hạn kiểm tra mặc định 3 ngày. Mã vận đơn, đồng hồ hoặc việc không bấm nút chưa đủ chứng minh đã giao.
+6. Người mua xác nhận hàng phù hợp thì hoàn tất sớm. Hết hạn kiểm tra chỉ tự hoàn tất khi đã ghi nhận giao, đủ tiền, không tranh chấp/cờ Admin và tài khoản đủ điều kiện.
+7. Giải ngân đúng một lần, cho đánh giá đúng đối tác, giữ toàn bộ lịch sử và gửi thông báo liên quan. “Đấu giá thành công” chỉ có nghĩa đã chọn người thắng; “Giao dịch hoàn tất” mới là đơn đã quyết toán.
+
+### 24.4. Các nhánh ngoại lệ cần xử lý
+
+1. **Winner không thanh toán:** hết hạn thì hủy đơn, đánh dấu cọc không hoàn theo chính sách đã công bố, ghi vi phạm chờ xét. Hàng còn nguyên ở trung tâm không phải vận chuyển về lần nữa. Người bán có thể gửi Second Chance hoặc chọn đăng phiên mới khi không còn đề nghị/nghĩa vụ đang mở; hai lựa chọn loại trừ nhau.
+2. **Đã thanh toán nhưng nguồn gửi chưa gửi:** giữ tiền, nhắc/đánh dấu quá hạn và cho Admin tiếp nhận. Nếu hủy trước khi hàng rời trung tâm, chỉ kiểm kê hàng đang có. Lỗi chậm gửi của trung tâm không tự ghi thành vi phạm của người bán. Không tự đổi nguyên nhân thành không thanh toán để mở Second Chance.
+3. **Hàng đang vận chuyển, chưa tới:** người mua có quyền báo chưa nhận tại mốc mặc định 7 ngày; Admin được can thiệp sớm khi có thông tin cần xử lý. Chờ xác minh/giao tiếp/hoàn về; không tự giải ngân vì người mua im lặng, không bán món hàng đang trên đường.
+4. **Người mua từ chối nhận hoặc đổi ý sau thanh toán:** ghi yêu cầu và bằng chứng; Admin xét nguyên nhân. Khi chấp nhận hủy, thu hồi về trung tâm và kiểm kê. Người mua có thể được ghi nhận vi phạm sau khi xác minh nếu vi phạm cam kết; không tự tịch thu cọc đã hòa vào tiền đơn. Phạm vi hiện tại chỉ hỗ trợ hoàn toàn bộ hoặc giải ngân toàn bộ, chưa có tự khấu trừ phí/hoàn một phần.
+5. **Hàng giao không thành công, hoàn về nguyên vẹn:** Admin tiếp nhận, đối chiếu serial, phụ kiện, tình trạng và hồ sơ; ghi kết quả kiểm kê. Sau khi quyết toán đơn/tranh chấp cũ, hàng đang ở trung tâm và còn phù hợp hồ sơ có thể được duyệt tạo phiên mới. Không bắt buộc trả người bán rồi gửi lại trung tâm chỉ để bán tiếp.
+6. **Hàng lỗi, thiếu phụ kiện hoặc sai mô tả:** mở tranh chấp, giữ tiền, cho người mua và người bán nộp bằng chứng. Nếu cần hoàn hàng, người mua gửi về trung tâm; trung tâm đối chiếu và ghi nhận kết luận, sau đó hoàn/giải ngân theo quyết định. Hàng không còn đạt điều kiện phải bị khóa bán và trả người bán để xử lý.
+7. **Người bán nhận lại hàng lỗi:** người bán xác nhận đã nhận lại, sửa/bổ sung/cập nhật đúng tình trạng rồi tạo hồ sơ đăng ký bán lại có liên kết hồ sơ gốc. Sản phẩm cần duyệt, kiểm định lại khi bắt buộc; chưa đạt thì không mở phiên. Không sửa mô tả của sản phẩm gắn với đơn cũ để xóa dấu vết sai lệch.
+8. **Không khớp serial hoặc hàng hoàn có bất thường:** khóa khả năng bán tiếp, giữ hồ sơ và tiền chưa quyết toán để Admin xác minh. Không tự hoàn tiền chỉ vì có mã vận đơn hoàn; cần ghi nhận đúng món hàng. Nếu đã hoàn tiền trước đó thì xử lý hàng/vi phạm bằng hồ sơ bổ sung, không quyết toán tiền lần hai.
+9. **Thất lạc hoặc hư hỏng không thu hồi được:** Admin ghi bằng chứng/kết luận và quyết định tiền theo phạm vi hệ thống; có thể hoàn tiền mà không có kiện hàng để nhận lại. Sản phẩm phải bị khóa bán; không tự đặt trạng thái đang ở trung tâm. Xử lý bồi thường với hãng vận chuyển ngoài phạm vi đồ án.
+10. **Khiếu nại không có căn cứ:** Admin ghi quyết định và bằng chứng. Nếu đủ căn cứ giao đúng hàng và hoàn tất nghĩa vụ thì giải ngân toàn bộ, đóng đơn/tranh chấp; không bán lại sản phẩm đã thuộc người mua.
+11. **Người nhận Second Chance từ chối/hết hạn:** chỉ đóng đề nghị, không tự tạo đơn hay vi phạm vì từ chối lời mời. Người bán chủ động gửi tiếp hoặc mở phiên mới nếu đủ điều kiện. Chấp nhận phải thanh toán đủ ngay, không đặt lại cọc và không tái sử dụng cọc đã hoàn.
+12. **Đơn cũ đã hủy/hoàn tiền theo code hiện tại:** giữ quyết toán cũ, bổ sung quy trình kiểm kê/thu hồi có tham chiếu đơn và tranh chấp. Không đổi lý do hủy thành `KHONG_THANH_TOAN`, xóa đơn, xóa ngày rời trung tâm hay sửa trực tiếp cờ kiểm định để làm hiện nút đăng lại.
+
+### 24.5. Kiểm kê hàng hoàn và điều kiện bán tiếp
+
+Đề xuất quản lý **trạng thái tiền của đơn** và **vị trí/tình trạng món hàng** riêng. Đơn đã hủy chưa đồng nghĩa trung tâm đã nhận lại hàng. Báo cáo kiểm định trước khi gửi là bằng chứng lịch sử, không chứng minh tình trạng sau quá trình vận chuyển và sử dụng.
+
+Luồng hàng hoàn dự kiến: yêu cầu thu hồi → ghi nhận gửi hoàn nếu hàng ở ngoài trung tâm → trung tâm thực nhận → kiểm kê/đối chiếu → đủ điều kiện lưu giữ để bán lại hoặc chờ trả người bán → ghi vận đơn trả → người bán xác nhận nhận lại. Đây là nhãn thiết kế, chưa phải enum/API mới đã có trong MySQL.
+
+Nếu hàng chưa từng rời trung tâm thì bỏ qua bước vận chuyển về, nhưng vẫn ghi nhận kiểm kê và quyết định xử lý. Nếu hàng mất thì đi nhánh thất lạc, không tạo biên bản tiếp nhận giả.
+
+Biên bản cần gắn sản phẩm, phiên, đơn/tranh chấp gốc, thời gian, người ghi nhận, nguồn gửi, mã vận đơn, serial/mã nhận dạng, số kiện, phụ kiện, ảnh và kết quả đối chiếu. Kiểm kê không thay thế kiểm định chuyên môn: có nghi vấn xác thực/hỏng hóc thì yêu cầu chuyên gia tái kiểm định và báo cáo mới; Admin ghi nhận kết quả.
+
+Chỉ mở khả năng tạo phiên mới khi đồng thời thỏa mãn:
+
+- Người bán vẫn sở hữu món hàng và đủ quyền bán; hồ sơ sản phẩm được duyệt, không bị khóa vì lỗi đang chờ xử lý.
+- Đơn/tranh chấp cũ đã có quyết định và hoàn tất các nghĩa vụ ảnh hưởng đến món hàng; không còn người mua đang có quyền nhận món hàng.
+- Trung tâm thực sự đang giữ đúng món hàng nếu bắt buộc kiểm định; đã hoàn tất kiểm kê sau hoàn hàng và kiểm định lại khi cần.
+- Không có phiên khác đang chờ/chạy, đơn còn nghĩa vụ hoặc đề nghị đang hiệu lực cho cùng món hàng, kể cả qua một hồ sơ sản phẩm đăng ký lại.
+- Người bán chọn mở phiên mới; hệ thống tạo ID phiên mới, giữ nguyên phiên và giá cũ. Không mở lại phiên đã kết thúc hay mang lượt BID/cọc cũ sang phiên mới.
+
+Hàng hoàn nguyên vẹn, hồ sơ không thay đổi và trung tâm tiếp tục giữ có thể dùng lại hồ sơ sản phẩm gốc sau duyệt bán lại. Hàng trả người bán hoặc phải sửa nội dung/tình trạng dùng hồ sơ đăng ký lại liên kết gốc; không buộc mọi trường hợp tạo sản phẩm trùng. Với hồ sơ kiểm định, ghi nhận lần nhận/kiểm tra mới có liên kết lịch sử; không xóa ngày rời trung tâm của lần giao trước.
+
+### 24.6. Phạm vi và vị trí Second Chance
+
+**Đề xuất giữ phạm vi hiện có: Second Chance dành cho đơn chưa thanh toán, đã hủy hợp lệ, hàng còn đủ điều kiện bán.** Chưa mở rộng sang mọi trường hợp giao không thành công hoặc đã hoàn tiền tranh chấp. Với hàng đã gửi ra ngoài, quy trình thu hồi/kiểm kê rồi tạo phiên mới rõ ràng hơn và không dùng lại cam kết giá của phiên cũ cho một tình trạng hàng có thể đã thay đổi.
+
+Nếu muốn hỗ trợ Second Chance sau giao hàng thất bại trong tương lai, phải thiết kế bổ sung điều kiện thu hồi, tình trạng không đổi, kết thúc nghĩa vụ cũ, giá/hiệu lực lời mời và khóa bán trùng. Không đơn giản đổi điều kiện từ một lý do hủy thành mọi đơn `DA_HUY`.
+
+Vị trí hiện có của người bán: `Đơn bán hàng` → chi tiết đơn gốc tại `/nguoi-ban/don-hang/:id` → mục “Đề nghị mua tiếp” → nút “Gửi đề nghị mua tiếp”. Danh sách đề nghị gửi/nhận ở `/tai-khoan/de-nghi`. Admin không thay người bán gửi lời mời.
+
+Người được mời không tự động thành người thắng mới: họ được quyền từ chối/hết hạn. Hệ thống chọn theo lượt trả công khai hợp lệ cuối của từng người, giá giảm dần, thời gian/ID tăng dần; bỏ người không đủ điều kiện và giá chưa đạt sàn. Không dùng `gia_toi_da` bí mật để định giá Second Chance. Vì có giá sàn, không phải phiên nào cũng có ứng viên hợp lệ dù có nhiều bidder.
+
+Khi đã chuyển sang phiên mới/hồ sơ bán lại, không cho gửi hoặc chấp nhận Second Chance từ phiên cũ. Một đề nghị đã chấp nhận là lịch sử giao dịch; nếu đơn sinh ra sau đó hủy, phải căn cứ nghĩa vụ và điều kiện hàng hiện tại, không khóa món hàng vĩnh viễn chỉ vì còn chữ `DA_CHAP_NHAN` trong lịch sử.
+
+### 24.7. Bật/tắt cọc theo từng phiên
+
+**Trước đợt sửa:** Admin bật/tắt và cấu hình mức cọc chung; mỗi phiên mới tự chụp chính sách. Sau đợt sửa, công tắc riêng và quyền cho phép lựa chọn đã có theo mục 24.12.
+
+**Thiết kế đề xuất:** Admin quyết định phạm vi cho phép, người bán chọn trong phạm vi đó khi tạo phiên:
+
+1. Admin tắt cọc: phiên mới không thu cọc, người bán không tự thu ngoài quy trình.
+2. Admin cho phép tùy chọn: form tạo phiên có “Yêu cầu đặt cọc”; người bán bật/tắt, số tiền tính theo công thức Admin đã cấu hình và hiển thị trước khi tạo.
+3. Admin bắt buộc cọc: công tắc hiển thị bật và khóa, giải thích chính sách; người bán không được tắt. Chưa tự đặt ngưỡng giá/danh mục bắt buộc khi chưa được cấu hình.
+
+Lựa chọn và số tiền chụp vào phiên một lần; không bật/tắt hoặc đổi số tiền sau khi phiên được tạo để không thay điều kiện của người đã tham gia. Cọc phải dương, không vượt giá khởi điểm và dùng phép tính tiền chính xác. Thêm trường gửi từ frontend cần đồng bộ Zod/API, không chỉ thêm công tắc giao diện.
+
+Người mua thấy yêu cầu/số tiền ngay trên chi tiết phiên, trước đăng ký/BID. Người thua được hoàn cọc, người thắng được trừ vào đơn, quá hạn chưa trả đủ xử lý theo chính sách đã công bố. Sau khi đã trả đủ tiền đơn, cọc là một phần tổng tiền; khi hoàn toàn bộ do tranh chấp cũng hoàn cả phần này. Không tự tạo chế độ giữ riêng cọc hoặc trừ phí trả hàng trong bản chỉ có hai kết quả quyết toán toàn bộ.
+
+### 24.8. Mua ngay: quyền quyết định, hiển thị và mục đích
+
+Người bán quyết định có đặt giá Mua ngay hay không lúc tạo phiên. Đề xuất thể hiện bằng công tắc “Cho phép Mua ngay” và ô giá khi bật; giá phải hợp lệ so với giá khởi điểm/giá sàn. Admin quản lý chính sách và duyệt hồ sơ sản phẩm; backend quyết định hiệu lực giao dịch theo quy tắc đã công bố. Người bán không được tự bật lại sau khi người mua đã BID.
+
+Quy tắc VietBid hiện có:
+
+- Không có giá sàn: Mua ngay còn hiệu lực trước lượt trả giá công khai hợp lệ đầu tiên.
+- Có giá sàn: Mua ngay còn hiệu lực khi giá công khai chưa đạt sàn; đạt sàn thì tắt. Không dựa vào việc giá công khai đã bằng giá Mua ngay hay chưa.
+- Chỉ mua được khi phiên đang trong thời gian hoạt động, người mua có quyền, có địa chỉ và không phải người bán của món đó. Phiên sắp mở/đã kết thúc/hủy không nhận giao dịch mới.
+- Thanh toán thành công mới chốt phiên, tạo đơn đã thu đủ và hoàn cọc các bidder còn lại; cọc hợp lệ của người mua được khấu trừ. Thanh toán lỗi không chốt phiên.
+
+Ví dụ: khởi điểm 10 triệu, sàn 20 triệu, Mua ngay 25 triệu. Trước khi đạt sàn, người mua có thể thanh toán 25 triệu cộng phí để chốt. Khi BID làm giá công khai đạt 20 triệu, Mua ngay tắt dù giá vẫn dưới 25 triệu. Không xuất giá sàn bí mật ra API công khai; thông báo chỉ nêu đã đạt điều kiện giá sàn.
+
+Vị trí thao tác mua: trang `/phien/:id`, trong khu vực tham gia của người mua, cạnh/dưới biểu mẫu đặt giá. Hiện code vẫn hiển thị khối/nút bị khóa khi không khả dụng. Đề xuất giữ lời giải thích cụ thể: chưa mở phiên, đã kết thúc, người bán không bật, đã có BID hoặc đã đạt sàn; khách chưa đăng nhập thấy thông tin và liên kết đăng nhập, còn seller/Admin chỉ có thông tin quản lý.
+
+Mua ngay là tính năng tùy chọn, giúp chốt sớm với mức giá người bán đồng ý và người mua chấp nhận. Nó không bắt buộc đối với một sàn đấu giá và cũng không thay thế cách xác định người thắng khi phiên chạy hết giờ. VietBid đã có luồng này nên có thể giữ, tắt mặc định khi tạo phiên và chỉ bật theo lựa chọn người bán; không cần thêm một chế độ cửa hàng bán giá cố định riêng cho đồ án.
+
+Đối chiếu eBay: nền tảng hỗ trợ cả bán giá cố định và thêm Mua ngay vào phiên đấu giá. Hướng dẫn chính thức nêu Mua ngay thường biến mất sau BID đầu tiên, hoặc khi đạt sàn nếu có; có ngoại lệ theo danh mục. Phần lớn danh mục yêu cầu giá Mua ngay cao hơn giá đấu ban đầu ít nhất 30%; đây là quy tắc riêng của eBay, không tự áp vào VietBid. eBay cũng hỗ trợ Second Chance khi winner không trả tiền và đơn đã hủy, chưa đạt sàn hoặc có thêm hàng giống nhau; VietBid chỉ chọn nhánh phù hợp với món hàng duy nhất và giữ điều kiện giá sàn hiện có.
+
+### 24.9. Thứ tự triển khai đề xuất
+
+1. Đồng bộ đặc tả sau khi chốt chính sách: tách không thanh toán, chưa nhận, từ chối nhận và hàng sai/lỗi; phân định rõ quyền yêu cầu với quyền kết luận của Admin.
+2. Thiết kế dữ liệu vòng đời hàng/biên bản nhận lại có liên kết đơn, sản phẩm và hồ sơ kiểm định. Đánh giá sử dụng cấu trúc hiện có hoặc migration tối thiểu sau khi có thiết kế cụ thể; không hứa giữ nguyên số bảng nếu làm mất lịch sử nhiều lần thu hồi. Không cần thêm actor trung tâm/chuyên gia riêng.
+3. Bổ sung API và transaction cho yêu cầu hủy/thu hồi, ghi vận chuyển hoàn, nhận lại/kiểm kê, quyết định lưu giữ hoặc trả seller, seller xác nhận nhận lại. Siết quyết toán theo bằng chứng/điều kiện, có ngoại lệ ghi nhận rõ cho thất lạc và dữ liệu đã hoàn tiền.
+4. Thống nhất một điều kiện đủ khả năng bán cho cả đăng lại, gửi/chấp nhận Second Chance và kiểm định. Khóa cùng món hàng xuyên các phiên/hồ sơ để ngăn bán trùng. Giữ nguyên lịch sử và báo lý do khóa có thể hành động được.
+5. Nối giao diện đúng từng tác nhân: buyer gửi yêu cầu/bằng chứng; seller phản hồi, nhận hàng trả và đăng lại; Admin xác nhận vị trí, kiểm kê, quyết định tiền/hàng. Bổ sung công tắc cọc theo quyền và công tắc Mua ngay, giải thích lý do không khả dụng.
+6. Kiểm thử trên CSDL riêng bằng các chuỗi đầy đủ, rồi mới chuyển dữ liệu/schema theo kế hoạch có sao lưu. Bộ kiểm thử của phiên bản cũ không chứng minh các nhánh mới đã hoàn thiện.
+
+### 24.10. Các ca nghiệm thu cho phần mở rộng
+
+1. Chốt phiên/cọc/tạo đơn một lần; retry hoặc nhiều request không tạo hai người thắng/hai đơn còn nghĩa vụ.
+2. Không có BID/chưa đạt sàn không tạo đơn, hoàn cọc đúng một lần; giá trúng không lấy trần bí mật.
+3. Winner quá hạn mới mở điều kiện Second Chance; nút nằm ở đúng đơn bán và kiểm tra lại quyền ở API.
+4. Không có ứng viên đạt sàn phải giải thích được; đề nghị dùng giá công khai, không lộ hoặc dùng mức tối đa.
+5. Second Chance bị từ chối/hết hạn không tạo nghĩa vụ mua/vi phạm; thử lại thanh toán không thu trùng và không dùng cọc đã hoàn.
+6. Mở phiên mới và gửi/chấp nhận đề nghị cũ đồng thời chỉ cho một nhánh bán món hàng thành công, kể cả hồ sơ đăng ký lại có ID khác.
+7. Không giải ngân khi chỉ có vận đơn, khi đang vận chuyển/chưa nhận, có tranh chấp/cờ xử lý, hoặc chưa đủ tiền.
+8. “Chưa nhận” không tự biến thành “từ chối”; người bán không tự xác nhận giao để bắt đầu đồng hồ kiểm tra.
+9. Đơn đã hoàn tiền không tự đánh dấu hàng đã về trung tâm, không thu/hoàn thêm khi mở hồ sơ thu hồi bổ sung.
+10. Kiểm kê phải đúng serial/số kiện/phụ kiện, có bằng chứng; hàng chưa nhận lại hoặc đang nghi vấn không được bán lại.
+11. Hàng vẫn ở trung tâm bỏ qua vận chuyển hoàn; hàng thất lạc không có biên bản tiếp nhận giả và bị khóa bán.
+12. Hàng nguyên vẹn được duyệt mở phiên mới; hàng lỗi trả seller, đăng ký lại/kiểm định lại; lịch sử sản phẩm, đơn, kiểm định cũ không bị sửa.
+13. Đề nghị đã chấp nhận/phiên đã kết thúc trong lịch sử không khóa vĩnh viễn quyền xử lý hàng khi nghĩa vụ thực tế đã chấm dứt.
+14. Lý do không khớp kiểm định chỉ dùng khi đơn có hồ sơ; quyền và lý do tranh chấp thống nhất giữa frontend và backend.
+15. Cọc từng phiên tuân thủ ba chế độ Admin, số tiền hợp lệ và snapshot; request giả không vượt chính sách, đổi cấu hình không làm đổi phiên cũ.
+16. Mua ngay kiểm tra trước BID/đạt sàn, giờ phiên, quyền, địa chỉ và thanh toán; cạnh tranh với BID/chốt phiên không bán hai lần, không bật lại trái phép.
+
+### 24.11. Nguồn tham khảo
+
+Đã đối chiếu hướng dẫn chính thức ngày 17/10/2026. Đây là tham khảo thiết kế; chính sách riêng của eBay không tự trở thành yêu cầu của VietBid.
+
+- [eBay — Making Second Chance Offers](https://www.ebay.com/help/default/default/making-second-chance-offers?id=4142).
+- [eBay — Responding to Second Chance Offers](https://www.ebay.com/help/buying/auctions-bidding/second-chance-offer?id=4017).
+- [eBay — Selling with Buy It Now](https://www.ebay.com/help/selling/listings/selling-buy-now?id=4109).
+
+### 24.12. Kết quả triển khai và cách kiểm thử lại — 17/10/2026
+
+Đã nối backend và frontend cho các bước bên dưới. Giữ 21 bảng; thêm don_hang.xu_ly_hang (JSON ghi các mốc và lịch sử) và san_pham.san_pham_goc_id (liên kết cùng món hàng). Migration 005 và công cụ nang-cap-hang-hoan.cjs sao lưu có SHA-256, đối chiếu toàn bộ cột/dữ liệu cũ trước/sau. Đã áp dụng cho CSDL kiểm thử và doan4_daugia; không xóa dữ liệu nghiệp vụ hoặc sửa kết quả tiền của đơn cũ.
+
+**Người mua:** trong chi tiết đơn đã thanh toán, trước/đang giao có nút “Yêu cầu hủy / không tiếp tục nhận hàng”. Gửi yêu cầu mở hồ sơ xét duyệt, tiền tiếp tục giữ. “Báo chưa nhận hàng” vẫn theo mốc khiếu nại riêng. Trong hồ sơ hàng hoàn, chỉ đúng bên đang giữ hàng được khai báo gửi hoàn; người mua được xác nhận nhận lại khi trung tâm gửi lại hàng cho mình.
+
+**Admin:** mở chi tiết đơn hoặc tranh chấp → phần “Thu hồi, kiểm kê & bán lại” → “Bắt đầu xử lý hàng hoàn”. Nếu hàng chưa rời trung tâm, chuyển thẳng chờ kiểm kê; nếu đang ở ngoài, khai báo gửi hoàn → trung tâm xác nhận nhận lại (serial/số kiện/tình trạng) → ghi biên bản kiểm kê (serial/phụ kiện/kết quả). Hàng nhận lại từ ngoài trung tâm tạo lần kiểm định mới, không sửa báo cáo/ngày rời trung tâm của lần giao trước. Hàng không khớp nhận dạng chặn hoàn tiền cho đến khi xác minh; thất lạc có nhánh riêng cần ghi căn cứ, không có biên bản nhận giả.
+
+**Hoàn toàn bộ:** sau kiểm kê hoặc kết luận thất lạc, Admin ra quyết định trong tranh chấp. Tiền hoàn gồm cọc đã chuyển và phí; không hoàn/thu lại lần hai. Các đơn cũ đã được hoàn tiền vẫn bắt đầu thu hồi từ chi tiết đơn để bổ sung lịch sử hàng, không mở lại quyết toán.
+
+**Bán tiếp hàng nguyên vẹn:** kiểm kê đạt → giải quyết đơn/tranh chấp cũ → hoàn tất lần kiểm định mới nếu hàng đã rời trung tâm → Admin duyệt lại sản phẩm → “Duyệt cho đấu giá lại” → người bán tạo phiên mới từ chi tiết đơn hoặc danh sách sản phẩm. Lượt BID, cọc và kết quả cũ không chuyển sang phiên mới.
+
+**Trả người bán:** hàng cần xử lý → hoàn tất quyết định đơn/tranh chấp → Admin “Gửi trả hàng cho người bán” và nhập vận đơn → seller “Tôi đã nhận lại hàng” → “Tạo hồ sơ đăng ký bán lại”. Tạo duy nhất bản nháp liên kết sản phẩm gốc, sao chép nội dung/ảnh để seller cập nhật; hồ sơ gốc được lưu trữ, không sửa nội dung đã giao dịch. Bản đăng ký lại phải gửi duyệt và kiểm định theo chính sách áp dụng.
+
+**Khiếu nại không có căn cứ:** trước khi bàn giao hàng hoàn, Admin có thể “Dừng yêu cầu thu hồi” và giải ngân khi đã có xác nhận giao. Nếu đã nhận về trung tâm, cần đối chiếu/kiểm định đạt, duyệt lại và “Gửi lại người mua sau đối chiếu”; người mua hoặc Admin xác nhận đã giao lại rồi mới giải ngân theo quyết định tranh chấp. Người bán không tự xác nhận giao lại. Tiền không giải ngân khi hàng còn ở trung tâm hoặc đang trên đường gửi lại.
+
+**Second Chance:** giữ nhánh đơn hủy do không thanh toán, seller chủ động gửi từng lần. API và giao diện giải thích khi không có ứng viên đạt sàn, có đề nghị đang chờ hoặc sản phẩm đã có phiên mới. Đã chặn gửi/chấp nhận đề nghị cũ khi cùng món hàng được đăng sang phiên khác; giao dịch dùng khóa sản phẩm gốc để bảo vệ cả hồ sơ đăng ký lại.
+
+**Cọc từng phiên:** Admin → Cấu hình → bật chính sách cọc và “Cho người bán chọn bật/tắt cọc từng phiên” nếu muốn cho chọn. Seller → Tạo phiên → Chính sách tham gia → bật/tắt “Yêu cầu đặt cọc”; xem trước số tiền theo cấu hình. Nếu Admin bắt buộc/tắt cọc, công tắc tương ứng bị khóa và có giải thích. Backend kiểm tra lại, giữ snapshot phiên cũ. Mua ngay có công tắc riêng; tắt thì không gửi giá Mua ngay còn lưu trong form. Quy tắc tắt sau BID/đạt sàn được giữ, có giải thích trên chi tiết phiên.
+
+**Kiểm tra:** bộ tích hợp 67/67 ca đạt trong CSDL riêng và rollback, gồm tám ca mới về thu hồi/kiểm kê/bán lại/chính sách cọc/gửi lại buyer. Bộ HTTP nền chạy 224 yêu cầu, 93/93 route thành công và 45 phản hồi lỗi đúng mã; bộ kiểm định/cọc vẫn bao phủ 16 route riêng. Định dạng, kiểu/build và kiểm thử frontend được kiểm tra cùng đợt. Không coi kết quả API là đã nghiệm thu mọi màn hình/trình duyệt hoặc tải lớn.
+
+**Dọn tệp:** xóa tools/bo_sung_thiet_ke_csdl.py là công cụ soạn báo cáo dùng một lần, không được ứng dụng hoặc scripts gọi. Giữ báo cáo Word, ảnh, SQL chuẩn, migration, sao lưu, công cụ khôi phục, seed và kiểm thử đang có tác dụng. Không xóa các tài liệu/sản phẩm dữ liệu người dùng chỉ vì chúng không được import lúc chạy web.
+
+### 24.13. Khép các nhánh ngoại lệ — phiên bản 3.2, 17/10/2026
+
+#### Quyết toán cọc khi người thắng bỏ thanh toán
+
+Chính sách do người dùng chốt: Admin chọn bồi hoàn toàn bộ cọc cho người bán hoặc hoàn toàn bộ cọc cho người mua khi có ngoại lệ được xác minh. Không chia cọc, không tự thu thêm, không tính khoản này thành đơn bán thành công. Hết hạn thanh toán chỉ hủy đơn, ghi vi phạm và giữ cọc chờ Admin; không tự chuyển cọc cho seller.
+
+Làm rõ ngày 18/10/2026: bỏ thanh toán vì đổi ý, thiếu tiền hoặc quên hạn không phải ngoại lệ hoàn cọc. Nếu chọn hoàn cho buyer, API và giao diện bắt buộc loai_ngoai_le (LOI_HE_THONG/LOI_BEN_BAN/SAI_THONG_TIN_PHIEN) và tham_chieu_bang_chung đã đối chiếu; Admin chịu trách nhiệm kiểm tra hồ sơ thực tế, không chỉ nhập một ghi chú chung. Hệ thống ghi biên bản, không tự xác minh nội dung chứng cứ bên ngoài. Chưa thu đủ tiền thì xét cọc; đã thu đủ tiền thì xét toàn bộ escrow theo tranh chấp, không tự tách cọc để phạt riêng. Yêu cầu hủy vì đổi ý là yêu cầu xét duyệt, không phải quyền tự nhận lại tiền.
+
+Tham chiếu để phân biệt mô hình, không sao chép thành quy tắc VietBid: [eBay xử lý không thanh toán và ngoại lệ có căn cứ](https://www.ebay.com/help/default/default/unpaid-item-policy?id=4271); [eBay phân biệt chưa nhận được với từ chối nhận](https://www.ebay.com/help/policies/ebay-money-back-guarantee-policy/ebay-money-back-guarantee-policy?id=4210); [Catawiki dùng khoản tạm giữ và xét giải phóng sau nghĩa vụ phí](https://www.catawiki.com/en/help/bidding-basics/what-is-a-bid-reservation). Khoản tạm giữ trên thẻ và cọc thu thực tế là các cơ chế khác nhau.
+
+Admin mở **Quản lý đơn hàng → Chi tiết → Đối soát và xử lý ngoại lệ → Quyết toán cọc**. Phải nhập ít nhất 20 ký tự về căn cứ, kiểm tra đúng cọc gắn đơn, tiền đang giữ và số tiền đã thu chỉ là cọc. Quyết toán chỉ áp dụng đơn hủy do KHONG_THANH_TOAN, chưa có tranh chấp và chưa quyết toán. Seller bị hạn chế tài khoản chưa được nhận bồi hoàn. Hoàn tiền ngoại lệ cho buyer không bị ngăn chỉ vì seller bị hạn chế.
+
+Sau quyết định, đơn vẫn DA_HUY; escrow hết số dư và được ghi DA_GIAI_NGAN hoặc DA_HOAN_TIEN theo bên nhận. Bản ghi cọc vẫn giữ liên kết chuyển vào đơn và dấu KHONG_HOAN_COC của thời điểm quá hạn; kết quả quyết toán cuối đọc từ đơn và biên bản, giao diện hiển thị “Đã bồi hoàn” hoặc “Đã hoàn cọc ngoại lệ”. Vi phạm được Admin xem xét riêng, không tự hủy chỉ vì hoàn lại cọc. Nhật ký lưu người xử lý, thời điểm, lý do, cọc và số tiền. Gửi lại cùng quyết định trả kết quả cũ; quyết định trái ngược bị từ chối, kể cả hai yêu cầu đến đồng thời. Điều kiện hàng/Second Chance được xét riêng, không bị khóa vì khoản cọc đang đối soát.
+
+#### Giải tỏa cảnh báo của đơn gửi muộn hoặc đã khôi phục tài khoản
+
+Admin mở chi tiết đơn → **Xác nhận đã kiểm tra và giải tỏa cảnh báo**. Chỉ cho phép khi đơn đã gửi/đang kiểm tra, đã thu đủ và đang giữ tiền, không có tranh chấp/thu hồi đang xử lý, cả buyer và seller đang hoạt động. Khi chưa đủ điều kiện, giao diện giải thích lý do khóa. Đơn chưa gửi phải thực hiện gửi hàng trước; đơn hủy xử lý cọc hoặc hàng hoàn; đơn tranh chấp xử lý theo hồ sơ tranh chấp.
+
+Thao tác chỉ gỡ cờ, lưu biên bản và thông báo hai bên; không tự hoàn tất, giải ngân, xóa vi phạm hoặc kéo dài hạn kiểm tra. Buyer xác nhận hàng phù hợp hoặc job xử lý sau hạn nếu đủ điều kiện. Job không quét lặp các đơn gửi muộn đã chờ Admin. Quyết định tranh chấp giải ngân cho seller cũng kiểm tra lại tài khoản hiện tại, không dùng để vượt điều kiện tài khoản bị khóa.
+
+#### Hàng chưa rời trung tâm nhưng đơn đã hủy
+
+Nếu hàng vẫn ở trung tâm thì không dựng một chuyến hoàn giả và không tạo lần tiếp nhận/kiểm định mới. Sau kiểm kê và quyết định hủy/hoàn tiền, Admin gửi trả seller: cập nhật đúng hồ sơ lưu giữ ban đầu (hoặc hồ sơ mới nếu hàng đã thực sự quay về), ngày rời trung tâm, ngày trả và lý do. Báo cáo, kết quả, serial và thông tin chuyên gia của lần kiểm định cũ không bị sửa. Hồ sơ gắn đơn luôn chỉ đọc; việc bàn giao thực hiện qua đơn. Seller xác nhận nhận lại rồi tạo hồ sơ nháp liên kết gốc nếu muốn bán lại; không hồi sinh hồ sơ cũ đã lưu trữ.
+
+#### Phí hoàn, thất lạc và bồi thường
+
+Trong phần hàng hoàn, Admin có **Kết luận trách nhiệm và chi phí phát sinh**. Quy tắc xét theo bằng chứng:
+
+- Người mua đổi ý khi hàng phù hợp: xem xét người mua chịu chi phí hoàn thực tế; không tự mất riêng cọc sau khi đã thanh toán đủ đơn.
+- Hàng sai/lỗi: đối chiếu hồ sơ giao nhận để xác định trách nhiệm seller, trung tâm hoặc đơn vị vận chuyển, không mặc định quy mọi lỗi cho seller sau kiểm định.
+- Thất lạc: xác minh bên chịu trách nhiệm theo vị trí bàn giao; hoàn đủ tiền đang giữ cho buyer theo quyết định tranh chấp, khóa bán món hàng thất lạc. Bồi thường cho bên thiệt hại được ghi riêng theo chứng cứ; không tự trả cả giá trị đơn cho seller từ tiền của buyer.
+
+Biên bản ghi bên chịu phí, phí hoàn, bên trả/nhận bồi thường, số tiền và căn cứ ít nhất 30 ký tự. Số tiền bằng 0 phải chọn Không phát sinh; có tiền phải có bên chịu trách nhiệm, bồi thường không được trả cho chính mình. Không phát sinh được ghi 0 sau khi đã xác minh, không dùng 0 để giả vờ khoản chưa rõ đã giải quyết.
+
+Các khoản phát sinh được thanh toán/đối soát thủ công ngoài khoản escrow của đơn; hiện chưa tích hợp cổng thu chi hoặc hãng vận chuyển thật. Admin chỉ dùng **Xác nhận đã đối soát chi phí và bồi thường** sau khi kiểm tra chứng từ, nhập mã chứng từ và kết quả. Ghi kết luận không có nghĩa đã thanh toán; giao diện tách trạng thái chưa/đã đối soát. Việc này không khấu trừ tiền hoàn, sửa tổng đơn hoặc ghi thêm giao dịch thanh toán vào escrow. Hoàn tiền buyer không phải chờ đối tác bồi thường; hồ sơ chi phí vẫn được xử lý sau khi tranh chấp kết thúc hoặc hàng đã mở phiên khác. Biên bản đã chốt không được ghi đè; thử lại không tạo trùng lịch sử.
+
+#### Phạm vi rà soát và kiểm tra
+
+Đối chiếu các nhóm API: tài khoản/địa chỉ/xác minh, danh mục/thuộc tính/sản phẩm/ảnh/duyệt, kiểm định/lưu giữ, tạo phiên/cọc/giá tối đa/gia hạn/Mua ngay/chốt phiên, đơn/thanh toán/giao nhận/giải ngân, tranh chấp/bằng chứng/hàng hoàn/đăng lại, Second Chance, đánh giá/thông báo/vi phạm/cấu hình/thống kê/tác vụ. Kiểm tra quyền đúng actor, chống sửa số tiền, giữ bí mật mức tối đa và xử lý lặp/đồng thời. Kiểm thử dùng doan4_daugia_kiem_thu; không nạp lại hoặc sửa dữ liệu nghiệp vụ chính.
+
+**Kết quả kiểm tra ngày 18/10/2026:** backend cơ bản đạt 18/18, tích hợp MySQL đạt 75/75, frontend đạt 13/13; không có ca bỏ qua hoặc thất bại. Bộ HTTP nền đối chiếu 95/95 route với 250 yêu cầu, gồm 53 phản hồi lỗi đúng mã; bộ kiểm định/cọc đối chiếu thêm 16 route. Ca nhiều kết nối kiểm tra hai quyết định cọc trái ngược cùng lúc: chỉ một kết quả được ghi, không hoàn và bồi hoàn trùng. Các ca mới kiểm tra hoàn cọc thiếu chứng cứ/bỏ thanh toán do đổi ý bị từ chối, nhãn kết quả cuối ở phía buyer, giải tỏa không tự giải ngân, khóa tài khoản, cập nhật lưu giữ gốc và đối soát chi phí không đổi escrow.
+
+**Kiểm tra trực tiếp bằng đúng tác nhân:** Admin quyết toán cọc bồi hoàn seller và hoàn ngoại lệ có căn cứ; phía buyer thấy kết quả tương ứng. Biểu mẫu hoàn ngoại lệ chặn thiếu loại lỗi/tham chiếu; màn hình xác nhận nêu đủ số tiền và căn cứ. Seller gửi Second Chance sau đơn quá hạn; bidder tiếp theo chấp nhận, trả đúng giá công khai và tạo đơn mới đã thanh toán. Với đơn gửi muộn, buyer nhận hàng nhưng chưa thể hoàn tất khi còn cờ; Admin kiểm tra/gỡ cờ vẫn giữ tiền; buyer hoàn tất sau đó mới giải ngân. Với hàng chưa rời trung tâm, Admin cập nhật bàn giao về seller, ghi trách nhiệm/phí và chứng từ; seller xác nhận nhận lại, tạo một hồ sơ nháp liên kết gốc rồi mở đúng trang chỉnh sửa. Đây là phạm vi thao tác thực sự đã thử, không phải nghiệm thu mọi màn hình, trình duyệt hoặc tổ hợp đầu vào.
+
+Máy chủ giao diện thử dùng cổng riêng, tắt jobs và nối doan4_daugia_kiem_thu. Đã dừng máy chủ, dọn năm tài khoản và toàn bộ chuỗi dữ liệu tạm theo UUID; xóa công cụ dựng môi trường tạm. Các kiểm thử tích hợp rollback hoặc tự dọn dữ liệu riêng sau khi chạy. Đợt khép ngoại lệ không thay đổi cấu trúc hoặc dữ liệu nghiệp vụ trong doan4_daugia. Thanh toán và đối soát chi phí vẫn chưa kết nối dịch vụ chuyển tiền thật.
+
+#### Thứ tự tự nghiệm thu các nhánh mới
+
+1. **Người thắng quá hạn thanh toán:** kiểm tra đơn đã hủy, cọc chờ quyết toán; người mua/người bán không có quyền quyết toán. Admin mở chi tiết đơn để bồi hoàn seller hoặc hoàn ngoại lệ có loại lỗi, lý do và tham chiếu chứng cứ. Sau quyết định, tiền đang giữ bằng 0; tải lại vẫn một kết quả; đơn vẫn đã hủy.
+2. **Second Chance:** trên phiên có đơn hủy do không thanh toán, seller chọn người trả giá hợp lệ tiếp theo; kiểm tra giá đề nghị là giá công khai. Người nhận chấp nhận và thanh toán đủ mới có đơn mới. Không dùng nhánh này cho đơn đã thanh toán rồi hủy do tranh chấp.
+3. **Gửi muộn nhưng hàng phù hợp:** ghi nhận đã gửi và buyer đã nhận; khi còn cờ Admin, buyer chưa hoàn tất được. Admin xác minh rồi giải tỏa; kiểm tra tiền vẫn được giữ. Buyer xác nhận hàng phù hợp mới hoàn tất và giải ngân.
+4. **Hủy và trả hàng:** đối chiếu hàng thực tế đang ở đâu, thu hồi nếu đã rời trung tâm, kiểm kê và giải quyết tranh chấp. Hàng có lỗi phải trả seller; seller xác nhận nhận lại rồi tạo hồ sơ mới liên kết gốc. Hàng đủ điều kiện bán tiếp phải hoàn tất các bước kiểm định/duyệt mà hệ thống yêu cầu trước tạo phiên; không bỏ qua điều kiện vì từng được kiểm định ở giao dịch cũ.
+5. **Phí hoàn hoặc thất lạc:** Admin ghi bên chịu trách nhiệm, số tiền và căn cứ. Nếu có chi phí, xác nhận đối soát chỉ sau khi có chứng từ. Kiểm tra tổng đơn, tiền hoàn và giải ngân không tự thay đổi theo biên bản chi phí; hàng thất lạc không được mở bán lại.
+
+Chạy ứng dụng thường ở localhost:5173 với backend cổng 5000. Cổng 5175 đã dùng cho máy chủ kiểm thử tạm và không phải địa chỉ mặc định. Khởi động backend bằng `npm --prefix backend run dev:local`, frontend bằng `npm --prefix frontend run dev` từ thư mục gốc, trên hai terminal riêng; không chạy lại SQL để thử các chức năng này.

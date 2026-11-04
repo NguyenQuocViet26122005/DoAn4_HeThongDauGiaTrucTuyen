@@ -16,6 +16,11 @@ function xuLyLoi(loi, yeuCau, phanHoi, tiepTheo) {
     trangThai = 409;
     thongDiep = 'Dữ liệu đã tồn tại';
   }
+  // Trigger chặn sai nghiệp vụ; nội dung SIGNAL là kỹ thuật nên không trả nguyên cho client.
+  if (loi.code === 'ER_SIGNAL_EXCEPTION') {
+    trangThai = 409;
+    thongDiep = 'Thao tác không phù hợp với trạng thái hiện tại, vui lòng làm mới dữ liệu';
+  }
   if (
     [
       'ER_NO_REFERENCED_ROW_2',

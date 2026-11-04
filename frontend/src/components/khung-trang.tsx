@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { Badge, Button, Drawer, Dropdown, Input } from 'antd';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Badge, Button, Drawer, Dropdown } from 'antd';
+import OTimKiem from './o-tim-kiem';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { BieuTuong } from './bieu-tuong';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
@@ -20,7 +21,32 @@ export function ThuongHieu() {
   );
 }
 
+const TIEU_DE_TRANG: Array<[string, string]> = [
+  ['/kham-pha', 'Khám phá phiên đấu giá'],
+  ['/phien/', 'Chi tiết phiên đấu giá'],
+  ['/huong-dan', 'Cách tham gia'],
+  ['/dang-nhap', 'Đăng nhập'],
+  ['/dang-ky', 'Đăng ký'],
+  ['/tai-khoan/don-hang', 'Đơn hàng'],
+  ['/tai-khoan/thong-bao', 'Thông báo'],
+  ['/tai-khoan', 'Tài khoản'],
+  ['/nguoi-ban/san-pham', 'Sản phẩm của tôi'],
+  ['/nguoi-ban/phien', 'Phiên đấu giá của tôi'],
+  ['/nguoi-ban/kiem-dinh', 'Hồ sơ kiểm định'],
+  ['/nguoi-ban/don-hang', 'Đơn bán'],
+  ['/nguoi-ban', 'Không gian người bán'],
+  ['/quan-tri', 'Quản trị'],
+];
+
 export default function KhungTrang() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const tieuDe = TIEU_DE_TRANG.find(([dau]) => pathname.startsWith(dau))?.[1];
+
+    document.title = tieuDe ? `${tieuDe} — VietBid` : 'VietBid — Giá trị xứng tầm';
+  }, [pathname]);
+
   useCapNhatThoiGianThuc();
 
   const { nguoiDung, dangXuat } = usePhienDangNhap();
@@ -99,7 +125,7 @@ export default function KhungTrang() {
             {dieuHuong}
           </nav>
           <div className="tim-kiem-dau-trang">
-            <Input.Search
+            <OTimKiem
               aria-label="Tìm sản phẩm"
               placeholder="Tìm điều bạn yêu thích…"
               maxLength={100}
@@ -148,7 +174,7 @@ export default function KhungTrang() {
         </div>
       </header>
       <Drawer title="Khám phá VietBid" open={mo} onClose={() => datMo(false)} size={320}>
-        <Input.Search
+        <OTimKiem
           aria-label="Tìm kiếm trong menu"
           placeholder="Tìm món đồ bạn thích…"
           maxLength={100}

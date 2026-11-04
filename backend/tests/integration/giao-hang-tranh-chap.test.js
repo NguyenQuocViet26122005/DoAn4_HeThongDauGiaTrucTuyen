@@ -67,6 +67,7 @@ test('Bằng chứng gửi lại không trùng; giữ quyền sở hữu và tr�
       assert.equal((await tranhChap.chiTiet(d.a, hoSo.id)).bang_chung.length, 1);
       await assert.rejects(tranhChap.themBangChung(d.outsider, hoSo.id, noiDung), { status: 403 });
       await assert.rejects(donHang.xacNhanHoanThanh(d.a, don.id), { status: 409 });
+      await require('../helpers/du-lieu-mau').thuHoiVaKiemKe(d, don.id);
       await tranhChap.giaiQuyet(d.admin, hoSo.id, {
         ket_qua: 'NGUOI_MUA',
         ket_qua_xu_ly: 'Hoàn toàn bộ',

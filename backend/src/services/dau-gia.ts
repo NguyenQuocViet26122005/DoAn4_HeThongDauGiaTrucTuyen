@@ -24,6 +24,8 @@ import { phienCongKhai } from '../utils/du-lieu-cong-khai';
 import datCoc = require('./dat-coc');
 import { thanhToanSchema } from '../validations/don-hang.schema';
 import { taoKhoaYeuCau, ketQuaDaXuLy, luuKetQua } from './yeu-cau-thanh-toan';
+import { khoaSanPham } from '../repositories/nghia-vu-san-pham';
+import { lyDoKhongTaoPhien, ketQuaSauPhien } from './dieu-kien-tao-phien';
 
 async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
   const dauVao = kiemTra.docSchema(taoPhienSchema, duLieuNhap);
@@ -62,18 +64,23 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
     await heThong.khoaCauHinh();
     await danhMucSanPham.kiemTraNguoiBan(nguoiDung);
 
-    const sanPham = batBuocTonTai(await khoBanGhi.layTheoId('san_pham', duLieu.san_pham_id, true));
+    const sanPham = await khoaSanPham(duLieu.san_pham_id);
 
     baoDam(cungId(sanPham.nguoi_ban_id, nguoiDung.id), 403, 'Sản phẩm không thuộc tài khoản');
     baoDam(sanPham.trang_thai_duyet === 'DA_DUYET', 409, 'Sản phẩm chưa được duyệt');
 
     await require('./kiem-dinh').kiemTraDuocDauGia(sanPham);
 
-    baoDam(
-      await danhMucSanPham.sanPhamDuocTaoPhien(sanPham.id),
-      409,
-      'Sản phẩm còn phiên, đơn hàng hoặc đề nghị mua tiếp chưa kết thúc; chưa thể tạo phiên mới',
-    );
+    if (!(await danhMucSanPham.sanPhamDuocTaoPhien(sanPham.id))) {
+      const chan = await lyDoKhongTaoPhien(sanPham);
+
+      baoDam(
+        false,
+        409,
+        chan?.ly_do ||
+          'Sản phẩm còn phiên, đơn hàng hoặc đề nghị mua tiếp chưa kết thúc; chưa thể tạo phiên mới',
+      );
+    }
 
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
 
@@ -93,7 +100,7 @@ async function tao(nguoiDung: NguoiDungDangNhap, duLieuNhap: unknown) {
 
     const id = await khoBanGhi.them('phien_dau_gia', {
       ...duLieu,
-      ...(await cauHinhNghiepVu.chupChinhSachCoc(duLieu.gia_khoi_diem)),
+      ...(await cauHinhNghiepVu.chupChinhSachCoc(duLieu.gia_khoi_diem, dauVao.yeu_cau_dat_coc)),
       gia_hien_tai: duLieu.gia_khoi_diem,
       cho_phep_mua_ngay: duLieu.gia_mua_ngay ? 1 : 0,
       thoi_gian_ket_thuc_goc: duLieu.thoi_gian_ket_thuc,
@@ -369,6 +376,7 @@ async function muaNgay(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown = {
     const ketQua = { ket_qua_mo_phong: 'THANH_CONG', don_hang_id: donHang.id };
 
     await luuKetQua('MUA_NGAY_THANH_TOAN', khoa, nguoiDung.id, id, ketQua);
+    await dongYeuCauHuyConMo(daCapNhat);
     await thongBaoKetThuc(daCapNhat);
 
     await ghiNhatKy(nguoiDung.id, 'MUA_NGAY_THANH_CONG', 'phien_dau_gia', id);
@@ -382,7 +390,45 @@ async function muaNgay(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown = {
   });
 }
 
+// Phiên đã có kết quả thì yêu cầu hủy còn mở không thể duyệt nữa; đóng lại để người bán biết.
+async function dongYeuCauHuyConMo(banGhi) {
+  const yeuCau = await khoDuLieu.yeuCauHuyDangCho(banGhi.id);
+
+  if (!yeuCau) {
+    return;
+  }
+
+  const ghiChu = 'Phiên đã kết thúc trước khi Admin xét yêu cầu hủy.';
+
+  await khoBanGhi.capNhat('yeu_cau_xu_ly', yeuCau.id, {
+    trang_thai: 'TU_CHOI',
+    ghi_chu_duyet: ghiChu,
+    ngay_duyet: await coSoDuLieu.thoiGianHienTai(),
+  });
+
+  await ghiNhatKy(null, 'DONG_YEU_CAU_HUY_KHI_KET_THUC', 'phien_dau_gia', banGhi.id);
+  await taoThongBao(
+    banGhi.nguoi_ban_id,
+    'DUYET_HUY_PHIEN',
+    'Yêu cầu hủy đã đóng',
+    ghiChu,
+    `/auctions/${banGhi.id}`,
+  );
+}
+
 async function thongBaoKetThuc(banGhi) {
+  if (banGhi.trang_thai === 'THAT_BAI') {
+    await taoThongBao(
+      banGhi.nguoi_ban_id,
+      'PHIEN_THAT_BAI',
+      'Phiên kết thúc không có người thắng',
+      banGhi.ly_do_ket_thuc === 'KHONG_DAT_GIA_SAN'
+        ? 'Giá cuối chưa đạt giá sàn. Bạn có thể đăng lại sản phẩm.'
+        : 'Phiên không có lượt trả giá. Bạn có thể đăng lại sản phẩm.',
+      `/auctions/${banGhi.id}`,
+    );
+  }
+
   for (const nguoiNhan of await khoDuLieu.nguoiThamGia(banGhi.id)) {
     if (
       cungId(nguoiNhan.nguoi_tra_gia_id, banGhi.nguoi_dan_dau_id) &&
@@ -450,13 +496,22 @@ async function xuLyDenHan(id) {
     const daCapNhat = await khoDuLieu.layTheoId(id);
 
     if (trangThai === 'DA_KET_THUC') {
-      await require('./don-hang').taoDonNguoiThang(
+      const don = await require('./don-hang').taoDonNguoiThang(
         daCapNhat,
         banGhi.nguoi_dan_dau_id,
         banGhi.gia_hien_tai,
       );
+
+      await taoThongBao(
+        banGhi.nguoi_dan_dau_id,
+        'THANG_PHIEN',
+        'Bạn đã thắng phiên đấu giá',
+        `Giá trúng ${Number(banGhi.gia_hien_tai).toLocaleString('vi-VN')} ₫. Mở đơn để hoàn tất thanh toán.`,
+        `/orders/${don.id}`,
+      );
     }
     await datCoc.ketThucPhien(id);
+    await dongYeuCauHuyConMo(daCapNhat);
     await thongBaoKetThuc(daCapNhat);
 
     await ghiNhatKy(null, 'KET_THUC_PHIEN', 'phien_dau_gia', id, {
@@ -625,6 +680,7 @@ async function chiTietCuaToi(nguoiDung: NguoiDungDangNhap, id) {
     yeu_cau_huy_moi_nhat: yeuCau,
     co_the_yeu_cau_huy: !lyDo,
     ly_do_khong_the_huy: lyDo,
+    ket_qua_sau_phien: await ketQuaSauPhien(phien),
   };
 }
 

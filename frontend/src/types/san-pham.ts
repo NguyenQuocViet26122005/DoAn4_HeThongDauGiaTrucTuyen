@@ -13,6 +13,9 @@ export interface SanPhamTrongDanhSach {
   ngay_tao: string;
   co_the_tao_phien?: boolean | number;
   da_tung_dau_gia?: boolean | number;
+  ly_do_khong_tao_phien?: string | null;
+  don_hang_lien_quan_id?: string | null;
+  phien_lien_quan_id?: string | null;
 }
 
 export interface ThuocTinhDanhMuc {

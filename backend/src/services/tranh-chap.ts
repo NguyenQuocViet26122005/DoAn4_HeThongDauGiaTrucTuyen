@@ -17,6 +17,21 @@ import { donViTienNho, chuoiTien } from '../utils/tien';
 import thoiGian = require('../utils/thoi-gian');
 const trangThaiDangMo = ['DANG_MO', 'NGUOI_BAN_DA_PHAN_HOI', 'QUAN_TRI_DANG_XU_LY'];
 
+function duocBoSungBangChung(tranhChap, donHang) {
+  const hang = require('./hang-hoan').docXuLyHang(donHang);
+
+  return (
+    trangThaiDangMo.includes(tranhChap.trang_thai) ||
+    (hang &&
+      ![
+        'DU_DIEU_KIEN_BAN_LAI',
+        'DA_TRA_NGUOI_BAN',
+        'DA_GIAO_LAI_NGUOI_MUA',
+        'DA_DUNG_THU_HOI',
+      ].includes(hang.trang_thai))
+  );
+}
+
 async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
   const banGhi = batBuocTonTai(await khoBanGhi.layTheoId('tranh_chap', kiemTra.id(id)));
 
@@ -26,6 +41,10 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
 
   return {
     ...banGhi,
+    // Chỉ để giao diện gọi đúng vai trò (Bạn/Người mua/Người bán) thay cho mã tài khoản.
+    nguoi_mua_id: donHang.nguoi_mua_id,
+    nguoi_ban_id: donHang.nguoi_ban_id,
+    co_the_them_bang_chung: !!duocBoSungBangChung(banGhi, donHang),
     bang_chung: await khoDuLieu.bangChung(id),
     ho_so_kiem_dinh: donHang.kiem_dinh_san_pham_id
       ? await require('./kiem-dinh').chiTiet(nguoiDung, donHang.kiem_dinh_san_pham_id)
@@ -38,8 +57,19 @@ function kiemTraDieuKienMo(
   donHang: BanGhiSQL,
   lyDo: string,
   thoiGianHienTai: string,
+  yeuCauHuy = false,
 ) {
+  baoDam(
+    lyDo !== 'KHONG_KHOP_HO_SO_KIEM_DINH' || donHang.kiem_dinh_san_pham_id,
+    409,
+    'Đơn không có hồ sơ kiểm định để đối chiếu',
+  );
+  baoDam(!yeuCauHuy || lyDo === 'KHAC', 400, 'Yêu cầu hủy sử dụng lý do Khác');
+
+  const choPhepYeuCauHuy =
+    yeuCauHuy && ['CHO_GUI_HANG', 'DA_THANH_TOAN', 'DA_GUI_HANG'].includes(donHang.trang_thai);
   const trongHanKiemTra =
+    lyDo !== 'CHUA_NHAN_HANG' &&
     ['DA_GIAO', 'DANG_KIEM_TRA'].includes(donHang.trang_thai) &&
     donHang.han_kiem_tra &&
     !thoiGian.daHetHan(donHang.han_kiem_tra, thoiGianHienTai);
@@ -55,7 +85,7 @@ function kiemTraDieuKienMo(
     );
 
   baoDam(
-    trongHanKiemTra || chuaNhanHang || adminCanThiep,
+    trongHanKiemTra || chuaNhanHang || adminCanThiep || choPhepYeuCauHuy,
     409,
     'Chưa đủ điều kiện hoặc đã quá hạn mở tranh chấp',
   );
@@ -87,7 +117,7 @@ async function mo(nguoiDung: NguoiDungDangNhap, donHangId, duLieuNhap: unknown) 
 
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
 
-    kiemTraDieuKienMo(nguoiDung, donHang, lyDo, thoiGianHienTai);
+    kiemTraDieuKienMo(nguoiDung, donHang, lyDo, thoiGianHienTai, dauVao.yeu_cau_huy);
 
     baoDam(!(await cacDonHang.tranhChapDangMo(donHang.id)), 409, 'Đơn đã có tranh chấp đang xử lý');
 
@@ -99,7 +129,7 @@ async function mo(nguoiDung: NguoiDungDangNhap, donHangId, duLieuNhap: unknown) 
       don_hang_id: donHang.id,
       nguoi_mo_id: nguoiDung.id,
       ly_do: lyDo,
-      mo_ta: moTa,
+      mo_ta: dauVao.yeu_cau_huy ? `[Yêu cầu hủy/không tiếp tục nhận hàng] ${moTa}` : moTa,
     });
     await khoBanGhi.capNhat('don_hang', donHang.id, { trang_thai: 'DANG_TRANH_CHAP' });
 
@@ -171,7 +201,7 @@ async function themBangChung(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unkno
       return daGan;
     }
 
-    baoDam(trangThaiDangMo.includes(tranhChap.trang_thai), 409, 'Tranh chấp đã kết thúc');
+    baoDam(duocBoSungBangChung(tranhChap, donHang), 409, 'Tranh chấp và xử lý hàng đã kết thúc');
     baoDam(cacBangChung.length < 30, 400, 'Tối đa 30 bằng chứng');
 
     const bangChungId = await khoBanGhi.them('tep_dinh_kem', {
@@ -207,6 +237,8 @@ async function tiepNhan(quanTri: NguoiDungDangNhap, id) {
 }
 
 async function giaiQuyet(quanTri: NguoiDungDangNhap, id, duLieuNhap: unknown) {
+  baoDam(quanTri.vai_tro === 'QUAN_TRI', 403, 'Chỉ Admin được giải quyết tranh chấp');
+
   const dauVao = kiemTra.docSchema(giaiQuyetSchema, duLieuNhap);
   const ketQua = kiemTra.giaTriLuaChon(dauVao.ket_qua, ['NGUOI_MUA', 'NGUOI_BAN'], 'Kết quả');
   const tienYeuCau =
@@ -240,6 +272,37 @@ async function giaiQuyet(quanTri: NguoiDungDangNhap, id, duLieuNhap: unknown) {
       400,
       'Chỉ hoàn toàn bộ tiền gồm phí vận chuyển hoặc giải ngân toàn bộ',
     );
+
+    if (ketQua === 'NGUOI_MUA') {
+      require('./hang-hoan').kiemTraHoanTien(donHang);
+    } else {
+      const hang = require('./hang-hoan').docXuLyHang(donHang);
+
+      baoDam(
+        !hang || ['DA_DUNG_THU_HOI', 'DA_GIAO_LAI_NGUOI_MUA'].includes(hang.trang_thai),
+        409,
+        'Hàng đã thu hồi phải gửi lại và xác nhận giao cho người mua trước khi giải ngân',
+      );
+      baoDam(
+        hang?.ngay_giao_lai || donHang.ngay_giao_hang,
+        409,
+        'Chưa ghi nhận hàng đã giao; không giải ngân cho người bán',
+      );
+
+      const cacId = [donHang.nguoi_mua_id, donHang.nguoi_ban_id].sort((a, b) =>
+        BigInt(a) < BigInt(b) ? -1 : 1,
+      );
+
+      for (const id of cacId) {
+        const taiKhoan = batBuocTonTai(await khoBanGhi.layTheoId('nguoi_dung', id, true));
+
+        baoDam(
+          taiKhoan.trang_thai_tai_khoan === 'HOAT_DONG',
+          409,
+          'Có tài khoản bị khóa/tạm ngưng; cần xác minh trước khi giải ngân',
+        );
+      }
+    }
 
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
     const trangThaiGiuTien = ketQua === 'NGUOI_MUA' ? 'DA_HOAN_TIEN' : 'DA_GIAI_NGAN';
@@ -287,7 +350,7 @@ async function giaiQuyet(quanTri: NguoiDungDangNhap, id, duLieuNhap: unknown) {
         nguoiDungId,
         'GIAI_QUYET_TRANH_CHAP',
         'Tranh chấp đã được giải quyết',
-        'Xem kết quả và số tiền mô phỏng tại chi tiết tranh chấp.',
+        'Xem quyết định và số tiền được xử lý tại chi tiết tranh chấp.',
         `/disputes/${id}`,
       );
     }

@@ -80,17 +80,21 @@
   margin: 6px 0 0;
 }
 .chon-tep-kiem-dinh {
+  position: relative;
   display: grid;
-  gap: 12px;
+  gap: 6px;
   padding: 18px;
   border: 1px dashed var(--vien);
   border-radius: 4px;
   margin-bottom: 20px;
   font-size: 13px;
+  cursor: pointer;
 }
-.chon-tep-kiem-dinh input {
-  width: 100%;
-  min-width: 0;
+.chon-tep-kiem-dinh span {
+  color: var(--vang);
+}
+.chon-tep-kiem-dinh small {
+  color: var(--chu-phu);
 }
 .nut-luu-kiem-dinh {
   margin-top: 18px;

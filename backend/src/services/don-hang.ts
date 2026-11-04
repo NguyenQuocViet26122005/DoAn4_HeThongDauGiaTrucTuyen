@@ -8,7 +8,7 @@ import cacTuongTac = require('../repositories/tuong-tac');
 import cacPhienDauGia = require('../repositories/dau-gia');
 import cacNguoiDung = require('../repositories/nguoi-dung');
 import cauHinhNghiepVu = require('./cau-hinh');
-import { ghiNhatKy, taoThongBao, thongBaoMotLan } from './nhat-ky-thong-bao';
+import { ghiNhatKy, taoThongBao, thongBaoMotLan, thongBaoQuanTri } from './nhat-ky-thong-bao';
 import kiemTra = require('../validations/du-lieu-dau-vao');
 import { baoDam, batBuocTonTai, cungId } from '../utils/loi';
 import { donViTienNho, chuoiTien } from '../utils/tien';
@@ -67,7 +67,9 @@ async function taoDonNguoiThang(
 
     return daCo;
   }
-  await cacNguoiDung.layTheoId(nguoiMuaId, true);
+
+  const taiKhoanNguoiThang = batBuocTonTai(await cacNguoiDung.layTheoId(nguoiMuaId, true));
+
   diaChi = diaChi || (await cacNguoiDung.diaChiMacDinh(nguoiMuaId));
 
   baoDam(diaChi, 409, 'Người thắng cần có địa chỉ giao hàng để tạo đơn');
@@ -129,6 +131,21 @@ async function taoDonNguoiThang(
 
   await ghiNhatKy(null, 'TAO_DON_HANG', 'don_hang', id, { nguon_don: nguon });
 
+  if (taiKhoanNguoiThang.trang_thai_tai_khoan !== 'HOAT_DONG') {
+    await khoBanGhi.capNhat('don_hang', id, {
+      can_admin_xu_ly: 1,
+      ly_do_can_xu_ly:
+        'Người thắng đang bị hạn chế tài khoản; cần Admin xem xét, không tự phạt cọc.',
+    });
+
+    await thongBaoQuanTri(
+      'NGUOI_THANG_BI_HAN_CHE',
+      `Đơn #${id} có người thắng bị hạn chế`,
+      'Người thắng không thể tự thanh toán khi tài khoản bị khóa hoặc tạm ngưng; cần Admin xem xét.',
+      `/orders/${id}`,
+    );
+  }
+
   if (daDuocThanhToanBangCoc) {
     await hoanTatThanhToanDon(
       { id: String(nguoiMuaId) } as NguoiDungDangNhap,
@@ -152,6 +169,30 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
 
   return {
     ...banGhi,
+    quyet_toan_coc: await require('./xu-ly-ngoai-le-don').bienBan(
+      id,
+      'QUYET_TOAN_COC_BO_THANH_TOAN',
+    ),
+    giai_toa_canh_bao: await require('./xu-ly-ngoai-le-don').bienBan(id, 'GIAI_TOA_CANH_BAO_DON'),
+    ly_do_chua_giai_toa:
+      nguoiDung.vai_tro === 'QUAN_TRI' && Number(banGhi.can_admin_xu_ly)
+        ? await require('./xu-ly-ngoai-le-don').lyDoChuaGiaiToa(banGhi)
+        : null,
+    co_the_quyet_toan_coc:
+      nguoiDung.vai_tro === 'QUAN_TRI' && require('./xu-ly-ngoai-le-don').duocQuyetToanCoc(banGhi),
+    san_pham_id: phienDauGia.san_pham_id,
+    tieu_de_san_pham: phienDauGia.tieu_de,
+    anh_san_pham:
+      (await require('../repositories/danh-muc-san-pham').danhSachAnh(phienDauGia.san_pham_id))[0]
+        ?.duong_dan_anh ?? null,
+    ung_vien_de_nghi: cungId(nguoiDung.id, banGhi.nguoi_ban_id)
+      ? await require('./de-nghi-mua-tiep').ungVienXemTruoc(phienDauGia, banGhi)
+      : null,
+    xu_ly_hang: require('./hang-hoan').docXuLyHang(banGhi),
+    thao_tac_hang: require('./hang-hoan').cacThaoTac(nguoiDung, banGhi),
+    ly_do_khong_gui_de_nghi: cungId(nguoiDung.id, banGhi.nguoi_ban_id)
+      ? await require('./de-nghi-mua-tiep').lyDoKhongGuiDuoc(phienDauGia, banGhi)
+      : null,
     ly_do_ket_thuc_phien: phienDauGia.ly_do_ket_thuc,
     thanh_toan: await khoDuLieu.cacThanhToan(id),
     giu_tien: await khoDuLieu.tienTrungGian(id),
@@ -198,12 +239,12 @@ async function thanhToan(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown =
     'Kết quả mô phỏng',
   );
   const khoaYeuCau =
-    dauVao.khoa_yeu_cau == null ? null : kiemTra.chuoi(dauVao.khoa_yeu_cau, 'Khóa yêu cầu', 100);
+    dauVao.khoa_yeu_cau == null ? null : kiemTra.chuoi(dauVao.khoa_yeu_cau, 'Khóa yêu cầu', 64);
 
   baoDam(
-    khoaYeuCau == null || /^[a-zA-Z0-9_-]{8,100}$/.test(khoaYeuCau),
+    khoaYeuCau == null || /^[a-zA-Z0-9_-]{8,64}$/.test(khoaYeuCau),
     400,
-    'Khóa yêu cầu cần 8–100 ký tự chữ, số, gạch ngang hoặc gạch dưới',
+    'Khóa yêu cầu cần 8–64 ký tự chữ, số, gạch ngang hoặc gạch dưới',
   );
 
   return coSoDuLieu.giaoDich(async () => {
@@ -357,6 +398,11 @@ async function guiHang(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
     const tienDangGiu = await khoDuLieu.tienTrungGian(id, true);
 
     baoDam(tienDangGiu?.trang_thai === 'DANG_GIU', 409, 'Đơn chưa được giữ tiền');
+    baoDam(
+      donViTienNho(banGhi.so_tien_da_thu) === donViTienNho(banGhi.tong_tien),
+      409,
+      'Đơn chưa thanh toán đủ',
+    );
 
     const thoiGianHienTai = await coSoDuLieu.thoiGianHienTai();
 
@@ -593,8 +639,13 @@ async function xuLyDenHan(id) {
       });
 
       await khoDuLieu.danhDauThanhToanHetHan(id);
-      await datCoc.khongHoanCoc(banGhi);
-      if (!(await khoDuLieu.viPhamCuaDon(id, 'KHONG_THANH_TOAN'))) {
+
+      const nguoiThang = batBuocTonTai(await cacNguoiDung.layTheoId(banGhi.nguoi_mua_id));
+      const biHanChe = nguoiThang.trang_thai_tai_khoan !== 'HOAT_DONG';
+      const giuCoc = await datCoc.khongHoanCoc(banGhi, biHanChe);
+
+      // Tài khoản bị khóa không thể tự thanh toán nên không tự ghi vi phạm bỏ thanh toán.
+      if (!biHanChe && !(await khoDuLieu.viPhamCuaDon(id, 'KHONG_THANH_TOAN'))) {
         await khoBanGhi.them('vi_pham', {
           nguoi_dung_id: banGhi.nguoi_mua_id,
           phien_dau_gia_id: banGhi.phien_dau_gia_id,
@@ -609,7 +660,14 @@ async function xuLyDenHan(id) {
         banGhi.nguoi_mua_id,
         'HET_HAN_THANH_TOAN',
         'Đơn đã hủy vì quá hạn thanh toán',
-        'Hệ thống đã ghi nhận vi phạm để Admin xem xét.',
+        [
+          biHanChe
+            ? 'Tài khoản đang bị hạn chế nên đơn được chuyển Admin xem xét.'
+            : 'Hệ thống đã ghi nhận vi phạm để Admin xem xét.',
+          giuCoc ? 'Khoản cọc chưa được hoàn và đang chờ Admin quyết toán.' : '',
+        ]
+          .join(' ')
+          .trim(),
         `/orders/${id}`,
       );
       await ghiNhatKy(null, 'HUY_DON_QUA_HAN', 'don_hang', id);
@@ -617,9 +675,18 @@ async function xuLyDenHan(id) {
         banGhi.nguoi_ban_id,
         'DON_KHONG_THANH_TOAN',
         'Người thắng không thanh toán',
-        'Bạn có thể chủ động tạo đề nghị mua tiếp theo từ đơn này.',
+        [
+          'Bạn có thể chủ động tạo đề nghị mua tiếp theo từ đơn này hoặc đăng lại sản phẩm.',
+          giuCoc ? 'Khoản cọc của người thắng đang chờ Admin quyết toán.' : '',
+        ]
+          .join(' ')
+          .trim(),
         `/orders/${id}`,
       );
+
+      if (giuCoc) {
+        await nhacAdminDonTreo(id);
+      }
     } else if (
       ['DA_GIAO', 'DANG_KIEM_TRA'].includes(banGhi.trang_thai) &&
       thoiGian.daHetHan(banGhi.han_kiem_tra, thoiGianHienTai) &&
@@ -633,6 +700,23 @@ async function xuLyDenHan(id) {
       await ghiNhanGiaoMuon(banGhi);
     }
   });
+}
+
+async function nhacAdminDonTreo(id) {
+  const banGhi = await khoBanGhi.layTheoId('don_hang', id);
+
+  if (banGhi?.trang_thai !== 'DA_HUY') {
+    return;
+  }
+
+  await thongBaoQuanTri(
+    'DON_TREO_CAN_ADMIN',
+    `Đơn #${id} cần Admin xử lý`,
+    banGhi.ly_do_huy === 'HOAN_TIEN_TRANH_CHAP'
+      ? 'Đơn đã hoàn tiền nhưng chưa có hồ sơ thu hồi hàng; sản phẩm chưa thể đăng lại.'
+      : 'Khoản cọc của đơn hủy đang chờ quyết toán.',
+    `/orders/${id}`,
+  );
 }
 
 async function nhacThanhToan(id) {
@@ -673,4 +757,5 @@ export {
   hoanThanhDonDaKhoa,
   xuLyDenHan,
   nhacThanhToan,
+  nhacAdminDonTreo,
 };

@@ -47,6 +47,7 @@ export interface SanPham {
   id: string;
   danh_muc_id: string;
   nguoi_ban_id: string;
+  ten_nguoi_ban?: string | null;
   tieu_de: string;
   mo_ta: string;
   tinh_trang_san_pham: string;

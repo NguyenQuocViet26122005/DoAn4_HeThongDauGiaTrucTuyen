@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
+import { useHoTro3D } from '../hooks/ho-tro-3d';
+
+const Bia3D = lazy(() => import('../components/bia-3d'));
 import { Alert, App, Button, Form, Input } from 'antd';
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { BieuTuong } from '../components/bieu-tuong';
 import { boNho, gui, loiDeDoc } from '../services/api';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
@@ -14,11 +17,13 @@ interface ThongTinDangNhap {
 }
 
 export default function DangNhapDangKy({ dangKy = false }: { dangKy?: boolean }) {
+  const hoTro3D = useHoTro3D();
   const [dangGui, datDangGui] = useState(false);
   const [loi, datLoi] = useState('');
   const { message } = App.useApp();
   const diDen = useNavigate();
   const [thamSo] = useSearchParams();
+  const viTri = useLocation();
   const { nguoiDung, dangNhap } = usePhienDangNhap();
   const dich = thamSo.get('tiep') || '/tai-khoan';
   const dichAnToan =
@@ -42,8 +47,18 @@ export default function DangNhapDangKy({ dangKy = false }: { dangKy?: boolean })
           ho_ten: duLieu.ho_ten?.trim(),
           ...(duLieu.so_dien_thoai ? { so_dien_thoai: duLieu.so_dien_thoai.trim() } : {}),
         });
-        message.success('Đã tạo tài khoản. Bạn có thể đăng nhập ngay.');
-        diDen(`/dang-nhap${duoi}`, { replace: true });
+        // Đăng nhập luôn bằng thông tin vừa tạo để người dùng không phải nhập lại.
+        try {
+          const ketQua = await gui<{ token: string; user: NguoiDung }>('/auth/login', thongTin);
+
+          boNho.clear();
+          dangNhap(ketQua.token, ketQua.user);
+          message.success('Đã tạo tài khoản và đăng nhập');
+          diDen(dichAnToan, { replace: true });
+        } catch {
+          message.success('Đã tạo tài khoản. Vui lòng đăng nhập.');
+          diDen(`/dang-nhap${duoi}`, { replace: true, state: { email: thongTin.email } });
+        }
       } else {
         const ketQua = await gui<{ token: string; user: NguoiDung }>('/auth/login', thongTin);
 
@@ -61,7 +76,12 @@ export default function DangNhapDangKy({ dangKy = false }: { dangKy?: boolean })
 
   return (
     <div className="khung trang-xac-thuc">
-      <section className="cau-chuyen-xac-thuc">
+      <section className={`cau-chuyen-xac-thuc ${hoTro3D.coThe ? 'cau-chuyen-3d' : ''}`}>
+        {hoTro3D.coThe && (
+          <Suspense fallback={null}>
+            <Bia3D dienThoai={hoTro3D.dienThoai} canGiua />
+          </Suspense>
+        )}
         <span className="nhan-nho">VietBid · KHÔNG GIAN SƯU TẦM</span>
         <h1>
           Mỗi lựa chọn,
@@ -91,6 +111,7 @@ export default function DangNhapDangKy({ dangKy = false }: { dangKy?: boolean })
         <Form
           layout="vertical"
           requiredMark="optional"
+          initialValues={{ email: (viTri.state as { email?: string } | null)?.email }}
           onFinish={guiBieuMau}
           className="bieu-mau"
           disabled={dangGui}
@@ -138,7 +159,7 @@ export default function DangNhapDangKy({ dangKy = false }: { dangKy?: boolean })
           <Form.Item
             name="mat_khau"
             label="Mật khẩu"
-            extra={dangKy ? 'Ít nhất 8 ký tự, tối đa 72 byte.' : undefined}
+            extra={dangKy ? 'Ít nhất 8 ký tự, tối đa khoảng 70 ký tự.' : undefined}
             rules={[
               { required: true, message: 'Vui lòng nhập mật khẩu' },
               { min: dangKy ? 8 : 1, message: 'Mật khẩu cần ít nhất 8 ký tự' },

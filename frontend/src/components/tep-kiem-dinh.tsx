@@ -82,7 +82,8 @@ export default function TepKiemDinh({
             <Select options={loaiTepKiemDinh.map((value) => ({ value, label: nhan(value) }))} />
           </Form.Item>
           <label className="chon-tep-kiem-dinh">
-            Chọn ảnh hoặc PDF · tối đa 10 MiB
+            <span>{tep ? `Đã chọn: ${tep.name} · Chọn lại` : '+ Chọn ảnh hoặc PDF'}</span>
+            <small>JPG, PNG, WebP hoặc PDF · tối đa 10 MB</small>
             <input
               key={lanChon}
               aria-label="Chọn tệp kiểm định"
@@ -102,7 +103,7 @@ export default function TepKiemDinh({
                   moi.size > 10 * 1024 * 1024 ||
                   !['image/png', 'image/jpeg', 'image/webp', 'application/pdf'].includes(moi.type)
                 ) {
-                  datLoi('Chỉ nhận JPG, PNG, WebP hoặc PDF, tối đa 10 MiB.');
+                  datLoi('Chỉ nhận JPG, PNG, WebP hoặc PDF, tối đa 10 MB.');
                   suKien.target.value = '';
 
                   return;

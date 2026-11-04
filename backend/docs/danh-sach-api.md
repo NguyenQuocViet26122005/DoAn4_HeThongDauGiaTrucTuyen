@@ -24,7 +24,7 @@ Các quy tắc nghiệp vụ hiện tại:
 
 - `POST /auctions` nhận thêm `phi_van_chuyen`, mặc định 0; chỉ nhận số tiền VND nguyên cho giao dịch mới. Phí được công bố trên phiên và chụp sang đơn.
 - `POST /orders/:id/payments/simulate` nhận `{ "ket_qua_mo_phong": "THANH_CONG", "khoa_yeu_cau": "ma-yeu-cau-01" }`. Kết quả có thể là `THAT_BAI`; cùng khóa sẽ trả lần xử lý cũ. Lần thử mới cần khóa mới. Không truyền tổng tiền từ client.
-- Khóa yêu cầu tùy chọn dài 8–100 ký tự chữ/số/gạch ngang/gạch dưới. Nếu không truyền, backend tạo mã; client nên giữ khóa khi thử lại sau lỗi mạng.
+- Khóa yêu cầu tùy chọn dài 8–64 ký tự chữ/số/gạch ngang/gạch dưới. Nếu không truyền, backend tạo mã; client nên giữ khóa khi thử lại sau lỗi mạng.
 - Khiếu nại `CHUA_NHAN_HANG` của người mua chỉ mở sau mốc 7 ngày từ khai báo gửi và còn đúng trạng thái. Admin có thể tiếp nhận trường hợp hàng đã thanh toán cần can thiệp.
 - Quyết định tranh chấp chỉ có `NGUOI_MUA` (hoàn toàn bộ, gồm phí) hoặc `NGUOI_BAN` (giải ngân toàn bộ). Nên bỏ `so_tien_hoan` để backend lấy từ đơn; nếu gửi thì phải khớp toàn bộ số tiền tương ứng.
 - Second Chance phải do người bán yêu cầu từng lần; từ chối/hết hạn không tự tạo đề nghị tiếp theo. Giá lấy từ lượt công khai hợp lệ.
@@ -117,6 +117,8 @@ Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
   "so_dien_thoai": "0900000000"
 }
 ```
+
+Gửi `"so_dien_thoai": null` để xóa số điện thoại; bỏ trường này để giữ nguyên.
 
 ### GET /users/me/addresses — Danh sách địa chỉ
 
@@ -992,7 +994,7 @@ Quyền: Admin.
 
 Admin tự chọn tỷ lệ/số tiền rồi đặt `bat = true`. `TY_LE`: số nguyên 1–100%; `CO_DINH`: số tiền VND nguyên dương không vượt giá khởi điểm. Số tiền cọc được chụp vào phiên khi tạo, không thay các phiên trước đó. Mặc định đang tắt.
 
-`deposit/register` trả bản ghi cọc, HTTP 201; đăng ký lặp trả cùng bản ghi. `deposit` trả bản ghi của chính người gọi hoặc null. `deposit/pay` trả `{ket_qua_mo_phong, dat_coc}`; thanh toán thất bại vẫn HTTP 200, trạng thái `THAT_BAI`. Không truyền số tiền; server lấy từ phiên. Khóa yêu cầu 8–100 ký tự, giữ nguyên khi gửi lại cùng lần thử; lần thử mới đổi khóa. Phiên không yêu cầu cọc trả 409 ở API đăng ký/thanh toán cọc.
+`deposit/register` trả bản ghi cọc, HTTP 201; đăng ký lặp trả cùng bản ghi. `deposit` trả bản ghi của chính người gọi hoặc null. `deposit/pay` trả `{ket_qua_mo_phong, dat_coc}`; thanh toán thất bại vẫn HTTP 200, trạng thái `THAT_BAI`. Không truyền số tiền; server lấy từ phiên. Khóa yêu cầu 8–64 ký tự, giữ nguyên khi gửi lại cùng lần thử; lần thử mới đổi khóa. Phiên không yêu cầu cọc trả 409 ở API đăng ký/thanh toán cọc.
 
 Thống kê seller chỉ có `da_dang_ky`, `da_coc` (đang có cọc hợp lệ), `du_dieu_kien` (cọc hợp lệ, tài khoản hoạt động, vai trò người dùng và có địa chỉ). Không trả danh sách người cọc hoặc mức giá tối đa. Admin xem danh sách cọc phân trang qua `/admin/deposits`.
 
@@ -1001,3 +1003,45 @@ Hồ sơ riêng trả biên bản, serial và tệp cho Admin, chủ sản phẩ
 Đơn trả thêm `tien_coc_da_chuyen`, `so_tien_con_phai_thanh_toan`, `nguon_gui_hang`, `kiem_dinh_san_pham_id` và hồ sơ `kiem_dinh` khi có quyền. Đơn `TRUNG_TAM` dùng API shipping hiện có bằng token Admin; đơn `NGUOI_BAN` dùng token seller. Không gửi hàng khi chưa thu đủ.
 
 Lý do tranh chấp mới gồm `KHONG_KHOP_HO_SO_KIEM_DINH`, `NGHI_NGO_TINH_XAC_THUC`, `THIEU_PHU_KIEN` cùng các lý do thông thường đang hỗ trợ. Không nhận `HANG_GIA` mới; vẫn giữ/đọc dữ liệu lịch sử. Chi tiết tranh chấp có `ho_so_kiem_dinh` để đối chiếu, vẫn kiểm tra quyền theo đơn.
+
+## Hàng hoàn và chính sách phiên — 17/10/2026
+
+GET /api/deposit-policy trả bat, kieu, gia_tri và cho_phep_nguoi_ban_chon (tùy chọn, mặc định false). POST /api/auctions nhận thêm yeu_cau_dat_coc kiểu boolean; backend kiểm tra quyền lựa chọn theo chính sách Admin và chụp vào phiên.
+
+POST /api/orders/:id/returned-item nhận thao_tac. GET chi tiết đơn trả xu_ly_hang, thao_tac_hang, san_pham_id và ly_do_khong_gui_de_nghi. Chỉ hiển thị thao tác server cho phép, API vẫn kiểm tra quyền/trạng thái trong transaction:
+
+- KHOI_TAO, DUNG_THU_HOI: ghi_chu bắt buộc; chỉ Admin.
+- GUI_HOAN, TRA_NGUOI_BAN, GUI_LAI_NGUOI_MUA: don_vi_van_chuyen, ma_van_don, ghi_chu bắt buộc. Bên gửi hoàn phải đúng người giữ hàng; hai thao tác gửi từ trung tâm chỉ Admin.
+- NHAN_LAI: serial, so_kien (1–1000), ghi_chu; chỉ Admin.
+- KIEM_KE: serial, phu_kien, ghi_chu, ket_qua (NGUYEN_VEN/CAN_XU_LY/KHONG_KHOP); chỉ Admin.
+- THAT_LAC: ghi_chu ít nhất 30 ký tự; chỉ Admin, chỉ khi hàng ở ngoài trung tâm.
+- CHO_PHEP_BAN_LAI: chỉ Admin sau hủy/kiểm kê/duyệt kiểm định; XAC_NHAN_NHAN_LAI và DANG_KY_LAI chỉ đúng seller. ghi_chu tùy chọn.
+- XAC_NHAN_GIAO_LAI: đúng buyer hoặc Admin; ghi_chu tùy chọn. Xác nhận này chưa tự quyết toán tranh chấp.
+
+POST /api/orders/:id/disputes nhận thêm yeu_cau_huy=true cùng ly_do=KHAC để buyer yêu cầu hủy trước/đang giao khi đã thu đủ và tiền đang giữ. Chưa nhận hàng và hủy do đổi ý là hai nhánh riêng. Không cho chọn KHONG_KHOP_HO_SO_KIEM_DINH khi đơn thiếu hồ sơ. Chi tiết tranh chấp trả co_the_them_bang_chung để hỗ trợ cả xử lý hàng sau quyết toán cũ. Hoàn cho buyer mới cần biên bản kiểm kê hoặc căn cứ thất lạc; gọi quyết toán lần hai bị chặn.
+
+## Sau đấu giá — lý do chặn và nhắc việc
+
+- `GET /products/mine`: `co_the_tao_phien` nay gồm cả trạng thái duyệt, kiểm định và nghĩa vụ. Khi chưa tạo được, trả thêm `ly_do_khong_tao_phien`, `don_hang_lien_quan_id`, `phien_lien_quan_id`.
+- `GET /auctions/mine/:id`: thêm `ket_qua_sau_phien` (null khi phiên còn hiệu lực) gồm `don_hang`, `buoc_tiep_theo`, `co_the_dang_lai`, `ly_do_khong_dang_lai`. Không có thông tin người mua hoặc mức tối đa.
+- `POST /auctions` trả 409 kèm đúng lý do đang chặn khi sản phẩm còn nghĩa vụ.
+- Phiên có kết quả sẽ tự đóng yêu cầu hủy còn mở (`TU_CHOI`) và báo người bán. Phiên thất bại cũng báo người bán.
+- Người thắng bị hạn chế tài khoản: đơn được đánh dấu cần Admin xử lý. Hết hạn thanh toán vẫn hủy đơn nhưng không tự ghi vi phạm; cọc giữ để Admin quyết toán.
+- Tác vụ định kỳ nhắc Admin một lần với đơn hủy còn giữ cọc hoặc đã hoàn tiền nhưng chưa có hồ sơ thu hồi hàng.
+- Danh sách phiên của Admin, người bán, người mua và theo dõi giữ cả phiên có sản phẩm đã quay về chờ xử lý; chỉ danh sách công khai lọc sản phẩm đã duyệt.
+- `GET /orders/:id` thêm `tieu_de_san_pham`, `anh_san_pham`; với người bán của đơn hủy vì không thanh toán còn có `ung_vien_de_nghi` (`ma_cong_khai`, `gia`) để xem trước Cơ hội mua tiếp, null khi không gửi được.
+- `GET /disputes/:id` thêm `nguoi_mua_id`, `nguoi_ban_id` để giao diện gọi đúng vai trò. Sản phẩm xem bởi Admin có `ten_nguoi_ban`.
+- Người thắng phiên nhận thông báo `THANG_PHIEN` dẫn tới đơn.
+- `PUT /admin/config/INSPECTION_CENTER_ADDRESS` (chuỗi 10–500 ký tự) lưu địa chỉ trung tâm; `GET /inspections/:id` trả `dia_chi_trung_tam` (null khi chưa cấu hình).
+- `POST /auth/login` chỉ tính lần đăng nhập thất bại vào giới hạn 20 lần/15 phút; đăng ký có giới hạn riêng.
+
+## Ngoại lệ đơn và chi phí — phiên bản 3.2
+
+Làm rõ hoàn cọc: khi ket_qua=HOAN_NGUOI_MUA, bắt buộc thêm loai_ngoai_le (LOI_HE_THONG/LOI_BEN_BAN/SAI_THONG_TIN_PHIEN) và tham_chieu_bang_chung (6–200 ký tự). Không nhận DOI_Y hoặc thiếu chứng cứ tham chiếu. Nhánh BOI_HOAN_NGUOI_BAN chỉ nhận ket_qua và ly_do; không gửi các trường ngoại lệ của nhánh hoàn. Đây là quyết định thủ công sau khi Admin đã xác minh, không phải tự động xác minh chứng cứ qua mã nhập.
+
+- POST /api/admin/orders/:id/deposit-settlement: chỉ Admin, body ket_qua=BOI_HOAN_NGUOI_BAN hoặc HOAN_NGUOI_MUA và ly_do (20–1000 ký tự). Server quyết toán đúng cọc đã thu của đơn hủy vì không thanh toán; không nhận so_tien. Trả chi tiết đơn kèm quyet_toan_coc. Gọi lại cùng kết quả idempotent; kết quả khác 409.
+- POST /api/admin/orders/:id/clear-hold: chỉ Admin, body ly_do (20–1000 ký tự). Chỉ giải tỏa khi đã gửi/nhận, đang giữ đủ tiền, không tranh chấp/hàng hoàn và cả hai tài khoản hoạt động; không giải ngân hoặc đổi hạn. GET chi tiết đơn trả giai_toa_canh_bao và ly_do_chua_giai_toa cho Admin, co_the_quyet_toan_coc cho quyền quyết toán.
+- POST /api/orders/:id/returned-item với thao_tac=KET_LUAN_TRACH_NHIEM: chỉ Admin khi có hồ sơ hàng hoàn. Body ben_chiu_phi, phi_hoan, ben_boi_thuong, nguoi_nhan_boi_thuong, tien_boi_thuong, ghi_chu (30–5000 ký tự). Các bên: NGUOI_MUA/NGUOI_BAN/TRUNG_TAM/VAN_CHUYEN/KHONG_PHAT_SINH; bên nhận bồi thường không có VAN_CHUYEN. Tiền VND không âm, không có phần lẻ. Số tiền 0 phải chọn KHONG_PHAT_SINH; có tiền phải ghi đủ các bên khác nhau. Biên bản bất biến, gọi lặp cùng nội dung không ghi thêm.
+- Cùng API với thao_tac=DOI_SOAT_CHI_PHI: chỉ Admin, ma_chung_tu (6–150 ký tự), ghi_chu (20–5000 ký tự). Cần có kết luận với khoản phát sinh dương. Chỉ ghi chứng từ đối soát thủ công ngoài đơn; không cập nhật tiền escrow. Không dùng lại chứng từ để đổi quyết định.
+
+GET chi tiết đơn: xu_ly_hang.trach_nhiem và doi_soat_chi_phi cùng lịch sử; thao_tac_hang bao gồm hành động đối soát được phép cả sau khi tranh chấp kết thúc. GET /api/admin/deposits trả thêm quyet_toan_trong_don để phân biệt cọc chưa xử lý với đã bồi hoàn/hoàn ngoại lệ. Trạng thái cọc gốc không bị viết lại để mất liên kết đơn.

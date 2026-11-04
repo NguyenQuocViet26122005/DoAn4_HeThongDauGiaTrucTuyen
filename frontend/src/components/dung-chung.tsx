@@ -58,8 +58,8 @@ export function TrangThaiPhien({ phien }: { phien: Phien }) {
   return <TrangThai giaTri={phien.trang_thai} />;
 }
 
+// Theo quy tắc thiết kế: không đặt nhãn nhỏ phía trên tiêu đề; nhanNho giữ để tương thích nơi gọi.
 export function TieuDe({
-  nhanNho,
   ten,
   moTa,
   children,
@@ -72,7 +72,6 @@ export function TieuDe({
   return (
     <div className="tieu-de-trang">
       <div>
-        {nhanNho && <span className="nhan-nho">{nhanNho}</span>}
         <h1>{ten}</h1>
         {moTa && <p>{moTa}</p>}
       </div>

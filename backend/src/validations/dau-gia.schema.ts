@@ -3,6 +3,7 @@ import { dinhDanh, soTien, vanBan } from './schema-chung';
 
 export const taoPhienSchema = z.strictObject({
   san_pham_id: dinhDanh,
+  yeu_cau_dat_coc: z.boolean().optional(),
   gia_khoi_diem: soTien,
   gia_san: soTien.nullish(),
   gia_mua_ngay: soTien.nullish(),

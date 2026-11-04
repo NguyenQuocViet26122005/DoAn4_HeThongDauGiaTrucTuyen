@@ -35,6 +35,13 @@ function MuaNgay({
   return (
     <section className="khoi-tham-gia">
       <h2>Mua ngay</h2>
+      {!Number(phien.cho_phep_mua_ngay) && phien.gia_mua_ngay && (
+        <p className="chu-mo">
+          {phien.dat_gia_san && phien.tong_luot_tra_gia > 0
+            ? 'Mua ngay đã đóng vì phiên đã đạt điều kiện giá sàn hoặc đã có kết quả.'
+            : 'Mua ngay đã đóng sau lượt trả giá hợp lệ hoặc khi phiên kết thúc.'}
+        </p>
+      )}
       <p className="chu-mo">
         Không cần đặt cọc trước. Thanh toán thành công sẽ chốt phiên và tạo đơn chờ gửi hàng.
       </p>
@@ -179,9 +186,16 @@ function ThaoTacNguoiMua({ phien, nguoiDung }: { phien: Phien; nguoiDung: NguoiD
               <h2>Cọc tham gia · {tien(phien.so_tien_dat_coc)}</h2>
               <p className="chu-mo">
                 Cọc hợp lệ mới được trả giá. Người không thắng được hoàn cọc; cọc của người thắng
-                chuyển vào đơn. Không thanh toán đúng hạn có thể bị giữ cọc.
+                chuyển vào đơn. Bỏ thanh toán vì đổi ý, thiếu tiền hoặc quên hạn không được hoàn
+                cọc. Hoàn ngoại lệ phải có chứng cứ lỗi hệ thống, bên bán hoặc thông tin phiên sai
+                được Admin xác minh.
               </p>
-              {coc.data && <TrangThai giaTri={coc.data.trang_thai} />}
+              {coc.data &&
+                (coc.data.nhan_quyet_toan ? (
+                  <span>{coc.data.nhan_quyet_toan}</span>
+                ) : (
+                  <TrangThai giaTri={coc.data.trang_thai} />
+                ))}
               {coc.data?.ly_do_xu_ly && <p>{coc.data.ly_do_xu_ly}</p>}
               {loi && <Alert type="error" title={loi} />}
               {ketQuaCoc && (
@@ -204,40 +218,44 @@ function ThaoTacNguoiMua({ phien, nguoiDung }: { phien: Phien; nguoiDung: NguoiD
                   Đăng ký tham gia phiên
                 </Button>
               )}
-              <ThanhToanMoPhong
-                nguoiDungId={nguoiDung.id}
-                doiTuongId={phien.id}
-                loai="coc"
-                ten={coc.data?.trang_thai === 'DA_DAT_COC' ? 'Đã đặt cọc' : 'Thanh toán cọc'}
-                khoa={
-                  !diaChiNhan ||
-                  !conHieuLuc ||
-                  !coc.data ||
-                  !['CHO_THANH_TOAN', 'THAT_BAI'].includes(coc.data.trang_thai)
-                }
-                daXuLy={(phanHoi) => {
-                  datKetQuaCoc(phanHoi);
-                  void lamMoiThamGia(phien.id);
-                }}
-              >
-                <p>
-                  Tiền cọc: <strong>{tien(phien.so_tien_dat_coc)}</strong>
-                </p>
-                <p>Khoản cọc này dành riêng cho phiên #{phien.id}.</p>
-              </ThanhToanMoPhong>
+              {coc.data?.trang_thai !== 'DA_DAT_COC' && (
+                <ThanhToanMoPhong
+                  nguoiDungId={nguoiDung.id}
+                  doiTuongId={phien.id}
+                  loai="coc"
+                  ten="Thanh toán cọc"
+                  khoa={
+                    !diaChiNhan ||
+                    !conHieuLuc ||
+                    !coc.data ||
+                    !['CHO_THANH_TOAN', 'THAT_BAI'].includes(coc.data.trang_thai)
+                  }
+                  daXuLy={(phanHoi) => {
+                    datKetQuaCoc(phanHoi);
+                    void lamMoiThamGia(phien.id);
+                  }}
+                >
+                  <p>
+                    Tiền cọc: <strong>{tien(phien.so_tien_dat_coc)}</strong>
+                  </p>
+                  <p>Khoản cọc này dành riêng cho phiên #{phien.id}.</p>
+                </ThanhToanMoPhong>
+              )}
             </section>
           )}
           {!duCoc && conHieuLuc && (
             <Alert type="warning" title="Hoàn tất đặt cọc để mở thao tác trả giá" />
           )}
           <DatGia phien={phien} khoa={!duocMua || !duCoc} />
-          <MuaNgay
-            phien={phien}
-            coc={coc.data || null}
-            diaChi={diaChiNhan}
-            nguoiDung={nguoiDung}
-            khoa={!duocMua}
-          />
+          {phien.gia_mua_ngay && (
+            <MuaNgay
+              phien={phien}
+              coc={coc.data || null}
+              diaChi={diaChiNhan}
+              nguoiDung={nguoiDung}
+              khoa={!duocMua}
+            />
+          )}
         </div>
       </ChoDuLieu>
     </ChoDuLieu>

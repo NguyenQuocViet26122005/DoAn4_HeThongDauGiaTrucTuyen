@@ -14,6 +14,8 @@ export function lamMoiDon(id: string) {
     predicate: ({ queryKey }) =>
       queryKey[0] === '/orders' ||
       queryKey[0] === `/orders/${id}` ||
+      queryKey[0] === '/admin/deposits' ||
+      queryKey[0] === '/admin/statistics' ||
       queryKey[0] === '/admin/orders',
   });
 }

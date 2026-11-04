@@ -29,6 +29,10 @@ const thongBaoDaCo = (nguoiDungId, loai, lienKet) =>
     'SELECT id FROM thong_bao WHERE nguoi_dung_id = ? AND loai = ? AND duong_dan_lien_ket = ? LIMIT 1',
     [nguoiDungId, loai, lienKet],
   );
+const cacQuanTri = () =>
+  coSoDuLieu.truyVan(
+    "SELECT id FROM nguoi_dung WHERE vai_tro='QUAN_TRI' AND trang_thai_tai_khoan='HOAT_DONG'",
+  );
 const quyenXemBangChung = (duongDan, nguoiDungId) =>
   coSoDuLieu.layMot(
     `SELECT b.id FROM tep_dinh_kem b
@@ -56,6 +60,7 @@ export {
   cacBuocGia,
   luuBoBuocGia,
   thongBaoDaCo,
+  cacQuanTri,
   quyenXemBangChung,
   quyenXemKiemDinh,
 };

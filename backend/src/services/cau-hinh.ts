@@ -52,7 +52,48 @@ function buocGiaTaiMuc(gia: bigint, cacBanGhi: BuocGia[]) {
   return buocGia;
 }
 
+const KHOA_DIA_CHI_TRUNG_TAM = 'INSPECTION_CENTER_ADDRESS';
+
+// Địa chỉ nhận hàng kiểm định do Admin nhập; null khi chưa cấu hình (không tự đặt địa chỉ giả).
+async function diaChiTrungTam(): Promise<string | null> {
+  return (await khoDuLieu.cauHinh(KHOA_DIA_CHI_TRUNG_TAM))?.gia_tri_cau_hinh || null;
+}
+
 async function luu(quanTri: NguoiDungDangNhap, khoa, dauVao) {
+  if (khoa === KHOA_DIA_CHI_TRUNG_TAM) {
+    kiemTra.kiemTraNoiDung(dauVao, ['gia_tri_cau_hinh']);
+
+    const diaChi = kiemTra.chuoi(dauVao.gia_tri_cau_hinh, 'Địa chỉ trung tâm', 500);
+
+    baoDam(diaChi.length >= 10, 400, 'Địa chỉ trung tâm cần ít nhất 10 ký tự');
+
+    return coSoDuLieu.giaoDich(async () => {
+      await khoDuLieu.khoaCauHinh();
+
+      const banGhi = await khoDuLieu.cauHinh(khoa);
+      const duLieu = {
+        gia_tri_cau_hinh: diaChi,
+        kieu_du_lieu: 'CHUOI',
+        nguoi_cap_nhat_id: quanTri.id,
+      };
+
+      if (banGhi) {
+        await khoBanGhi.capNhat('cau_hinh_he_thong', banGhi.id, duLieu);
+      } else {
+        await khoBanGhi.them('cau_hinh_he_thong', {
+          ...duLieu,
+          khoa_cau_hinh: khoa,
+          mo_ta: 'Địa chỉ trung tâm nhận hàng kiểm định',
+        });
+      }
+
+      await ghiNhatKy(quanTri.id, 'DOI_DIA_CHI_TRUNG_TAM', 'cau_hinh_he_thong', banGhi?.id, {
+        khoa,
+      });
+
+      return khoDuLieu.cauHinh(khoa);
+    });
+  }
   if (khoa === 'DEPOSIT_POLICY') {
     kiemTra.kiemTraNoiDung(dauVao, ['gia_tri_cau_hinh']);
 
@@ -177,11 +218,23 @@ async function thayBoBuocGia(quanTri: NguoiDungDangNhap, dauVao) {
   });
 }
 
-async function chupChinhSachCoc(giaKhoiDiem: string) {
+async function chinhSachCoc() {
   const banGhi = await khoDuLieu.cauHinh('DEPOSIT_POLICY');
-  const chinhSach = kiemTra.docSchema(chinhSachCocSchema, docJSON(banGhi?.gia_tri_cau_hinh, {}));
 
-  if (!chinhSach.bat) {
+  return kiemTra.docSchema(chinhSachCocSchema, docJSON(banGhi?.gia_tri_cau_hinh, {}));
+}
+
+async function chupChinhSachCoc(giaKhoiDiem: string, yeuCau?: boolean) {
+  const chinhSach = await chinhSachCoc();
+
+  baoDam(chinhSach.bat || yeuCau !== true, 409, 'Admin đang tắt chính sách cọc');
+  baoDam(
+    !chinhSach.bat || chinhSach.cho_phep_nguoi_ban_chon || yeuCau !== false,
+    409,
+    'Chính sách hiện tại bắt buộc cọc, người bán không thể tắt',
+  );
+
+  if (!chinhSach.bat || (chinhSach.cho_phep_nguoi_ban_chon && yeuCau === false)) {
     return { yeu_cau_dat_coc: 0, so_tien_dat_coc: null };
   }
 
@@ -197,4 +250,12 @@ async function chupChinhSachCoc(giaKhoiDiem: string) {
   return { yeu_cau_dat_coc: 1, so_tien_dat_coc: chuoiTien(coc) };
 }
 
-export { docSoCauHinh, buocGiaTaiMuc, luu, thayBoBuocGia, chupChinhSachCoc };
+export {
+  docSoCauHinh,
+  buocGiaTaiMuc,
+  luu,
+  thayBoBuocGia,
+  chupChinhSachCoc,
+  chinhSachCoc,
+  diaChiTrungTam,
+};

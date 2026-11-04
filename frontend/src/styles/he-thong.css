@@ -1,0 +1,142 @@
+/*
+ * Hệ thống giao diện chung, nạp sau cùng để thống nhất mọi trang.
+ * Theo quy tắc Impeccable/Taste: font tự lưu trữ có tiếng Việt, một thang bo góc,
+ * một khoảng cách lưới, thanh bên dùng nền trung tính cho mục đang chọn,
+ * không dùng nhãn chữ hoa giãn cách phía trên tiêu đề.
+ */
+:root {
+  --chu-than: 'Be Vietnam Pro', 'Segoe UI', Arial, sans-serif;
+  --tieu-de: 'Cormorant Garamond', Georgia, serif;
+  --bo-the: 12px;
+  --bo-nut: 6px;
+  --khoang: 24px;
+  --nen-noi: #181a16;
+  --nen-chon: #262821;
+  font-family: var(--chu-than);
+}
+body,
+.ant-app {
+  font-family: var(--chu-than);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Tiêu đề: font có chân, nét vừa, khoảng chữ hơi khép. */
+h1,
+h2 {
+  font-family: var(--tieu-de);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+h1 {
+  font-size: clamp(34px, 3.4vw, 50px);
+  line-height: 1.12;
+}
+h2 {
+  font-size: 30px;
+  line-height: 1.2;
+}
+h3 {
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+p {
+  text-wrap: pretty;
+}
+
+/* Nhãn nhỏ còn lại dùng chữ thường, không giãn cách như con dấu trang trí. */
+.nhan-nho {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: lowercase;
+}
+.nhan-nho::first-letter {
+  text-transform: uppercase;
+}
+.duong-nhan {
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+/* Một thang bo góc cho mọi khối nội dung; viền là cách nâng khối duy nhất. */
+.tam-noi-dung,
+.khoi-cho,
+.trong,
+.thanh-ben,
+.the-phien,
+.anh-bia,
+.dong-san-pham-ban,
+.the-xac-thuc,
+.cau-chuyen-xac-thuc {
+  border-radius: var(--bo-the);
+}
+.tam-noi-dung {
+  background: var(--nen-noi);
+}
+.nut-vang,
+.nut-trong {
+  border-radius: var(--bo-nut);
+}
+
+/* Tiêu đề trang: tiêu đề và mô tả, thao tác nằm cùng hàng bên phải. */
+.tieu-de-trang {
+  margin-bottom: 28px;
+  align-items: flex-end;
+}
+.tieu-de-trang h1 {
+  margin: 0 0 8px;
+}
+.noi-dung-lam-viec .tieu-de-trang h1 {
+  font-size: 40px;
+}
+.tieu-de-trang p {
+  max-width: 68ch;
+}
+
+/* Thanh bên khu làm việc: hàng 36px, mục đang chọn là viên nền trung tính, chữ giữ màu thường. */
+.thanh-ben {
+  background: #151713;
+  padding: 20px 12px;
+}
+.thanh-ben nav {
+  gap: 2px;
+}
+.thanh-ben nav a {
+  min-height: 36px;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  color: var(--chu-phu);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.thanh-ben nav a:hover {
+  background: #1f211b;
+  color: var(--chu);
+}
+.thanh-ben nav a.active {
+  background: var(--nen-chon);
+  color: var(--chu);
+  font-weight: 500;
+}
+.thanh-ben nav a.active svg {
+  color: var(--vang);
+}
+
+/* Một khoảng cách lưới thống nhất cho khu làm việc. */
+.khung-lam-viec {
+  gap: 32px;
+}
+
+/* Bảng Ant Design: số liệu thẳng cột, đầu bảng chữ thường. */
+.ant-table {
+  font-variant-numeric: tabular-nums;
+}
+.ant-table-thead > tr > th {
+  font-weight: 500;
+  color: var(--chu-phu);
+}

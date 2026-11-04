@@ -20,9 +20,12 @@ export default function App() {
           colorText: '#eeeee7',
           colorTextSecondary: '#aaa99e',
           colorBorder: '#373a31',
-          borderRadius: 5,
+          borderRadius: 6,
           controlHeight: 42,
-          fontFamily: '"Segoe UI", Arial, sans-serif',
+          fontFamily: '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
+          fontSize: 14,
+          borderRadiusLG: 12,
+          colorBgElevated: '#1d1f1a',
         },
         components: {
           Button: {

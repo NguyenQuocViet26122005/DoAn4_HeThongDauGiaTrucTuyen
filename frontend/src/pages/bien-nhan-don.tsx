@@ -1,6 +1,6 @@
 import { Alert, Button, Descriptions } from 'antd';
 import { Link, useParams } from 'react-router-dom';
-import { ChoDuLieu, TieuDe, TrangThai } from '../components/dung-chung';
+import { AnhSanPham, ChoDuLieu, TieuDe, TrangThai } from '../components/dung-chung';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import type { DonHang } from '../types/don-hang';
 import { ngayGio, nhan, tien } from '../utils/dinh-dang';
@@ -8,6 +8,8 @@ import ThaoTacDonHang from '../components/thao-tac-don-hang';
 import GiaoHangVaHoTro from '../components/giao-hang-va-ho-tro';
 import TaoDeNghiMuaTiep from '../components/tao-de-nghi-mua-tiep';
 import DanhGiaDon from '../components/danh-gia-don';
+import XuLyHangHoan from '../components/xu-ly-hang-hoan';
+import XuLyNgoaiLeDon from '../components/xu-ly-ngoai-le-don';
 import { lamMoiDon } from '../services/don-hang';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 
@@ -31,7 +33,13 @@ export default function BienNhanDon({ khuVuc = 'tai-khoan' }: { khuVuc?: string 
         {don && (
           <div className="chi-tiet-don">
             <section className="tam-noi-dung thong-tin-don">
-              <h2>{don.ma_don_hang}</h2>
+              {don.tieu_de_san_pham && (
+                <Link className="san-pham-cua-don" to={`/phien/${don.phien_dau_gia_id}`}>
+                  <AnhSanPham src={don.anh_san_pham || null} ten={don.tieu_de_san_pham} />
+                  <strong>{don.tieu_de_san_pham}</strong>
+                </Link>
+              )}
+              <h2>Mã đơn {don.ma_don_hang}</h2>
               <TrangThai giaTri={don.trang_thai} />
               <Descriptions
                 column={1}
@@ -64,7 +72,10 @@ export default function BienNhanDon({ khuVuc = 'tai-khoan' }: { khuVuc?: string 
                   {
                     key: 'con-lai',
                     label: 'Còn phải thanh toán',
-                    children: tien(don.so_tien_con_phai_thanh_toan),
+                    children:
+                      don.trang_thai === 'DA_HUY'
+                        ? 'Đơn đã hủy · không thu thêm'
+                        : tien(don.so_tien_con_phai_thanh_toan),
                   },
                   {
                     key: 'dang-giu',
@@ -106,7 +117,7 @@ export default function BienNhanDon({ khuVuc = 'tai-khoan' }: { khuVuc?: string 
                 />
               )}
               {don.ly_do_huy && (
-                <Alert type="warning" title="Lý do hủy đơn" description={don.ly_do_huy} />
+                <Alert type="warning" title="Lý do hủy đơn" description={nhan(don.ly_do_huy)} />
               )}
               <Link className="link-vang" to={`/phien/${don.phien_dau_gia_id}`}>
                 Quay lại phiên đấu giá →
@@ -117,6 +128,8 @@ export default function BienNhanDon({ khuVuc = 'tai-khoan' }: { khuVuc?: string 
                 <ThaoTacDonHang key={`${don.id}:${nguoiDung?.id}`} don={don} />
               )}
               <GiaoHangVaHoTro key={`ho-tro:${don.id}:${nguoiDung?.id}`} don={don} />
+              <XuLyHangHoan don={don} />
+              <XuLyNgoaiLeDon don={don} />
               <TaoDeNghiMuaTiep don={don} />
               <DanhGiaDon don={don} />
             </div>

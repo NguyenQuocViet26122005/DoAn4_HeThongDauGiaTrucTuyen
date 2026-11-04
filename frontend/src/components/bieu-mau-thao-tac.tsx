@@ -90,7 +90,7 @@ export default function BieuMauThaoTac<T extends object>({
                 }
               }}
             >
-              {duLieu ? 'Sửa thông tin' : 'Đóng'}
+              {duLieu ? 'Quay lại' : 'Đóng'}
             </Button>
             <Button
               type="primary"

@@ -32,6 +32,10 @@ export function duocGuiHang(don: DonHang, nguoiDung: NguoiDung) {
 }
 
 export function lyDoDuocMo(don: DonHang, nguoiDung: NguoiDung, hienTai: number): string[] {
+  const cacLyDo = lyDoTranhChap.filter(
+    (lyDo) => lyDo !== 'KHONG_KHOP_HO_SO_KIEM_DINH' || !!don.kiem_dinh_san_pham_id,
+  );
+
   if (
     nguoiDung.trang_thai_tai_khoan !== 'HOAT_DONG' ||
     don.trang_thai_giu_tien !== 'DANG_GIU' ||
@@ -44,7 +48,7 @@ export function lyDoDuocMo(don: DonHang, nguoiDung: NguoiDung, hienTai: number):
     return ['CHO_GUI_HANG', 'DA_THANH_TOAN', 'DA_GUI_HANG', 'DA_GIAO', 'DANG_KIEM_TRA'].includes(
       don.trang_thai,
     )
-      ? lyDoTranhChap
+      ? cacLyDo
       : [];
   }
 
@@ -57,7 +61,7 @@ export function lyDoDuocMo(don: DonHang, nguoiDung: NguoiDung, hienTai: number):
     don.han_kiem_tra &&
     mocThoiGian(don.han_kiem_tra) > hienTai
   ) {
-    return lyDoTranhChap.filter((lyDo) => lyDo !== 'CHUA_NHAN_HANG');
+    return cacLyDo.filter((lyDo) => lyDo !== 'CHUA_NHAN_HANG');
   }
 
   return don.trang_thai === 'DA_GUI_HANG' &&

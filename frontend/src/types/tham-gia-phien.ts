@@ -14,6 +14,7 @@ export interface DiaChi {
 export type BieuMauDiaChi = Omit<DiaChi, 'id'>;
 
 export interface DatCoc {
+  nhan_quyet_toan?: string;
   id: string;
   so_tien: string;
   trang_thai: string;

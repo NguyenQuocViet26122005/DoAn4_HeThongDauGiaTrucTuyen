@@ -93,7 +93,42 @@ async function hoanTac(congViec) {
   }
 }
 
+async function thuHoiVaKiemKe(d, donId, ketQua = 'CAN_XU_LY') {
+  const hangHoan = require('../../dist/services/hang-hoan');
+  const donHang = require('../../dist/services/don-hang');
+  const don = await donHang.chiTiet(d.admin, donId);
+  const serial = don.kiem_dinh?.serial_khi_nhan || `KT-${donId}`;
+  let capNhat = await hangHoan.xuLy(d.admin, donId, {
+    thao_tac: 'KHOI_TAO',
+    ghi_chu: 'Thu hồi để đối chiếu trong kiểm thử',
+  });
+
+  if (capNhat.xu_ly_hang.trang_thai === 'CHO_THU_HOI') {
+    await hangHoan.xuLy(d.admin, donId, {
+      thao_tac: 'GUI_HOAN',
+      don_vi_van_chuyen: 'Vận chuyển kiểm thử',
+      ma_van_don: `HOAN-${donId}`,
+      ghi_chu: 'Đã bàn giao hàng hoàn',
+    });
+    await hangHoan.xuLy(d.admin, donId, {
+      thao_tac: 'NHAN_LAI',
+      serial,
+      so_kien: 1,
+      ghi_chu: 'Trung tâm thực nhận một kiện',
+    });
+  }
+
+  return hangHoan.xuLy(d.admin, donId, {
+    thao_tac: 'KIEM_KE',
+    ket_qua: ketQua,
+    serial,
+    phu_kien: 'Đã đối chiếu phụ kiện và hồ sơ gốc',
+    ghi_chu: 'Biên bản kiểm kê để xử lý giao dịch',
+  });
+}
+
 module.exports = {
+  thuHoiVaKiemKe,
   taoDuLieuKiemThu,
   sanPham,
   phienDauGia,

@@ -26,6 +26,14 @@ function TruongKiemDinh({ thaoTac, hoSo }: { thaoTac: string; hoSo: HoSoKiemDinh
   if (thaoTac === 'shipping') {
     return (
       <>
+        <Alert
+          type="info"
+          title="Gửi hàng đến"
+          description={
+            hoSo.dia_chi_trung_tam ||
+            'Admin chưa cấu hình địa chỉ trung tâm. Vui lòng liên hệ Admin trước khi gửi hàng.'
+          }
+        />
         <Form.Item name="don_vi_van_chuyen" label="Đơn vị vận chuyển" rules={batBuoc}>
           <Input maxLength={100} />
         </Form.Item>

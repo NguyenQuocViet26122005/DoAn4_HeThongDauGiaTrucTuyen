@@ -1,3 +1,4 @@
+import SoChuyenDong from '../components/so-chuyen-dong';
 import { Button } from 'antd';
 import { BieuDoTrangThai } from '../components/bieu-do-tong-quan';
 import '../styles/tong-quan-quan-tri.css';
@@ -46,11 +47,12 @@ export default function TongQuanQuanTri() {
           {cacNhom.slice(0, 4).map(([khoa, ten, duongDan]) => (
             <Link key={khoa} to={`/quan-tri/${duongDan}`}>
               <span>{ten}</span>
-              <strong>
-                {(truyVan.data?.[khoa] ?? [])
-                  .reduce((tong, dong) => tong + Number(dong.so_luong || 0), 0)
-                  .toLocaleString('vi-VN')}
-              </strong>
+              <SoChuyenDong
+                giaTri={(truyVan.data?.[khoa] ?? []).reduce(
+                  (tong, dong) => tong + Number(dong.so_luong || 0),
+                  0,
+                )}
+              />
               <small>Tất cả trạng thái ↗</small>
             </Link>
           ))}

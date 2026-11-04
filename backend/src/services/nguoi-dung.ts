@@ -95,7 +95,8 @@ async function capNhatHoSo(nguoiDung: NguoiDungDangNhap, dauVao) {
     duLieu.ho_ten = kiemTra.chuoi(dauVao.ho_ten, 'Họ tên', 100);
   }
   if (dauVao.so_dien_thoai !== undefined) {
-    duLieu.so_dien_thoai = kiemTra.soDienThoai(dauVao.so_dien_thoai);
+    duLieu.so_dien_thoai =
+      dauVao.so_dien_thoai === null ? null : kiemTra.soDienThoai(dauVao.so_dien_thoai);
   }
   if (dauVao.anh_dai_dien !== undefined) {
     await require('./tai-tep').kiemTraTepSoHuu(dauVao.anh_dai_dien, 'avatar', nguoiDung.id);

@@ -16,6 +16,7 @@
     "du-lieu:demo": "npm run build && node scripts/du-lieu-demo-vietbid.js",
     "du-lieu:demo:verify": "npm run build && node scripts/du-lieu-demo-vietbid.js --verify",
     "check:schema": "node scripts/kiem-tra-cau-truc.js",
+    "migrate:hang-hoan": "npm run build && node ../co-so-du-lieu/cong-cu/nang-cap-hang-hoan.cjs",
     "build": "tsc -p tsconfig.json",
     "pretest": "npm run build",
     "pretest:integration": "npm run build",

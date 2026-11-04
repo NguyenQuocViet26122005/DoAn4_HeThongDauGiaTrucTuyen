@@ -100,6 +100,7 @@ CREATE TABLE `danh_muc` (
 
 CREATE TABLE `san_pham` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `san_pham_goc_id` bigint unsigned DEFAULT NULL,
   `nguoi_ban_id` bigint unsigned NOT NULL,
   `danh_muc_id` bigint unsigned NOT NULL,
   `tieu_de` varchar(200) NOT NULL,
@@ -130,6 +131,7 @@ CREATE TABLE `san_pham` (
   KEY `idx_product_seller` (`nguoi_ban_id`),
   KEY `idx_product_category` (`danh_muc_id`),
   KEY `idx_product_approval` (`trang_thai_duyet`),
+  CONSTRAINT `fk_san_pham_dang_lai` FOREIGN KEY (`san_pham_goc_id`) REFERENCES `san_pham` (`id`),
   CONSTRAINT `ck_san_pham_kiem_dinh` CHECK ((`bat_buoc_kiem_dinh` in (0,1))),
   CONSTRAINT `ck_san_pham_thuoc_tinh` CHECK (((`thuoc_tinh_json` is null)
     or (json_type(`thuoc_tinh_json`) = _utf8mb4'OBJECT')))
@@ -336,6 +338,7 @@ CREATE TABLE `dat_coc_dau_gia` (
 
 CREATE TABLE `don_hang` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `xu_ly_hang` json DEFAULT NULL,
   `ma_don_hang` varchar(30) NOT NULL,
   `phien_dau_gia_id` bigint unsigned NOT NULL,
   `nguoi_mua_id` bigint unsigned NOT NULL,

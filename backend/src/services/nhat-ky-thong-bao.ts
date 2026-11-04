@@ -43,4 +43,10 @@ async function thongBaoMotLan(nguoiDungId, loai, tieuDe, noiDung, lienKet) {
   return taoThongBao(nguoiDungId, loai, tieuDe, noiDung, lienKet);
 }
 
-export { ghiNhatKy, taoThongBao, thongBaoMotLan };
+async function thongBaoQuanTri(loai, tieuDe, noiDung, lienKet) {
+  for (const quanTri of await khoDuLieu.cacQuanTri()) {
+    await thongBaoMotLan(quanTri.id, loai, tieuDe, noiDung, lienKet);
+  }
+}
+
+export { ghiNhatKy, taoThongBao, thongBaoMotLan, thongBaoQuanTri };

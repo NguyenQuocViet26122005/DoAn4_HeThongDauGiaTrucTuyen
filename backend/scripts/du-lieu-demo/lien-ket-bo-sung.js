@@ -431,6 +431,42 @@ async function cacCauChuyen(manifest) {
     }),
   );
   await luc('2026-10-05 09:00:00', () => tranhChap.tiepNhan(admin, tc.id));
+
+  const hangHoan = require('../../dist/services/hang-hoan');
+  const donThuHoi = await donHang.chiTiet(admin, d3.id);
+  const serialThuHoi = donThuHoi.kiem_dinh?.serial_khi_nhan || 'SP-131';
+
+  await luc('2026-10-05 09:30:00', () =>
+    hangHoan.xuLy(admin, d3.id, {
+      thao_tac: 'KHOI_TAO',
+      ghi_chu: 'Thu hồi về trung tâm để đối chiếu phụ kiện',
+    }),
+  );
+  await luc('2026-10-05 10:00:00', () =>
+    hangHoan.xuLy(actor(1217), d3.id, {
+      thao_tac: 'GUI_HOAN',
+      don_vi_van_chuyen: 'Vận chuyển hàng giá trị cao',
+      ma_van_don: 'VB-HOAN-131',
+      ghi_chu: 'Người mua bàn giao hàng hoàn',
+    }),
+  );
+  await luc('2026-10-05 11:00:00', () =>
+    hangHoan.xuLy(admin, d3.id, {
+      thao_tac: 'NHAN_LAI',
+      serial: serialThuHoi,
+      so_kien: 1,
+      ghi_chu: 'Đã nhận lại đúng kiện tại trung tâm',
+    }),
+  );
+  await luc('2026-10-05 12:00:00', () =>
+    hangHoan.xuLy(admin, d3.id, {
+      thao_tac: 'KIEM_KE',
+      serial: serialThuHoi,
+      ket_qua: 'CAN_XU_LY',
+      phu_kien: 'Đối chiếu biên bản xác nhận thiếu phụ kiện',
+      ghi_chu: 'Hàng cần trả người bán để bổ sung',
+    }),
+  );
   await luc('2026-10-05 15:00:00', () =>
     tranhChap.giaiQuyet(admin, tc.id, {
       ket_qua: 'NGUOI_MUA',

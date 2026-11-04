@@ -3,35 +3,21 @@ import coSoDuLieu = require('./ket-noi');
 import khoBanGhi = require('./ban-ghi');
 import { docJSON } from '../utils/du-lieu-json';
 import { baoDam, batBuocTonTai, cungId } from '../utils/loi';
+import { dieuKienKhongConNghiaVu } from './nghia-vu-san-pham';
 
 const danhSachDanhMuc = (tatCa = false) =>
   coSoDuLieu.truyVan(
     `SELECT * FROM danh_muc ${tatCa ? '' : 'WHERE dang_hoat_dong=1'} ORDER BY thu_tu,id`,
   );
 
-const dieuKienDuocTaoPhien = (maBang = 'p') => `
-  NOT EXISTS (
-    SELECT 1 FROM phien_dau_gia a
-    WHERE a.san_pham_id=${maBang}.id AND a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG')
-  )
-  AND NOT EXISTS (
-    SELECT 1 FROM phien_dau_gia a
-    WHERE a.san_pham_id=${maBang}.id
-      AND a.trang_thai IN ('DA_KET_THUC','THAT_BAI')
-      AND a.ly_do_ket_thuc IN ('CO_NGUOI_THANG','MUA_NGAY')
-      AND NOT EXISTS (SELECT 1 FROM don_hang d WHERE d.phien_dau_gia_id=a.id)
-  )
-  AND NOT EXISTS (
-    SELECT 1 FROM phien_dau_gia a
-    JOIN don_hang d ON d.phien_dau_gia_id=a.id
-    WHERE a.san_pham_id=${maBang}.id
-      AND (d.trang_thai<>'DA_HUY' OR COALESCE(d.ly_do_huy,'')<>'KHONG_THANH_TOAN')
-  )
-  AND NOT EXISTS (
-    SELECT 1 FROM phien_dau_gia a
-    JOIN de_nghi_mua_tiep_theo n ON n.phien_dau_gia_id=a.id
-    WHERE a.san_pham_id=${maBang}.id AND n.trang_thai IN ('CHO_XU_LY','DA_CHAP_NHAN')
-  )`;
+const dieuKienDuocTaoPhien = dieuKienKhongConNghiaVu;
+const DU_DIEU_KIEN_KIEM_DINH = `(p.bat_buoc_kiem_dinh=0 OR EXISTS (
+        SELECT 1 FROM kiem_dinh_san_pham k WHERE k.san_pham_id=p.id
+          AND k.lan_kiem_dinh=(SELECT MAX(m.lan_kiem_dinh) FROM kiem_dinh_san_pham m WHERE m.san_pham_id=p.id)
+          AND k.ket_qua='DAT' AND k.trang_thai='DANG_LUU_GIU' AND k.ngay_roi_trung_tam IS NULL
+          AND EXISTS (SELECT 1 FROM tep_dinh_kem t WHERE t.kiem_dinh_san_pham_id=k.id
+            AND t.loai_tep='BAO_CAO_KIEM_DINH')
+      ))`;
 
 const sanPhamDuocTaoPhien = (id) =>
   coSoDuLieu.layMot(`SELECT p.id FROM san_pham p WHERE p.id=? AND ${dieuKienDuocTaoPhien()}`, [id]);
@@ -175,17 +161,7 @@ function danhSachSanPham(
   }
 
   if (duDieuKienDauGia) {
-    dk.push(
-      "p.trang_thai_duyet='DA_DUYET'",
-      dieuKienDuocTaoPhien(),
-      `(p.bat_buoc_kiem_dinh=0 OR EXISTS (
-        SELECT 1 FROM kiem_dinh_san_pham k WHERE k.san_pham_id=p.id
-          AND k.lan_kiem_dinh=(SELECT MAX(m.lan_kiem_dinh) FROM kiem_dinh_san_pham m WHERE m.san_pham_id=p.id)
-          AND k.ket_qua='DAT' AND k.trang_thai='DANG_LUU_GIU' AND k.ngay_roi_trung_tam IS NULL
-          AND EXISTS (SELECT 1 FROM tep_dinh_kem t WHERE t.kiem_dinh_san_pham_id=k.id
-            AND t.loai_tep='BAO_CAO_KIEM_DINH')
-      ))`,
-    );
+    dk.push("p.trang_thai_duyet='DA_DUYET'", dieuKienDuocTaoPhien(), DU_DIEU_KIEN_KIEM_DINH);
   }
 
   return coSoDuLieu.truyVan(
@@ -193,7 +169,8 @@ function danhSachSanPham(
     p.tinh_trang_san_pham,p.thuong_hieu,p.trang_thai_duyet,p.ngay_tao,
     ${
       sellerId
-        ? `(${dieuKienDuocTaoPhien()}) AS co_the_tao_phien,
+        ? `(p.trang_thai_duyet='DA_DUYET' AND ${DU_DIEU_KIEN_KIEM_DINH} AND ${dieuKienDuocTaoPhien()}) AS co_the_tao_phien,
+      p.bat_buoc_kiem_dinh,
       EXISTS (SELECT 1 FROM phien_dau_gia cu WHERE cu.san_pham_id=p.id) AS da_tung_dau_gia,`
         : ''
     }

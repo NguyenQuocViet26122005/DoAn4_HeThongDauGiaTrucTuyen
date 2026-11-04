@@ -19,7 +19,7 @@ export function docLanThanhToan(ten: string): LanThanhToan | null {
     !('khoa_yeu_cau' in lan) ||
     !('ket_qua_mo_phong' in lan) ||
     typeof lan.khoa_yeu_cau !== 'string' ||
-    !/^[a-zA-Z0-9_-]{8,100}$/.test(lan.khoa_yeu_cau) ||
+    !/^[a-zA-Z0-9_-]{8,64}$/.test(lan.khoa_yeu_cau) ||
     !['THANH_CONG', 'THAT_BAI'].includes(String(lan.ket_qua_mo_phong))
   ) {
     throw new Error(

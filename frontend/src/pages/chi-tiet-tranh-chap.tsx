@@ -8,8 +8,10 @@ import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { lamMoiTranhChap, xuLyTranhChap } from '../services/tranh-chap';
 import { tranhChapDangMo } from '../utils/giao-hang-tranh-chap';
 import { ngayGio, nhan, tien } from '../utils/dinh-dang';
+import { vaiTroGiaoDich } from '../utils/vai-tro-giao-dich';
 import type { ChiTietTranhChap } from '../types/tranh-chap';
 import type { DonHang } from '../types/don-hang';
+import XuLyHangHoan from '../components/xu-ly-hang-hoan';
 
 function NoiDungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap }) {
   const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
@@ -47,7 +49,7 @@ function NoiDungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap }) {
             {
               key: 'nguoi',
               label: 'Người mở',
-              children: `Tài khoản #${hoSo.nguoi_mo_id}`,
+              children: vaiTroGiaoDich(hoSo.nguoi_mo_id, hoSo, nguoiDung?.id),
             },
             {
               key: 'xong',
@@ -109,6 +111,14 @@ function NoiDungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap }) {
                   type="info"
                   title="Tiền được giữ trong thời gian xem xét"
                   description="Việc gửi phản hồi hoặc bằng chứng không tự hoàn tiền hay giải ngân."
+                />
+              )}
+              {dangMo && quanTri && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  title="Hoàn tiền cần có kết quả xử lý hàng"
+                  description="Thực hiện phần Thu hồi, kiểm kê & bán lại bên dưới. Hàng chưa về hoặc không khớp nhận dạng chưa đủ điều kiện hoàn tiền; thất lạc phải có căn cứ. Hàng đã gửi ra ngoài cần kiểm định mới trước khi bán lại."
                 />
               )}
               {dangMo && laNguoiBan && (
@@ -211,6 +221,7 @@ function NoiDungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap }) {
         </ChoDuLieu>
       </section>
       <BangChungTranhChap key={hoSo.id} hoSo={hoSo} />
+      {don.data && <XuLyHangHoan don={don.data} />}
       {hoSoKiemDinh && (
         <section className="tam-noi-dung">
           <h2>Hồ sơ kiểm định liên quan</h2>

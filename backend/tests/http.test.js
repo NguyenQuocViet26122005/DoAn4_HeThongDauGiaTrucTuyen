@@ -4,6 +4,7 @@ const http = require('node:http');
 const ungDung = require('../dist/ung-dung');
 const { dongKetNoiMotLan } = require('./helpers/dong-ket-noi');
 const { nhanDangLoaiTep } = require('../dist/services/tai-tep');
+const { xuLyLoi } = require('../dist/middlewares/xu-ly-loi');
 let mayChu;
 let diaChiGoc;
 
@@ -60,6 +61,55 @@ kiemThu('Không có route thì trả 404 và CORS chặn nguồn lạ', async ()
     (await fetch(`${diaChiGoc}/`, { headers: { Origin: 'https://unknown.invalid' } })).status,
     403,
   );
+});
+
+kiemThu('Lỗi trigger trả 409 và không lộ nội dung SIGNAL', () => {
+  let ketQua;
+  const phanHoi = {
+    headersSent: false,
+    status(ma) {
+      ketQua = { ma };
+
+      return this;
+    },
+    json(noiDung) {
+      ketQua.noiDung = noiDung;
+    },
+  };
+
+  xuLyLoi(
+    Object.assign(new Error('Coc khong khop phien'), { code: 'ER_SIGNAL_EXCEPTION' }),
+    {},
+    phanHoi,
+    () => {},
+  );
+  xacNhan.equal(ketQua.ma, 409);
+  xacNhan.ok(!ketQua.noiDung.message.includes('Coc khong khop'));
+});
+
+kiemThu('Giới hạn đăng nhập chỉ đếm lần thất bại', async () => {
+  const gioiHan = require('../dist/middlewares/gioi-han-yeu-cau')({
+    limit: 2,
+    windowMs: 60000,
+    chiDemLoi: true,
+  });
+  const { EventEmitter } = require('node:events');
+  const goi = (maTrangThai) =>
+    new Promise((xong) => {
+      const phanHoi = Object.assign(new EventEmitter(), { statusCode: maTrangThai, set() {} });
+
+      gioiHan({ ip: '10.0.0.9' }, phanHoi, (loi) => {
+        phanHoi.emit('finish');
+        xong(loi?.status ?? 200);
+      });
+    });
+
+  for (let i = 0; i < 5; i++) {
+    xacNhan.equal(await goi(200), 200);
+  }
+  xacNhan.equal(await goi(401), 200);
+  xacNhan.equal(await goi(401), 200);
+  xacNhan.equal(await goi(401), 429);
 });
 
 kiemThu('Upload kiểm tra dấu hiệu nội dung, không chỉ tin phần mở rộng', () => {

@@ -27,10 +27,12 @@ const thongKe = (phienId) =>
 
 const danhSach = ({ limit, offset }) =>
   coSoDuLieu.truyVan(
-    `SELECT c.*, a.trang_thai AS trang_thai_phien,
+    `SELECT c.*, d.trang_thai_giu_tien AS quyet_toan_trong_don,
+            a.trang_thai AS trang_thai_phien,
             a.thoi_gian_ket_thuc AS thoi_gian_ket_thuc_phien
      FROM dat_coc_dau_gia c
      JOIN phien_dau_gia a ON a.id = c.phien_dau_gia_id
+     LEFT JOIN don_hang d ON d.id=c.don_hang_id
      ORDER BY c.id DESC LIMIT ${limit} OFFSET ${offset}`,
   );
 

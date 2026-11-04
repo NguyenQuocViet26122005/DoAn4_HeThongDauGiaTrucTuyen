@@ -35,5 +35,6 @@ export const chinhSachCocSchema = z
     bat: z.boolean(),
     kieu: z.enum(['TY_LE', 'CO_DINH']),
     gia_tri: z.number().int().positive().max(9999999999999),
+    cho_phep_nguoi_ban_chon: z.boolean().optional(),
   })
   .refine((d) => d.kieu !== 'TY_LE' || d.gia_tri <= 100, 'Tỷ lệ cọc phải từ 1 đến 100 phần trăm');

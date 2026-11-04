@@ -1,4 +1,4 @@
-import { Alert, Button, Form, InputNumber, Select, Switch } from 'antd';
+import { Alert, Button, Form, Input, InputNumber, Select, Switch } from 'antd';
 import BieuMauThaoTac from '../components/bieu-mau-thao-tac';
 import { ChoDuLieu, TieuDe } from '../components/dung-chung';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
@@ -10,6 +10,7 @@ interface CauHinh {
 }
 interface ChinhSachCoc {
   bat: boolean;
+  cho_phep_nguoi_ban_chon?: boolean;
   kieu: 'TY_LE' | 'CO_DINH';
   gia_tri: number;
 }
@@ -32,6 +33,7 @@ const cacThoiHan: [string, string, number][] = [
 async function lamMoi() {
   await Promise.all([
     boNho.invalidateQueries({ queryKey: ['/admin/config'] }),
+    boNho.invalidateQueries({ queryKey: ['/deposit-policy'] }),
     boNho.invalidateQueries({ queryKey: ['/bid-increments'] }),
   ]);
 }
@@ -92,6 +94,14 @@ function CauHinhCoc({ giaTri }: { giaTri: string | undefined }) {
               { value: 'CO_DINH', label: 'Số tiền cố định (đồng)' },
             ]}
           />
+        </Form.Item>
+        <Form.Item
+          name="cho_phep_nguoi_ban_chon"
+          label="Cho người bán chọn bật/tắt cọc từng phiên"
+          valuePropName="checked"
+          extra="Khi chính sách cọc bật: tắt lựa chọn này nghĩa là bắt buộc cọc. Chỉ áp dụng phiên tạo sau khi lưu."
+        >
+          <Switch />
         </Form.Item>
         <Form.Item
           name="gia_tri"
@@ -227,6 +237,40 @@ function CauHinhBuocGia() {
   );
 }
 
+function CauHinhDiaChiTrungTam({ giaTri }: { giaTri: string | undefined }) {
+  return (
+    <section className="tam-noi-dung">
+      <h2>Địa chỉ trung tâm kiểm định</h2>
+      <p>{giaTri || 'Chưa cấu hình. Người bán sẽ được nhắc liên hệ Admin trước khi gửi hàng.'}</p>
+      <BieuMauThaoTac<{ gia_tri_cau_hinh: string }>
+        key={giaTri}
+        ten="Sửa địa chỉ trung tâm"
+        banDau={{ gia_tri_cau_hinh: giaTri || '' }}
+        xacNhan={(muc) => <p>Người bán sẽ gửi hàng kiểm định đến: {muc.gia_tri_cau_hinh}</p>}
+        onGui={async (muc) => {
+          await gui('/admin/config/INSPECTION_CENTER_ADDRESS', muc, 'put');
+          await lamMoi();
+        }}
+      >
+        <Form.Item
+          name="gia_tri_cau_hinh"
+          label="Địa chỉ nhận hàng, người nhận và số điện thoại"
+          rules={[
+            {
+              required: true,
+              whitespace: true,
+              min: 10,
+              max: 500,
+            },
+          ]}
+        >
+          <Input.TextArea rows={3} maxLength={500} showCount />
+        </Form.Item>
+      </BieuMauThaoTac>
+    </section>
+  );
+}
+
 export default function CauHinhHeThong() {
   const truyVan = useDuLieu<CauHinh[]>('/admin/config');
 
@@ -246,6 +290,12 @@ export default function CauHinhHeThong() {
             <CauHinhCoc
               giaTri={
                 truyVan.data.find((muc) => muc.khoa_cau_hinh === 'DEPOSIT_POLICY')?.gia_tri_cau_hinh
+              }
+            />
+            <CauHinhDiaChiTrungTam
+              giaTri={
+                truyVan.data.find((muc) => muc.khoa_cau_hinh === 'INSPECTION_CENTER_ADDRESS')
+                  ?.gia_tri_cau_hinh
               }
             />
             <section className="tam-noi-dung">

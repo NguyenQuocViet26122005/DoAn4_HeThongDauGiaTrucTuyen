@@ -15,7 +15,7 @@ export default function SuaHoSo({ nguoiDung }: { nguoiDung: NguoiDung }) {
       xacNhan={(duLieu) => (
         <>
           <p>Họ tên: {duLieu.ho_ten}</p>
-          <p>Điện thoại: {duLieu.so_dien_thoai || 'Giữ nguyên'}</p>
+          <p>Điện thoại: {duLieu.so_dien_thoai?.trim() || 'Không có'}</p>
         </>
       )}
       onGui={async (duLieu) => {
@@ -23,7 +23,7 @@ export default function SuaHoSo({ nguoiDung }: { nguoiDung: NguoiDung }) {
           '/users/me',
           {
             ho_ten: duLieu.ho_ten,
-            ...(duLieu.so_dien_thoai ? { so_dien_thoai: duLieu.so_dien_thoai } : {}),
+            so_dien_thoai: duLieu.so_dien_thoai?.trim() || null,
           },
           'patch',
         );
@@ -48,7 +48,7 @@ export default function SuaHoSo({ nguoiDung }: { nguoiDung: NguoiDung }) {
       <Form.Item
         name="so_dien_thoai"
         label="Số điện thoại"
-        rules={[{ pattern: /^\+?[0-9\s.-]{8,20}$/, message: 'Số điện thoại không hợp lệ' }]}
+        rules={[{ pattern: /^\+?[0-9 ()-]{8,20}$/, message: 'Số điện thoại không hợp lệ' }]}
       >
         <Input maxLength={20} autoComplete="tel" />
       </Form.Item>

@@ -43,6 +43,9 @@ kiemThu(
           }),
           { status: 400 },
         );
+        if (hoanToanBo) {
+          await require('../helpers/du-lieu-mau').thuHoiVaKiemKe(duLieu, donHang.id);
+        }
         await cacTranhChap.giaiQuyet(duLieu.admin, tranhChap.id, {
           ket_qua: hoanToanBo ? 'NGUOI_MUA' : 'NGUOI_BAN',
           so_tien_hoan: hoanToanBo ? '24000000' : '0',

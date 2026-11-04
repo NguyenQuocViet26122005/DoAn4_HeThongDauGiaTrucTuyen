@@ -50,8 +50,10 @@ const yeuCauHuyMoiNhat = (id) =>
   );
 
 function danhSach({ limit: gioiHan, offset: viTriBatDau }: PhanTrang, boLoc: BoLocDanhSach = {}) {
-  const dieuKienLoc = ['p.trang_thai_duyet = ?'];
-  const thamSo: unknown[] = ['DA_DUYET'];
+  // Chỉ danh sách công khai ẩn sản phẩm chưa duyệt; Admin, người bán và người mua vẫn
+  // cần thấy lịch sử phiên khi sản phẩm quay về chờ xử lý sau hàng hoàn hoặc đăng lại.
+  const dieuKienLoc = boLoc.chiDanhMucDangHoatDong ? ["p.trang_thai_duyet='DA_DUYET'"] : ['1=1'];
+  const thamSo: unknown[] = [];
 
   if (boLoc.status) {
     dieuKienLoc.push('a.trang_thai=?');

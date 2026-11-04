@@ -1,5 +1,15 @@
-import { useEffect, useState } from 'react';
-import { Alert, Button, Input, Select } from 'antd';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useHoTro3D } from '../hooks/ho-tro-3d';
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+// Tải lười để trang khác không phải mang thư viện 3D.
+const Bia3D = lazy(() => import('../components/bia-3d'));
+import { Alert, Button, Select } from 'antd';
+import OTimKiem from '../components/o-tim-kiem';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { DanhMuc, Phien } from '../types/du-lieu';
 import {
@@ -49,6 +59,8 @@ export function ThePhien({ phien }: { phien: Phien }) {
 }
 
 export function TrangChu() {
+  const bia = useRef<HTMLElement>(null);
+  const hoTro3D = useHoTro3D();
   const [hienTai, datHienTai] = useState(Date.now);
   const phienDangDienRa = useDuLieu<Phien[]>(
     '/auctions',
@@ -89,6 +101,56 @@ export function TrangChu() {
     (danhMuc.isError && !danhMuc.data);
   const dangTaiLai = phienDangDienRa.isFetching || phienSapDienRa.isFetching || danhMuc.isFetching;
 
+  // Một chuyển động mở màn duy nhất: các dòng chữ trồi lên lần lượt; tắt khi giảm chuyển động.
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        gsap.from('.hien-dan', {
+          yPercent: 110,
+          opacity: 0,
+          duration: 1.1,
+          ease: 'expo.out',
+          stagger: 0.09,
+          delay: 0.15,
+        });
+      });
+
+      return () => mm.revert();
+    },
+    { scope: bia },
+  );
+
+  // Thẻ phiên và danh mục trồi nhẹ lên khi cuộn tới; chạy lại khi dữ liệu thẻ thay đổi.
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        ScrollTrigger.batch('.khu-vuc .the-phien, .luoi-danh-muc > *, .cac-buoc > *', {
+          start: 'top 92%',
+          once: true,
+          onEnter: (cacPhanTu) =>
+            gsap.from(cacPhanTu, {
+              y: 28,
+              opacity: 0,
+              duration: 0.9,
+              ease: 'expo.out',
+              stagger: 0.08,
+              clearProps: 'transform,opacity',
+            }),
+        });
+      });
+
+      return () => mm.revert();
+    },
+    {
+      dependencies: [cacPhienDangDienRa.length, cacPhienSapDienRa.length, danhMuc.data?.length],
+      revertOnUpdate: true,
+    },
+  );
+
   function taiLaiNoiDung() {
     void Promise.all([phienDangDienRa.refetch(), phienSapDienRa.refetch(), danhMuc.refetch()]);
   }
@@ -103,26 +165,36 @@ export function TrangChu() {
     <>
       <div className="khung">
         <section
-          className="anh-bia"
-          style={{
-            backgroundImage: `linear-gradient(90deg, rgba(10,11,10,.45), transparent), url(${anhBia})`,
-          }}
+          ref={bia}
+          className={`anh-bia ${hoTro3D.coThe ? 'anh-bia-3d' : ''}`}
+          style={
+            hoTro3D.coThe
+              ? undefined
+              : {
+                  backgroundImage: `linear-gradient(90deg, rgba(10,11,10,.45), transparent), url(${anhBia})`,
+                }
+          }
         >
+          {hoTro3D.coThe && (
+            <Suspense fallback={null}>
+              <Bia3D dienThoai={hoTro3D.dienThoai} />
+            </Suspense>
+          )}
           <div className="noi-dung-bia">
-            <span className="nhan-nho">
-              <span className="duong-nhan" /> MỖI MÓN ĐỒ, MỘT GIÁ TRỊ
-            </span>
             <h1>
-              Giá trị xứng tầm.
-              <br />
-              <em>Cơ hội trong tầm tay.</em>
+              <span className="dong-chu">
+                <span className="hien-dan">Giá trị xứng tầm.</span>
+              </span>
+              <span className="dong-chu">
+                <em className="hien-dan">Cơ hội trong tầm tay.</em>
+              </span>
             </h1>
-            <p>
+            <p className="hien-dan">
               Khám phá những món đồ đáng sở hữu.
               <br />
               Đặt giá theo cách của bạn, an tâm trên từng bước.
             </p>
-            <div className="nhom-nut">
+            <div className="nhom-nut hien-dan">
               <Link className="nut-vang" to="/kham-pha">
                 Khám phá đấu giá <BieuTuong ten="muiTen" size={18} />
               </Link>
@@ -130,9 +202,19 @@ export function TrangChu() {
                 Cách tham gia <span>↗</span>
               </Link>
             </div>
-            <div className="chi-tiet-bia">
-              <span>01 / BỘ SƯU TẬP CẢM HỨNG</span>
-              <span>VẺ ĐẸP VƯỢT THỜI GIAN</span>
+            <div className="chi-tiet-bia hien-dan">
+              {/* Chỉ nêu số liệu thật đang có, không hiện số 0 làm trang trống trải. */}
+              {[
+                [cacPhienDangDienRa.length, 'phiên đang diễn ra'],
+                [cacPhienSapDienRa.length, 'phiên sắp mở'],
+                [danhMuc.data?.length ?? 0, 'danh mục sưu tầm'],
+              ]
+                .filter(([so]) => Number(so) > 0)
+                .map(([so, ten]) => (
+                  <span key={ten}>
+                    <strong>{so}</strong> {ten}
+                  </span>
+                ))}
             </div>
           </div>
         </section>
@@ -168,7 +250,6 @@ export function TrangChu() {
         <section className="khu-vuc" hidden={phienDangDienRa.isError && !phienDangDienRa.data}>
           <div className="tieu-de-muc">
             <div>
-              <span className="nhan-nho">ĐANG TRONG PHIÊN</span>
               <h2>Những phiên đang diễn ra</h2>
             </div>
             <Link className="link-vang" to="/kham-pha?trang_thai=HOAT_DONG">
@@ -187,10 +268,15 @@ export function TrangChu() {
             </div>
           </ChoDuLieu>
         </section>
-        <section className="khu-vuc" hidden={phienSapDienRa.isError && !phienSapDienRa.data}>
+        <section
+          className="khu-vuc"
+          hidden={
+            (phienSapDienRa.isError && !phienSapDienRa.data) ||
+            (phienSapDienRa.isSuccess && cacPhienSapDienRa.length === 0)
+          }
+        >
           <div className="tieu-de-muc">
             <div>
-              <span className="nhan-nho">SẮP ĐƯỢC MỞ</span>
               <h2>Đón phiên sắp bắt đầu</h2>
             </div>
             <Link className="link-vang" to="/kham-pha?trang_thai=DA_LEN_LICH">
@@ -212,7 +298,6 @@ export function TrangChu() {
         <section className="khu-vuc khu-danh-muc" hidden={danhMuc.isError && !danhMuc.data}>
           <div className="tieu-de-muc">
             <div>
-              <span className="nhan-nho">TÌM ĐIỀU BẠN YÊU THÍCH</span>
               <h2>Khám phá theo danh mục</h2>
             </div>
             <span className="chu-mo">Mỗi sở thích, một thế giới riêng.</span>
@@ -231,7 +316,6 @@ export function TrangChu() {
         </section>
         <section className="cau-chuyen">
           <div>
-            <span className="nhan-nho">MỘT HÀNH TRÌNH ĐƠN GIẢN</span>
             <h2>
               Từ lần đặt giá đầu tiên
               <br />
@@ -272,7 +356,6 @@ export function TrangChu() {
         <section className="loi-moi-ban">
           <BieuTuong ten="kimCuong" size={46} />
           <div>
-            <span className="nhan-nho">TRAO GIÁ TRỊ, NHẬN CƠ HỘI</span>
             <h2>Món đồ của bạn xứng đáng được khám phá.</h2>
             <p>Bắt đầu với hồ sơ người bán được xác minh.</p>
           </div>
@@ -328,7 +411,7 @@ export default function KhamPha() {
             Bộ lọc <BieuTuong ten="luoi" size={18} />
           </h3>
           <label htmlFor="tim-san-pham">Tìm sản phẩm</label>
-          <Input.Search
+          <OTimKiem
             key={tuKhoaTrenUrl}
             defaultValue={tuKhoaTrenUrl}
             id="tim-san-pham"

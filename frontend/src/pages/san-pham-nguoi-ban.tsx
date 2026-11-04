@@ -1,4 +1,5 @@
-import { Button, Input, Select } from 'antd';
+import { Button, Select } from 'antd';
+import OTimKiem from '../components/o-tim-kiem';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AnhSanPham, ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import QuyenNguoiBan from '../components/quyen-nguoi-ban';
@@ -60,7 +61,7 @@ function DanhSachSanPham() {
         </span>
       </div>
       <div className="bo-loc-san-pham">
-        <Input.Search
+        <OTimKiem
           key={tuKhoa}
           defaultValue={tuKhoa}
           aria-label="Tìm sản phẩm của tôi"
@@ -114,6 +115,9 @@ function DanhSachSanPham() {
                     'Danh mục đã lưu'}{' '}
                   · {ngayGio(muc.ngay_tao)}
                 </p>
+                {muc.ly_do_khong_tao_phien && (
+                  <p className="chu-mo">Chưa thể tạo phiên: {muc.ly_do_khong_tao_phien}</p>
+                )}
               </div>
               <div className="hanh-dong-san-pham-ban">
                 <TrangThai giaTri={muc.trang_thai_duyet} />
@@ -121,6 +125,16 @@ function DanhSachSanPham() {
                 {!!Number(muc.co_the_tao_phien) && (
                   <Link to={`/nguoi-ban/phien/moi?san_pham_id=${muc.id}`}>
                     {Number(muc.da_tung_dau_gia) ? 'Đăng lại sản phẩm' : 'Tạo phiên đấu giá'} ↗
+                  </Link>
+                )}
+                {muc.don_hang_lien_quan_id && (
+                  <Link to={`/nguoi-ban/don-hang/${muc.don_hang_lien_quan_id}`}>
+                    Mở đơn #{muc.don_hang_lien_quan_id} ↗
+                  </Link>
+                )}
+                {muc.phien_lien_quan_id && (
+                  <Link to={`/nguoi-ban/phien/${muc.phien_lien_quan_id}`}>
+                    Mở phiên #{muc.phien_lien_quan_id} ↗
                   </Link>
                 )}
               </div>

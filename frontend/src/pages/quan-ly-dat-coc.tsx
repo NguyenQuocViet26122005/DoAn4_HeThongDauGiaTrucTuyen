@@ -19,6 +19,7 @@ interface Coc {
   ngay_chuyen_vao_don: string | null;
   ngay_khong_hoan: string | null;
   ly_do_xu_ly: string | null;
+  quyet_toan_trong_don?: string;
 }
 
 function DonHangCuaKhoanCoc({ muc, hienTai }: { muc: Coc; hienTai: number }) {
@@ -81,7 +82,7 @@ export default function QuanLyDatCoc() {
       <Alert
         type="info"
         showIcon
-        message="Cọc chỉ chuyển vào đơn của người thắng sau khi phiên được chốt. Các khoản cọc còn lại được hoàn; danh sách tự làm mới mỗi 15 giây."
+        title="Cọc chỉ chuyển vào đơn của người thắng sau khi phiên được chốt. Các khoản cọc còn lại được hoàn; danh sách tự làm mới mỗi 15 giây."
       />
       <ChoDuLieu truyVan={truyVan} rong={truyVan.data?.length === 0}>
         <div className="bang-cuon">
@@ -105,7 +106,16 @@ export default function QuanLyDatCoc() {
                   </td>
                   <td>{tien(muc.so_tien)}</td>
                   <td>
-                    <TrangThai giaTri={muc.trang_thai} />
+                    {muc.trang_thai === 'KHONG_HOAN_COC' &&
+                    ['DA_HOAN_TIEN', 'DA_GIAI_NGAN'].includes(muc.quyet_toan_trong_don || '') ? (
+                      <span>
+                        {muc.quyet_toan_trong_don === 'DA_HOAN_TIEN'
+                          ? 'Đã hoàn cọc ngoại lệ'
+                          : 'Đã bồi hoàn cho người bán'}
+                      </span>
+                    ) : (
+                      <TrangThai giaTri={muc.trang_thai} />
+                    )}
                     <p>{muc.ly_do_xu_ly}</p>
                   </td>
                   <td>

@@ -1715,10 +1715,10 @@
                 "value": "application/json"
               }
             ],
-            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Tạo phiên hai phút cho sản phẩm đã duyệt. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md.",
+            "description": "Người bán của sản phẩm/đơn; thao tác bán cần xác minh. Tạo phiên hai phút cho sản phẩm đã duyệt. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md. Đọc GET /deposit-policy trước; yêu cầu cọc phải phù hợp chính sách Admin. Có thể bỏ yeu_cau_dat_coc để lấy chính sách mặc định.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"san_pham_id\": \"{{sanPhamId}}\",\n  \"gia_khoi_diem\": \"18000000\",\n  \"gia_san\": null,\n  \"gia_mua_ngay\": \"25000000\",\n  \"thoi_gian_bat_dau\": \"{{batDauISO}}\",\n  \"thoi_gian_ket_thuc\": \"{{ketThucISO}}\"\n}",
+              "raw": "{\n  \"san_pham_id\": \"{{sanPhamId}}\",\n  \"gia_khoi_diem\": \"18000000\",\n  \"gia_san\": null,\n  \"gia_mua_ngay\": \"25000000\",\n  \"thoi_gian_bat_dau\": \"{{batDauISO}}\",\n  \"thoi_gian_ket_thuc\": \"{{ketThucISO}}\",\n  \"yeu_cau_dat_coc\": false\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2218,6 +2218,18 @@
               }
             ],
             "description": "Đăng nhập; trả dang_theo_doi của tài khoản hiện tại, không trả cam kết giá."
+          },
+          "response": []
+        },
+        {
+          "name": "Chính sách cọc khi tạo phiên",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/deposit-policy",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": []
           },
           "response": []
         }
@@ -2733,6 +2745,40 @@
               }
             }
           ]
+        },
+        {
+          "name": "Thu hồi và kiểm kê hàng hoàn",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/returned-item",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"thao_tac\": \"KHOI_TAO\",\n  \"ghi_chu\": \"Tiếp nhận xử lý hàng sau yêu cầu hủy hoặc tranh chấp\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Đúng chủ thể thao tác theo thao_tac_hang của GET chi tiết đơn. Các bước: KHOI_TAO, GUI_HOAN, NHAN_LAI, KIEM_KE, CHO_PHEP_BAN_LAI hoặc TRA_NGUOI_BAN, XAC_NHAN_NHAN_LAI, DANG_KY_LAI. Xem danh-sach-api.md."
+          },
+          "response": []
         }
       ]
     },
@@ -4379,6 +4425,147 @@
               }
             },
             "description": "Chạy theo đúng bước trong tài liệu. Kết quả thanh toán phải kiểm tra thêm ket_qua_mo_phong/trạng thái cọc, không chỉ mã HTTP."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ngoại lệ đơn, quyết toán cọc và chi phí hàng hoàn",
+      "item": [
+        {
+          "name": "Quyết toán cọc bỏ thanh toán",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/orders/{{donHangId}}/deposit-settlement",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ket_qua\": \"BOI_HOAN_NGUOI_BAN\",\n  \"ly_do\": \"Đã kiểm tra chứng cứ, người thắng không thanh toán đúng hạn.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chỉ Admin. Hoặc chọn HOAN_NGUOI_MUA nếu có ngoại lệ. Số tiền lấy từ cọc; không gửi so_tien. Không thay kết quả hủy đơn. Thử lại cùng quyết định không trả tiền hai lần. Nếu hoàn buyer, phải thêm loai_ngoai_le=LOI_HE_THONG/LOI_BEN_BAN/SAI_THONG_TIN_PHIEN và tham_chieu_bang_chung (6-200 ký tự). Đổi ý/thiếu tiền/quên hạn không phải ngoại lệ."
+          },
+          "response": []
+        },
+        {
+          "name": "Giải tỏa cảnh báo đơn sau kiểm tra",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/admin/orders/{{donHangId}}/clear-hold",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ly_do\": \"Đã xác minh vận đơn và tình trạng tài khoản; giao dịch tiếp tục theo quy trình.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chỉ Admin khi đã gửi hàng, thu đủ, tài khoản hoạt động và không có tranh chấp/thu hồi. Không tự giải ngân hoặc đổi hạn."
+          },
+          "response": []
+        },
+        {
+          "name": "Kết luận trách nhiệm phí hoàn và bồi thường",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/returned-item",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"thao_tac\": \"KET_LUAN_TRACH_NHIEM\",\n  \"ben_chiu_phi\": \"NGUOI_MUA\",\n  \"phi_hoan\": \"100000\",\n  \"ben_boi_thuong\": \"KHONG_PHAT_SINH\",\n  \"nguoi_nhan_boi_thuong\": \"KHONG_PHAT_SINH\",\n  \"tien_boi_thuong\": \"0\",\n  \"ghi_chu\": \"Đã đối chiếu yêu cầu đổi ý của người mua và chứng từ phí hoàn thực tế.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chỉ Admin, cần có hồ sơ hàng hoàn. Phí phát sinh đối soát ngoài đơn; không tự trừ tiền buyer. Thay số tiền và trách nhiệm theo bằng chứng thực tế."
+          },
+          "response": []
+        },
+        {
+          "name": "Xác nhận đối soát khoản ngoài đơn",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/orders/{{donHangId}}/returned-item",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maQuanTri}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"thao_tac\": \"DOI_SOAT_CHI_PHI\",\n  \"ma_chung_tu\": \"BIEN-NHAN-001\",\n  \"ghi_chu\": \"Đã kiểm tra biên nhận thu chi ngoài đơn theo kết luận trách nhiệm.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chỉ Admin sau khi có kết luận và khoản tiền phát sinh. Chỉ xác nhận nếu đã kiểm tra chứng từ thực tế; không gọi cổng thu chi hoặc cập nhật tiền escrow."
           },
           "response": []
         }

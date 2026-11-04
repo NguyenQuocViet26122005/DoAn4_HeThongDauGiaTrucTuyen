@@ -6,7 +6,7 @@ import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { gui } from '../services/api';
 import { lamMoiDon } from '../services/don-hang';
 import { lamMoiTranhChap, moTranhChap } from '../services/tranh-chap';
-import { duocGuiHang, lyDoDuocMo } from '../utils/giao-hang-tranh-chap';
+import { duocGuiHang, lyDoDuocMo, tranhChapDangMo } from '../utils/giao-hang-tranh-chap';
 import { ngayGio, nhan } from '../utils/dinh-dang';
 import type { DonHang } from '../types/don-hang';
 
@@ -22,7 +22,7 @@ export default function GiaoHangVaHoTro({ don }: { don: DonHang }) {
     return () => clearInterval(dongHo);
   }, []);
 
-  if (!nguoiDung) {
+  if (!nguoiDung || ['DA_HUY', 'HOAN_THANH'].includes(don.trang_thai)) {
     return null;
   }
 
@@ -30,14 +30,55 @@ export default function GiaoHangVaHoTro({ don }: { don: DonHang }) {
   const gocTranhChap = quanTri ? '/quan-tri/tranh-chap' : '/tai-khoan/tranh-chap';
   const cacLyDo = lyDoDuocMo(don, nguoiDung, hienTai);
   const coTheBaoChuaNhan = !quanTri && cacLyDo.includes('CHUA_NHAN_HANG');
-  const cacLyDoKhac = quanTri
-    ? cacLyDo
-    : cacLyDo.filter((lyDo) => lyDo !== 'CHUA_NHAN_HANG');
+  const cacLyDoKhac = quanTri ? cacLyDo : cacLyDo.filter((lyDo) => lyDo !== 'CHUA_NHAN_HANG');
   const choGui = ['CHO_GUI_HANG', 'DA_THANH_TOAN'].includes(don.trang_thai);
 
   return (
     <section className="tam-noi-dung thao-tac-don">
       <h2>Gửi hàng & hỗ trợ giao dịch</h2>
+      {String(nguoiDung.id) === String(don.nguoi_mua_id) &&
+        ['CHO_GUI_HANG', 'DA_THANH_TOAN', 'DA_GUI_HANG'].includes(don.trang_thai) &&
+        don.trang_thai_giu_tien === 'DANG_GIU' &&
+        !don.tranh_chap.some((t) => tranhChapDangMo(t.trang_thai)) && (
+          <BieuMauThaoTac<{ mo_ta: string }>
+            ten="Yêu cầu hủy / không tiếp tục nhận hàng"
+            xacNhan={(duLieu) => (
+              <>
+                <p className="van-ban-dai">{duLieu.mo_ta}</p>
+                <p>
+                  Admin sẽ xem xét yêu cầu và vị trí hàng. Tiền được giữ trong quá trình xác minh.
+                </p>
+              </>
+            )}
+            onGui={async (duLieu) => {
+              const hoSo = await moTranhChap(don.id, {
+                ...duLieu,
+                ly_do: 'KHAC',
+                yeu_cau_huy: true,
+              });
+
+              await lamMoiTranhChap();
+              chuyenTrang(`${gocTranhChap}/${hoSo.id}`);
+            }}
+          >
+            <p>
+              Yêu cầu cần được Admin chấp thuận. Việc gửi yêu cầu chưa hủy đơn hoặc tự hoàn tiền.
+            </p>
+            <Form.Item
+              name="mo_ta"
+              label="Lý do và thông tin giao nhận"
+              rules={[
+                {
+                  required: true,
+                  whitespace: true,
+                  message: 'Nhập lý do yêu cầu',
+                },
+              ]}
+            >
+              <Input.TextArea rows={5} maxLength={20000} showCount />
+            </Form.Item>
+          </BieuMauThaoTac>
+        )}
       {choGui && (
         <Alert
           type="info"
@@ -140,8 +181,8 @@ export default function GiaoHangVaHoTro({ don }: { don: DonHang }) {
               </p>
               <p className="van-ban-dai">{duLieu.mo_ta}</p>
               <p>
-                Yêu cầu sẽ được chuyển cho Admin kiểm tra. Tiền vẫn được giữ trong lúc xử lý;
-                thao tác này không gửi đề nghị Second Chance.
+                Yêu cầu sẽ được chuyển cho Admin kiểm tra. Tiền vẫn được giữ trong lúc xử lý; thao
+                tác này không gửi đề nghị Second Chance.
               </p>
             </>
           )}

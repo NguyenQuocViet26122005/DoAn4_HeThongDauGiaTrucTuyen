@@ -20,6 +20,16 @@
 body {
   margin: 0;
   min-width: 320px;
+  font-variant-numeric: tabular-nums;
+  scrollbar-color: #4a4c3f #111310;
+  scrollbar-width: thin;
+}
+small {
+  font-size: 12px;
+}
+input,
+textarea {
+  caret-color: var(--vang);
 }
 body,
 .ant-app {
@@ -90,7 +100,28 @@ em {
   background: #665633;
   color: #fff;
 }
+.ant-badge .ant-badge-count {
+  background: #b3261e;
+}
+.ant-btn-dangerous:not(.ant-btn-primary, :disabled) {
+  color: #f0837c;
+}
+/* Vùng chạm đủ lớn cho liên kết chữ trên màn hình cảm ứng. */
+@media (pointer: coarse) {
+  .link-vang,
+  .hanh-dong-san-pham-ban a,
+  .chan-trang a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
+  .nut-vang:active,
+  .nut-trong:active,
+  .ant-btn:active {
+    transform: none;
+  }
   *,
   *::before,
   *::after {

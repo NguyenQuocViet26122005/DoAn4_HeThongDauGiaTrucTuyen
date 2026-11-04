@@ -253,6 +253,56 @@ kiemThu('MySQL nhiều kết nối: khóa đấu giá, chốt đơn, thanh toán
     );
 
     xacNhan.deepEqual(cocSau.map((c) => c.trang_thai).sort(), ['DA_CHUYEN_VAO_DON', 'DA_HOAN_COC']);
+
+    const phienBo = await coSoDuLieu.giaoDich(() =>
+      phienDauGia(duLieu, { yeu_cau_dat_coc: 1, so_tien_dat_coc: '1800000' }),
+    );
+
+    await datCoc.dangKy(duLieu.a, phienBo);
+    await datCoc.thanhToan(duLieu.a, phienBo, {});
+    await dauGia.datGia(duLieu.a, phienBo, { gia_toi_da: '22000000' });
+
+    await khoBanGhi.capNhat('phien_dau_gia', phienBo, {
+      thoi_gian_ket_thuc: await coSoDuLieu.thoiGianHienTai(),
+    });
+
+    await dauGia.xuLyDenHan(phienBo);
+
+    const donBo = await khoDon.donDangXuLyCuaPhien(phienBo);
+
+    await khoBanGhi.capNhat('don_hang', donBo.id, {
+      han_thanh_toan: thoiGian.congGiay(await coSoDuLieu.thoiGianHienTai(), -60),
+    });
+
+    await donHang.xuLyDenHan(donBo.id);
+
+    const ngoaiLe = require('../../dist/services/xu-ly-ngoai-le-don');
+    const doiLap = await Promise.allSettled(
+      ['HOAN_NGUOI_MUA', 'BOI_HOAN_NGUOI_BAN'].map((ket_qua) =>
+        ngoaiLe.quyetToanCoc(duLieu.admin, donBo.id, {
+          ket_qua,
+          ly_do: 'Đối chiếu giao dịch đồng thời, chỉ một quyết định được chấp nhận.',
+          ...(ket_qua === 'HOAN_NGUOI_MUA'
+            ? { loai_ngoai_le: 'LOI_HE_THONG', tham_chieu_bang_chung: 'HO-SO-DONG-THOI-001' }
+            : {}),
+        }),
+      ),
+    );
+
+    xacNhan.equal(doiLap.filter((muc) => muc.status === 'fulfilled').length, 1);
+    xacNhan.equal(
+      doiLap.filter((muc) => muc.status === 'rejected' && muc.reason.status === 409).length,
+      1,
+    );
+
+    const tienSau = await khoDon.tienTrungGian(donBo.id);
+
+    xacNhan.equal(tienSau.so_tien_dang_giu, '0.00');
+    xacNhan.equal(
+      BigInt(tienSau.so_tien_da_hoan.split('.')[0]) +
+        BigInt(tienSau.so_tien_da_giai_ngan.split('.')[0]),
+      1800000n,
+    );
   } finally {
     khach?.ketNoi.close();
     await new Promise((xong) => io.close(xong));

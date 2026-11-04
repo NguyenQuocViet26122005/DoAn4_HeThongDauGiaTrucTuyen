@@ -350,6 +350,9 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
     ...sanPham,
     ...(laChuSanPham ? { co_the_sua: !lyDo, ly_do_khong_the_sua: lyDo } : {}),
     ...(coQuyenRieng ? { kiem_dinh_moi_nhat: kiemDinhMoiNhat } : {}),
+    ...(nguoiDung?.vai_tro === 'QUAN_TRI'
+      ? { ten_nguoi_ban: (await cacNguoiDung.layTheoId(banGhi.nguoi_ban_id))?.ho_ten ?? null }
+      : {}),
     hinh_anh: await khoDuLieu.danhSachAnh(id),
     thuoc_tinh: await khoDuLieu.cacGiaTri(id),
   };
@@ -522,7 +525,11 @@ async function xoaAnh(nguoiDung: NguoiDungDangNhap, id, anhId) {
   });
 }
 
-function danhSach(nguoiDung: NguoiDungDangNhap, truyVan: TruyVanDanhSach = {}, phamVi = 'public') {
+async function danhSach(
+  nguoiDung: NguoiDungDangNhap,
+  truyVan: TruyVanDanhSach = {},
+  phamVi = 'public',
+) {
   const boLoc: BoLocDanhSach = {
     search: truyVan.q ? kiemTra.chuoi(truyVan.q, 'Tìm kiếm', 100) : '',
     categoryId: truyVan.danh_muc_id ? kiemTra.id(truyVan.danh_muc_id) : undefined,
@@ -550,7 +557,26 @@ function danhSach(nguoiDung: NguoiDungDangNhap, truyVan: TruyVanDanhSach = {}, p
     boLoc.status = kiemTra.giaTriLuaChon(truyVan.trang_thai, cacTrangThai, 'Trạng thái');
   }
 
-  return khoDuLieu.danhSachSanPham(kiemTra.phanTrang(truyVan), boLoc);
+  const cacSanPham = await khoDuLieu.danhSachSanPham(kiemTra.phanTrang(truyVan), boLoc);
+
+  if (phamVi !== 'mine') {
+    return cacSanPham;
+  }
+
+  const { lyDoKhongTaoPhien } = require('./dieu-kien-tao-phien');
+
+  return Promise.all(
+    cacSanPham.map(async (sanPham) => {
+      const chan = Number(sanPham.co_the_tao_phien) ? null : await lyDoKhongTaoPhien(sanPham);
+
+      return {
+        ...sanPham,
+        ly_do_khong_tao_phien: chan?.ly_do ?? null,
+        don_hang_lien_quan_id: chan?.don_hang_id ?? null,
+        phien_lien_quan_id: chan?.phien_id ?? null,
+      };
+    }),
+  );
 }
 
 const sanPhamDuocTaoPhien = (id) => khoDuLieu.sanPhamDuocTaoPhien(kiemTra.id(id));

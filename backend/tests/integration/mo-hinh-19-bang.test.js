@@ -88,6 +88,7 @@ test('19 bảng: thanh toán lỗi không giữ tiền; retry một lần và ho
       }),
       { status: 400 },
     );
+    await require('../helpers/du-lieu-mau').thuHoiVaKiemKe(d, don.id);
     await tranhChap.giaiQuyet(d.admin, tc.id, {
       ket_qua: 'NGUOI_MUA',
       ket_qua_xu_ly: 'Hoàn toàn bộ gồm vận chuyển',
@@ -130,6 +131,7 @@ test('19 bảng: tài khoản bị khóa không được tự giải ngân khi h
       mo_ta: 'Tiếp nhận đơn cần Admin kiểm tra',
     });
 
+    await require('../helpers/du-lieu-mau').thuHoiVaKiemKe(d, don.id);
     await tranhChap.giaiQuyet(d.admin, tc.id, {
       ket_qua: 'NGUOI_MUA',
       ket_qua_xu_ly: 'Hoàn toàn bộ',

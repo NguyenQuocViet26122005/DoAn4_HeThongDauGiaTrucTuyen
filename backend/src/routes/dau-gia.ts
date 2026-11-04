@@ -20,6 +20,7 @@ boDinhTuyen.post(
   dieuKhien.yeuCauHuy,
 );
 boDinhTuyen.get('/bid-increments', dieuKhien.cacBuocGia);
+boDinhTuyen.get('/deposit-policy', dieuKhien.chinhSachCoc);
 boDinhTuyen.get('/watchlist', yeuCauDangNhap(), dieuKhien.danhSachTheoDoi);
 boDinhTuyen.get('/watchlist/:id', yeuCauDangNhap(), dieuKhien.trangThaiTheoDoi);
 boDinhTuyen.post('/watchlist/:id', yeuCauDangNhap(), dieuKhien.theoDoi);

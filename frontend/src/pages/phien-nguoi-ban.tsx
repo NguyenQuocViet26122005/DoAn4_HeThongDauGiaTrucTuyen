@@ -1,4 +1,5 @@
-import { Button, Input, Select } from 'antd';
+import { Button, Select } from 'antd';
+import OTimKiem from '../components/o-tim-kiem';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   AnhSanPham,
@@ -49,7 +50,7 @@ function DanhSachPhien() {
         </Link>
       </TieuDe>
       <div className="bo-loc-kiem-dinh">
-        <Input.Search
+        <OTimKiem
           key={tuKhoa}
           defaultValue={tuKhoa}
           aria-label="Tìm phiên của tôi"

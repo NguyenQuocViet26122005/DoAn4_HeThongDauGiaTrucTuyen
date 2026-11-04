@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, App, Button, Descriptions, Form, Input, Modal, Select, Tag } from 'antd';
+import OTimKiem from '../components/o-tim-kiem';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AnhSanPham, ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import { useDuLieu, useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
@@ -57,7 +58,7 @@ export default function DuyetSanPham() {
         </span>
       </div>
       <div className="bo-loc-san-pham">
-        <Input.Search
+        <OTimKiem
           key={tuKhoa}
           defaultValue={tuKhoa}
           maxLength={100}
@@ -297,7 +298,7 @@ export function ChiTietDuyetSanPham() {
             <TieuDe
               nhanNho={`SẢN PHẨM #${sanPham.data.id}`}
               ten={sanPham.data.tieu_de}
-              moTa={`Hồ sơ gửi bởi người bán #${sanPham.data.nguoi_ban_id}`}
+              moTa={`Hồ sơ gửi bởi ${sanPham.data.ten_nguoi_ban || 'người bán'} (tài khoản #${sanPham.data.nguoi_ban_id})`}
             />
             <div className="cot-bien-tap-san-pham">
               <div className="cac-buoc-san-pham">

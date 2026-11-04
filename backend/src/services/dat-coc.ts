@@ -183,25 +183,31 @@ async function ketThucPhien(phienId) {
   }
 }
 
-async function khongHoanCoc(donHang) {
+async function khongHoanCoc(donHang, nguoiMuaBiHanChe = false) {
   const coc = await khoCoc.cuaNguoiDung(donHang.phien_dau_gia_id, donHang.nguoi_mua_id, true);
 
   if (coc?.trang_thai !== 'DA_CHUYEN_VAO_DON' || !cungId(coc.don_hang_id, donHang.id)) {
-    return;
+    return false;
   }
 
   await khoBanGhi.capNhat('dat_coc_dau_gia', coc.id, {
     trang_thai: 'KHONG_HOAN_COC',
     ngay_khong_hoan: await coSoDuLieu.thoiGianHienTai(),
-    ly_do_xu_ly: 'Người thắng không thanh toán phần còn lại đúng hạn.',
+    ly_do_xu_ly: nguoiMuaBiHanChe
+      ? 'Tài khoản người thắng bị hạn chế khi hết hạn thanh toán; Admin sẽ quyết toán khoản cọc.'
+      : 'Người thắng không thanh toán phần còn lại đúng hạn.',
   });
   // Tiền đã thuộc đơn vẫn nằm trong khoản đang giữ, không chuyển cho người bán.
   await khoBanGhi.capNhat('don_hang', donHang.id, {
     can_admin_xu_ly: 1,
-    ly_do_can_xu_ly: 'Cọc không hoàn do quá hạn thanh toán; vi phạm chờ Admin xét.',
+    ly_do_can_xu_ly: nguoiMuaBiHanChe
+      ? 'Người thắng bị hạn chế tài khoản khi hết hạn thanh toán; Admin quyết toán cọc, không tự phạt.'
+      : 'Cọc không hoàn do quá hạn thanh toán; vi phạm chờ Admin xét.',
   });
 
   await ghiNhatKy(null, 'KHONG_HOAN_COC', 'dat_coc_dau_gia', coc.id);
+
+  return true;
 }
 
 async function thongKeNguoiBan(nguoiDung: NguoiDungDangNhap, phienId) {
@@ -221,7 +227,26 @@ async function cuaToi(nguoiDung: NguoiDungDangNhap, phienId) {
 
   batBuocTonTai(await cacPhien.layTheoId(id));
 
-  return khoCoc.cuaNguoiDung(id, nguoiDung.id);
+  const coc = await khoCoc.cuaNguoiDung(id, nguoiDung.id);
+
+  if (coc?.trang_thai === 'KHONG_HOAN_COC' && coc.don_hang_id) {
+    const quyetToan = await require('./xu-ly-ngoai-le-don').bienBan(
+      coc.don_hang_id,
+      'QUYET_TOAN_COC_BO_THANH_TOAN',
+    );
+
+    if (quyetToan) {
+      return {
+        ...coc,
+        nhan_quyet_toan:
+          quyetToan.ket_qua === 'HOAN_NGUOI_MUA'
+            ? 'Đã hoàn cọc theo ngoại lệ có căn cứ'
+            : 'Đã bồi hoàn cọc cho người bán',
+      };
+    }
+  }
+
+  return coc;
 }
 
 export {

@@ -272,6 +272,15 @@ kiemThu(
                 anh_dai_dien: avatar,
               });
 
+              const sdtCu = (await gui('GET', '/users/me', 'a')).so_dien_thoai;
+
+              await gui('PATCH', '/users/me', 'a', { so_dien_thoai: '0900.000.000' }, 400);
+              await gui('PATCH', '/users/me', 'a', { so_dien_thoai: null });
+              xacNhan.equal((await gui('GET', '/users/me', 'a')).so_dien_thoai, null);
+              if (sdtCu) {
+                await gui('PATCH', '/users/me', 'a', { so_dien_thoai: sdtCu });
+              }
+
               const dc = await gui('POST', '/users/me/addresses', 'a', noiDungDiaChi, 201);
 
               diaChiMoi = await gui('PUT', `/users/me/addresses/${dc.id}`, 'a', noiDungDiaChi);
@@ -654,6 +663,7 @@ kiemThu(
               await gui('GET', '/auctions/my-bids', 'a');
               await gui('GET', '/admin/auctions', 'admin');
               await gui('GET', '/bid-increments');
+              await gui('GET', '/deposit-policy');
               await gui('POST', `/watchlist/${phien.id}`, 'a', {});
               xacNhan.equal((await gui('GET', `/watchlist/${phien.id}`, 'a')).dang_theo_doi, true);
               xacNhan.equal((await gui('GET', `/watchlist/${phien.id}`, 'b')).dang_theo_doi, false);
@@ -811,6 +821,29 @@ kiemThu(
               };
 
               await gui('POST', `/admin/disputes/${tc.id}/resolve`, 'a', nd, 403);
+              await gui('POST', `/orders/${donTranhChap.id}/returned-item`, 'admin', {
+                thao_tac: 'KHOI_TAO',
+                ghi_chu: 'Thu hồi để xử lý tranh chấp HTTP',
+              });
+              await gui('POST', `/orders/${donTranhChap.id}/returned-item`, 'admin', {
+                thao_tac: 'GUI_HOAN',
+                don_vi_van_chuyen: 'HTTP kiểm thử',
+                ma_van_don: 'HTTP-HOAN',
+                ghi_chu: 'Đã gửi hoàn',
+              });
+              await gui('POST', `/orders/${donTranhChap.id}/returned-item`, 'admin', {
+                thao_tac: 'NHAN_LAI',
+                serial: 'HTTP-TEST',
+                so_kien: 1,
+                ghi_chu: 'Đã nhận lại kiện hàng',
+              });
+              await gui('POST', `/orders/${donTranhChap.id}/returned-item`, 'admin', {
+                thao_tac: 'KIEM_KE',
+                serial: 'HTTP-TEST',
+                ket_qua: 'CAN_XU_LY',
+                phu_kien: 'Đã đối chiếu đủ phụ kiện',
+                ghi_chu: 'Hàng cần trả người bán xử lý',
+              });
               await gui('POST', `/admin/disputes/${tc.id}/resolve`, 'admin', nd);
               await gui('POST', `/admin/disputes/${tc.id}/resolve`, 'admin', nd, 409);
               xacNhan.equal(
@@ -821,6 +854,92 @@ kiemThu(
                 (await gui('GET', `/orders/${donTranhChap.id}`, 'a')).giu_tien.trang_thai,
                 'DA_HOAN_TIEN',
               );
+            },
+          );
+
+          await boKiemThu.test(
+            'Admin quyết toán cọc và giải tỏa đơn gửi muộn; kiểm tra quyền HTTP',
+            async () => {
+              const coc = require('../../dist/services/dat-coc');
+              const donHang = require('../../dist/services/don-hang');
+              const p = await taoPhienMoi();
+
+              await khoBanGhi.capNhat('phien_dau_gia', p.id, {
+                yeu_cau_dat_coc: 1,
+                so_tien_dat_coc: '1800000',
+              });
+
+              await coc.dangKy(duLieu.a, p.id);
+              await coc.thanhToan(duLieu.a, p.id, {});
+              await gui('POST', `/auctions/${p.id}/bids`, 'a', { gia_toi_da: '20000000' });
+
+              const donCoc = await chotPhien(p.id);
+
+              await khoBanGhi.capNhat('don_hang', donCoc.id, {
+                han_thanh_toan: thoiGian.congGiay(await coSoDuLieu.thoiGianHienTai(), -60),
+              });
+
+              await donHang.xuLyDenHan(donCoc.id);
+
+              const nd = {
+                ket_qua: 'BOI_HOAN_NGUOI_BAN',
+                ly_do: 'Đã xác minh người thắng bỏ thanh toán theo hồ sơ và thông báo.',
+              };
+              const url = `/admin/orders/${donCoc.id}/deposit-settlement`;
+
+              await gui('POST', url, null, nd, 401);
+              await gui('POST', url, 'seller', nd, 403);
+              await gui('POST', url, 'a', nd, 403);
+              await gui('POST', url, 'admin', { ...nd, so_tien: '1' }, 400);
+
+              const daChot = await gui('POST', url, 'admin', nd);
+
+              xacNhan.equal(daChot.trang_thai, 'DA_HUY');
+              xacNhan.equal(daChot.so_tien_dang_giu, '0.00');
+              xacNhan.equal(daChot.quyet_toan_coc.ket_qua, nd.ket_qua);
+              await gui('POST', url, 'admin', nd);
+              await gui(
+                'POST',
+                url,
+                'admin',
+                {
+                  ...nd,
+                  ket_qua: 'HOAN_NGUOI_MUA',
+                  loai_ngoai_le: 'LOI_HE_THONG',
+                  tham_chieu_bang_chung: 'HO-SO-HTTP-001',
+                },
+                409,
+              );
+
+              const phienMuon = await taoPhienMoi();
+              const donMuon = (await gui('POST', `/auctions/${phienMuon.id}/buy-now`, 'b', {}))
+                .don_hang;
+
+              await khoBanGhi.capNhat('don_hang', donMuon.id, {
+                han_nguoi_ban_gui_hang: thoiGian.congGiay(await coSoDuLieu.thoiGianHienTai(), -60),
+              });
+
+              await gui('POST', `/orders/${donMuon.id}/shipping`, 'seller', {
+                don_vi_van_chuyen: 'HTTP kiểm thử',
+                ma_van_don: 'GUI-MUON-HTTP',
+              });
+
+              const giaiToa = `/admin/orders/${donMuon.id}/clear-hold`;
+              const kiemTra = {
+                ly_do: 'Đã đối chiếu vận đơn gửi muộn, kiện hàng đang được giao hợp lệ.',
+              };
+
+              await gui('POST', giaiToa, null, kiemTra, 401);
+              await gui('POST', giaiToa, 'b', kiemTra, 403);
+              await gui('POST', giaiToa, 'seller', kiemTra, 403);
+
+              const daGiaiToa = await gui('POST', giaiToa, 'admin', kiemTra);
+
+              xacNhan.equal(Number(daGiaiToa.can_admin_xu_ly), 0);
+              xacNhan.equal(daGiaiToa.trang_thai, 'DA_GUI_HANG');
+              xacNhan.equal(daGiaiToa.so_tien_da_giai_ngan, '0.00');
+              await gui('POST', `/orders/${donMuon.id}/delivered`, 'b', {});
+              await gui('POST', `/orders/${donMuon.id}/confirm`, 'b', {});
             },
           );
 

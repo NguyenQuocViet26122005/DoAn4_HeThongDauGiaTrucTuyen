@@ -114,6 +114,7 @@ export const nhanTrangThai: Record<string, string> = {
   KIEM_DINH_KHONG_DAT: 'Kiểm định không đạt',
   DA_KIEM_DINH_DAT: 'Kiểm định đạt',
   DANG_LUU_GIU: 'Đang lưu giữ tại trung tâm',
+  DA_ROI_TRUNG_TAM: 'Đã rời trung tâm',
   DA_TRA_NGUOI_BAN: 'Đã trả người bán',
   BIEN_BAN_TIEP_NHAN: 'Biên bản tiếp nhận',
   BAO_CAO_KIEM_DINH: 'Báo cáo kiểm định',

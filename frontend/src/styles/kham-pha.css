@@ -9,8 +9,51 @@
   overflow: hidden;
 }
 .noi-dung-bia {
+  position: relative;
   padding: 48px 48px 27px;
   max-width: 680px;
+}
+/* Sân khấu 3D: nền đen sâu, phía trên là lớp vàng lỏng LiquidChrome. */
+.anh-bia-3d {
+  min-height: 520px;
+  background:
+    radial-gradient(circle at 72% 46%, #3a311d 0%, #1a1712 28%, transparent 56%),
+    linear-gradient(180deg, #11120f, #0b0c0a);
+}
+.anh-bia-3d::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d5b77866, transparent);
+}
+.bia-3d {
+  position: absolute;
+  inset: 0;
+}
+.anh-bia-3d .noi-dung-bia {
+  padding-top: 72px;
+}
+.dong-chu {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+.dong-chu > * {
+  display: inline-block;
+}
+.anh-bia-3d .chi-tiet-bia {
+  letter-spacing: 0;
+  font-size: 12px;
+  text-transform: none;
+}
+.chi-tiet-bia strong {
+  display: block;
+  font-family: var(--tieu-de);
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--vang);
+  line-height: 1.1;
 }
 .noi-dung-bia h1 {
   font-size: clamp(34px, 3.8vw, 54px);
@@ -38,7 +81,7 @@
   gap: 32px;
   margin-top: 40px;
   color: #a59c83;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 1.6px;
 }
 .dai-cam-ket {
@@ -68,7 +111,7 @@
 .dai-cam-ket small {
   display: block;
   color: #979c8c;
-  font-size: 10px;
+  font-size: 11px;
   margin-top: 3px;
 }
 .khu-vuc {
@@ -100,17 +143,39 @@
   gap: 20px;
 }
 .the-phien {
+  position: relative;
   border: 1px solid #30352b;
   border-radius: 4px;
   background: #191c17;
   overflow: hidden;
   transition:
     border-color 0.2s,
-    transform 0.2s;
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s;
   min-width: 0;
+}
+/* Ánh vàng lướt qua thẻ khi rê chuột, như ánh đèn trên mặt kính tủ trưng bày. */
+.the-phien::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(241, 217, 167, 0.14) 48%,
+    rgba(241, 217, 167, 0.04) 55%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.the-phien:hover::after {
+  transform: translateX(120%);
 }
 .the-phien:hover {
   border-color: #897447;
+  box-shadow: 0 18px 40px -22px rgba(213, 183, 120, 0.45);
   transform: translateY(-3px);
 }
 .anh-the {
@@ -143,7 +208,7 @@
 }
 .anh-thay-the span {
   color: #999f8e;
-  font-size: 10px;
+  font-size: 11px;
 }
 .nhan-the {
   position: absolute;
@@ -156,13 +221,13 @@
   gap: 6px;
 }
 .nhan-the .ant-tag {
-  font-size: 9px;
+  font-size: 11px;
   margin: 0;
   line-height: 20px;
   background: #141a14e6;
 }
 .so-phien {
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.5px;
   color: #c6c5b8;
   background: #10140ddd;
@@ -187,7 +252,7 @@
 }
 .danh-muc-the {
   color: #c5ad78;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.7px;
 }
 .noi-dung-the h3 {
@@ -210,7 +275,7 @@
 }
 .gia-the small {
   color: #a6ad9b;
-  font-size: 10px;
+  font-size: 11px;
 }
 .gia-the strong {
   display: block;
@@ -226,7 +291,7 @@
   border-top: 1px solid #333a2d;
   margin-top: 17px;
   padding-top: 12px;
-  font-size: 9px;
+  font-size: 11px;
 }
 .chan-the > span:last-child {
   color: #b8b7a6;
@@ -455,6 +520,21 @@
     min-height: 415px;
     background-position: 61% center;
   }
+  /* Điện thoại: dải vàng lỏng nằm trên, chữ bên dưới, không đè lên nhau. */
+  .anh-bia-3d {
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at 50% 22%, #3a311d 0%, #16140f 34%, #0b0c0a 64%);
+  }
+  .anh-bia-3d .bia-3d {
+    position: relative;
+    inset: auto;
+    height: 260px;
+  }
+  .anh-bia-3d .noi-dung-bia {
+    background: none;
+    padding-top: 0;
+  }
   .noi-dung-bia {
     background: linear-gradient(90deg, #080a07ee, #080a0770 70%, transparent);
     padding: 34px 26px;
@@ -513,6 +593,9 @@
   }
 }
 @media (max-width: 540px) {
+  .noi-dung-bia {
+    background: linear-gradient(90deg, #080a07f5, #080a07cc 72%, #080a0799);
+  }
   .anh-bia {
     margin-top: 16px;
   }
@@ -524,7 +607,7 @@
   }
   .chi-tiet-bia {
     gap: 16px;
-    font-size: 7px;
+    font-size: 11px;
   }
   .chi-tiet-bia span:last-child {
     display: none;
@@ -585,5 +668,24 @@
   }
   .khu-danh-muc .tieu-de-muc > .chu-mo {
     display: none;
+  }
+}
+
+/* Lớp phủ trên nền vàng lỏng: tối dần sang trái và xuống đáy để chữ luôn đọc rõ. */
+.bia-3d::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, #0b0c0af2 0%, #0b0c0acc 30%, #0b0c0a33 62%, transparent 80%),
+    linear-gradient(0deg, #0b0c0acc 0%, transparent 35%);
+}
+.cau-chuyen-3d .bia-3d::after {
+  background: linear-gradient(180deg, #0b0c0ae6 0%, #0b0c0a66 45%, #0b0c0ae6 100%);
+}
+@media (max-width: 760px) {
+  .anh-bia-3d .bia-3d::after {
+    background: linear-gradient(0deg, #0b0c0a 0%, transparent 45%);
   }
 }

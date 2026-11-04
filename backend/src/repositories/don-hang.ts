@@ -2,6 +2,7 @@ import type { NguoiDungDangNhap } from '../types/nghiep-vu';
 import coSoDuLieu = require('./ket-noi');
 import khoBanGhi = require('./ban-ghi');
 import cacPhienDauGia = require('./dau-gia');
+import { khoaSanPham } from './nghia-vu-san-pham';
 
 async function khoaDuLieu(id) {
   const banDau = await khoBanGhi.layTheoId('don_hang', id);
@@ -9,6 +10,10 @@ async function khoaDuLieu(id) {
   if (!banDau) {
     return null;
   }
+
+  const phien = await cacPhienDauGia.layTheoId(banDau.phien_dau_gia_id);
+
+  await khoaSanPham(phien.san_pham_id);
   await cacPhienDauGia.layTheoId(banDau.phien_dau_gia_id, true);
 
   return khoBanGhi.layTheoId('don_hang', id, true);
@@ -86,11 +91,23 @@ const denHan = () =>
         OR (d.trang_thai IN ('DA_GIAO','DANG_KIEM_TRA') AND d.han_kiem_tra<=NOW() AND d.can_admin_xu_ly=0)
         OR (d.trang_thai IN ('DA_THANH_TOAN','CHO_GUI_HANG')
             AND d.han_nguoi_ban_gui_hang<=NOW()
+            AND d.can_admin_xu_ly=0
             AND NOT EXISTS (
               SELECT 1 FROM vi_pham v
               WHERE v.don_hang_id=d.id AND v.loai_vi_pham='GIAO_HANG_MUON'
             ))
      ORDER BY d.id LIMIT 100`,
+  );
+const donTreoCanAdmin = () =>
+  coSoDuLieu.truyVan(
+    `SELECT d.id FROM don_hang d
+     WHERE d.trang_thai='DA_HUY'
+       AND ((d.ly_do_huy='HOAN_TIEN_TRANH_CHAP' AND d.xu_ly_hang IS NULL)
+         OR (d.ly_do_huy='KHONG_THANH_TOAN' AND d.trang_thai_giu_tien='DANG_GIU' AND d.can_admin_xu_ly=1))
+       AND NOT EXISTS (
+         SELECT 1 FROM thong_bao t WHERE t.loai='DON_TREO_CAN_ADMIN'
+           AND t.duong_dan_lien_ket=CONCAT('/orders/',d.id)
+       )`,
   );
 const canNhacNho = () =>
   coSoDuLieu.truyVan(
@@ -178,7 +195,15 @@ const giaCongKhaiCuoi = (phienDauGiaId, nguoiDungId) =>
      ORDER BY b.ngay_tao DESC,b.id DESC LIMIT 1`,
     [phienDauGiaId, nguoiDungId],
   );
+const xuLyNgoaiLe = (donId, hanhDong) =>
+  coSoDuLieu.layMot(
+    `SELECT nguoi_thuc_hien_id,ngay_tao,du_lieu_moi FROM nhat_ky_hoat_dong
+     WHERE loai_doi_tuong='don_hang' AND doi_tuong_id=? AND hanh_dong=?
+     ORDER BY id DESC LIMIT 1`,
+    [donId, hanhDong],
+  );
 export {
+  xuLyNgoaiLe,
   khoaDuLieu,
   donDangXuLyCuaPhien,
   donHangCuaPhien,
@@ -189,6 +214,7 @@ export {
   tranhChapDangMo,
   danhSach,
   denHan,
+  donTreoCanAdmin,
   canNhacNho,
   viPhamCuaDon,
   danhDauThanhToanHetHan,

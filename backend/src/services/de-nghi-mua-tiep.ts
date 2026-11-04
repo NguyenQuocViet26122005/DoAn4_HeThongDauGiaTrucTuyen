@@ -13,8 +13,68 @@ import { baoDam, batBuocTonTai, cungId } from '../utils/loi';
 import { donViTienNho } from '../utils/tien';
 import thoiGian = require('../utils/thoi-gian');
 import { taoKhoaYeuCau, ketQuaDaXuLy, luuKetQua } from './yeu-cau-thanh-toan';
+import { khoaSanPham, coPhienMoiHon } from '../repositories/nghia-vu-san-pham';
+
+async function kiemTraQuyenBanTiep(phien, don) {
+  const hang = require('./hang-hoan').docXuLyHang(don);
+
+  baoDam(
+    !hang || ['DU_DIEU_KIEN_BAN_LAI', 'DA_DUNG_THU_HOI'].includes(hang.trang_thai),
+    409,
+    'Hàng đang thu hồi/kiểm kê hoặc đã trả người bán; chưa thể gửi đề nghị',
+  );
+  baoDam(
+    !(await coPhienMoiHon(phien.san_pham_id, phien.id)),
+    409,
+    'Sản phẩm đã có phiên mới; đề nghị từ phiên cũ không còn hiệu lực',
+  );
+}
+
+export async function lyDoKhongGuiDuoc(phien, don) {
+  if (don.trang_thai !== 'DA_HUY' || don.ly_do_huy !== 'KHONG_THANH_TOAN') {
+    return 'Chỉ gửi đề nghị từ đơn bị hủy vì người thắng không thanh toán.';
+  }
+
+  const hang = require('./hang-hoan').docXuLyHang(don);
+
+  if (hang && !['DU_DIEU_KIEN_BAN_LAI', 'DA_DUNG_THU_HOI'].includes(hang.trang_thai)) {
+    return 'Hàng đang được thu hồi, kiểm kê hoặc đã trả người bán.';
+  }
+  if (await coPhienMoiHon(phien.san_pham_id, phien.id)) {
+    return 'Sản phẩm đã có phiên mới; không gửi đề nghị từ phiên cũ.';
+  }
+  if (await khoDuLieu.donDangXuLyCuaPhien(phien.id)) {
+    return 'Phiên đã có đơn hàng còn nghĩa vụ.';
+  }
+  if (await khoDuLieu.deNghiDangCho(phien.id)) {
+    return 'Đang có đề nghị chờ người nhận phản hồi.';
+  }
+
+  const cacUngVien = await khoDuLieu.ungVienTiepTheo(phien.id);
+
+  return cacUngVien.some(
+    (x) => phien.gia_san == null || donViTienNho(x.so_tien) >= donViTienNho(phien.gia_san),
+  )
+    ? null
+    : 'Không còn người trả giá công khai hợp lệ đạt điều kiện giá sàn.';
+}
+
+// Cho người bán xem trước ứng viên (mã công khai) và giá trước khi gửi; không lộ mức tối đa.
+export async function ungVienXemTruoc(phien, don) {
+  if (await lyDoKhongGuiDuoc(phien, don)) {
+    return null;
+  }
+
+  const ungVien = (await khoDuLieu.ungVienTiepTheo(phien.id)).find(
+    (x) => phien.gia_san == null || donViTienNho(x.so_tien) >= donViTienNho(phien.gia_san),
+  );
+
+  return ungVien ? { ma_cong_khai: `ND-${ungVien.nguoi_tra_gia_id}`, gia: ungVien.so_tien } : null;
+}
 
 async function deNghiNguoiTiepTheoDaKhoa(phienDauGia, banGoc, nguoiYeuCauId) {
+  await kiemTraQuyenBanTiep(phienDauGia, banGoc);
+
   if (
     phienDauGia.trang_thai !== 'DA_KET_THUC' ||
     banGoc.trang_thai !== 'DA_HUY' ||
@@ -128,6 +188,10 @@ async function phanHoiDeNghi(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unkno
     const banDau = batBuocTonTai(
       await khoBanGhi.layTheoId('de_nghi_mua_tiep_theo', kiemTra.id(id)),
     );
+    const thongTinPhien = batBuocTonTai(await cacPhienDauGia.layTheoId(banDau.phien_dau_gia_id));
+
+    await khoaSanPham(thongTinPhien.san_pham_id);
+
     const phienDauGia = batBuocTonTai(
       await cacPhienDauGia.layTheoId(banDau.phien_dau_gia_id, true),
     );
@@ -180,6 +244,8 @@ async function phanHoiDeNghi(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unkno
     let donHang = null;
 
     if (chapNhan) {
+      await kiemTraQuyenBanTiep(phienDauGia, banGoc);
+
       const nguoiBan = batBuocTonTai(await cacNguoiDung.layTheoId(phienDauGia.nguoi_ban_id));
 
       baoDam(

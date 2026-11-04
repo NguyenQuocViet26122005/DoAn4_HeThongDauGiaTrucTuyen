@@ -49,6 +49,12 @@ async function khoaHoSo(id) {
   const hoSo = batBuocTonTai(await khoBanGhi.layTheoId('kiem_dinh_san_pham', id, true));
 
   baoDam(
+    !(await khoKiemDinh.daGanDon(id)),
+    409,
+    'Hồ sơ đã gắn đơn hàng phải giữ nguyên; sử dụng lần kiểm định sau hoàn hàng',
+  );
+
+  baoDam(
     !(await khoKiemDinh.coGiaoDich(sanPham.id)),
     409,
     'Sản phẩm đang có phiên hoặc nghĩa vụ bán; không sửa hồ sơ kiểm định',
@@ -355,11 +361,14 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
   );
 
   const coGiaoDich = await khoKiemDinh.coGiaoDich(sanPham.id);
-  const lyDo = coGiaoDich
-    ? 'Sản phẩm đang có phiên hoặc nghĩa vụ bán; hồ sơ chỉ được xem.'
-    : hoSo.trang_thai === 'DA_TRA_NGUOI_BAN'
-      ? 'Hồ sơ đã trả hàng cho người bán.'
-      : null;
+  const daGanDon = await khoKiemDinh.daGanDon(id);
+  const lyDo = daGanDon
+    ? 'Hồ sơ đã gắn đơn hàng chỉ được xem; xử lý hàng hoàn tại đơn liên quan.'
+    : coGiaoDich
+      ? 'Sản phẩm đang có phiên hoặc nghĩa vụ bán; hồ sơ chỉ được xem.'
+      : hoSo.trang_thai === 'DA_TRA_NGUOI_BAN'
+        ? 'Hồ sơ đã trả hàng cho người bán.'
+        : null;
 
   return {
     ...hoSo,
@@ -368,6 +377,7 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
     co_the_cap_nhat:
       !lyDo && (nguoiDung.vai_tro === 'QUAN_TRI' || cungId(nguoiDung.id, sanPham.nguoi_ban_id)),
     ly_do_khong_the_cap_nhat: lyDo,
+    dia_chi_trung_tam: await require('./cau-hinh').diaChiTrungTam(),
     tep_dinh_kem: await khoKiemDinh.tepDinhKem(id),
   };
 }

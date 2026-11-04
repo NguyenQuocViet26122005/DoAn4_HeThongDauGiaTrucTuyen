@@ -10,7 +10,11 @@ const cauHoi = [
   ],
   [
     'Khi nào tôi cần đặt cọc?',
-    'Chỉ các phiên công bố yêu cầu cọc mới cần đặt cọc trước khi trả giá. Chính sách do Admin cấu hình và chỉ áp dụng cho phiên mới. Cọc của người thắng được chuyển vào đơn, người không thắng được hoàn cọc. Không thanh toán phần còn lại đúng hạn có thể bị mất cọc và được Admin xem xét vi phạm.',
+    'Chỉ các phiên công bố yêu cầu cọc mới cần đặt cọc trước khi trả giá. Chính sách do Admin cấu hình và chỉ áp dụng cho phiên mới. Cọc của người thắng được chuyển vào đơn, người không thắng được hoàn cọc. Bỏ thanh toán vì đổi ý, thiếu tiền hoặc quên hạn không được hoàn cọc. Admin quyết toán theo hồ sơ; chỉ hoàn ngoại lệ khi xác minh lỗi hệ thống, bên bán hoặc thông tin phiên sai.',
+  ],
+  [
+    'Tôi đổi ý không nhận hàng thì được hoàn tiền không?',
+    'Không tự động. Bạn chỉ được gửi yêu cầu để Admin xem xét và có thể bị từ chối. Đã trả đủ tiền thì cọc là một phần tiền đơn; khi hàng sai, lỗi hoặc thất lạc, việc hoàn toàn bộ phải qua xác minh và xử lý tranh chấp. Phí hoàn và bồi thường phát sinh được ghi, đối soát riêng theo chứng cứ, không tự trừ vào escrow.',
   ],
   [
     'Phiên có tự gia hạn không?',

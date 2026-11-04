@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Alert, App, Button, Descriptions, Form, Input, InputNumber, Modal } from 'antd';
+import { useEffect, useState } from 'react';
+import { Alert, App, Button, Descriptions, Form, Input, InputNumber, Modal, Switch } from 'antd';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import ChonSanPhamPhien from '../components/chon-san-pham-phien';
 import QuyenNguoiBan from '../components/quyen-nguoi-ban';
@@ -9,15 +9,91 @@ import { lamMoiPhienNguoiBan, taoPhien } from '../services/phien-nguoi-ban';
 import type { BieuMauTaoPhien } from '../types/phien-nguoi-ban';
 import type { SanPhamTrongDanhSach } from '../types/san-pham';
 import { mocThoiGian, ngayGio, tien } from '../utils/dinh-dang';
+import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { ChoDuLieu } from '../components/dung-chung';
 
 const giaToiDa = 9999999999999;
 const batBuoc = [{ required: true, message: 'Vui lòng nhập thông tin này' }];
+
+function ChinhSachPhien() {
+  const truyVan = useDuLieu<{
+    bat: boolean;
+    cho_phep_nguoi_ban_chon?: boolean;
+    kieu: string;
+    gia_tri: number;
+  }>('/deposit-policy');
+  const bieuMau = Form.useFormInstance<BieuMauTaoPhien>();
+  const gia = Form.useWatch('gia_khoi_diem', bieuMau);
+  const batCoc = Form.useWatch('yeu_cau_dat_coc', bieuMau);
+  const chinhSach = truyVan.data;
+
+  useEffect(() => {
+    if (!chinhSach) {
+      return;
+    }
+    if (
+      !chinhSach.bat ||
+      !chinhSach.cho_phep_nguoi_ban_chon ||
+      bieuMau.getFieldValue('yeu_cau_dat_coc') == null
+    ) {
+      bieuMau.setFieldValue('yeu_cau_dat_coc', chinhSach.bat);
+    }
+  }, [chinhSach, bieuMau]);
+
+  const tienCoc =
+    chinhSach && gia > 0
+      ? chinhSach.kieu === 'TY_LE'
+        ? (BigInt(Math.round(gia)) * BigInt(chinhSach.gia_tri) + 99n) / 100n
+        : BigInt(chinhSach.gia_tri)
+      : null;
+
+  return (
+    <section className="tam-noi-dung">
+      <h2>Chính sách tham gia</h2>
+      <ChoDuLieu truyVan={truyVan}>
+        <Form.Item
+          name="yeu_cau_dat_coc"
+          label="Yêu cầu đặt cọc"
+          valuePropName="checked"
+          rules={[
+            {
+              validator: () =>
+                chinhSach
+                  ? Promise.resolve()
+                  : Promise.reject(new Error('Chưa tải được chính sách cọc')),
+            },
+          ]}
+          extra={
+            !chinhSach?.bat
+              ? 'Admin đang tắt cọc cho phiên mới.'
+              : chinhSach.cho_phep_nguoi_ban_chon
+                ? 'Bạn được chọn bật hoặc tắt cọc trước khi tạo phiên.'
+                : 'Admin bắt buộc cọc; phiên này không thể tắt.'
+          }
+        >
+          <Switch disabled={!chinhSach?.bat || !chinhSach.cho_phep_nguoi_ban_chon} />
+        </Form.Item>
+        {batCoc && tienCoc !== null && (
+          <Alert
+            type="info"
+            showIcon
+            title={`Cọc mỗi người: ${tien(tienCoc.toString())}`}
+            description="Tính từ giá khởi điểm theo chính sách Admin. Lựa chọn và số tiền được cố định khi tạo phiên."
+          />
+        )}
+      </ChoDuLieu>
+    </section>
+  );
+}
 
 function ngayNhapVietNam(moc: number) {
   return new Date(moc + 7 * 3600000).toISOString().slice(0, 16);
 }
 
 function TruongGiaVaThoiGian() {
+  const bieuMau = Form.useFormInstance();
+  const batMuaNgay = Form.useWatch('bat_mua_ngay', bieuMau);
+
   return (
     <>
       <section className="tam-noi-dung">
@@ -64,27 +140,38 @@ function TruongGiaVaThoiGian() {
             <InputNumber min={1} max={giaToiDa} precision={0} suffix="₫" />
           </Form.Item>
           <Form.Item
-            name="gia_mua_ngay"
-            label="Giá Mua ngay (không bắt buộc)"
-            dependencies={['gia_khoi_diem', 'gia_san']}
-            rules={[
-              ({ getFieldValue }) => ({
-                validator(_, giaTri) {
-                  const moc = getFieldValue('gia_san') ?? getFieldValue('gia_khoi_diem');
-
-                  if (giaTri != null && (giaTri <= 0 || giaTri < Number(moc))) {
-                    return Promise.reject(
-                      new Error('Giá Mua ngay không thấp hơn giá sàn hoặc giá khởi điểm'),
-                    );
-                  }
-
-                  return Promise.resolve();
-                },
-              }),
-            ]}
+            name="bat_mua_ngay"
+            label="Cho phép Mua ngay"
+            valuePropName="checked"
+            extra="Tắt sau BID đầu tiên nếu không có sàn; có sàn thì tắt khi đạt sàn."
           >
-            <InputNumber min={1} max={giaToiDa} precision={0} suffix="₫" />
+            <Switch />
           </Form.Item>
+          {batMuaNgay && (
+            <Form.Item
+              name="gia_mua_ngay"
+              label="Giá Mua ngay (không bắt buộc)"
+              dependencies={['gia_khoi_diem', 'gia_san']}
+              rules={[
+                { required: true, message: 'Nhập giá Mua ngay hoặc tắt tính năng này' },
+                ({ getFieldValue }) => ({
+                  validator(_, giaTri) {
+                    const moc = getFieldValue('gia_san') ?? getFieldValue('gia_khoi_diem');
+
+                    if (giaTri != null && (giaTri <= 0 || giaTri < Number(moc))) {
+                      return Promise.reject(
+                        new Error('Giá Mua ngay không thấp hơn giá sàn hoặc giá khởi điểm'),
+                      );
+                    }
+
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
+            >
+              <InputNumber min={1} max={giaToiDa} precision={0} suffix="₫" />
+            </Form.Item>
+          )}
           <Form.Item
             name="phi_van_chuyen"
             label="Phí vận chuyển cố định"
@@ -168,11 +255,24 @@ function TruongGiaVaThoiGian() {
 }
 
 function BieuMauPhien() {
+  const chinhSachCoc = useDuLieu<{ bat: boolean; kieu: 'TY_LE' | 'CO_DINH'; gia_tri: number }>(
+    '/deposit-policy',
+  );
   const dieuHuong = useNavigate();
   const [thamSo] = useSearchParams();
   const sanPhamIdUuTien = thamSo.get('san_pham_id') || undefined;
   const { message } = App.useApp();
   const [bieuMau] = Form.useForm<BieuMauTaoPhien>();
+  const giaKhoiDiem = Form.useWatch('gia_khoi_diem', bieuMau);
+  const yeuCauCoc = Form.useWatch('yeu_cau_dat_coc', bieuMau);
+  const cs = chinhSachCoc.data;
+  // Cùng cách làm tròn với backend (lên đến 1 đồng); số tiền chính thức được chụp khi lưu phiên.
+  const tienCocDuKien =
+    cs?.bat && yeuCauCoc !== false && giaKhoiDiem
+      ? cs.kieu === 'TY_LE'
+        ? Math.ceil((Number(giaKhoiDiem) * cs.gia_tri) / 100)
+        : cs.gia_tri
+      : undefined;
   const [sanPham, datSanPham] = useState<SanPhamTrongDanhSach>();
   const [xacNhan, datXacNhan] = useState<BieuMauTaoPhien>();
   const [dangTao, datDangTao] = useState(false);
@@ -222,6 +322,11 @@ function BieuMauPhien() {
         disabled={dangTao}
         className="tao-phien-ban"
         onFinish={(duLieu) => {
+          if (chinhSachCoc.isPending || chinhSachCoc.isError) {
+            datLoi('Cần tải được chính sách cọc trước khi tạo phiên.');
+
+            return;
+          }
           datLoi('');
           datXacNhan(duLieu);
         }}
@@ -242,6 +347,7 @@ function BieuMauPhien() {
               </Form.Item>
             </section>
             <TruongGiaVaThoiGian />
+            <ChinhSachPhien />
           </div>
           <aside className="tam-noi-dung kiem-tra-gui-duyet">
             <span className="nhan-nho">TRƯỚC KHI CÔNG BỐ</span>
@@ -251,8 +357,9 @@ function BieuMauPhien() {
             )}
             <ul>
               <li>
-                Cọc tham gia theo chính sách Admin tại thời điểm tạo. Số tiền áp dụng được hiển thị
-                sau khi lưu.
+                {tienCocDuKien
+                  ? `Cọc tham gia dự kiến: ${tien(tienCocDuKien)} mỗi người (theo chính sách Admin lúc tạo).`
+                  : 'Phiên không yêu cầu cọc theo lựa chọn hiện tại.'}
               </li>
               <li>Mức tối đa của người mua luôn bí mật. Bạn chỉ xem giá công khai.</li>
               <li>
@@ -260,7 +367,14 @@ function BieuMauPhien() {
                 xét duyệt.
               </li>
             </ul>
-            <Button type="primary" htmlType="submit" block size="large" loading={dangTao}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              size="large"
+              loading={dangTao}
+              disabled={chinhSachCoc.isPending || chinhSachCoc.isError}
+            >
               Kiểm tra & tạo phiên
             </Button>
             {loi && (
@@ -312,7 +426,9 @@ function BieuMauPhien() {
                     key: 'mua',
                     label: 'Mua ngay',
                     children:
-                      xacNhan.gia_mua_ngay == null ? 'Không dùng' : tien(xacNhan.gia_mua_ngay),
+                      !xacNhan.bat_mua_ngay || xacNhan.gia_mua_ngay == null
+                        ? 'Không dùng'
+                        : tien(xacNhan.gia_mua_ngay),
                   },
                   {
                     key: 'phi',

@@ -12,10 +12,20 @@ const tepDinhKem = (id) =>
     id,
   ]);
 
+const daGanDon = (id) =>
+  coSoDuLieu.layMot('SELECT id FROM don_hang WHERE kiem_dinh_san_pham_id=? LIMIT 1', [id]);
+
 const coGiaoDich = (sanPhamId) =>
   coSoDuLieu.layMot(
-    `SELECT a.id FROM phien_dau_gia a WHERE a.san_pham_id = ?
-     AND a.trang_thai IN ('DA_LEN_LICH', 'HOAT_DONG', 'DA_KET_THUC') LIMIT 1`,
+    `SELECT a.id FROM phien_dau_gia a WHERE a.san_pham_id = ? AND (
+       a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG')
+       OR EXISTS (SELECT 1 FROM don_hang d WHERE d.phien_dau_gia_id=a.id
+         AND d.trang_thai<>'DA_HUY' AND NOT (
+           d.trang_thai='DANG_TRANH_CHAP' AND
+           COALESCE(JSON_UNQUOTE(JSON_EXTRACT(d.xu_ly_hang,'$.trang_thai')),'')
+             IN ('CHO_KIEM_KE','DA_KIEM_KE','CAN_XU_LY','KHONG_KHOP')
+         ))
+     ) LIMIT 1`,
     [sanPhamId],
   );
 
@@ -58,4 +68,4 @@ function danhSach(
   );
 }
 
-export { moiNhat, tepDinhKem, coGiaoDich, quyenNguoiMua, danhSach };
+export { moiNhat, tepDinhKem, coGiaoDich, quyenNguoiMua, danhSach, daGanDon };

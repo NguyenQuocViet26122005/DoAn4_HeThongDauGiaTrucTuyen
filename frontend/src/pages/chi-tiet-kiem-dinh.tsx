@@ -27,7 +27,13 @@ function NoiDungHoSo({ hoSo, quanTri }: { hoSo: HoSoKiemDinh; quanTri: boolean }
         ten={hoSo.tieu_de}
         moTa={hoSo.ma_kiem_dinh}
       >
-        <TrangThai giaTri={hoSo.trang_thai} />
+        <TrangThai
+          giaTri={
+            hoSo.trang_thai === 'DANG_LUU_GIU' && hoSo.ngay_roi_trung_tam
+              ? 'DA_ROI_TRUNG_TAM'
+              : hoSo.trang_thai
+          }
+        />
       </TieuDe>
       <section className="tam-noi-dung lo-trinh-kiem-dinh">
         <Steps

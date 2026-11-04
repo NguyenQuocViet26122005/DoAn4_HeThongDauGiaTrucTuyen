@@ -3,8 +3,13 @@ import dieuKhien = require('../controllers/nguoi-dung');
 import { yeuCauDangNhap, quanTri } from '../middlewares/xac-thuc';
 import gioiHanYeuCau = require('../middlewares/gioi-han-yeu-cau');
 const boDinhTuyen = TaoBoDinhTuyen();
-const gioiHanDangNhap = gioiHanYeuCau({ limit: 20, windowMs: 15 * 60 * 1000 });
-boDinhTuyen.post('/auth/register', gioiHanDangNhap, dieuKhien.dangKy);
+const gioiHanDangNhap = gioiHanYeuCau({
+  limit: 20,
+  windowMs: 15 * 60 * 1000,
+  chiDemLoi: true,
+});
+const gioiHanDangKy = gioiHanYeuCau({ limit: 20, windowMs: 15 * 60 * 1000 });
+boDinhTuyen.post('/auth/register', gioiHanDangKy, dieuKhien.dangKy);
 boDinhTuyen.post('/auth/login', gioiHanDangNhap, dieuKhien.dangNhap);
 boDinhTuyen.get('/users/me', yeuCauDangNhap(), dieuKhien.hoSo);
 boDinhTuyen.patch('/users/me', yeuCauDangNhap(), dieuKhien.capNhatHoSo);

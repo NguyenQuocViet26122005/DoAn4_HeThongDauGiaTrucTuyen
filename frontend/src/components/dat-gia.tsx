@@ -4,8 +4,28 @@ import type { Phien } from '../types/du-lieu';
 import { datGia, lamMoiThamGia } from '../services/tham-gia-phien';
 import { loiDeDoc } from '../services/api';
 import { tien } from '../utils/dinh-dang';
+import { useDuLieu } from '../hooks/su-dung-du-lieu';
+
+type BuocGia = { gia_tu: string; gia_den: string | null; muc_tang_gia: string };
+
+// Mức thấp nhất để có lượt giá hợp lệ: khởi điểm khi chưa ai trả, sau đó giá hiện tại + bước giá.
+function mucToiThieu(phien: Phien, cacBuoc: BuocGia[] = []) {
+  const hienTai = Number(phien.gia_hien_tai);
+
+  if (!Number(phien.tong_luot_tra_gia)) {
+    return Math.max(Number(phien.gia_khoi_diem), 1);
+  }
+
+  const buoc = cacBuoc.find(
+    (b) => hienTai >= Number(b.gia_tu) && (b.gia_den == null || hienTai <= Number(b.gia_den)),
+  );
+
+  return buoc ? hienTai + Number(buoc.muc_tang_gia) : undefined;
+}
 
 export default function DatGia({ phien, khoa }: { phien: Phien; khoa: boolean }) {
+  const buocGia = useDuLieu<BuocGia[]>('/bid-increments');
+  const toiThieu = mucToiThieu(phien, buocGia.data);
   const [bieuMau] = Form.useForm<{ muc_toi_da: number }>();
   const [mucXacNhan, datMucXacNhan] = useState<number>();
   const [dangGui, datDangGui] = useState(false);
@@ -68,7 +88,7 @@ export default function DatGia({ phien, khoa }: { phien: Phien; khoa: boolean })
         <Form.Item
           name="muc_toi_da"
           label="Mức tối đa bí mật của bạn"
-          extra="Chỉ nhập số tiền VND nguyên; không bao gồm phí vận chuyển."
+          extra={`${toiThieu ? `Mức tối thiểu hiện tại: ${tien(toiThieu)}. ` : ''}Chỉ nhập số tiền VND nguyên; không bao gồm phí vận chuyển.`}
           rules={[
             { required: true, message: 'Vui lòng nhập mức tối đa bạn chấp nhận' },
             {

@@ -97,6 +97,17 @@
   margin-bottom: 0;
 }
 
+.lich-su-hang-hoan ol {
+  padding-left: 24px;
+  display: grid;
+  gap: 20px;
+}
+
+.lich-su-hang-hoan p {
+  margin-block: 8px 0;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 1180px) {
   .chi-tiet-don {
     grid-template-columns: minmax(0, 1fr);

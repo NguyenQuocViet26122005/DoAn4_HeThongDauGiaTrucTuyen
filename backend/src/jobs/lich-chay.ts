@@ -25,6 +25,7 @@ async function chayMotLuot() {
       [cacDonHang.deNghiDenHan, cacDeNghi.xuLyHetHan],
       [cacPhienDauGia.sapKetThuc, dichVuDauGia.nhacPhienSapKetThuc],
       [cacDonHang.canNhacNho, dichVuDonHang.nhacThanhToan],
+      [cacDonHang.donTreoCanAdmin, dichVuDonHang.nhacAdminDonTreo],
     ];
 
     for (const [timDuLieu, congViec] of cacCongViec) {

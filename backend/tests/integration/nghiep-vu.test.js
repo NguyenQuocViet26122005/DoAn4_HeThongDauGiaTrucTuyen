@@ -377,6 +377,7 @@ kiemThu('MySQL: toàn bộ kiểm thử nghiệp vụ được rollback', async 
           }),
           { status: 400 },
         );
+        await require('../helpers/du-lieu-mau').thuHoiVaKiemKe(duLieuKiemThu, donHang.id);
         await cacTranhChap.giaiQuyet(duLieuKiemThu.admin, tranhChap.id, {
           ket_qua: 'NGUOI_MUA',
           so_tien_hoan: donHang.tong_tien,

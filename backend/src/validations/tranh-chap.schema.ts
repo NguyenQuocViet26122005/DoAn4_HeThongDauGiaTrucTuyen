@@ -12,6 +12,7 @@ export const moTranhChapSchema = z.strictObject({
     'KHAC',
   ]),
   mo_ta: vanBan(20000, 'Mô tả'),
+  yeu_cau_huy: z.boolean().optional(),
 });
 export const phanHoiSchema = z.strictObject({ phan_hoi_nguoi_ban: vanBan(20000, 'Phản hồi') });
 export const bangChungSchema = z.strictObject({

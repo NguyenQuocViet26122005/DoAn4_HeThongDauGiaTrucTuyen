@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button, Input } from 'antd';
+import { Button } from 'antd';
+import OTimKiem from './o-tim-kiem';
 import { Link } from 'react-router-dom';
 import { AnhSanPham, ChoDuLieu, PhanTrang } from './dung-chung';
 import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
@@ -42,9 +43,9 @@ export default function ChonSanPhamPhien({
     <div className="chon-san-pham-phien">
       <p className="chu-mo">
         Chỉ hiển thị sản phẩm đã duyệt, đủ điều kiện kiểm định, không còn phiên/đơn đang xử lý và
-        không có Cơ hội mua tiếp đang chờ hoặc đã được chấp nhận.
+        không có Cơ hội mua tiếp đang chờ.
       </p>
-      <Input.Search
+      <OTimKiem
         aria-label="Tìm sản phẩm đủ điều kiện"
         placeholder="Tìm sản phẩm đã được duyệt…"
         allowClear

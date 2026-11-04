@@ -6,7 +6,7 @@ Chỉ có `NGUOI_DUNG` và `QUAN_TRI`. Một người dùng có thể mua; muố
 
 Sản phẩm đi từ `BAN_NHAP` → `CHO_XU_LY` → `DA_DUYET` hoặc `TU_CHOI`. Chỉ sửa nháp/bị từ chối và chưa có lịch sử phiên. Gửi duyệt cần ít nhất một ảnh cùng đủ thuộc tính bắt buộc của danh mục. Các kiểu thuộc tính hỗ trợ: `VAN_BAN`, `SO`, `LUA_CHON`, `DUNG_SAI`, `NGAY`. Thuộc tính hiện áp dụng theo đúng danh mục của sản phẩm, chưa tự kế thừa từ danh mục cha.
 
-Phiên chỉ được tạo cho sản phẩm đã duyệt, thuộc người bán. Backend không cung cấp API sửa giá/thời gian phiên sau khi tạo; hủy thông qua yêu cầu để Admin xét duyệt. Sản phẩm có phiên đang chờ/đang chạy/đã kết thúc thành công không được tạo thêm phiên để tránh bán trùng, kể cả khi đang chờ Second Chance.
+Phiên chỉ được tạo cho sản phẩm đã duyệt, thuộc người bán. Backend không cung cấp API sửa giá/thời gian phiên sau khi tạo; hủy thông qua yêu cầu để Admin xét duyệt. Chặn phiên đang chờ/chạy và mọi đơn, đề nghị còn nghĩa vụ của cùng món hàng, kể cả hồ sơ đăng bán lại. Đơn hủy do không thanh toán có thể đăng lại; đơn hoàn tiền tranh chấp chỉ đăng lại sau thu hồi/kiểm kê, kiểm định lại và duyệt hàng đủ điều kiện theo phiên bản 3.1.
 
 ## Giá tối đa bí mật và giá công khai
 
@@ -91,3 +91,25 @@ Admin cấu hình DEPOSIT_POLICY rồi bật; mặc định tắt, chỉ phiên 
 Mua ngay không yêu cầu cọc riêng: nếu có cọc thì trừ vào phần phải trả. Thanh toán đủ và chốt phiên cùng transaction; thất bại giữ phiên/cọc, không tạo đơn. Không áp dụng thanh toán sau cho Mua ngay hoặc Second Chance.
 
 Nhận hàng chưa giải ngân; giải ngân cần đủ tiền, không tranh chấp/cờ Admin và tài khoản đủ điều kiện. Lý do tranh chấp mới hỗ trợ không khớp kiểm định, nghi ngờ tính xác thực và thiếu phụ kiện. API không nhận HANG_GIA mới; MySQL giữ giá trị lịch sử. Hoàn toàn bộ bao gồm cọc, phần trả thêm và phí; không hoàn một phần mới.
+
+## Hàng hoàn và đăng bán lại — phiên bản 3.1 (17/10/2026)
+
+Đặc tả và hướng dẫn kiểm thử tại mục 24.12 của tài liệu nghiệp vụ chính. Đã có API /orders/:id/returned-item và giao diện trong chi tiết đơn/tranh chấp cho đúng actor. Hủy do đổi ý là yêu cầu xét duyệt riêng, không tự hoàn tiền. Hoàn tiền tranh chấp mới cần thu hồi/kiểm kê hoặc kết luận thất lạc; tiền và vị trí hàng được quản lý riêng. Đơn đã hoàn trước đây bổ sung xử lý hàng mà không quyết toán lại.
+
+Nhận hàng hoàn từ ngoài trung tâm tạo lần kiểm định mới; báo cáo lần giao cũ giữ nguyên. Nguyên vẹn cần kiểm định/duyệt trước khi cho đấu giá tiếp. Hàng lỗi trả seller; seller xác nhận nhận lại rồi tạo một hồ sơ bản nháp liên kết sản phẩm gốc để cập nhật và gửi duyệt. Hàng không khớp/đang vận chuyển/thất lạc không được bán tiếp. Khi tranh chấp không có căn cứ, có thể dừng thu hồi trước khi gửi; nếu đã nhận về, phải gửi lại và xác nhận giao buyer trước khi giải ngân.
+
+Cùng món hàng khóa theo sản phẩm gốc khi tạo phiên, xử lý đơn và Second Chance. Đã có phiên mới thì đề nghị từ phiên cũ không còn được gửi/chấp nhận. Chữ DA_CHAP_NHAN trong lịch sử không tự khóa hàng vĩnh viễn khi đơn liên quan đã hủy và mọi điều kiện bán lại đã đạt.
+
+Cấu hình cọc có thêm cho_phep_nguoi_ban_chon. Nếu Admin tắt cọc, seller không bật được; nếu bắt buộc, không tắt được; khi cho phép chọn, seller bật/tắt trước khi tạo. Snapshot số tiền và điều kiện phiên cũ giữ nguyên. Mua ngay có công tắc riêng, bỏ giá khi tắt và giải thích lý do bị khóa khi phiên đã BID/đạt sàn/kết thúc.
+
+## Ngoại lệ đơn và trách nhiệm hàng hoàn — phiên bản 3.2
+
+Hoàn cọc ngoại lệ không áp dụng việc buyer tự đổi ý, thiếu tiền hoặc quên thanh toán. Phải chọn lỗi hệ thống/lỗi bên bán/thông tin phiên sai và ghi tham chiếu chứng cứ đã xác minh. API kiểm tra bắt buộc các trường; Admin xác minh căn cứ thực tế, không có công cụ tự xác minh nội dung hồ sơ bên ngoài.
+
+Chi tiết chính sách ở mục 24.13 tài liệu chính. Admin quyết toán toàn bộ cọc bỏ thanh toán cho seller hoặc hoàn buyer theo ngoại lệ có lý do, chỉ một lần; đơn vẫn hủy. Cọc vẫn giữ lịch sử chuyển vào đơn, kết quả cuối ở escrow và nhật ký QUYET_TOAN_COC_BO_THANH_TOAN. Không tự hủy vi phạm và không tính là bán thành công.
+
+Admin giải tỏa cảnh báo sau khi đã gửi hàng, thu đủ, hai tài khoản hoạt động, không tranh chấp/thu hồi. Thao tác không giải ngân hoặc đổi hạn kiểm tra. Job bỏ qua đơn đã chờ Admin. Quyết định tranh chấp cho seller cũng chặn giải ngân khi có tài khoản bị hạn chế.
+
+Trả hàng vẫn ở trung tâm cập nhật hồ sơ lưu giữ gốc, không tạo lần nhận giả; nội dung kiểm định cũ bất biến. Hồ sơ đã gắn đơn hiển thị chỉ đọc, bàn giao qua workflow hàng hoàn.
+
+Admin ghi biên bản trách nhiệm/phí hoàn/bồi thường và xác nhận đối soát với mã chứng từ riêng; không ghi đè biên bản. Thu chi phát sinh do các bên đối soát thủ công, không tự khấu trừ escrow hay sửa tổng đơn. Hoàn tiền buyer không chờ đối tác bồi thường; món hàng thất lạc vẫn khóa bán. Chưa có tích hợp chi trả bồi thường qua cổng thanh toán hoặc tự xác minh vận đơn thật.
