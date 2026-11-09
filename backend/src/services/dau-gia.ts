@@ -651,14 +651,49 @@ async function danhSach(
     boLoc.bidderId = nguoiDung.id;
   }
 
+  await chotPhienDenHan();
+
   return (await khoDuLieu.danhSach(kiemTra.phanTrang(truyVan), boLoc)).map(phienCongKhai);
 }
 
+// Chốt các phiên đã đến giờ bắt đầu/kết thúc ngay khi có người xem, không chờ tác vụ định kỳ.
+// Lỗi của từng phiên (ví dụ người thắng thiếu địa chỉ) không làm hỏng yêu cầu đọc; tác vụ sẽ thử lại.
+async function chotPhienDenHan(gioiHan = 20) {
+  for (const { id } of (await khoDuLieu.denHan()).slice(0, gioiHan)) {
+    try {
+      await xuLyDenHan(id);
+    } catch {
+      // Bỏ qua để trang vẫn hiển thị; trạng thái sẽ được tác vụ định kỳ xử lý lại.
+    }
+  }
+}
+
 async function chiTiet(id) {
-  return phienCongKhai(batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id))));
+  const phienId = kiemTra.id(id);
+  const phien = batBuocTonTai(await khoDuLieu.layTheoId(phienId));
+
+  if (['DA_LEN_LICH', 'HOAT_DONG'].includes(phien.trang_thai)) {
+    const hienTai = await coSoDuLieu.thoiGianHienTai();
+    const denMoc =
+      thoiGian.daHetHan(phien.thoi_gian_ket_thuc, hienTai) ||
+      (phien.trang_thai === 'DA_LEN_LICH' && thoiGian.daHetHan(phien.thoi_gian_bat_dau, hienTai));
+
+    if (denMoc) {
+      try {
+        return await xuLyDenHan(phienId);
+      } catch {
+        // Giữ trạng thái hiện có nếu chưa chốt được; tác vụ định kỳ sẽ xử lý lại.
+      }
+    }
+  }
+
+  return phienCongKhai(phien);
 }
 
 async function chiTietCuaToi(nguoiDung: NguoiDungDangNhap, id) {
+  // Chốt phiên nếu đã đến hạn trước khi đọc, để người bán thấy đúng kết quả.
+  await chiTiet(id);
+
   const phien = batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id)));
 
   baoDam(cungId(phien.nguoi_ban_id, nguoiDung.id), 403, 'Phiên không thuộc tài khoản');

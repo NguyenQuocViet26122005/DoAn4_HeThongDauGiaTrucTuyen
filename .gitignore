@@ -42,3 +42,7 @@ pnpm-debug.log*
 /tools/bo_sung_thiet_ke_csdl.py
 # Tệp khóa tạm của Word.
 ~$*.docx
+
+# Kết quả kiểm thử E2E (Playwright)
+/frontend/test-results/
+/frontend/playwright-report/

@@ -21,6 +21,8 @@ function khoiTao(io) {
     }
   });
   io.on('connection', (ketNoiSocket) => {
+    ketNoiSocket.join(cacSuKien.PHONG_DANH_SACH);
+
     if (ketNoiSocket.data.user) {
       ketNoiSocket.join(`user:${ketNoiSocket.data.user.id}`);
     }

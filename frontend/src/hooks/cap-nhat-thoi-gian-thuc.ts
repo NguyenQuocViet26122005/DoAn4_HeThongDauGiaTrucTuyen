@@ -67,9 +67,14 @@ export function useCapNhatThoiGianThuc() {
           tatCa
             ? undefined
             : {
+                // Mục kết thúc bằng '$' là khớp đúng khóa, còn lại khớp theo tiền tố.
                 predicate: ({ queryKey }) =>
                   typeof queryKey[0] === 'string' &&
-                  nhom.some((muc) => (queryKey[0] as string).startsWith(muc)),
+                  nhom.some((muc) =>
+                    muc.endsWith('$')
+                      ? queryKey[0] === muc.slice(0, -1)
+                      : (queryKey[0] as string).startsWith(muc),
+                  ),
               },
         );
       }, 250);
@@ -128,10 +133,24 @@ export function useCapNhatThoiGianThuc() {
 
       capNhat(nhom ? ['/notifications', '/users/me', ...nhom] : undefined);
     });
+
+    // Mọi kết nối nhận sự kiện của mọi phiên (phòng danh sách), nên chỉ làm mới
+    // các danh sách phiên và đúng phiên vừa đổi, không tải lại chi tiết phiên khác.
+    const nhomPhien = (phien?: { id?: string | number }) => [
+      '/auctions$',
+      '/auctions/my-bids$',
+      '/auctions/mine$',
+      '/admin/auctions$',
+      '/watchlist',
+      ...(phien?.id ? [`/auctions/${phien.id}`, `/auctions/mine/${phien.id}`] : []),
+    ];
+
     for (const suKien of ['auction:bid-updated', 'auction:started']) {
-      ketNoi.on(suKien, () => capNhat(['/auctions', '/watchlist']));
+      ketNoi.on(suKien, (phien?: { id?: string | number }) => capNhat(nhomPhien(phien)));
     }
-    ketNoi.on('auction:ended', () => capNhat(['/auctions', '/watchlist', '/orders']));
+    ketNoi.on('auction:ended', (phien?: { id?: string | number }) =>
+      capNhat([...nhomPhien(phien), '/orders', '/admin/orders']),
+    );
 
     return () => {
       daDong = true;

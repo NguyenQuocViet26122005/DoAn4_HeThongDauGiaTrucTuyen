@@ -82,6 +82,15 @@ Chế độ `dev:local` thay máy chủ xem trước chỉ đọc trước đây
 
 Ảnh bìa trang chủ là tài nguyên trang trí, không thay thế ảnh sản phẩm. Ảnh sản phẩm thật phải do người bán cung cấp. Đã bỏ các tài nguyên mẫu không còn dùng: `src/assets/hero.png`, `src/assets/react.svg`, `src/assets/vite.svg`, `public/icons.svg`; giữ ảnh bìa hiện tại và favicon VietBid.
 
+## Kiểm thử E2E tự động (Playwright)
+
+`npm run test:e2e` tự build backend, bật máy chủ thử `kiem-thu-giao-dien.js --nguoi-mua --don-hang` ở cổng 5001 (CSDL `doan4_daugia_kiem_thu`, dữ liệu trong transaction được hoàn tác khi dừng) và Vite thử ở cổng 5174, rồi chạy các bài trong `e2e/`. Cần chạy `npm run test:prepare` trong backend một lần nếu CSDL kiểm thử chưa có, và cổng 5001/5174 phải trống. Trình duyệt là Microsoft Edge có sẵn trên Windows (`channel: 'msedge'`), không cần tải trình duyệt của Playwright.
+
+- `bo-cuc.spec.ts`: đo bố cục các trang công khai, tài khoản, người bán, Admin ở cỡ máy tính (1440px) và điện thoại (Pixel 7): không cuộn ngang, không phần tử tràn, không khối chữ bị bóp vào cột hẹp.
+- `luong-chinh.spec.ts` (chỉ cỡ máy tính): đăng nhập bằng biểu mẫu; đặt giá và xem lại mức tối đa của mình; đặt cọc rồi mới mở được ô đặt giá; thanh toán phần còn lại chuyển đơn sang chờ gửi hàng; thông báo của người bán dẫn về khu người bán.
+
+Máy chủ thử không bao giờ commit nên sự kiện Socket.IO (chỉ phát sau commit) không chạy trong E2E; việc phát sự kiện tới phòng danh sách được kiểm ở `backend/tests/su-kien-phong.test.js`. Ảnh kiểm thử trong `backend/uploads-kiem-thu` có thể còn lại khi Playwright dừng máy chủ đột ngột; thư mục này không đưa vào Git.
+
 ## Kiểm tra giao diện bằng dữ liệu riêng
 
 Ngày 04/10/2026 đã hoàn tất kiểm tra trình duyệt luồng xác minh: gửi giấy tờ, Admin duyệt và người dùng nhận trạng thái đã xác minh. Các ca từ chối có lý do, nộp lại, CCCD/hộ chiếu và xem tệp riêng đã kiểm tra trong đợt 03–04/10. Thông báo đã thử lọc chưa đọc, phân trang, đánh dấu một/tất cả và liên kết về đúng hồ sơ. Đánh dấu tất cả đưa về trang đầu; nút làm mới cập nhật cả số chưa đọc trên thanh điều hướng. Hai nhánh quyết định tranh chấp đã kiểm tra trên UI, tiền đang giữ về 0 đúng theo hoàn tiền hoặc giải ngân. Bố cục PC đã kiểm tra; các trang mới còn cần kiểm tra lại màn hình nhỏ vì công cụ viewport không đổi được kích thước trong phiên 04/10.

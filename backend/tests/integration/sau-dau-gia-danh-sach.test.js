@@ -77,6 +77,35 @@ test('Sau phiên: báo người thắng, đơn có tên sản phẩm, người b
     assert.equal((await donHang.chiTiet(d.b, don.id)).ung_vien_de_nghi, null);
   }));
 
+test('Đọc chi tiết hoặc danh sách tự chốt phiên đã đến hạn, không chờ tác vụ định kỳ', () =>
+  hoanTac(async () => {
+    const d = await taoDuLieuKiemThu();
+    const hienTai = await db.thoiGianHienTai();
+    const sapMo = await phienDauGia(d, {
+      trang_thai: 'DA_LEN_LICH',
+      thoi_gian_bat_dau: thoiGian.congGiay(hienTai, -5),
+    });
+
+    assert.equal((await dauGia.chiTiet(sapMo)).trang_thai, 'HOAT_DONG');
+
+    const coNguoiThang = await phienDauGia(d);
+
+    await dauGia.datGia(d.a, coNguoiThang, { gia_toi_da: '20000000' });
+    await records.capNhat('phien_dau_gia', coNguoiThang, {
+      thoi_gian_ket_thuc: thoiGian.congGiay(hienTai, -1),
+    });
+
+    const daChot = await dauGia.chiTiet(coNguoiThang);
+
+    assert.equal(daChot.trang_thai, 'DA_KET_THUC');
+    assert.ok(await khoDon.donDangXuLyCuaPhien(coNguoiThang));
+
+    const khongAi = await phienDauGia(d, { thoi_gian_ket_thuc: thoiGian.congGiay(hienTai, -1) });
+
+    await dauGia.danhSach(null, { q: d.prefix, limit: 5 });
+    assert.equal((await khoPhien.layTheoId(khongAi)).trang_thai, 'THAT_BAI');
+  }));
+
 test('Địa chỉ trung tâm: Admin lưu chuỗi, hồ sơ kiểm định trả về; giá trị quá ngắn bị từ chối', () =>
   hoanTac(async () => {
     const d = await taoDuLieuKiemThu();

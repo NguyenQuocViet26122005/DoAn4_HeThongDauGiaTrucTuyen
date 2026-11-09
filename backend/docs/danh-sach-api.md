@@ -386,6 +386,8 @@ Quyền: QUAN_TRI.
 
 Quyền: Công khai.
 
+Trước khi trả danh sách (cả `/auctions/mine`, `/auctions/my-bids`, `/watchlist`, `/admin/auctions`), máy chủ chốt tối đa 20 phiên đã đến giờ bắt đầu/kết thúc bằng đúng nghiệp vụ của tác vụ định kỳ, để trạng thái không phụ thuộc lịch chạy. Lỗi chốt của một phiên không làm hỏng yêu cầu đọc; tác vụ định kỳ xử lý lại.
+
 ### GET /auctions/mine — Phiên do tôi bán
 
 Quyền: Người bán của sản phẩm/đơn; thao tác bán cần xác minh.
@@ -402,7 +404,9 @@ Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 
 ### GET /auctions/:id — Chi tiết phiên công khai
 
-Quyền: Công khai.
+Quyền: Công khai. Nếu phiên đã đến giờ bắt đầu hoặc kết thúc mà chưa được chốt, máy chủ chốt ngay (mở phiên, hoặc kết thúc và tạo đơn cho người thắng) rồi mới trả kết quả. `GET /auctions/mine/:id` làm tương tự cho người bán.
+
+Sự kiện Socket.IO `auction:bid-updated`, `auction:started`, `auction:ended` phát cho phòng của phiên và phòng chung `danh-sach-phien` mà mọi kết nối tự vào, để trang danh sách cũng thấy thay đổi; nội dung chỉ gồm trường công khai.
 
 ### GET /auctions/:id/bids — Lịch sử giá công khai
 
