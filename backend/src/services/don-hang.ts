@@ -702,6 +702,41 @@ async function xuLyDenHan(id) {
   });
 }
 
+// Chốt các đơn đã đến hạn (quá hạn thanh toán, hết hạn kiểm tra, quá hạn gửi hàng) ngay khi có
+// người xem, cùng nghiệp vụ với tác vụ định kỳ. Lỗi của một đơn không làm hỏng yêu cầu đọc.
+async function chotDonDenHan(gioiHan = 20) {
+  for (const { id } of (await khoDuLieu.denHan()).slice(0, gioiHan)) {
+    try {
+      await xuLyDenHan(id);
+    } catch {
+      // Bỏ qua để trang vẫn hiển thị; tác vụ định kỳ sẽ xử lý lại.
+    }
+  }
+}
+
+async function danhSach(nguoiDung: NguoiDungDangNhap, phanTrang, phamVi) {
+  await chotDonDenHan();
+
+  return khoDuLieu.danhSach(nguoiDung, phanTrang, phamVi);
+}
+
+// Đường đọc chi tiết qua HTTP: kiểm tra quyền trước, chốt đơn nếu đã đến hạn rồi mới trả.
+async function xemChiTiet(nguoiDung: NguoiDungDangNhap, id) {
+  const donId = kiemTra.id(id);
+
+  kiemTraQuyen(nguoiDung, batBuocTonTai(await khoBanGhi.layTheoId('don_hang', donId)));
+
+  if ((await khoDuLieu.denHan()).some((muc) => cungId(muc.id, donId))) {
+    try {
+      await xuLyDenHan(donId);
+    } catch {
+      // Giữ trạng thái hiện có nếu chưa chốt được; tác vụ định kỳ sẽ xử lý lại.
+    }
+  }
+
+  return chiTiet(nguoiDung, donId);
+}
+
 async function nhacAdminDonTreo(id) {
   const banGhi = await khoBanGhi.layTheoId('don_hang', id);
 
@@ -749,6 +784,9 @@ export {
   chupDiaChi,
   taoDonNguoiThang,
   chiTiet,
+  xemChiTiet,
+  danhSach,
+  chotDonDenHan,
   capNhatDiaChi,
   thanhToan,
   guiHang,

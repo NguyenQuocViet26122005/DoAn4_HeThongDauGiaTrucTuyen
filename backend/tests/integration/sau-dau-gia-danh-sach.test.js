@@ -106,6 +106,42 @@ test('Đọc chi tiết hoặc danh sách tự chốt phiên đã đến hạn, 
     assert.equal((await khoPhien.layTheoId(khongAi)).trang_thai, 'THAT_BAI');
   }));
 
+test('Xem chi tiết hoặc danh sách đơn tự chốt đơn quá hạn thanh toán, không chờ tác vụ định kỳ', () =>
+  hoanTac(async () => {
+    const d = await taoDuLieuKiemThu();
+    const taoDonQuaHan = async () => {
+      const p = await phienDauGia(d);
+
+      await dauGia.datGia(d.a, p, { gia_toi_da: '20000000' });
+      await records.capNhat('phien_dau_gia', p, { thoi_gian_ket_thuc: await db.thoiGianHienTai() });
+      await dauGia.xuLyDenHan(p);
+
+      const don = await khoDon.donDangXuLyCuaPhien(p);
+
+      await records.capNhat('don_hang', don.id, {
+        han_thanh_toan: thoiGian.congGiay(await db.thoiGianHienTai(), -1),
+      });
+
+      return don.id;
+    };
+
+    const xemChiTiet = await taoDonQuaHan();
+
+    // Người ngoài không có quyền xem thì bị chặn trước, không kích hoạt việc chốt đơn.
+    await assert.rejects(donHang.xemChiTiet(d.outsider, xemChiTiet), { status: 403 });
+    assert.equal((await records.layTheoId('don_hang', xemChiTiet)).trang_thai, 'CHO_THANH_TOAN');
+
+    const daXem = await donHang.xemChiTiet(d.a, xemChiTiet);
+
+    assert.equal(daXem.trang_thai, 'DA_HUY');
+    assert.equal(daXem.ly_do_huy, 'KHONG_THANH_TOAN');
+
+    const quaDanhSach = await taoDonQuaHan();
+
+    await donHang.danhSach(d.seller, { limit: 10, offset: 0 }, 'NGUOI_BAN');
+    assert.equal((await records.layTheoId('don_hang', quaDanhSach)).trang_thai, 'DA_HUY');
+  }));
+
 test('Địa chỉ trung tâm: Admin lưu chuỗi, hồ sơ kiểm định trả về; giá trị quá ngắn bị từ chối', () =>
   hoanTac(async () => {
     const d = await taoDuLieuKiemThu();

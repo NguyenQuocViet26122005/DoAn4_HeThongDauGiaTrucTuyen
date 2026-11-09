@@ -547,11 +547,13 @@ Quyền: QUAN_TRI.
 
 Tùy chọn `vai_tro=NGUOI_MUA` hoặc `vai_tro=NGUOI_BAN` lọc đúng tài khoản trước phân trang. Bỏ tham số trả cả đơn mua và bán như trước; giá trị khác trả 400. Không cấp quyền đọc đơn của người khác qua bộ lọc.
 
+Trước khi trả danh sách (cả `GET /admin/orders`), máy chủ chốt tối đa 20 đơn đã đến hạn bằng đúng nghiệp vụ của tác vụ định kỳ: quá hạn thanh toán thì hủy đơn, xử lý cọc và ghi vi phạm; hết hạn kiểm tra hàng mà không có tranh chấp thì giải ngân; quá hạn gửi hàng thì ghi nhận gửi muộn. Lỗi chốt của một đơn không làm hỏng yêu cầu đọc.
+
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 
 ### GET /orders/:id — Chi tiết đơn và tiền đang giữ
 
-Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
+Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Sau khi kiểm tra quyền, nếu đơn đã đến hạn mà chưa được chốt, máy chủ chốt ngay theo nghiệp vụ của tác vụ định kỳ rồi mới trả kết quả; người không có quyền xem không kích hoạt việc chốt.
 
 Chi tiết đơn bổ sung `danh_gia_cua_toi`: null nếu người đang xem chưa đánh giá, hoặc object gồm `id`, `so_sao`, `nhan_xet`, `ngay_tao`. Trường này chỉ được đọc sau kiểm tra quyền xem đơn.
 

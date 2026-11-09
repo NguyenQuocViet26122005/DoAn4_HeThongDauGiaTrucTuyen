@@ -18,12 +18,12 @@ function phamViDon(yeuCau) {
 
 export = {
   danhSach: xuLyHTTP((yeuCau) =>
-    khoDuLieu.danhSach(yeuCau.user, kiemTra.phanTrang(yeuCau.query), phamViDon(yeuCau)),
+    dichVu.danhSach(yeuCau.user, kiemTra.phanTrang(yeuCau.query), phamViDon(yeuCau)),
   ),
   danhSachQuanTri: xuLyHTTP((yeuCau) =>
-    khoDuLieu.danhSach(yeuCau.user, kiemTra.phanTrang(yeuCau.query), 'admin'),
+    dichVu.danhSach(yeuCau.user, kiemTra.phanTrang(yeuCau.query), 'admin'),
   ),
-  chiTiet: xuLyHTTP((yeuCau) => dichVu.chiTiet(yeuCau.user, yeuCau.params.id)),
+  chiTiet: xuLyHTTP((yeuCau) => dichVu.xemChiTiet(yeuCau.user, yeuCau.params.id)),
   quyetToanCoc: xuLyHTTP((r) =>
     require('../services/xu-ly-ngoai-le-don').quyetToanCoc(r.user, r.params.id, r.body),
   ),
