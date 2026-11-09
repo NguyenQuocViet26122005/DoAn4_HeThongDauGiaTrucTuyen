@@ -82,15 +82,22 @@ p {
 }
 
 /* Tiêu đề trang: tiêu đề và mô tả, thao tác nằm cùng hàng bên phải. */
+/* Các quy tắc chỉ dành cho màn rộng nằm trong media query để không đè bố cục điện thoại ở bo-cuc.css. */
 .tieu-de-trang {
   margin-bottom: 28px;
-  align-items: flex-end;
 }
 .tieu-de-trang h1 {
   margin: 0 0 8px;
 }
-.noi-dung-lam-viec .tieu-de-trang h1 {
-  font-size: 40px;
+@media (min-width: 541px) {
+  .tieu-de-trang {
+    align-items: flex-end;
+  }
+}
+@media (min-width: 801px) {
+  .noi-dung-lam-viec .tieu-de-trang h1 {
+    font-size: 40px;
+  }
 }
 .tieu-de-trang p {
   max-width: 68ch;
@@ -99,7 +106,11 @@ p {
 /* Thanh bên khu làm việc: hàng 36px, mục đang chọn là viên nền trung tính, chữ giữ màu thường. */
 .thanh-ben {
   background: #151713;
-  padding: 20px 12px;
+}
+@media (min-width: 801px) {
+  .thanh-ben {
+    padding: 20px 12px;
+  }
 }
 .thanh-ben nav {
   gap: 2px;
@@ -128,8 +139,10 @@ p {
 }
 
 /* Một khoảng cách lưới thống nhất cho khu làm việc. */
-.khung-lam-viec {
-  gap: 32px;
+@media (min-width: 801px) {
+  .khung-lam-viec {
+    gap: 32px;
+  }
 }
 
 /* Bảng Ant Design: số liệu thẳng cột, đầu bảng chữ thường. */
@@ -139,4 +152,92 @@ p {
 .ant-table-thead > tr > th {
   font-weight: 500;
   color: var(--chu-phu);
+}
+
+/* Thẻ danh sách: cùng một phản hồi khi di chuột, viền ngả vàng và nhấc nhẹ. */
+.the-don,
+.dong-san-pham-ban,
+.the-phien {
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+@media (hover: hover) {
+  .the-don:hover,
+  .dong-san-pham-ban:hover {
+    border-color: #d5b77859;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px -20px #000;
+  }
+}
+
+/* Tiến trình đơn: bốn chấm nối nhau, bước đã qua tô vàng, bước hiện tại sáng viền. */
+.tien-trinh-don {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 14px 0 6px;
+  padding: 0;
+  list-style: none;
+  max-width: 520px;
+}
+.tien-trinh-don li {
+  position: relative;
+  padding-top: 18px;
+  font-size: 11.5px;
+  color: var(--chu-phu);
+}
+.tien-trinh-don li::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #34372f;
+  z-index: 1;
+}
+.tien-trinh-don li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 9px;
+  right: 0;
+  height: 1px;
+  background: #34372f;
+}
+.tien-trinh-don li.da-xong::before,
+.tien-trinh-don li.da-xong::after {
+  background: var(--vang);
+}
+.tien-trinh-don li.dang-o {
+  color: var(--chu);
+  font-weight: 500;
+}
+.tien-trinh-don li.dang-o::before {
+  background: #11120f;
+  box-shadow: 0 0 0 2px var(--vang);
+}
+
+/* Nội dung trang hiện dần khi chuyển trang; tắt khi người dùng chọn giảm chuyển động. */
+@media (prefers-reduced-motion: no-preference) {
+  .noi-dung-lam-viec > *,
+  .trang-noi-dung > * {
+    animation: hien-trang 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .noi-dung-lam-viec > :nth-child(2),
+  .trang-noi-dung > :nth-child(2) {
+    animation-delay: 0.05s;
+  }
+  .noi-dung-lam-viec > :nth-child(n + 3),
+  .trang-noi-dung > :nth-child(n + 3) {
+    animation-delay: 0.1s;
+  }
+}
+@keyframes hien-trang {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }

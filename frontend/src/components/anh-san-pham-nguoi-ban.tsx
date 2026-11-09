@@ -4,6 +4,7 @@ import { AnhSanPham } from './dung-chung';
 import type { AnhSanPham as DuLieuAnh } from '../types/san-pham';
 import { loiDeDoc, taiTep } from '../services/api';
 import { chonAnhChinh, ganAnh, xoaAnh } from '../services/san-pham';
+import { maNgauNhien } from '../utils/ma-ngau-nhien';
 
 interface TepCho {
   id: string;
@@ -176,10 +177,7 @@ export default function AnhSanPhamNguoiBan({
                   return true;
                 });
 
-                datTepCho((cu) => [
-                  ...cu,
-                  ...hopLe.map((tep) => ({ id: crypto.randomUUID(), tep })),
-                ]);
+                datTepCho((cu) => [...cu, ...hopLe.map((tep) => ({ id: maNgauNhien(), tep }))]);
               }}
             />
           </label>

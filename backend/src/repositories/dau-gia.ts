@@ -150,9 +150,15 @@ const trangThaiTheoDoi = (nguoiDungId, phienId) =>
     'SELECT dang_theo_doi FROM tham_gia_phien WHERE nguoi_dung_id=? AND phien_dau_gia_id=?',
     [nguoiDungId, phienId],
   );
+const mucToiDaCuaToi = (nguoiDungId, phienId) =>
+  coSoDuLieu.layMot(
+    'SELECT gia_toi_da, thoi_gian_dat_gia_toi_da FROM tham_gia_phien WHERE nguoi_dung_id=? AND phien_dau_gia_id=? AND gia_toi_da IS NOT NULL',
+    [nguoiDungId, phienId],
+  );
 
 export {
   trangThaiTheoDoi,
+  mucToiDaCuaToi,
   layTheoId,
   cacMucToiDa,
   lichSu,

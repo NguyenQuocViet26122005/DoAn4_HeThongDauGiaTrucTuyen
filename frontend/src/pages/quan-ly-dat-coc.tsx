@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { mocThoiGian, ngayGio, tien } from '../utils/dinh-dang';
+import { gioMayChu } from '../utils/gio-may-chu';
 
 interface Coc {
   id: string;
@@ -61,7 +62,7 @@ export default function QuanLyDatCoc() {
   );
 
   useEffect(() => {
-    const capNhatThoiGian = () => datHienTai(Date.now());
+    const capNhatThoiGian = () => datHienTai(gioMayChu());
     const boHenGio = setInterval(capNhatThoiGian, 10000);
 
     capNhatThoiGian();

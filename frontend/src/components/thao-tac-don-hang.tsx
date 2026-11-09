@@ -9,10 +9,11 @@ import type { DonHang } from '../types/don-hang';
 import type { KetQuaThanhToan } from '../types/tham-gia-phien';
 import { duocHoanTatDon } from '../utils/don-hang';
 import { mocThoiGian, ngayGio, tien } from '../utils/dinh-dang';
+import { gioMayChu } from '../utils/gio-may-chu';
 
 export default function ThaoTacDonHang({ don }: { don: DonHang }) {
   const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
-  const [hienTai, datHienTai] = useState(Date.now);
+  const [hienTai, datHienTai] = useState(gioMayChu);
   const [ketQua, datKetQua] = useState<KetQuaThanhToan>();
   const [thaoTac, datThaoTac] = useState<'delivered' | 'confirm'>();
   const [dangGui, datDangGui] = useState(false);
@@ -21,7 +22,7 @@ export default function ThaoTacDonHang({ don }: { don: DonHang }) {
   const dangXuLy = useRef(false);
 
   useEffect(() => {
-    const dem = setInterval(() => datHienTai(Date.now()), 1000);
+    const dem = setInterval(() => datHienTai(gioMayChu()), 1000);
 
     return () => clearInterval(dem);
   }, []);

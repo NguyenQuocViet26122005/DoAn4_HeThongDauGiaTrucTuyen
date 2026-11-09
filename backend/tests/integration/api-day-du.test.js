@@ -628,6 +628,21 @@ kiemThu(
 
               // SQL kiểm thử có bước 500.000 đồng tại mức 20 triệu.
               xacNhan.equal(thuHai.gia_hien_tai, '20500000.00');
+
+              // Mỗi người chỉ đọc được mức tối đa của chính mình.
+              xacNhan.equal(
+                (await gui('GET', `/auctions/${phien.id}/my-max`, 'b')).muc_toi_da_cua_toi,
+                '22000000.00',
+              );
+              xacNhan.equal(
+                (await gui('GET', `/auctions/${phien.id}/my-max`, 'a')).muc_toi_da_cua_toi,
+                '20000000.00',
+              );
+              xacNhan.equal(
+                (await gui('GET', `/auctions/${phien.id}/my-max`, 'seller')).muc_toi_da_cua_toi,
+                null,
+              );
+              await gui('GET', `/auctions/${phien.id}/my-max`, undefined, undefined, 401);
               await gui('POST', `/auctions/${phien.id}/buy-now`, 'b', {}, 409);
               await gui('GET', `/auctions/${phien.id}/bids`);
               await gui('GET', `/auctions/${phien.id}`);

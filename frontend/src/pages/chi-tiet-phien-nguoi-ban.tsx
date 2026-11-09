@@ -8,6 +8,8 @@ import { loiDeDoc } from '../services/api';
 import { guiYeuCauHuyPhien, lamMoiPhienNguoiBan } from '../services/phien-nguoi-ban';
 import type { PhienNguoiBan, ThongKeCoc } from '../types/phien-nguoi-ban';
 import { mocThoiGian, ngayGio, tien } from '../utils/dinh-dang';
+import { gioMayChu } from '../utils/gio-may-chu';
+import { useChuKyDuPhong } from '../store/ket-noi-thoi-gian-thuc';
 
 const lyDoKetThuc: Record<string, string> = {
   CO_NGUOI_THANG: 'Đã xác định người thắng',
@@ -192,12 +194,17 @@ function YeuCauHuy({ phien, hetGio }: { phien: PhienNguoiBan; hetGio: boolean })
 }
 
 function NoiDungPhien({ id }: { id: string }) {
-  const truyVan = useDuLieu<PhienNguoiBan>(`/auctions/mine/${id}`, undefined, true, 10000);
+  const truyVan = useDuLieu<PhienNguoiBan>(
+    `/auctions/mine/${id}`,
+    undefined,
+    true,
+    useChuKyDuPhong(10000),
+  );
   const phien = truyVan.data;
-  const [hienTai, datHienTai] = useState(Date.now);
+  const [hienTai, datHienTai] = useState(gioMayChu);
 
   useEffect(() => {
-    const boDem = setInterval(() => datHienTai(Date.now()), 1000);
+    const boDem = setInterval(() => datHienTai(gioMayChu()), 1000);
 
     return () => clearInterval(boDem);
   }, []);

@@ -10,6 +10,7 @@ boDinhTuyen.get('/auctions/mine/:id', yeuCauDangNhap(), nguoiBan, dieuKhien.chiT
 boDinhTuyen.get('/auctions/my-bids', yeuCauDangNhap(), dieuKhien.phienDaThamGia);
 boDinhTuyen.get('/auctions/:id', dieuKhien.chiTiet);
 boDinhTuyen.get('/auctions/:id/bids', dieuKhien.lichSu);
+boDinhTuyen.get('/auctions/:id/my-max', yeuCauDangNhap(), dieuKhien.mucToiDaCuaToi);
 boDinhTuyen.post('/auctions', yeuCauDangNhap(), nguoiBan, dieuKhien.tao);
 boDinhTuyen.post('/auctions/:id/bids', yeuCauDangNhap(), gioiHanDatGia, dieuKhien.datGia);
 boDinhTuyen.post('/auctions/:id/buy-now', yeuCauDangNhap(), dieuKhien.muaNgay);

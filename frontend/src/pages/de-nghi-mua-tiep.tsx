@@ -8,12 +8,13 @@ import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { lamMoiDeNghi } from '../services/de-nghi-mua-tiep';
 import { mocThoiGian, ngayGio, tien } from '../utils/dinh-dang';
 import type { DeNghiMuaTiep } from '../types/de-nghi-mua-tiep';
+import { gioMayChu } from '../utils/gio-may-chu';
 
 function useThoiGian() {
-  const [hienTai, datHienTai] = useState(Date.now);
+  const [hienTai, datHienTai] = useState(gioMayChu);
 
   useEffect(() => {
-    const dem = setInterval(() => datHienTai(Date.now()), 1000);
+    const dem = setInterval(() => datHienTai(gioMayChu()), 1000);
 
     return () => clearInterval(dem);
   }, []);

@@ -26,6 +26,17 @@
   width: 100%;
 }
 
+.khoi-tham-gia .muc-cua-toi {
+  padding: 10px 14px;
+  border: 1px solid var(--vien);
+  border-radius: var(--bo-nut);
+  font-variant-numeric: tabular-nums;
+}
+
+.muc-cua-toi strong {
+  color: var(--vang);
+}
+
 .xac-nhan-thanh-toan,
 .danh-sach-dia-chi {
   margin-top: 20px;

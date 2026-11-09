@@ -158,7 +158,9 @@ Kiểm tra giao diện ngày 03–04/10/2026 trên CSDL riêng: người bán g�
 - **Danh mục và thuộc tính:** thêm/sửa danh mục, danh mục cha, thứ tự, trạng thái sử dụng và yêu cầu kiểm định; thêm/sửa thuộc tính văn bản/số/lựa chọn/đúng-sai/ngày, đơn vị và bắt buộc nhập. Backend bảo vệ cây danh mục và thuộc tính đã sử dụng. Không thêm xóa cứng danh mục hoặc thuộc tính.
 - **Cấu hình:** Admin sửa các thời hạn, chính sách cọc và toàn bộ khoảng bước giá qua biểu mẫu có xác nhận. Cọc chỉ chụp vào phiên tạo sau khi lưu; bước giá chỉ sửa khi không còn phiên chờ/đang chạy. Biểu mẫu dùng số tiền dạng chuỗi cho các khoảng để giữ chính xác phần thập phân lịch sử.
 - **Theo dõi vận hành:** bảng cọc hiển thị trạng thái, số tiền, các mốc xử lý và đơn liên quan; nhật ký có phân trang; tổng quan dùng số liệu thật từ API theo trạng thái, phân biệt giá trị đơn, tổng thu và tiền đang giữ. Admin xem trạng thái tác vụ nền, lượt chạy cuối và số lỗi; không có nút tự bật tác vụ hoặc quét dữ liệu chính từ trình duyệt.
-- **Cập nhật thời gian thực:** một kết nối Socket.IO theo phiên đăng nhập; vào/rời phòng khi mở chi tiết phiên công khai hoặc phiên của người bán, vào lại khi kết nối lại, đóng khi đổi tài khoản/rời ứng dụng. Sự kiện giá/bắt đầu/kết thúc/thông báo làm mới dữ liệu API; không lưu mức tối đa bí mật. Giá công khai vẫn làm mới định kỳ, số thông báo chưa đọc có chu kỳ dự phòng 30 giây.
+- **Cập nhật thời gian thực:** một kết nối Socket.IO theo phiên đăng nhập; vào/rời phòng khi mở chi tiết phiên công khai hoặc phiên của người bán, vào lại khi kết nối lại, đóng khi đổi tài khoản/rời ứng dụng. Sự kiện giá/bắt đầu/kết thúc chỉ làm mới nhóm dữ liệu phiên; thông báo chỉ làm mới nhóm dữ liệu theo liên kết của nó (đơn, tranh chấp, kiểm định…); không lưu mức tối đa bí mật. Trang phiên chỉ tự tải lại 10 giây khi socket mất kết nối; số thông báo chưa đọc có chu kỳ dự phòng 30 giây. Khi máy chủ ngắt hoặc từ chối socket (thường do token hết hạn), giao diện hỏi lại `/users/me`: hết hạn thì đăng xuất, còn hợp lệ thì kết nối lại.
+- **Giờ máy chủ:** mọi phản hồi API có header `X-Server-Time`; đếm ngược và việc khóa nút đặt giá/thanh toán dùng giờ máy chủ, nên máy người dùng chạy sai giờ vẫn hiện đúng.
+- **Mã ngẫu nhiên:** khóa chống gửi trùng và mã ảnh dùng `crypto.randomUUID`, tự chuyển sang `crypto.getRandomValues` khi mở qua HTTP không bảo mật (ví dụ IP mạng LAN).
 
 Trên trình duyệt đã kiểm tra: người bán gửi đề nghị theo giá công khai; người nhận xem đúng số tiền và địa chỉ; thanh toán thành công nhưng mất phản hồi vẫn khôi phục được sau khi tải lại bằng cùng mã giao dịch; đơn tạo đúng 21.050.000 đồng, không thu cọc và chỉ ghi nhận một khoản thanh toán. Đã kiểm tra thêm thanh toán thất bại rồi thử lại thành công, người nhận từ chối và đề nghị hết hạn bị khóa thanh toán. Các thao tác dùng môi trường kiểm thử riêng; CSDL chính không đổi cấu trúc hoặc dữ liệu.
 
@@ -262,7 +264,7 @@ Người mua đặt mức tối đa bí mật. Hệ thống chỉ nâng giá cô
 
 Chỉ lượt giá công khai hợp lệ trong 60 giây cuối mới kích hoạt cộng thêm 90 giây vào giờ kết thúc hiện tại. Người đang dẫn đầu tăng trần nhưng không làm đổi giá công khai không tạo lượt giả hoặc gia hạn giả.
 
-Trần không được xuất qua API, Socket.IO, thông báo hoặc nhật ký, kể cả API Admin. Giá sàn cũng không được suy ra bằng cách xuất dữ liệu nội bộ. API dùng danh sách trường công khai và lớp kiểm tra đầu ra.
+Trần của một người không được xuất cho người khác qua API, Socket.IO, thông báo hoặc nhật ký, kể cả API Admin. Ngoại lệ duy nhất: `GET /auctions/:id/my-max` trả trần của chính người gọi (trường `muc_toi_da_cua_toi`), để họ biết phải nâng lên trên mức nào. Giá sàn cũng không được suy ra bằng cách xuất dữ liệu nội bộ. API dùng danh sách trường công khai và lớp kiểm tra đầu ra.
 
 Đặt giá, Mua ngay, kết thúc và hủy phiên dùng transaction với khóa phiên để chỉ có một kết quả hợp lệ. Sự kiện realtime chỉ gửi sau commit.
 

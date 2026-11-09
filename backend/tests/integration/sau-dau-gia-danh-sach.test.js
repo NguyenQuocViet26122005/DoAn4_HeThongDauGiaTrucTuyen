@@ -7,6 +7,7 @@ const dauGia = require('../../dist/services/dau-gia');
 const donHang = require('../../dist/services/don-hang');
 const cauHinh = require('../../dist/services/cau-hinh');
 const khoDon = require('../../dist/repositories/don-hang');
+const khoTuongTac = require('../../dist/repositories/tuong-tac');
 const db = require('../../dist/repositories/ket-noi');
 const thoiGian = require('../../dist/utils/thoi-gian');
 
@@ -53,6 +54,15 @@ test('Sau phiên: báo người thắng, đơn có tên sản phẩm, người b
 
     assert.equal(thang.length, 1);
     assert.equal(thang[0].duong_dan_lien_ket, `/orders/${don.id}`);
+
+    // Cùng liên kết đơn: người bán được đánh dấu la_nguoi_ban để mở khu người bán.
+    const coCo = async (nguoiDung) =>
+      (await khoTuongTac.danhSachThongBao(nguoiDung.id, { limit: 50, offset: 0 }))
+        .filter((x) => x.duong_dan_lien_ket === `/orders/${don.id}`)
+        .map((x) => Number(x.la_nguoi_ban));
+
+    assert.deepEqual([...new Set(await coCo(d.seller))], [1]);
+    assert.deepEqual([...new Set(await coCo(d.b))], [0]);
     assert.match((await donHang.chiTiet(d.b, don.id)).tieu_de_san_pham, /Sản phẩm/);
 
     await records.capNhat('don_hang', don.id, {

@@ -408,6 +408,12 @@ Quyền: Công khai.
 
 Quyền: Công khai.
 
+### GET /auctions/:id/my-max — Mức tối đa của tôi
+
+Quyền: Đăng nhập. Chỉ trả mức tối đa bí mật của chính người gọi (`muc_toi_da_cua_toi`, `thoi_gian_dat`), để họ biết cần nâng lên trên mức nào; `muc_toi_da_cua_toi` là `null` khi chưa đặt giá. Không có API nào trả mức tối đa của người khác.
+
+Mọi phản hồi API có header `X-Server-Time` (mili giây Unix) để giao diện đếm ngược theo giờ máy chủ.
+
 ### POST /auctions/:id/reports — Báo cáo sản phẩm trong phiên
 
 Quyền: Đăng nhập; người bán của sản phẩm không được tự báo cáo. Mỗi người dùng chỉ gửi một báo cáo cho cùng sản phẩm, kể cả khi sản phẩm có nhiều phiên. Báo cáo tạo hồ sơ chờ Admin xem xét trong bảng vi phạm hiện có; không tự áp dụng chế tài.
@@ -721,6 +727,8 @@ Quyền: Công khai.
 ### GET /notifications — Thông báo của tôi
 
 Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
+
+Mỗi thông báo có thêm `la_nguoi_ban` (0/1): bằng 1 khi liên kết là `/auctions/:id` hoặc `/orders/:id` và người nhận là người bán của phiên/đơn đó. Giao diện dùng cờ này để mở khu người bán thay vì khu tài khoản người mua.
 
 ### GET /notifications/unread-count — Số thông báo chưa đọc
 

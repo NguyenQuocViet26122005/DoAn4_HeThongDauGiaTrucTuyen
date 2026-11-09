@@ -50,7 +50,18 @@ const cacDanhGia = (nguoiDungId, { limit: gioiHan, offset: viTriBatDau }) =>
   );
 const danhSachThongBao = (nguoiDungId, { limit: gioiHan, offset: viTriBatDau }, chuaDoc = false) =>
   coSoDuLieu.truyVan(
-    `SELECT * FROM thong_bao WHERE nguoi_dung_id=? ${chuaDoc ? 'AND da_doc=0' : ''} ORDER BY id DESC LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
+    // la_nguoi_ban: người nhận là chủ phiên/đơn trong liên kết, để giao diện mở đúng khu người bán.
+    `SELECT t.*,
+       CASE
+         WHEN t.duong_dan_lien_ket REGEXP '^/auctions/[0-9]+$' THEN EXISTS(
+           SELECT 1 FROM phien_dau_gia p JOIN san_pham s ON s.id=p.san_pham_id
+           WHERE p.id=CAST(SUBSTRING(t.duong_dan_lien_ket,11) AS UNSIGNED) AND s.nguoi_ban_id=t.nguoi_dung_id)
+         WHEN t.duong_dan_lien_ket REGEXP '^/orders/[0-9]+$' THEN EXISTS(
+           SELECT 1 FROM don_hang d
+           WHERE d.id=CAST(SUBSTRING(t.duong_dan_lien_ket,9) AS UNSIGNED) AND d.nguoi_ban_id=t.nguoi_dung_id)
+         ELSE 0
+       END AS la_nguoi_ban
+     FROM thong_bao t WHERE t.nguoi_dung_id=? ${chuaDoc ? 'AND t.da_doc=0' : ''} ORDER BY t.id DESC LIMIT ${gioiHan} OFFSET ${viTriBatDau}`,
     [nguoiDungId],
   );
 const demChuaDoc = (nguoiDungId) =>

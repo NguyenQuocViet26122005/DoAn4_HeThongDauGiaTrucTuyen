@@ -13,6 +13,7 @@ interface ThongBao {
   tieu_de: string;
   noi_dung: string;
   duong_dan_lien_ket: string | null;
+  la_nguoi_ban?: number;
   da_doc: number;
   ngay_tao: string;
 }
@@ -92,7 +93,11 @@ export default function TrangThongBao() {
       >
         <div className="danh-sach-don">
           {truyVan.data?.map((muc) => {
-            const lienKet = lienKetThongBao(muc.duong_dan_lien_ket, quanTri);
+            const lienKet = lienKetThongBao(
+              muc.duong_dan_lien_ket,
+              quanTri,
+              Boolean(muc.la_nguoi_ban),
+            );
 
             return (
               <article className="tam-noi-dung the-don" key={muc.id}>

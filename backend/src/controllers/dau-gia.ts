@@ -26,6 +26,7 @@ export = {
   ),
   danhSachTheoDoi: xuLyHTTP((yeuCau) => dichVu.danhSach(yeuCau.user, yeuCau.query, 'watchlist')),
   trangThaiTheoDoi: xuLyHTTP((yeuCau) => dichVu.trangThaiTheoDoi(yeuCau.user, yeuCau.params.id)),
+  mucToiDaCuaToi: xuLyHTTP((yeuCau) => dichVu.mucToiDaCuaToi(yeuCau.user, yeuCau.params.id)),
   theoDoi: xuLyHTTP((yeuCau) => dichVu.theoDoi(yeuCau.user, yeuCau.params.id, true)),
   boTheoDoi: xuLyHTTP((yeuCau) => dichVu.theoDoi(yeuCau.user, yeuCau.params.id, false)),
   cacBuocGia: xuLyHTTP(() => heThong.cacBuocGia()),

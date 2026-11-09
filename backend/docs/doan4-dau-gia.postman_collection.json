@@ -1641,6 +1641,40 @@
           ]
         },
         {
+          "name": "Mức tối đa của tôi trong phiên",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/auctions/{{phienId}}/my-max",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{maNguoiMua}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
+            "description": "Đăng nhập; chỉ trả mức tối đa của chính người gọi, không trả của người khác. Trả muc_toi_da_cua_toi = null nếu chưa đặt giá. Các ID phải lấy từ dữ liệu thật; xem huong-dan-postman.md."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Yêu cầu hợp lệ thành công', () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+                  "  const duLieu = pm.response.json().data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Chi tiết phiên công khai",
           "request": {
             "method": "GET",

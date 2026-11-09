@@ -18,11 +18,14 @@ ungDung.use(
         true,
       );
     },
+    exposedHeaders: ['X-Server-Time'],
   }),
 );
 ungDung.use((yeuCau, phanHoi, tiepTheo) => {
   phanHoi.set('X-Content-Type-Options', 'nosniff');
   phanHoi.set('Cache-Control', 'no-store');
+  // Giao diện dùng mốc này để đếm ngược theo giờ máy chủ, không theo đồng hồ máy người dùng.
+  phanHoi.set('X-Server-Time', String(Date.now()));
   tiepTheo();
 });
 ungDung.use(express.json({ limit: '128kb' }));

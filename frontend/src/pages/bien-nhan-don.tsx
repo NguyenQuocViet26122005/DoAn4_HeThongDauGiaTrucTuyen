@@ -1,6 +1,6 @@
 import { Alert, Button, Descriptions } from 'antd';
 import { Link, useParams } from 'react-router-dom';
-import { AnhSanPham, ChoDuLieu, TieuDe, TrangThai } from '../components/dung-chung';
+import { AnhSanPham, ChoDuLieu, TieuDe, TienTrinhDon, TrangThai } from '../components/dung-chung';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import type { DonHang } from '../types/don-hang';
 import { ngayGio, nhan, tien } from '../utils/dinh-dang';
@@ -41,6 +41,7 @@ export default function BienNhanDon({ khuVuc = 'tai-khoan' }: { khuVuc?: string 
               )}
               <h2>Mã đơn {don.ma_don_hang}</h2>
               <TrangThai giaTri={don.trang_thai} />
+              <TienTrinhDon trangThai={don.trang_thai} />
               <Descriptions
                 column={1}
                 items={[

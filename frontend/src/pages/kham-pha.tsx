@@ -25,6 +25,7 @@ import { bieuTuongDanhMuc } from '../utils/bieu-tuong';
 import { useDuLieu, useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { mocThoiGian, tenGiaPhien, tien } from '../utils/dinh-dang';
 import anhBia from '../assets/khong-gian-dau-gia.webp';
+import { gioMayChu } from '../utils/gio-may-chu';
 
 export function ThePhien({ phien }: { phien: Phien }) {
   return (
@@ -61,7 +62,7 @@ export function ThePhien({ phien }: { phien: Phien }) {
 export function TrangChu() {
   const bia = useRef<HTMLElement>(null);
   const hoTro3D = useHoTro3D();
-  const [hienTai, datHienTai] = useState(Date.now);
+  const [hienTai, datHienTai] = useState(gioMayChu);
   const phienDangDienRa = useDuLieu<Phien[]>(
     '/auctions',
     {
@@ -156,7 +157,7 @@ export function TrangChu() {
   }
 
   useEffect(() => {
-    const boDem = setInterval(() => datHienTai(Date.now()), 15000);
+    const boDem = setInterval(() => datHienTai(gioMayChu()), 15000);
 
     return () => clearInterval(boDem);
   }, []);

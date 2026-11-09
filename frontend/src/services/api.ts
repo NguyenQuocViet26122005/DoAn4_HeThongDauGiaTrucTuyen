@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { QueryClient } from '@tanstack/react-query';
+import { ghiNhanGioMayChu } from '../utils/gio-may-chu';
 
 export const boNho = new QueryClient({
   defaultOptions: {
@@ -24,8 +25,15 @@ http.interceptors.request.use((cauHinh) => {
   return cauHinh;
 });
 http.interceptors.response.use(
-  (phanHoi) => phanHoi,
+  (phanHoi) => {
+    ghiNhanGioMayChu(phanHoi.headers['x-server-time']);
+
+    return phanHoi;
+  },
   (loi) => {
+    if (axios.isAxiosError(loi)) {
+      ghiNhanGioMayChu(loi.response?.headers['x-server-time']);
+    }
     if (
       axios.isAxiosError(loi) &&
       loi.response?.status === 401 &&

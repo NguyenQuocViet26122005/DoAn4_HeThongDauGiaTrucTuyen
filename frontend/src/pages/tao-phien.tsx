@@ -11,6 +11,7 @@ import type { SanPhamTrongDanhSach } from '../types/san-pham';
 import { mocThoiGian, ngayGio, tien } from '../utils/dinh-dang';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import { ChoDuLieu } from '../components/dung-chung';
+import { gioMayChu } from '../utils/gio-may-chu';
 
 const giaToiDa = 9999999999999;
 const batBuoc = [{ required: true, message: 'Vui lòng nhập thông tin này' }];
@@ -204,7 +205,7 @@ function TruongGiaVaThoiGian() {
                   if (
                     giaTri &&
                     (!Number.isFinite(mocThoiGian(giaTri)) ||
-                      mocThoiGian(giaTri) < Date.now() - 60000)
+                      mocThoiGian(giaTri) < gioMayChu() - 60000)
                   ) {
                     return Promise.reject(new Error('Chọn thời gian bắt đầu từ hiện tại trở đi'));
                   }
@@ -227,7 +228,7 @@ function TruongGiaVaThoiGian() {
                   if (
                     giaTri &&
                     (!Number.isFinite(mocThoiGian(giaTri)) ||
-                      mocThoiGian(giaTri) <= Date.now() ||
+                      mocThoiGian(giaTri) <= gioMayChu() ||
                       mocThoiGian(giaTri) <= mocThoiGian(getFieldValue('thoi_gian_bat_dau')))
                   ) {
                     return Promise.reject(
@@ -280,8 +281,8 @@ function BieuMauPhien() {
   const [banDau] = useState(() => ({
     san_pham_id: sanPhamIdUuTien,
     phi_van_chuyen: 0,
-    thoi_gian_bat_dau: ngayNhapVietNam(Date.now() + 15 * 60000),
-    thoi_gian_ket_thuc: ngayNhapVietNam(Date.now() + 24 * 3600000),
+    thoi_gian_bat_dau: ngayNhapVietNam(gioMayChu() + 15 * 60000),
+    thoi_gian_ket_thuc: ngayNhapVietNam(gioMayChu() + 24 * 3600000),
   }));
 
   async function luu() {

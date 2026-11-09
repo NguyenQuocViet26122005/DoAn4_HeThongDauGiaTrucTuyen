@@ -1,5 +1,10 @@
 // Chỉ chuyển các đích nghiệp vụ đã biết; không điều hướng tới URL tùy ý trong dữ liệu.
-export function lienKetThongBao(giaTri: string | null, quanTri = false): string | null {
+// laNguoiBan: người nhận là chủ phiên/đơn (API trả la_nguoi_ban) thì mở khu người bán.
+export function lienKetThongBao(
+  giaTri: string | null,
+  quanTri = false,
+  laNguoiBan = false,
+): string | null {
   if (giaTri === '/seller/verification') {
     return '/tai-khoan/xac-minh';
   }
@@ -17,9 +22,10 @@ export function lienKetThongBao(giaTri: string | null, quanTri = false): string 
   }
 
   const [, loai, id] = khop;
-  const goc = quanTri ? '/quan-tri' : '/tai-khoan';
+  const nguoiBan = laNguoiBan && !quanTri;
+  const goc = quanTri ? '/quan-tri' : nguoiBan ? '/nguoi-ban' : '/tai-khoan';
   const cacGoc: Record<string, string> = {
-    auctions: '/phien',
+    auctions: nguoiBan ? '/nguoi-ban/phien' : '/phien',
     orders: `${goc}/don-hang`,
     disputes: `${goc}/tranh-chap`,
     inspections: `${quanTri ? '/quan-tri' : '/nguoi-ban'}/kiem-dinh`,

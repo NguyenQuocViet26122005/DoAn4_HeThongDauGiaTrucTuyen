@@ -10,6 +10,21 @@
   gap: 24px;
 }
 
+/* Chỉ thẻ đơn có ảnh mới thêm cột ảnh; thông báo, đề nghị, tranh chấp giữ hai cột. */
+.the-don.co-anh {
+  grid-template-columns: 112px minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.anh-don .anh-san-pham {
+  aspect-ratio: 1;
+  border-radius: 8px;
+}
+
+.anh-don .anh-thay-the span {
+  display: none;
+}
+
 .the-don h2 {
   margin: 16px 0 8px;
   font-size: 25px;
@@ -119,7 +134,49 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .the-don.co-anh {
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .the-don.co-anh .tong-don {
+    grid-column: 1 / -1;
+  }
+
   .tong-don {
     text-align: left;
   }
+}
+
+/* Đầu biên nhận: ảnh nhỏ cạnh tên sản phẩm, không chiếm cả khung trên điện thoại. */
+.san-pham-cua-don {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--vien);
+  color: var(--chu);
+}
+
+.san-pham-cua-don .anh-san-pham {
+  aspect-ratio: 1;
+  border-radius: 8px;
+}
+
+.san-pham-cua-don .anh-thay-the span {
+  display: none;
+}
+
+.san-pham-cua-don strong {
+  font-family: var(--tieu-de);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.san-pham-cua-don:hover strong {
+  color: var(--vang);
 }

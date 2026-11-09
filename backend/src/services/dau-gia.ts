@@ -706,6 +706,19 @@ async function trangThaiTheoDoi(nguoiDung: NguoiDungDangNhap, id) {
   return { dang_theo_doi: Boolean(thamGia?.dang_theo_doi) };
 }
 
+// Mức tối đa chỉ trả cho chính người đặt, để họ biết cần nâng lên trên mức nào.
+// Dùng tên trường riêng: lớp bảo vệ đầu ra vẫn chặn khóa gia_toi_da ở mọi phản hồi khác.
+async function mucToiDaCuaToi(nguoiDung: NguoiDungDangNhap, id) {
+  batBuocTonTai(await khoDuLieu.layTheoId(kiemTra.id(id)));
+
+  const muc = await khoDuLieu.mucToiDaCuaToi(nguoiDung.id, id);
+
+  return {
+    muc_toi_da_cua_toi: muc?.gia_toi_da ?? null,
+    thoi_gian_dat: muc?.thoi_gian_dat_gia_toi_da ?? null,
+  };
+}
+
 async function nhacPhienSapKetThuc(id) {
   return coSoDuLieu.giaoDich(async () => {
     const banGhi = await khoDuLieu.layTheoId(id, true);
@@ -752,6 +765,7 @@ export {
   lichSu,
   theoDoi,
   trangThaiTheoDoi,
+  mucToiDaCuaToi,
   nhacPhienSapKetThuc,
   kiemTraNguoiMua,
 };

@@ -73,7 +73,10 @@ function danhSach(
     phamVi === 'admin' ? [] : phamVi === 'mine' ? [nguoiDung.id, nguoiDung.id] : [nguoiDung.id];
 
   return coSoDuLieu.truyVan(
-    `SELECT d.*, p.tieu_de, a.ly_do_ket_thuc
+    `SELECT d.*, p.tieu_de, a.ly_do_ket_thuc,
+       (SELECT t.duong_dan_tep FROM tep_dinh_kem t
+        WHERE t.loai_tep='ANH_SAN_PHAM' AND t.san_pham_id=p.id
+        ORDER BY t.la_anh_chinh DESC, t.thu_tu, t.id LIMIT 1) AS anh_chinh
      FROM don_hang d
      JOIN phien_dau_gia a ON a.id=d.phien_dau_gia_id
      JOIN san_pham p ON p.id=a.san_pham_id

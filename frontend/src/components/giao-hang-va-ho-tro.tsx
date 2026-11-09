@@ -9,15 +9,16 @@ import { lamMoiTranhChap, moTranhChap } from '../services/tranh-chap';
 import { duocGuiHang, lyDoDuocMo, tranhChapDangMo } from '../utils/giao-hang-tranh-chap';
 import { ngayGio, nhan } from '../utils/dinh-dang';
 import type { DonHang } from '../types/don-hang';
+import { gioMayChu } from '../utils/gio-may-chu';
 
 export default function GiaoHangVaHoTro({ don }: { don: DonHang }) {
   const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
-  const [hienTai, datHienTai] = useState(Date.now);
+  const [hienTai, datHienTai] = useState(gioMayChu);
   const chuyenTrang = useNavigate();
   const { message } = App.useApp();
 
   useEffect(() => {
-    const dongHo = setInterval(() => datHienTai(Date.now()), 1000);
+    const dongHo = setInterval(() => datHienTai(gioMayChu()), 1000);
 
     return () => clearInterval(dongHo);
   }, []);

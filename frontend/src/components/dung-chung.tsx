@@ -19,6 +19,7 @@ import { boNho, duongDanAnh, http, loiDeDoc, taiTep } from '../services/api';
 import { chuoi, mocThoiGian, nhan } from '../utils/dinh-dang';
 import { BieuTuong } from './bieu-tuong';
 import { bieuTuongDanhMuc } from '../utils/bieu-tuong';
+import { gioMayChu } from '../utils/gio-may-chu';
 
 export function TrangThai({ giaTri }: { giaTri: unknown }) {
   const ten = chuoi(giaTri);
@@ -39,10 +40,10 @@ export function TrangThai({ giaTri }: { giaTri: unknown }) {
 }
 
 export function TrangThaiPhien({ phien }: { phien: Phien }) {
-  const [hienTai, datHienTai] = useState(Date.now);
+  const [hienTai, datHienTai] = useState(gioMayChu);
 
   useEffect(() => {
-    const boDem = setInterval(() => datHienTai(Date.now()), 1000);
+    const boDem = setInterval(() => datHienTai(gioMayChu()), 1000);
 
     return () => clearInterval(boDem);
   }, []);
@@ -147,10 +148,10 @@ export function AnhSanPham({
 }
 
 export function DemNguoc({ batDau, ketThuc }: { batDau?: string; ketThuc: string }) {
-  const [hienTai, datHienTai] = useState(Date.now);
+  const [hienTai, datHienTai] = useState(gioMayChu);
 
   useEffect(() => {
-    const boDem = setInterval(() => datHienTai(Date.now()), 1000);
+    const boDem = setInterval(() => datHienTai(gioMayChu()), 1000);
 
     return () => clearInterval(boDem);
   }, []);
@@ -473,5 +474,40 @@ export function TepRiengTu({ url, ten }: { url: string; ten: string }) {
     >
       {ten}
     </Button>
+  );
+}
+
+// Bốn bước của một đơn; đơn hủy không hiện tiến trình vì nhãn trạng thái đã nói rõ.
+const BUOC_DON = ['Thanh toán', 'Gửi hàng', 'Nhận và kiểm tra', 'Hoàn thành'];
+const VI_TRI_BUOC: Record<string, number> = {
+  CHO_THANH_TOAN: 0,
+  CHO_GUI_HANG: 1,
+  DA_THANH_TOAN: 1,
+  DA_GUI_HANG: 2,
+  DA_GIAO: 2,
+  DANG_KIEM_TRA: 2,
+  DANG_TRANH_CHAP: 2,
+  HOAN_THANH: 4,
+};
+
+export function TienTrinhDon({ trangThai }: { trangThai: string }) {
+  const viTri = VI_TRI_BUOC[trangThai];
+
+  if (viTri === undefined) {
+    return null;
+  }
+
+  return (
+    <ol className="tien-trinh-don" aria-label="Tiến trình đơn hàng">
+      {BUOC_DON.map((buoc, i) => (
+        <li
+          key={buoc}
+          className={i < viTri ? 'da-xong' : i === viTri ? 'dang-o' : undefined}
+          aria-current={i === viTri ? 'step' : undefined}
+        >
+          <span>{buoc}</span>
+        </li>
+      ))}
+    </ol>
   );
 }

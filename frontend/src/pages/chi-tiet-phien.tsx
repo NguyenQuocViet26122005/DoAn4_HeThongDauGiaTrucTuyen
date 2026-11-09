@@ -19,6 +19,7 @@ import BaoCaoSanPham from '../components/bao-cao-san-pham';
 import { doc } from '../services/api';
 import { lamMoiThamGia } from '../services/tham-gia-phien';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
+import { useChuKyDuPhong } from '../store/ket-noi-thoi-gian-thuc';
 
 interface LuotGia {
   id: string;
@@ -39,13 +40,14 @@ function NoiDungPhien({ phien }: { phien: Phien }) {
   const [anhChon, datAnhChon] = useState<string>();
   const [trang, datTrang] = useState(1);
   const nguoiDung = usePhienDangNhap((s) => s.nguoiDung);
+  const duPhong = useChuKyDuPhong(10000);
   const sanPham = useDuLieu<SanPham>(`/products/${phien.san_pham_id}`);
   const kiemDinh = useDuLieu<KiemDinhCongKhai | null>(`/products/${phien.san_pham_id}/inspection`);
   const lichSu = useDanhSachDuLieu<LuotGia[]>(
     `/auctions/${phien.id}/bids`,
     { page: trang, limit: 10 },
     true,
-    ['DA_LEN_LICH', 'HOAT_DONG'].includes(phien.trang_thai) ? 10000 : false,
+    ['DA_LEN_LICH', 'HOAT_DONG'].includes(phien.trang_thai) ? duPhong : false,
   );
   const thongTinDauGia = layThongTinDauGia(phien, nguoiDung?.id);
 
@@ -327,12 +329,13 @@ function layThongTinDauGia(phien: Phien, nguoiDungId?: string) {
 
 export default function ChiTietPhien() {
   const { id } = useParams();
+  const duPhong = useChuKyDuPhong(10000);
   const phien = useQuery({
     queryKey: [`/auctions/${id}`, undefined],
     queryFn: () => doc<Phien>(`/auctions/${id}`),
     refetchInterval: (truyVan) =>
       truyVan.state.data && ['DA_LEN_LICH', 'HOAT_DONG'].includes(truyVan.state.data.trang_thai)
-        ? 10000
+        ? duPhong
         : false,
   });
 

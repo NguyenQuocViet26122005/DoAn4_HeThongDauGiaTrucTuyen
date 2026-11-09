@@ -5,6 +5,7 @@ import { datGia, lamMoiThamGia } from '../services/tham-gia-phien';
 import { loiDeDoc } from '../services/api';
 import { tien } from '../utils/dinh-dang';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
+import { usePhienDangNhap } from '../store/phien-dang-nhap';
 
 type BuocGia = { gia_tu: string; gia_den: string | null; muc_tang_gia: string };
 
@@ -23,9 +24,29 @@ function mucToiThieu(phien: Phien, cacBuoc: BuocGia[] = []) {
   return buoc ? hienTai + Number(buoc.muc_tang_gia) : undefined;
 }
 
+// Backend bắt mức mới cao hơn mức đã đặt; người đang dẫn đầu không cần vượt bước giá.
+function mucGoiY(phien: Phien, cacBuoc: BuocGia[] = [], mucCu?: string | null, dangDanDau = false) {
+  const daDat = mucCu ? Number(mucCu) + 1 : undefined;
+  const chung = mucToiThieu(phien, cacBuoc);
+
+  if (dangDanDau) {
+    return daDat;
+  }
+
+  return daDat && chung ? Math.max(daDat, chung) : (daDat ?? chung);
+}
+
 export default function DatGia({ phien, khoa }: { phien: Phien; khoa: boolean }) {
   const buocGia = useDuLieu<BuocGia[]>('/bid-increments');
-  const toiThieu = mucToiThieu(phien, buocGia.data);
+  const nguoiDungId = usePhienDangNhap((s) => s.nguoiDung?.id);
+  const cuaToi = useDuLieu<{ muc_toi_da_cua_toi: string | null }>(
+    `/auctions/${phien.id}/my-max`,
+    undefined,
+    !!nguoiDungId,
+  );
+  const mucCu = cuaToi.data?.muc_toi_da_cua_toi;
+  const dangDanDau = !!nguoiDungId && phien.nguoi_dan_dau === `ND-${nguoiDungId}`;
+  const toiThieu = mucGoiY(phien, buocGia.data, mucCu, dangDanDau);
   const [bieuMau] = Form.useForm<{ muc_toi_da: number }>();
   const [mucXacNhan, datMucXacNhan] = useState<number>();
   const [dangGui, datDangGui] = useState(false);
@@ -65,11 +86,17 @@ export default function DatGia({ phien, khoa }: { phien: Phien; khoa: boolean })
         Hệ thống tự trả giá theo bước giá, trong phạm vi bạn cam kết. Hai mức tối đa bằng nhau:
         người đặt trước được ưu tiên. Bạn chỉ được nâng, không giảm hoặc rút mức đã đặt.
       </p>
+      {mucCu && (
+        <p className="muc-cua-toi">
+          Mức tối đa bạn đã đặt: <strong>{tien(mucCu)}</strong>
+          <span className="chu-mo"> · chỉ bạn nhìn thấy</span>
+        </p>
+      )}
       {daGhiNhan && (
         <Alert
           type="success"
           title="Đã ghi nhận mức tối đa bí mật"
-          description="Ô nhập đã được xóa. Theo dõi giá công khai và người dẫn đầu bên trên; mức đã đặt không được đọc lại qua API."
+          description="Theo dõi giá công khai và người dẫn đầu bên trên. Người khác không xem được mức bạn đặt."
         />
       )}
       {loi && (
@@ -88,7 +115,7 @@ export default function DatGia({ phien, khoa }: { phien: Phien; khoa: boolean })
         <Form.Item
           name="muc_toi_da"
           label="Mức tối đa bí mật của bạn"
-          extra={`${toiThieu ? `Mức tối thiểu hiện tại: ${tien(toiThieu)}. ` : ''}Chỉ nhập số tiền VND nguyên; không bao gồm phí vận chuyển.`}
+          extra={`${toiThieu ? `${mucCu ? 'Cần đặt từ' : 'Mức tối thiểu hiện tại:'} ${tien(toiThieu)}. ` : ''}Chỉ nhập số tiền VND nguyên; không bao gồm phí vận chuyển.`}
           rules={[
             { required: true, message: 'Vui lòng nhập mức tối đa bạn chấp nhận' },
             {

@@ -1,6 +1,13 @@
 import { Button, Tag } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
+import {
+  AnhSanPham,
+  ChoDuLieu,
+  PhanTrang,
+  TieuDe,
+  TienTrinhDon,
+  TrangThai,
+} from '../components/dung-chung';
 import { useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import type { DonHang } from '../types/don-hang';
@@ -41,7 +48,15 @@ export default function DonHangCuaToi({ khuVuc = 'tai-khoan' }: { khuVuc?: strin
       >
         <div className="danh-sach-don">
           {truyVan.data?.map((don) => (
-            <article className="tam-noi-dung the-don" key={don.id}>
+            <article className="tam-noi-dung the-don co-anh" key={don.id}>
+              <Link
+                className="anh-don"
+                to={`/${khuVuc}/don-hang/${don.id}`}
+                tabIndex={-1}
+                aria-hidden="true"
+              >
+                <AnhSanPham src={don.anh_chinh} ten={don.tieu_de} />
+              </Link>
               <div>
                 <Tag>
                   {quanTri
@@ -61,6 +76,7 @@ export default function DonHangCuaToi({ khuVuc = 'tai-khoan' }: { khuVuc?: strin
                 <p className="chu-mo">
                   {don.ma_don_hang} · {ngayGio(don.ngay_tao)}
                 </p>
+                <TienTrinhDon trangThai={don.trang_thai} />
                 {don.trang_thai === 'CHO_THANH_TOAN' && (
                   <p>Hạn thanh toán: {ngayGio(don.han_thanh_toan)}</p>
                 )}

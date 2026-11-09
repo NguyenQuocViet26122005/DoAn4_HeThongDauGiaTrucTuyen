@@ -7,6 +7,7 @@ import { thanhToanDon } from '../services/don-hang';
 import { chapNhanDeNghi } from '../services/de-nghi-mua-tiep';
 import { docLanThanhToan, luuLanThanhToan, tenLanThanhToan } from '../services/lan-thanh-toan';
 import type { KetQuaThanhToan, LanThanhToan } from '../types/tham-gia-phien';
+import { maNgauNhien } from '../utils/ma-ngau-nhien';
 
 export default function ThanhToanMoPhong({
   nguoiDungId,
@@ -56,7 +57,7 @@ export default function ThanhToanMoPhong({
     datLoi('');
 
     try {
-      const lanGui = lan || { khoa_yeu_cau: crypto.randomUUID(), ket_qua_mo_phong: ketQua };
+      const lanGui = lan || { khoa_yeu_cau: maNgauNhien(), ket_qua_mo_phong: ketQua };
 
       luuLanThanhToan(tenLuu, lanGui);
       datLan(lanGui);

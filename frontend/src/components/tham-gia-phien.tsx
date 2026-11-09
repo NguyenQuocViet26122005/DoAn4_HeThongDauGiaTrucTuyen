@@ -13,6 +13,8 @@ import type { NguoiDung, Phien } from '../types/du-lieu';
 import type { DatCoc as HoSoCoc, DiaChi, KetQuaThanhToan } from '../types/tham-gia-phien';
 import { mocThoiGian, tien } from '../utils/dinh-dang';
 import { soTienMuaNgay } from '../utils/tien-tham-gia';
+import { gioMayChu } from '../utils/gio-may-chu';
+import { useChuKyDuPhong } from '../store/ket-noi-thoi-gian-thuc';
 
 function MuaNgay({
   phien,
@@ -118,14 +120,19 @@ function MuaNgay({
 
 function ThaoTacNguoiMua({ phien, nguoiDung }: { phien: Phien; nguoiDung: NguoiDung }) {
   const diaChi = useDuLieu<DiaChi[]>('/users/me/addresses');
-  const coc = useDuLieu<HoSoCoc | null>(`/auctions/${phien.id}/deposit`, undefined, true, 10000);
-  const [hienTai, datHienTai] = useState(Date.now);
+  const coc = useDuLieu<HoSoCoc | null>(
+    `/auctions/${phien.id}/deposit`,
+    undefined,
+    true,
+    useChuKyDuPhong(10000),
+  );
+  const [hienTai, datHienTai] = useState(gioMayChu);
   const [dangDangKy, datDangDangKy] = useState(false);
   const [loi, datLoi] = useState('');
   const [ketQuaCoc, datKetQuaCoc] = useState<KetQuaThanhToan>();
 
   useEffect(() => {
-    const dem = setInterval(() => datHienTai(Date.now()), 1000);
+    const dem = setInterval(() => datHienTai(gioMayChu()), 1000);
 
     return () => clearInterval(dem);
   }, []);
