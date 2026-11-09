@@ -242,7 +242,8 @@ async function lyDoKhongDuocSua(banGhi) {
 
   const kiemDinh = await require('../repositories/kiem-dinh').moiNhat(banGhi.id);
 
-  if (kiemDinh && kiemDinh.trang_thai !== 'DA_TRA_NGUOI_BAN') {
+  // Hàng chưa gửi đi (chờ gửi trung tâm) vẫn ở tay người bán nên được sửa rồi gửi duyệt lại.
+  if (kiemDinh && !['DA_TRA_NGUOI_BAN', 'CHO_GUI_TRUNG_TAM'].includes(kiemDinh.trang_thai)) {
     return 'Không sửa mô tả sản phẩm khi hồ sơ kiểm định đang xử lý hoặc trung tâm đang giữ hàng';
   }
 
@@ -402,6 +403,20 @@ async function duyet(quanTri: NguoiDungDangNhap, id, dauVao) {
 
     baoDam(banGhi.trang_thai_duyet === 'CHO_XU_LY', 409, 'Sản phẩm không chờ duyệt');
 
+    if (trangThai === 'TU_CHOI') {
+      // Từ chối giữa chừng khi hàng đang trên đường hoặc đang kiểm định sẽ làm hồ sơ kẹt:
+      // người bán không sửa được, trung tâm chưa có kết quả để trả hàng.
+      const kiemDinh = await khoKiemDinh.moiNhat(id);
+
+      baoDam(
+        !kiemDinh ||
+          !['DANG_VAN_CHUYEN_DEN_TRUNG_TAM', 'DA_NHAN_TAI_TRUNG_TAM', 'DANG_KIEM_DINH'].includes(
+            kiemDinh.trang_thai,
+          ),
+        409,
+        'Hàng đang được kiểm định; ghi kết quả kiểm định trước khi từ chối nội dung',
+      );
+    }
     if (trangThai === 'DA_DUYET') {
       await kiemTraNguoiBan({ id: banGhi.nguoi_ban_id });
       await require('./kiem-dinh').kiemTraDuocDauGia(banGhi);

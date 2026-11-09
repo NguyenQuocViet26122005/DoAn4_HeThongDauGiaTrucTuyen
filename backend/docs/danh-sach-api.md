@@ -372,7 +372,7 @@ Quyền: QUAN_TRI.
 
 ### PATCH /admin/products/:id/review — Admin duyệt sản phẩm
 
-Quyền: QUAN_TRI.
+Quyền: QUAN_TRI. Duyệt cần kiểm định đạt, trung tâm đang giữ hàng và có báo cáo. Từ chối trả 409 khi hàng đang vận chuyển đến trung tâm, đã tiếp nhận hoặc đang kiểm định (ghi kết quả trước), để hồ sơ không bị kẹt. Từ chối khi hồ sơ kiểm định còn ở bước chờ gửi: người bán vẫn sửa được vì hàng chưa rời tay.
 
 ```json
 {
@@ -890,7 +890,7 @@ Quyền: Admin.
 
 ### POST /inspections/:id/shipping — Seller khai báo gửi trung tâm
 
-Quyền: người bán chính chủ (Admin xem được hồ sơ/thống kê).
+Quyền: người bán chính chủ (Admin xem được hồ sơ/thống kê). Chỉ khi hồ sơ ở bước chờ gửi và sản phẩm đang chờ duyệt; sản phẩm bị từ chối hoặc đang sửa phải gửi duyệt lại trước.
 
 ```json
 {
@@ -905,7 +905,7 @@ Quyền: Admin. Hỗ trợ cùng bộ lọc `page`, `limit`, `q`, `trang_thai`, 
 
 ### POST /admin/inspections/:id/received — Admin ghi nhận trung tâm nhận hàng
 
-Quyền: Admin.
+Quyền: Admin. Chỉ sau khi người bán đã khai báo gửi hàng (`DANG_VAN_CHUYEN_DEN_TRUNG_TAM`); ở bước chờ gửi trả 409. `serial_khi_nhan` tùy chọn: để trống thì hệ thống cấp mã tem niêm phong `TEM-<id hồ sơ>-<6 ký tự>` để mọi món hàng có mã đối chiếu khi bàn giao hoặc nhận hàng hoàn.
 
 ```json
 {
@@ -938,7 +938,7 @@ Quyền: Admin. Cùng đường dẫn đã gắn vào cùng hồ sơ và cùng l
 
 ### PATCH /admin/inspections/:id/result — Admin nhập kết quả từ báo cáo chuyên gia
 
-Quyền: Admin.
+Quyền: Admin. Ghi khi đang kiểm định; đính chính được khi đã đạt hoặc không đạt (trước khi bán). Hồ sơ cần bổ sung phải `start` lại rồi mới ghi kết quả mới.
 
 ```json
 {
@@ -953,7 +953,7 @@ Quyền: Admin.
 
 ### POST /admin/inspections/:id/return — Admin trả hàng không đạt hoặc cần bổ sung
 
-Quyền: Admin.
+Quyền: Admin. Trả được hàng không đạt, cần bổ sung, hoặc hàng đạt đang lưu giữ của sản phẩm đã bị từ chối nội dung (để người bán sửa và gửi lại).
 
 ```json
 {

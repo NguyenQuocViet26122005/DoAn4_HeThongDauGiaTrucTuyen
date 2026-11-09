@@ -18,6 +18,7 @@ export interface KiemDinhMoiNhat {
 export interface HoSoKiemDinh extends Omit<KiemDinhMoiNhat, 'co_bao_cao'> {
   san_pham_id: string;
   nguoi_ban_id?: string;
+  trang_thai_duyet_san_pham?: string;
   dia_chi_trung_tam?: string | null;
   tieu_de: string;
   ngay_tao: string;

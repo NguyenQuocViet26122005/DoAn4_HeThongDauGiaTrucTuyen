@@ -226,7 +226,9 @@ Không dùng trạng thái hoặc nhãn “Hàng thật 100%”. Nhãn công kha
 
 ### 6.2. Biên bản nhận và báo cáo
 
-Biên bản tiếp nhận gồm mã kiểm định, sản phẩm/seller, ngày nhận, tình trạng khi nhận, serial/mã nhận dạng nếu có, số kiện, ghi chú và ảnh/tệp tiếp nhận. Đây là căn cứ đối chiếu tình trạng, hỏng hóc, serial và việc lưu giữ.
+Biên bản tiếp nhận gồm mã kiểm định, sản phẩm/seller, ngày nhận, tình trạng khi nhận, serial/mã nhận dạng, số kiện, ghi chú và ảnh/tệp tiếp nhận. Hàng không có serial thì hệ thống cấp mã tem niêm phong `TEM-<id hồ sơ>-<6 ký tự>`, nên mọi món hàng đều có mã đối chiếu khi bàn giao hoặc nhận hàng hoàn. Đây là căn cứ đối chiếu tình trạng, hỏng hóc, serial và việc lưu giữ.
+
+Thứ tự bắt buộc, mỗi bước chỉ mở khi bước trước xong: người bán gửi duyệt (đủ ảnh, thuộc tính) → Admin mở hồ sơ kiểm định → người bán khai báo gửi hàng (sản phẩm phải đang chờ duyệt) → trung tâm tiếp nhận → bắt đầu kiểm định → đính kèm báo cáo → ghi kết quả → (đạt) Admin duyệt nội dung → người bán tạo phiên. Cần bổ sung phải bắt đầu kiểm định lại. Admin không được từ chối nội dung khi hàng đang vận chuyển, đã tiếp nhận hoặc đang kiểm định; từ chối khi hồ sơ còn chờ gửi thì người bán vẫn sửa được; từ chối khi hàng đạt đang lưu giữ thì Admin trả hàng để người bán sửa và kiểm định lại.
 
 Kết quả gồm ngày kiểm định, chuyên gia, đơn vị, kết quả `DAT`/`KHONG_DAT`/`CAN_BO_SUNG`, nhận xét, mã chứng nhận và báo cáo. Chỉ ghi đạt khi có báo cáo được tải đúng nhóm bởi Admin; ngày kiểm định không trước tiếp nhận hoặc ở tương lai. Mọi thay đổi kết quả phải ghi nhật ký.
 

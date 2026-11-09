@@ -348,8 +348,38 @@ test('HTTP: đủ 16 API kiểm định/cọc mới và quyền truy cập hồ 
           async () => {
             const sp2 = await sanPham(d, { trang_thai_duyet: 'CHO_XU_LY', bat_buoc_kiem_dinh: 1 });
             const hs2 = await gui('POST', `/admin/products/${sp2}/inspections`, 'admin', {}, 201);
+            const { serial_khi_nhan: _boQua, ...nhanKhongSerial } = nhan;
 
-            await gui('POST', `/admin/inspections/${hs2.id}/received`, 'admin', nhan);
+            // Từng bước theo thứ tự: chưa khai báo gửi hàng thì trung tâm chưa được tiếp nhận.
+            await gui(
+              'POST',
+              `/admin/inspections/${hs2.id}/received`,
+              'admin',
+              nhanKhongSerial,
+              409,
+            );
+            await gui('POST', `/inspections/${hs2.id}/shipping`, 'seller', {
+              don_vi_van_chuyen: 'Kiểm thử',
+              ma_van_don: 'KD-DEN-2',
+            });
+            // Hàng đang trên đường: không được từ chối nội dung giữa chừng.
+            await gui(
+              'PATCH',
+              `/admin/products/${sp2}/review`,
+              'admin',
+              { trang_thai_duyet: 'TU_CHOI', ly_do_tu_choi: 'Thiếu ảnh' },
+              409,
+            );
+
+            const daNhan = await gui(
+              'POST',
+              `/admin/inspections/${hs2.id}/received`,
+              'admin',
+              nhanKhongSerial,
+            );
+
+            // Không nhập serial thì trung tâm tự cấp mã tem niêm phong.
+            assert.match(daNhan.serial_khi_nhan, new RegExp(`^TEM-${hs2.id}-[0-9A-F]{6}$`));
             await gui('POST', `/admin/inspections/${hs2.id}/start`, 'admin', {});
             await gui(
               'POST',
@@ -358,6 +388,21 @@ test('HTTP: đủ 16 API kiểm định/cọc mới và quyền truy cập hồ 
               { loai_tep: 'BAO_CAO_KIEM_DINH', duong_dan_tep: baoCao },
               201,
             );
+            await gui(
+              'PATCH',
+              `/admin/inspections/${hs2.id}/result`,
+              'admin',
+              await ketQua('CAN_BO_SUNG'),
+            );
+            // Cần bổ sung phải bắt đầu kiểm định lại rồi mới ghi kết quả mới.
+            await gui(
+              'PATCH',
+              `/admin/inspections/${hs2.id}/result`,
+              'admin',
+              await ketQua('KHONG_DAT'),
+              409,
+            );
+            await gui('POST', `/admin/inspections/${hs2.id}/start`, 'admin', {});
             await gui(
               'PATCH',
               `/admin/inspections/${hs2.id}/result`,

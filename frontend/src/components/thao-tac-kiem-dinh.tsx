@@ -50,8 +50,12 @@ function TruongKiemDinh({ thaoTac, hoSo }: { thaoTac: string; hoSo: HoSoKiemDinh
           <Input.TextArea rows={3} maxLength={5000} showCount />
         </Form.Item>
         <div className="luoi-truong-san-pham">
-          <Form.Item name="serial_khi_nhan" label="Serial / mã nhận dạng">
-            <Input maxLength={150} />
+          <Form.Item
+            name="serial_khi_nhan"
+            label="Serial / mã nhận dạng"
+            extra="Nhập serial in trên hàng nếu có. Để trống, hệ thống tự cấp mã tem niêm phong để đối chiếu khi bàn giao hoặc nhận hàng hoàn."
+          >
+            <Input maxLength={150} placeholder="Để trống để tự cấp mã tem" />
           </Form.Item>
           <Form.Item
             name="so_kien"
@@ -153,27 +157,37 @@ export default function ThaoTacKiemDinh({
   const [thaoTac, datThaoTac] = useState('');
   const [loi, datLoi] = useState('');
   const coBaoCao = hoSo.tep_dinh_kem.some((tep) => tep.loai_tep === 'BAO_CAO_KIEM_DINH');
+  const sanPhamChoDuyet = hoSo.trang_thai_duyet_san_pham === 'CHO_XU_LY';
   const cacThaoTac: string[] = [];
+  // Mỗi bước chỉ mở khi bước trước đã xong; khớp với điều kiện kiểm ở backend.
+  let choBuocTruoc = '';
 
   if (quanTri) {
-    if (['CHO_GUI_TRUNG_TAM', 'DANG_VAN_CHUYEN_DEN_TRUNG_TAM'].includes(hoSo.trang_thai)) {
+    if (hoSo.trang_thai === 'CHO_GUI_TRUNG_TAM') {
+      choBuocTruoc =
+        'Chờ người bán khai báo gửi hàng (đơn vị vận chuyển, mã vận đơn) rồi mới tiếp nhận.';
+    }
+    if (hoSo.trang_thai === 'DANG_VAN_CHUYEN_DEN_TRUNG_TAM') {
       cacThaoTac.push('received');
     }
     if (['DA_NHAN_TAI_TRUNG_TAM', 'CAN_BO_SUNG'].includes(hoSo.trang_thai)) {
       cacThaoTac.push('start');
     }
-    if (
-      ['DANG_KIEM_DINH', 'CAN_BO_SUNG', 'DANG_LUU_GIU', 'KIEM_DINH_KHONG_DAT'].includes(
-        hoSo.trang_thai,
-      )
-    ) {
+    if (['DANG_KIEM_DINH', 'DANG_LUU_GIU', 'KIEM_DINH_KHONG_DAT'].includes(hoSo.trang_thai)) {
       cacThaoTac.push('result');
     }
-    if (['CAN_BO_SUNG', 'KIEM_DINH_KHONG_DAT'].includes(hoSo.trang_thai)) {
+    if (
+      ['CAN_BO_SUNG', 'KIEM_DINH_KHONG_DAT'].includes(hoSo.trang_thai) ||
+      (hoSo.trang_thai === 'DANG_LUU_GIU' && hoSo.trang_thai_duyet_san_pham === 'TU_CHOI')
+    ) {
       cacThaoTac.push('return');
     }
   } else if (hoSo.trang_thai === 'CHO_GUI_TRUNG_TAM') {
-    cacThaoTac.push('shipping');
+    if (sanPhamChoDuyet) {
+      cacThaoTac.push('shipping');
+    } else {
+      choBuocTruoc = 'Sản phẩm cần được gửi duyệt lại trước khi gửi hàng đến trung tâm.';
+    }
   }
 
   async function luu(ten: string, duLieu: BanGhi = {}) {
@@ -241,7 +255,8 @@ export default function ThaoTacKiemDinh({
           {cacThaoTac.includes('result') && !coBaoCao && (
             <p className="chu-mo">Cần đính kèm báo cáo kiểm định trước khi ghi kết quả.</p>
           )}
-          {!cacThaoTac.length && (
+          {choBuocTruoc && <Alert type="info" showIcon title={choBuocTruoc} />}
+          {!cacThaoTac.length && !choBuocTruoc && (
             <p className="chu-mo">Theo dõi cập nhật của trung tâm trong hồ sơ này.</p>
           )}
         </>

@@ -118,6 +118,12 @@ async function guiTrungTam(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown
       'Chỉ người bán của sản phẩm được khai báo gửi',
     );
     baoDam(hoSo.trang_thai === 'CHO_GUI_TRUNG_TAM', 409, 'Hồ sơ không ở bước chờ gửi');
+    // Sản phẩm bị từ chối hoặc đang sửa phải gửi duyệt lại trước khi gửi hàng.
+    baoDam(
+      sanPham.trang_thai_duyet === 'CHO_XU_LY',
+      409,
+      'Sản phẩm cần ở trạng thái chờ duyệt trước khi gửi hàng kiểm định',
+    );
 
     await khoBanGhi.capNhat('kiem_dinh_san_pham', id, {
       trang_thai: 'DANG_VAN_CHUYEN_DEN_TRUNG_TAM',
@@ -141,17 +147,25 @@ async function nhanHang(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
   return coSoDuLieu.giaoDich(async () => {
     const { hoSo } = await khoaHoSo(id);
 
+    // Tiếp nhận chỉ sau khi người bán đã khai báo gửi hàng (đơn vị vận chuyển, mã vận đơn).
     baoDam(
-      ['CHO_GUI_TRUNG_TAM', 'DANG_VAN_CHUYEN_DEN_TRUNG_TAM'].includes(hoSo.trang_thai),
+      hoSo.trang_thai !== 'CHO_GUI_TRUNG_TAM',
       409,
-      'Hồ sơ đã được tiếp nhận',
+      'Người bán chưa khai báo gửi hàng đến trung tâm',
     );
+    baoDam(hoSo.trang_thai === 'DANG_VAN_CHUYEN_DEN_TRUNG_TAM', 409, 'Hồ sơ đã được tiếp nhận');
+
+    // Không có serial của nhà sản xuất thì cấp mã tem niêm phong của trung tâm,
+    // để mọi món hàng đều có mã đối chiếu khi bàn giao hoặc nhận hàng hoàn.
+    const serial =
+      dauVao.serial_khi_nhan?.trim() ||
+      `TEM-${hoSo.id}-${randomUUID().replaceAll('-', '').slice(0, 6).toUpperCase()}`;
 
     await khoBanGhi.capNhat('kiem_dinh_san_pham', id, {
       trang_thai: 'DA_NHAN_TAI_TRUNG_TAM',
       ngay_nhan_trung_tam: await coSoDuLieu.thoiGianHienTai(),
       tinh_trang_khi_nhan: dauVao.tinh_trang_khi_nhan,
-      serial_khi_nhan: dauVao.serial_khi_nhan ?? null,
+      serial_khi_nhan: serial,
       so_kien: dauVao.so_kien,
       ghi_chu_tiep_nhan: dauVao.ghi_chu ?? null,
       nguoi_cap_nhat_id: nguoiDung.id,
@@ -239,10 +253,14 @@ async function ghiKetQua(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) 
   return coSoDuLieu.giaoDich(async () => {
     const { hoSo, sanPham } = await khoaHoSo(id);
 
+    // Hồ sơ cần bổ sung phải bắt đầu kiểm định lại; đạt/không đạt vẫn được đính chính trước khi bán.
     baoDam(
-      ['DANG_KIEM_DINH', 'CAN_BO_SUNG', 'DANG_LUU_GIU', 'KIEM_DINH_KHONG_DAT'].includes(
-        hoSo.trang_thai,
-      ),
+      hoSo.trang_thai !== 'CAN_BO_SUNG',
+      409,
+      'Hồ sơ cần bổ sung: bắt đầu kiểm định lại trước khi ghi kết quả mới',
+    );
+    baoDam(
+      ['DANG_KIEM_DINH', 'DANG_LUU_GIU', 'KIEM_DINH_KHONG_DAT'].includes(hoSo.trang_thai),
       409,
       'Hồ sơ chưa ở bước ghi nhận kết quả',
     );
@@ -304,12 +322,14 @@ async function traNguoiBan(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown
   const dauVao = kiemTra.docSchema(traNguoiBanSchema, duLieuNhap);
 
   return coSoDuLieu.giaoDich(async () => {
-    const { hoSo } = await khoaHoSo(id);
+    const { hoSo, sanPham } = await khoaHoSo(id);
 
+    // Hàng đạt chỉ được trả khi Admin đã từ chối nội dung sản phẩm, để người bán sửa và gửi lại.
     baoDam(
-      ['KIEM_DINH_KHONG_DAT', 'CAN_BO_SUNG'].includes(hoSo.trang_thai),
+      ['KIEM_DINH_KHONG_DAT', 'CAN_BO_SUNG'].includes(hoSo.trang_thai) ||
+        (hoSo.trang_thai === 'DANG_LUU_GIU' && sanPham.trang_thai_duyet === 'TU_CHOI'),
       409,
-      'Chỉ trả hàng không đạt hoặc không hoàn tất kiểm định; hàng đạt tiếp tục ở trung tâm',
+      'Chỉ trả hàng không đạt, cần bổ sung, hoặc hàng đạt của sản phẩm đã bị từ chối nội dung',
     );
 
     await khoBanGhi.capNhat('kiem_dinh_san_pham', id, {
@@ -374,6 +394,7 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
     ...hoSo,
     tieu_de: sanPham.tieu_de,
     nguoi_ban_id: sanPham.nguoi_ban_id,
+    trang_thai_duyet_san_pham: sanPham.trang_thai_duyet,
     co_the_cap_nhat:
       !lyDo && (nguoiDung.vai_tro === 'QUAN_TRI' || cungId(nguoiDung.id, sanPham.nguoi_ban_id)),
     ly_do_khong_the_cap_nhat: lyDo,

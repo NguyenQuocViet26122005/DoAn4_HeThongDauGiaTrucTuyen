@@ -139,6 +139,12 @@ function QuyetDinhSanPham({ sanPham }: { sanPham: SanPham }) {
   const [moTuChoi, datMoTuChoi] = useState(false);
   const hoSo = sanPham.kiem_dinh_moi_nhat;
   const canKiemDinh = Boolean(sanPham.bat_buoc_kiem_dinh);
+  // Từ chối khi hàng đang trên đường hoặc đang kiểm định sẽ làm hồ sơ kẹt (backend cũng chặn).
+  const dangKiemDinhDo = [
+    'DANG_VAN_CHUYEN_DEN_TRUNG_TAM',
+    'DA_NHAN_TAI_TRUNG_TAM',
+    'DANG_KIEM_DINH',
+  ].includes(hoSo?.trang_thai || '');
   const duKiemDinh =
     !canKiemDinh ||
     Boolean(
@@ -239,9 +245,14 @@ function QuyetDinhSanPham({ sanPham }: { sanPham: SanPham }) {
           >
             Duyệt sản phẩm
           </Button>
-          <Button danger disabled={dangLuu} onClick={() => datMoTuChoi(true)}>
+          <Button danger disabled={dangLuu || dangKiemDinhDo} onClick={() => datMoTuChoi(true)}>
             Từ chối và nêu lý do
           </Button>
+          {dangKiemDinhDo && (
+            <small className="chu-mo">
+              Hàng đang được vận chuyển hoặc kiểm định; ghi kết quả kiểm định trước khi từ chối.
+            </small>
+          )}
         </div>
       ) : (
         <p>Chỉ xử lý sản phẩm đang chờ duyệt. Ngày xét duyệt: {ngayGio(sanPham.ngay_duyet)}.</p>
