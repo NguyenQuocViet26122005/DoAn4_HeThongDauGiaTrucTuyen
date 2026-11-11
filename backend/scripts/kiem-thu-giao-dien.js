@@ -6,7 +6,9 @@ const duongDan = require('node:path');
 process.env.DB_NAME = 'doan4_daugia_kiem_thu';
 process.env.JWT_SECRET = taoNgauNhien(48).toString('hex');
 process.env.JOBS_ENABLED = 'false';
-process.env.FRONTEND_URL = 'http://localhost:5174';
+// Web kiểm thử chạy ở 5174; bản web của app di động (Expo) chạy ở 8081.
+const NGUON_KIEM_THU = ['http://localhost:5174', 'http://localhost:8081'];
+process.env.FRONTEND_URL = NGUON_KIEM_THU.join(',');
 
 const { taoDuLieuKiemThu, phienDauGia, hoanTac } = require('../tests/helpers/du-lieu-mau');
 const khoBanGhi = require('../dist/repositories/ban-ghi');
@@ -179,7 +181,7 @@ async function chay() {
     });
 
     const io = new (require('socket.io').Server)(mayChu, {
-      cors: { origin: 'http://localhost:5174' },
+      cors: { origin: NGUON_KIEM_THU },
     });
 
     require('../dist/sockets/ket-noi').khoiTao(io);

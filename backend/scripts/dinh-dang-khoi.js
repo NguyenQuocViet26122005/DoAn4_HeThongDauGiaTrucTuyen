@@ -8,6 +8,7 @@ const cacThuMuc = [
   'backend/scripts',
   'backend/tests',
   'frontend/src',
+  'mobile/src',
   'co-so-du-lieu/cong-cu',
 ];
 const chiKiemTra = process.argv.includes('--check');

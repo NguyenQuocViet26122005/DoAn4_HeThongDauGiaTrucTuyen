@@ -12,6 +12,7 @@
     "test:api": "node scripts/chay-kiem-thu-tich-hop.js --api",
     "dev": "tsx watch src/may-chu.ts",
     "dev:local": "tsx scripts/chay-cuc-bo.js",
+    "dev:lan": "tsx scripts/chay-cuc-bo.js --lan",
     "start": "node dist/may-chu.js",
     "du-lieu:demo": "npm run build && node scripts/du-lieu-demo-vietbid.js",
     "du-lieu:demo:verify": "npm run build && node scripts/du-lieu-demo-vietbid.js --verify",

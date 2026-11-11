@@ -7,11 +7,22 @@ async function chayCucBo() {
   chuanBiMoiTruongCucBo(process.env, duongDan.join(__dirname, '../.local'));
 
   const { khoiDongMayChu } = require('../src/may-chu');
+  // --lan: nghe trên mọi địa chỉ để app di động VietBid trên điện thoại cùng mạng Wi-Fi gọi được.
+  // Mặc định chỉ nghe 127.0.0.1 để máy khác trong mạng không truy cập được.
+  const mangLan = process.argv.includes('--lan');
 
-  await khoiDongMayChu('127.0.0.1');
+  await khoiDongMayChu(mangLan ? '0.0.0.0' : '127.0.0.1');
   console.log(
     `Chế độ cục bộ: đăng nhập/API đầy đủ, tác vụ tự động ${process.env.JOBS_ENABLED === 'false' ? 'tắt' : 'bật'}.`,
   );
+  if (mangLan) {
+    const diaChi = Object.values(require('node:os').networkInterfaces())
+      .flat()
+      .filter((muc) => muc && muc.family === 'IPv4' && !muc.internal)
+      .map((muc) => `http://${muc.address}:${process.env.PORT || 5000}/api`);
+
+    console.log(`Mạng LAN: app di động dùng EXPO_PUBLIC_API_URL = ${diaChi.join(' hoặc ')}`);
+  }
 }
 
 chayCucBo().catch(async (loi) => {

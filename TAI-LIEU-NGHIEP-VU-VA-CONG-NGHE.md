@@ -184,6 +184,39 @@ Giữ tên tệp/hàm/biến nghiệp vụ tiếng Việt không dấu và cấu
 
 Lệnh `npm run format`, `npm run format:check`, `npm run check` ở gốc áp dụng chuẩn chung cho code dự án. Không định dạng thư viện, bản build, bản sao riêng hoặc SQL lịch sử. Không đọc/hiển thị mật khẩu trong `.env`.
 
+### 3.4. Ứng dụng di động VietBid — 11/11/2026
+
+Thư mục `mobile/` là app di động **VietBid** cho người mua, dùng chung API và CSDL với web; không có bảng, endpoint hay quy tắc nghiệp vụ riêng. Bán hàng, kiểm định, khiếu nại và quản trị vẫn làm trên web; app có nút mở web trong tab Tài khoản.
+
+**Công nghệ:** Expo SDK 58 (React Native 0.88, React 19, React Compiler), **Expo Router** định tuyến theo tệp trong `src/app`, **TanStack Query** cho dữ liệu, **Socket.IO client** cho realtime, **expo-secure-store** giữ token đăng nhập, **expo-crypto** tạo khóa chống gửi trùng, **Reanimated** cho hiệu ứng, **expo-linear-gradient** và **expo-image** cho giao diện. Phông Be Vietnam Pro và Cormorant Garamond, nền tối vàng đồng giống web. Icon và màn chờ là viên kim cương vàng nhiều mặt.
+
+**Màn hình:**
+
+- Khám phá: lọc Đang diễn ra / Sắp mở / Đã kết thúc và tìm kiếm.
+- Chi tiết phiên: ảnh vuốt ngang, giá nhấp nháy khi đổi, đếm ngược theo giờ máy chủ, lịch sử trả giá công khai.
+- Tham gia phiên: thêm địa chỉ → đăng ký → thanh toán cọc → đặt mức tối đa; Mua ngay khi phiên cho phép.
+- Đăng nhập / đăng ký.
+- Đơn hàng: tách "Tôi mua" và "Tôi bán". Chi tiết đơn có đổi địa chỉ, thanh toán phần còn lại, xác nhận đã nhận hàng và hoàn tất.
+- Thông báo: lọc chưa đọc, đọc tất cả, mở đúng phiên hoặc đơn.
+- Tài khoản và sổ địa chỉ.
+
+**Ràng buộc thứ tự:** app chặn đúng như web — chưa có địa chỉ thì chưa tham gia; chưa đủ cọc hoặc phiên chưa bắt đầu thì khóa đặt giá; chỉ hiện "Tôi đã nhận hàng" khi đơn đang vận chuyển; chỉ cho hoàn tất khi đơn đã nhận, tiền đang giữ, đã thu đủ, không có tranh chấp mở và không cần Admin xử lý. Mọi thao tác có hậu quả đều qua hộp xác nhận, và backend vẫn kiểm tra lại toàn bộ.
+
+**Kết nối:** địa chỉ API đặt bằng `EXPO_PUBLIC_API_URL`, mặc định `http://localhost:5000/api`. Điện thoại thật dùng IP máy tính do `npm run dev:lan` của backend in ra. Khi app trở lại từ nền, dữ liệu được làm mới.
+
+**Đã kiểm tra:** `tsc`, `expo lint` và `expo-doctor` (20/20) sạch. Bản web của app chạy với máy chủ kiểm thử rollback (cổng 5001, cho phép nguồn `localhost:8081`); CSDL chính không đổi. Các luồng đã chạy trên bản web:
+
+- đăng nhập;
+- đăng ký phiên, thanh toán cọc và đặt giá dẫn đầu;
+- đấu giá ủy quyền: mức 20 triệu của A thắng mức 19 triệu của B, giá công khai 19,5 triệu;
+- thanh toán đơn, xác nhận nhận hàng và hoàn tất (tiền chuyển "Đã giải ngân");
+- xem tài khoản, sổ địa chỉ và thông báo.
+
+**Chưa kiểm tra:**
+
+- Chưa chạy trên điện thoại thật hoặc máy ảo; mới thử bản web.
+- Sự kiện realtime chưa thử được: máy chủ kiểm thử bọc mọi thao tác trong một giao dịch không commit nên không phát sự kiện. App làm mới khi kéo xuống hoặc mở lại màn hình.
+
 ## 4. Tài khoản, đăng nhập và xác minh người bán
 
 Người dùng đăng ký bằng thông tin hợp lệ; email duy nhất, mật khẩu được băm. Không nhận vai trò/quyền Admin từ body đăng ký. JWT hết hạn theo cấu hình; máy chủ kiểm tra trạng thái tài khoản khi thực hiện thao tác riêng tư. Tài khoản bị khóa/tạm ngưng không được tiếp tục hoạt động mua bán mới.

@@ -15,6 +15,8 @@ npm run dev
 
 **Thử giao diện trên máy:** dùng `npm run dev:local`. Chế độ này chỉ lắng nghe `127.0.0.1`, dùng MySQL hiện có, cho phép API đầy đủ và chạy tác vụ nền để tự mở/chốt phiên, xử lý cọc và đơn quá hạn. Tác vụ quét ngay khi khởi động rồi chạy mỗi 60 giây. Để tạm dừng, đặt `JOBS_ENABLED=false` trong `backend/.env`. Nếu thiếu `JWT_SECRET`, tạo khóa ngẫu nhiên 48 byte trong `backend/.local/jwt.key` (bỏ qua bởi Git), tái sử dụng khi khởi động lại; không xuất khóa ra log và không sửa `.env`. Khóa đã cấu hình được giữ nguyên, khóa quá ngắn bị từ chối. Lệnh từ chối `NODE_ENV=production`. Sau khi đổi mã backend, dừng và chạy lại.
 
+**Thử app di động VietBid trên điện thoại thật:** dùng `npm run dev:lan`. Lệnh giống `dev:local` nhưng lắng nghe `0.0.0.0` để điện thoại cùng mạng Wi-Fi gọi được API, và in sẵn địa chỉ `EXPO_PUBLIC_API_URL` cần dùng (ví dụ `http://192.168.1.10:5000/api`). Chỉ chạy trên mạng tin cậy vì máy khác trong mạng cũng truy cập được API; Windows có thể hỏi quyền tường lửa cho Node.js lần đầu. App gốc không gửi `Origin` nên không cần sửa CORS. Riêng bản web của app (`npx expo start --web`, cổng 8081) cần thêm `http://localhost:8081` vào `FRONTEND_URL`. Cách chạy app xem `../mobile/README.md`.
+
 Ứng dụng tự nạp `backend/.env`. Không cần gửi nội dung tệp này cho người khác. Các tên cấu hình ứng dụng sử dụng:
 
 - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`: dùng kết nối MySQL hiện có; tên database là `doan4_daugia`.
