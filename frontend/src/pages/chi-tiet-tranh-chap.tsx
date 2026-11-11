@@ -156,57 +156,66 @@ function NoiDungTranhChap({ hoSo }: { hoSo: ChiTietTranhChap }) {
                       <p>Kiểm tra mô tả, phản hồi và bằng chứng trước khi ra quyết định.</p>
                     </BieuMauThaoTac>
                   )}
-                  <BieuMauThaoTac<{ ket_qua: 'NGUOI_MUA' | 'NGUOI_BAN'; ket_qua_xu_ly: string }>
-                    ten="Ra quyết định xử lý"
-                    xacNhan={(duLieu) => (
-                      <>
-                        <Alert
-                          type="warning"
-                          title={
-                            duLieu.ket_qua === 'NGUOI_MUA'
-                              ? 'Hoàn toàn bộ cho người mua và hủy đơn'
-                              : 'Giải ngân toàn bộ cho người bán và hoàn tất đơn'
-                          }
+                  {hoSo.trang_thai !== 'QUAN_TRI_DANG_XU_LY' && (
+                    <Alert
+                      type="info"
+                      showIcon
+                      title="Tiếp nhận hồ sơ trước, sau đó mới ra quyết định xử lý."
+                    />
+                  )}
+                  {hoSo.trang_thai === 'QUAN_TRI_DANG_XU_LY' && (
+                    <BieuMauThaoTac<{ ket_qua: 'NGUOI_MUA' | 'NGUOI_BAN'; ket_qua_xu_ly: string }>
+                      ten="Ra quyết định xử lý"
+                      xacNhan={(duLieu) => (
+                        <>
+                          <Alert
+                            type="warning"
+                            title={
+                              duLieu.ket_qua === 'NGUOI_MUA'
+                                ? 'Hoàn toàn bộ cho người mua và hủy đơn'
+                                : 'Giải ngân toàn bộ cho người bán và hoàn tất đơn'
+                            }
+                          />
+                          <p>
+                            Số tiền đang giữ: <strong>{tien(don.data!.so_tien_dang_giu)}</strong>,
+                            bao gồm cọc đã chuyển vào đơn và phí vận chuyển.
+                          </p>
+                          <p className="van-ban-dai">{duLieu.ket_qua_xu_ly}</p>
+                          <p>
+                            Quyết định kết thúc tranh chấp. Hãy đối chiếu đầy đủ bằng chứng trước
+                            khi xác nhận.
+                          </p>
+                        </>
+                      )}
+                      onGui={(duLieu) => xuLy('resolve', duLieu)}
+                    >
+                      <Form.Item
+                        name="ket_qua"
+                        label="Hướng giải quyết"
+                        rules={[{ required: true, message: 'Chọn hướng giải quyết' }]}
+                      >
+                        <Select
+                          options={[
+                            { value: 'NGUOI_MUA', label: 'Hoàn toàn bộ cho người mua' },
+                            { value: 'NGUOI_BAN', label: 'Giải ngân toàn bộ cho người bán' },
+                          ]}
                         />
-                        <p>
-                          Số tiền đang giữ: <strong>{tien(don.data!.so_tien_dang_giu)}</strong>, bao
-                          gồm cọc đã chuyển vào đơn và phí vận chuyển.
-                        </p>
-                        <p className="van-ban-dai">{duLieu.ket_qua_xu_ly}</p>
-                        <p>
-                          Quyết định kết thúc tranh chấp. Hãy đối chiếu đầy đủ bằng chứng trước khi
-                          xác nhận.
-                        </p>
-                      </>
-                    )}
-                    onGui={(duLieu) => xuLy('resolve', duLieu)}
-                  >
-                    <Form.Item
-                      name="ket_qua"
-                      label="Hướng giải quyết"
-                      rules={[{ required: true, message: 'Chọn hướng giải quyết' }]}
-                    >
-                      <Select
-                        options={[
-                          { value: 'NGUOI_MUA', label: 'Hoàn toàn bộ cho người mua' },
-                          { value: 'NGUOI_BAN', label: 'Giải ngân toàn bộ cho người bán' },
+                      </Form.Item>
+                      <Form.Item
+                        name="ket_qua_xu_ly"
+                        label="Căn cứ và quyết định xử lý"
+                        rules={[
+                          {
+                            required: true,
+                            whitespace: true,
+                            message: 'Nhập căn cứ và quyết định',
+                          },
                         ]}
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      name="ket_qua_xu_ly"
-                      label="Căn cứ và quyết định xử lý"
-                      rules={[
-                        {
-                          required: true,
-                          whitespace: true,
-                          message: 'Nhập căn cứ và quyết định',
-                        },
-                      ]}
-                    >
-                      <Input.TextArea rows={6} maxLength={20000} showCount />
-                    </Form.Item>
-                  </BieuMauThaoTac>
+                      >
+                        <Input.TextArea rows={6} maxLength={20000} showCount />
+                      </Form.Item>
+                    </BieuMauThaoTac>
+                  )}
                 </>
               )}
               {!dangMo && (

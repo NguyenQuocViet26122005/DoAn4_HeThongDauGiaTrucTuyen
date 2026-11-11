@@ -348,6 +348,8 @@ kiemThu('tranh chấp hoàn đủ cọc, phần trả thêm và phí vận chuy�
     mo_ta: 'Đề nghị đối chiếu hồ sơ',
   });
 
+  await tranhChap.tiepNhan(d.admin, tc.id);
+
   await assert.rejects(donHang.xacNhanHoanThanh(d.a, don.id), { status: 409 });
   await require('../helpers/du-lieu-mau').thuHoiVaKiemKe(d, don.id);
   await tranhChap.giaiQuyet(d.admin, tc.id, {

@@ -322,6 +322,8 @@ test('HTTP: đủ 16 API kiểm định/cọc mới và quyền truy cập hồ 
           async () => {
             don = (await dauGia.muaNgay(d.a, phien.id, {})).don_hang;
             assert.equal(don.nguon_gui_hang, 'TRUNG_TAM');
+            // Trung tâm còn giữ hàng đạt kiểm định: Admin được gửi từ trung tâm.
+            assert.equal(don.ly_do_khong_gui_tu_trung_tam, null);
             await gui('GET', `/inspections/${hoSo.id}`, 'a');
             await gui('GET', baoCao.slice(4), 'a');
             await assert.rejects(
@@ -336,6 +338,10 @@ test('HTTP: đủ 16 API kiểm định/cọc mới và quyền truy cập hồ 
               ma_van_don: 'KD-RA',
             });
             assert.ok((await kiemDinh.chiTiet(d.admin, hoSo.id)).ngay_roi_trung_tam);
+            assert.match(
+              (await donHang.chiTiet(d.admin, don.id)).ly_do_khong_gui_tu_trung_tam,
+              /rời trung tâm/,
+            );
             await donHang.xacNhanDaGiao(d.a, don.id);
             assert.equal((await donHang.chiTiet(d.a, don.id)).giu_tien.trang_thai, 'DANG_GIU');
             await donHang.xacNhanHoanThanh(d.a, don.id);
@@ -380,6 +386,14 @@ test('HTTP: đủ 16 API kiểm định/cọc mới và quyền truy cập hồ 
 
             // Không nhập serial thì trung tâm tự cấp mã tem niêm phong.
             assert.match(daNhan.serial_khi_nhan, new RegExp(`^TEM-${hs2.id}-[0-9A-F]{6}$`));
+            // Chưa bắt đầu kiểm định thì chưa được gắn báo cáo.
+            await gui(
+              'POST',
+              `/admin/inspections/${hs2.id}/files`,
+              'admin',
+              { loai_tep: 'BAO_CAO_KIEM_DINH', duong_dan_tep: baoCao },
+              409,
+            );
             await gui('POST', `/admin/inspections/${hs2.id}/start`, 'admin', {});
             await gui(
               'POST',

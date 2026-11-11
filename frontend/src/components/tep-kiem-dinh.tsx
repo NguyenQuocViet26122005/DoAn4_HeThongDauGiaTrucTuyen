@@ -23,6 +23,13 @@ export default function TepKiemDinh({
   const [duongDan, datDuongDan] = useState('');
   const [loi, datLoi] = useState('');
   const [lanChon, datLanChon] = useState(0);
+  // Báo cáo và chứng nhận chỉ có từ khi bắt đầu kiểm định; trước đó chỉ gắn biên bản tiếp nhận.
+  const daBatDau = ['DANG_KIEM_DINH', 'DANG_LUU_GIU', 'KIEM_DINH_KHONG_DAT'].includes(
+    hoSo.trang_thai,
+  );
+  const cacLoai = daBatDau
+    ? loaiTepKiemDinh
+    : loaiTepKiemDinh.filter((loai) => loai === 'BIEN_BAN_TIEP_NHAN');
 
   async function ganTep(noiDung: { loai_tep: string; mo_ta?: string }) {
     if (!tep) {
@@ -71,15 +78,23 @@ export default function TepKiemDinh({
       {!hoSo.tep_dinh_kem.length && <p className="chu-mo">Chưa có tệp đính kèm.</p>}
       {quanTri && hoSo.co_the_cap_nhat && hoSo.ngay_nhan_trung_tam && (
         <Form
+          key={daBatDau ? 'da-bat-dau' : 'chua-bat-dau'}
           form={bieuMau}
           layout="vertical"
           disabled={dangBan}
           onFinish={ganTep}
-          initialValues={{ loai_tep: 'BAO_CAO_KIEM_DINH' }}
+          initialValues={{ loai_tep: daBatDau ? 'BAO_CAO_KIEM_DINH' : 'BIEN_BAN_TIEP_NHAN' }}
         >
           <h3>Đính kèm tệp mới</h3>
+          {!daBatDau && (
+            <Alert
+              type="info"
+              showIcon
+              title="Hiện chỉ gắn được biên bản tiếp nhận. Báo cáo và chứng nhận mở sau khi bắt đầu kiểm định."
+            />
+          )}
           <Form.Item name="loai_tep" label="Loại hồ sơ" rules={[{ required: true }]}>
-            <Select options={loaiTepKiemDinh.map((value) => ({ value, label: nhan(value) }))} />
+            <Select options={cacLoai.map((value) => ({ value, label: nhan(value) }))} />
           </Form.Item>
           <label className="chon-tep-kiem-dinh">
             <span>{tep ? `Đã chọn: ${tep.name} · Chọn lại` : '+ Chọn ảnh hoặc PDF'}</span>

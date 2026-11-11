@@ -255,6 +255,12 @@ async function giaiQuyet(quanTri: NguoiDungDangNhap, id, duLieuNhap: unknown) {
       409,
       'Tranh chấp đã xử lý hoặc đơn không phù hợp',
     );
+    // Quyết định chỉ sau khi Admin đã tiếp nhận hồ sơ (đã xem mô tả, phản hồi và bằng chứng).
+    baoDam(
+      tranhChap.trang_thai === 'QUAN_TRI_DANG_XU_LY',
+      409,
+      'Cần tiếp nhận tranh chấp trước khi ra quyết định',
+    );
 
     const tienDangGiu = batBuocTonTai(await cacDonHang.tienTrungGian(donHang.id, true));
 

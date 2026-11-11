@@ -160,6 +160,21 @@ async function taoDonNguoiThang(
   return khoBanGhi.layTheoId('don_hang', id);
 }
 
+// Cùng điều kiện với bước trung tâm gửi hàng: kiểm định đạt, đang lưu giữ, hàng chưa rời trung tâm.
+async function lyDoKhongGuiTuTrungTam(banGhi) {
+  if (banGhi.nguon_gui_hang !== 'TRUNG_TAM') {
+    return null;
+  }
+
+  const hoSo = banGhi.kiem_dinh_san_pham_id
+    ? await khoBanGhi.layTheoId('kiem_dinh_san_pham', banGhi.kiem_dinh_san_pham_id)
+    : null;
+
+  return hoSo?.ket_qua === 'DAT' && hoSo.trang_thai === 'DANG_LUU_GIU' && !hoSo.ngay_roi_trung_tam
+    ? null
+    : 'Hồ sơ kiểm định không còn đạt hoặc hàng đã rời trung tâm; không gửi được từ trung tâm.';
+}
+
 async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
   const banGhi = batBuocTonTai(await khoBanGhi.layTheoId('don_hang', kiemTra.id(id)));
 
@@ -169,6 +184,7 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
 
   return {
     ...banGhi,
+    ly_do_khong_gui_tu_trung_tam: await lyDoKhongGuiTuTrungTam(banGhi),
     quyet_toan_coc: await require('./xu-ly-ngoai-le-don').bienBan(
       id,
       'QUYET_TOAN_COC_BO_THANH_TOAN',

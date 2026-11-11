@@ -528,7 +528,7 @@ Quyền: QUAN_TRI.
 
 ### GET /admin/cancellation-requests — Admin xem yêu cầu hủy
 
-Quyền: QUAN_TRI.
+Quyền: QUAN_TRI. Trước khi trả danh sách, máy chủ chốt các phiên đã hết giờ; yêu cầu hủy của phiên đã kết thúc tự đóng (`TU_CHOI`, kèm ghi chú) thay vì còn hiện chờ xử lý.
 
 ### PATCH /admin/cancellation-requests/:id/review — Admin duyệt yêu cầu hủy
 
@@ -553,7 +553,7 @@ Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác.
 
 ### GET /orders/:id — Chi tiết đơn và tiền đang giữ
 
-Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Sau khi kiểm tra quyền, nếu đơn đã đến hạn mà chưa được chốt, máy chủ chốt ngay theo nghiệp vụ của tác vụ định kỳ rồi mới trả kết quả; người không có quyền xem không kích hoạt việc chốt.
+Quyền: Đăng nhập; kiểm tra quyền sở hữu theo thao tác. Sau khi kiểm tra quyền, nếu đơn đã đến hạn mà chưa được chốt, máy chủ chốt ngay theo nghiệp vụ của tác vụ định kỳ rồi mới trả kết quả; người không có quyền xem không kích hoạt việc chốt. Trường `ly_do_khong_gui_tu_trung_tam` khác `null` khi đơn gửi từ trung tâm nhưng hồ sơ kiểm định không còn đạt hoặc hàng đã rời trung tâm; giao diện ẩn nút gửi từ trung tâm và hiện lý do này.
 
 Chi tiết đơn bổ sung `danh_gia_cua_toi`: null nếu người đang xem chưa đánh giá, hoặc object gồm `id`, `so_sao`, `nhan_xet`, `ngay_tao`. Trường này chỉ được đọc sau kiểm tra quyền xem đơn.
 
@@ -704,7 +704,7 @@ Quyền: QUAN_TRI.
 
 ### POST /admin/disputes/:id/resolve — Admin hoàn toàn bộ tiền mô phỏng
 
-Quyền: QUAN_TRI.
+Quyền: QUAN_TRI. Chỉ sau khi Admin đã tiếp nhận hồ sơ (`POST /admin/disputes/:id/take`, trạng thái `QUAN_TRI_DANG_XU_LY`); trước đó trả 409.
 
 ```json
 {
@@ -926,7 +926,7 @@ Quyền: Admin.
 
 ### POST /admin/inspections/:id/files — Gắn báo cáo chuyên gia đã tải lên
 
-Quyền: Admin. Cùng đường dẫn đã gắn vào cùng hồ sơ và cùng loại trả bản ghi hiện có (201), không tạo trùng. Cùng đường dẫn nhưng đổi loại trả 409. Chỉ gắn sau tiếp nhận và khi hồ sơ còn được cập nhật.
+Quyền: Admin. Cùng đường dẫn đã gắn vào cùng hồ sơ và cùng loại trả bản ghi hiện có (201), không tạo trùng. Cùng đường dẫn nhưng đổi loại trả 409. Chỉ gắn sau tiếp nhận và khi hồ sơ còn được cập nhật. `BIEN_BAN_TIEP_NHAN` gắn được ngay sau tiếp nhận; `BAO_CAO_KIEM_DINH` và `CHUNG_NHAN_KIEM_DINH` chỉ từ khi đã bắt đầu kiểm định (hoặc khi đính chính kết quả đạt/không đạt), trước đó trả 409.
 
 ```json
 {
@@ -1055,7 +1055,7 @@ Làm rõ hoàn cọc: khi ket_qua=HOAN_NGUOI_MUA, bắt buộc thêm loai_ngoai_
 
 - POST /api/admin/orders/:id/deposit-settlement: chỉ Admin, body ket_qua=BOI_HOAN_NGUOI_BAN hoặc HOAN_NGUOI_MUA và ly_do (20–1000 ký tự). Server quyết toán đúng cọc đã thu của đơn hủy vì không thanh toán; không nhận so_tien. Trả chi tiết đơn kèm quyet_toan_coc. Gọi lại cùng kết quả idempotent; kết quả khác 409.
 - POST /api/admin/orders/:id/clear-hold: chỉ Admin, body ly_do (20–1000 ký tự). Chỉ giải tỏa khi đã gửi/nhận, đang giữ đủ tiền, không tranh chấp/hàng hoàn và cả hai tài khoản hoạt động; không giải ngân hoặc đổi hạn. GET chi tiết đơn trả giai_toa_canh_bao và ly_do_chua_giai_toa cho Admin, co_the_quyet_toan_coc cho quyền quyết toán.
-- POST /api/orders/:id/returned-item với thao_tac=KET_LUAN_TRACH_NHIEM: chỉ Admin khi có hồ sơ hàng hoàn. Body ben_chiu_phi, phi_hoan, ben_boi_thuong, nguoi_nhan_boi_thuong, tien_boi_thuong, ghi_chu (30–5000 ký tự). Các bên: NGUOI_MUA/NGUOI_BAN/TRUNG_TAM/VAN_CHUYEN/KHONG_PHAT_SINH; bên nhận bồi thường không có VAN_CHUYEN. Tiền VND không âm, không có phần lẻ. Số tiền 0 phải chọn KHONG_PHAT_SINH; có tiền phải ghi đủ các bên khác nhau. Biên bản bất biến, gọi lặp cùng nội dung không ghi thêm.
+- POST /api/orders/:id/returned-item với thao_tac=KET_LUAN_TRACH_NHIEM: chỉ Admin khi có hồ sơ hàng hoàn và đã rõ tình trạng hàng (đã kiểm kê, không khớp, thất lạc có căn cứ, dừng thu hồi hoặc các bước sau kiểm kê); hàng còn ở người mua, đang hoàn về hoặc chờ kiểm kê thì chưa được kết luận. Body ben_chiu_phi, phi_hoan, ben_boi_thuong, nguoi_nhan_boi_thuong, tien_boi_thuong, ghi_chu (30–5000 ký tự). Các bên: NGUOI_MUA/NGUOI_BAN/TRUNG_TAM/VAN_CHUYEN/KHONG_PHAT_SINH; bên nhận bồi thường không có VAN_CHUYEN. Tiền VND không âm, không có phần lẻ. Số tiền 0 phải chọn KHONG_PHAT_SINH; có tiền phải ghi đủ các bên khác nhau. Biên bản bất biến, gọi lặp cùng nội dung không ghi thêm.
 - Cùng API với thao_tac=DOI_SOAT_CHI_PHI: chỉ Admin, ma_chung_tu (6–150 ký tự), ghi_chu (20–5000 ký tự). Cần có kết luận với khoản phát sinh dương. Chỉ ghi chứng từ đối soát thủ công ngoài đơn; không cập nhật tiền escrow. Không dùng lại chứng từ để đổi quyết định.
 
 GET chi tiết đơn: xu_ly_hang.trach_nhiem và doi_soat_chi_phi cùng lịch sử; thao_tac_hang bao gồm hành động đối soát được phép cả sau khi tranh chấp kết thúc. GET /api/admin/deposits trả thêm quyet_toan_trong_don để phân biệt cọc chưa xử lý với đã bồi hoàn/hoàn ngoại lệ. Trạng thái cọc gốc không bị viết lại để mất liên kết đơn.

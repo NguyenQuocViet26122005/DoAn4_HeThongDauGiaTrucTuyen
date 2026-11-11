@@ -106,6 +106,23 @@ test('Đọc chi tiết hoặc danh sách tự chốt phiên đã đến hạn, 
     assert.equal((await khoPhien.layTheoId(khongAi)).trang_thai, 'THAT_BAI');
   }));
 
+test('Hàng đợi yêu cầu hủy tự đóng yêu cầu của phiên đã hết giờ', () =>
+  hoanTac(async () => {
+    const d = await taoDuLieuKiemThu();
+    const p = await phienDauGia(d);
+    const yeuCau = await dauGia.guiYeuCauHuy(d.seller, p, { ly_do: 'Cần rút sản phẩm' });
+
+    await records.capNhat('phien_dau_gia', p, {
+      thoi_gian_ket_thuc: thoiGian.congGiay(await db.thoiGianHienTai(), -1),
+    });
+    await dauGia.danhSachYeuCauHuy({ limit: 20, offset: 0 });
+
+    const sau = await records.layTheoId('yeu_cau_xu_ly', yeuCau.id);
+
+    assert.equal(sau.trang_thai, 'TU_CHOI');
+    assert.match(sau.ghi_chu_duyet, /kết thúc/);
+  }));
+
 test('Xem chi tiết hoặc danh sách đơn tự chốt đơn quá hạn thanh toán, không chờ tác vụ định kỳ', () =>
   hoanTac(async () => {
     const d = await taoDuLieuKiemThu();

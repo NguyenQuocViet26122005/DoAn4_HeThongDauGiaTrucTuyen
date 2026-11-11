@@ -26,8 +26,9 @@ export function duocGuiHang(don: DonHang, nguoiDung: NguoiDung) {
     return false;
   }
 
+  // Gửi từ trung tâm cần hồ sơ kiểm định còn đạt và hàng chưa rời trung tâm (backend trả lý do).
   return don.nguon_gui_hang === 'TRUNG_TAM'
-    ? nguoiDung.vai_tro === 'QUAN_TRI'
+    ? nguoiDung.vai_tro === 'QUAN_TRI' && !don.ly_do_khong_gui_tu_trung_tam
     : nguoiDung.vai_tro === 'NGUOI_DUNG' && String(nguoiDung.id) === String(don.nguoi_ban_id);
 }
 

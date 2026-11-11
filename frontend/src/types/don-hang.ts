@@ -70,6 +70,7 @@ export interface DonHang extends DonMua {
   anh_chinh?: string | null;
   nguon_don: string;
   nguon_gui_hang: string;
+  ly_do_khong_gui_tu_trung_tam?: string | null;
   so_tien_con_phai_thanh_toan: string;
   so_tien_dang_giu: string;
   so_tien_da_hoan: string;

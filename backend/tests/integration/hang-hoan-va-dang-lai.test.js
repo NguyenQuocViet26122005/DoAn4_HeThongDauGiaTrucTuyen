@@ -69,6 +69,8 @@ test('Hủy vì đổi ý trước gửi là yêu cầu xét duyệt; không t�
       yeu_cau_huy: true,
     });
 
+    await tranhChap.tiepNhan(d.admin, tc.id);
+
     assert.equal((await donHang.chiTiet(d.a, don.id)).so_tien_dang_giu, don.tong_tien);
     await assert.rejects(hang.xuLy(d.a, don.id, { thao_tac: 'KHOI_TAO', ghi_chu: 'Tự hủy' }), {
       status: 409,
@@ -111,6 +113,8 @@ test('Hàng lỗi: kiểm kê, hoàn đủ, trả seller, xác nhận nhận và
       ly_do: 'THIEU_PHU_KIEN',
       mo_ta: 'Thiếu phụ kiện so với mô tả',
     });
+
+    await tranhChap.tiepNhan(d.admin, tc.id);
 
     await assert.rejects(
       tranhChap.giaiQuyet(d.admin, tc.id, { ket_qua: 'NGUOI_MUA', ket_qua_xu_ly: 'Chưa thu hồi' }),
@@ -171,6 +175,9 @@ test('Chưa nhận hàng: hoàn về nguyên vẹn vẫn cần kiểm định m�
         ly_do: 'CHUA_NHAN_HANG',
         mo_ta: 'Kiện giao không thành công',
       });
+
+      await tranhChap.tiepNhan(d.admin, tc.id);
+
       const sau = await thuHoiVaKiemKe(d, don.id, 'NGUYEN_VEN');
       const kiemDinhMoi = sau.xu_ly_hang.kiem_dinh_moi_id;
 
@@ -243,6 +250,8 @@ test('Thất lạc cần căn cứ, không cho kiểm kê giả hoặc bán lạ
       ly_do: 'KHAC',
       mo_ta: 'Hãng vận chuyển xác minh thất lạc',
     });
+
+    await tranhChap.tiepNhan(d.admin, tc.id);
 
     await hang.xuLy(d.admin, don.id, { thao_tac: 'KHOI_TAO', ghi_chu: 'Tìm lại kiện hàng' });
     await assert.rejects(
@@ -367,6 +376,8 @@ test('Khiếu nại không có căn cứ: dừng thu hồi trước gửi và gi
       mo_ta: 'Đề nghị kiểm tra giao dịch',
     });
 
+    await tranhChap.tiepNhan(d.admin, tc.id);
+
     await hang.xuLy(d.admin, don.id, {
       thao_tac: 'KHOI_TAO',
       ghi_chu: 'Xác minh yêu cầu trước khi thu hồi',
@@ -394,6 +405,9 @@ test('Hàng thu hồi hợp lệ gửi lại buyer: chưa xác nhận giao lại
         ly_do: 'KHAC',
         mo_ta: 'Đề nghị đối chiếu lại sản phẩm',
       });
+
+      await tranhChap.tiepNhan(d.admin, tc.id);
+
       const sau = await thuHoiVaKiemKe(d, don.id, 'NGUYEN_VEN');
       const id = sau.xu_ly_hang.kiem_dinh_moi_id;
 

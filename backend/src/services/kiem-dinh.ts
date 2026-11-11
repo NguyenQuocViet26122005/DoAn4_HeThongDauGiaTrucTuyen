@@ -214,6 +214,14 @@ async function themTep(nguoiDung: NguoiDungDangNhap, id, duLieuNhap: unknown) {
       409,
       'Chỉ thêm hồ sơ khi trung tâm đã nhận hàng',
     );
+    // Biên bản tiếp nhận có ngay sau khi nhận hàng; báo cáo và chứng nhận chỉ có từ khi bắt đầu
+    // kiểm định (hoặc khi đính chính kết quả đạt/không đạt).
+    baoDam(
+      dauVao.loai_tep === 'BIEN_BAN_TIEP_NHAN' ||
+        ['DANG_KIEM_DINH', 'DANG_LUU_GIU', 'KIEM_DINH_KHONG_DAT'].includes(hoSo.trang_thai),
+      409,
+      'Bắt đầu kiểm định trước khi đính kèm báo cáo hoặc chứng nhận',
+    );
 
     // Gắn lại sau mất phản hồi không tạo hai bản ghi cho cùng một tệp.
     const tepDaGan = (await khoKiemDinh.tepDinhKem(id)).find(

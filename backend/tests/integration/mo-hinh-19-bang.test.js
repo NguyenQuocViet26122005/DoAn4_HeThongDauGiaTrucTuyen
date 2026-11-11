@@ -80,6 +80,8 @@ test('19 bảng: thanh toán lỗi không giữ tiền; retry một lần và ho
       mo_ta: 'Đã quá mốc chưa nhận hàng',
     });
 
+    await tranhChap.tiepNhan(d.admin, tc.id);
+
     await assert.rejects(
       tranhChap.giaiQuyet(d.admin, tc.id, {
         ket_qua: 'NGUOI_MUA',
@@ -130,6 +132,8 @@ test('19 bảng: tài khoản bị khóa không được tự giải ngân khi h
       ly_do: 'KHAC',
       mo_ta: 'Tiếp nhận đơn cần Admin kiểm tra',
     });
+
+    await tranhChap.tiepNhan(d.admin, tc.id);
 
     await require('../helpers/du-lieu-mau').thuHoiVaKiemKe(d, don.id);
     await tranhChap.giaiQuyet(d.admin, tc.id, {

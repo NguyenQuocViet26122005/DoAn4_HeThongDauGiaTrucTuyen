@@ -91,6 +91,9 @@ export default function GiaoHangVaHoTro({ don }: { don: DonHang }) {
           description={`Hạn gửi: ${ngayGio(don.han_nguoi_ban_gui_hang)}. Khai báo vận đơn chưa xác nhận người mua đã nhận hàng.`}
         />
       )}
+      {choGui && quanTri && don.ly_do_khong_gui_tu_trung_tam && (
+        <Alert type="warning" showIcon title={don.ly_do_khong_gui_tu_trung_tam} />
+      )}
       {duocGuiHang(don, nguoiDung) && (
         <BieuMauThaoTac<{ don_vi_van_chuyen: string; ma_van_don: string }>
           ten={

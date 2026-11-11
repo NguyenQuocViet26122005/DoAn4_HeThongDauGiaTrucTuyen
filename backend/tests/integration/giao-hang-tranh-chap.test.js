@@ -47,6 +47,14 @@ test('Bằng chứng gửi lại không trùng; giữ quyền sở hữu và tr�
         size: buffer.length,
         mimetype: 'application/pdf',
       });
+
+      // Chưa tiếp nhận hồ sơ thì Admin chưa được ra quyết định.
+      await assert.rejects(
+        tranhChap.giaiQuyet(d.admin, hoSo.id, { ket_qua: 'NGUOI_MUA', ket_qua_xu_ly: 'Quá sớm' }),
+        { status: 409, message: /tiếp nhận/ },
+      );
+      await tranhChap.tiepNhan(d.admin, hoSo.id);
+
       const viTri = path.resolve(
         cauHinh.uploadRoot,
         tep.duong_dan.replace('/api/uploads/files/', ''),

@@ -35,6 +35,8 @@ kiemThu(
           mo_ta: 'Kiểm thử kết quả xử lý tiền',
         });
 
+        await cacTranhChap.tiepNhan(duLieu.admin, tranhChap.id);
+
         await xacNhan.rejects(
           cacTranhChap.giaiQuyet(duLieu.admin, tranhChap.id, {
             ket_qua: 'NGUOI_MUA',

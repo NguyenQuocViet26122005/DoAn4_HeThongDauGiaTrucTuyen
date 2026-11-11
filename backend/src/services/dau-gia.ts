@@ -656,6 +656,14 @@ async function danhSach(
   return (await khoDuLieu.danhSach(kiemTra.phanTrang(truyVan), boLoc)).map(phienCongKhai);
 }
 
+// Hàng đợi yêu cầu hủy của Admin: chốt phiên đã hết giờ trước, để yêu cầu của phiên đã kết thúc
+// tự đóng (kèm ghi chú) thay vì còn hiện "Chờ xử lý" rồi bị từ chối khi bấm duyệt.
+async function danhSachYeuCauHuy(phanTrang) {
+  await chotPhienDenHan();
+
+  return khoDuLieu.danhSachYeuCauHuy(phanTrang);
+}
+
 // Chốt các phiên đã đến giờ bắt đầu/kết thúc ngay khi có người xem, không chờ tác vụ định kỳ.
 // Lỗi của từng phiên (ví dụ người thắng thiếu địa chỉ) không làm hỏng yêu cầu đọc; tác vụ sẽ thử lại.
 async function chotPhienDenHan(gioiHan = 20) {
@@ -801,6 +809,7 @@ export {
   theoDoi,
   trangThaiTheoDoi,
   mucToiDaCuaToi,
+  danhSachYeuCauHuy,
   nhacPhienSapKetThuc,
   kiemTraNguoiMua,
 };

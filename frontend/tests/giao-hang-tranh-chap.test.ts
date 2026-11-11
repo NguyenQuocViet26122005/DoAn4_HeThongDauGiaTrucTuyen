@@ -23,6 +23,18 @@ test('Đơn gửi từ trung tâm chỉ Admin thao tác; đơn người bán kh�
   assert.equal(duocGuiHang(don, admin), false);
   assert.equal(duocGuiHang({ ...don, nguon_gui_hang: 'TRUNG_TAM' }, ban), false);
   assert.equal(duocGuiHang({ ...don, nguon_gui_hang: 'TRUNG_TAM' }, admin), true);
+  // Hàng đã rời trung tâm hoặc kiểm định không còn đạt: Admin không còn nút gửi từ trung tâm.
+  assert.equal(
+    duocGuiHang(
+      {
+        ...don,
+        nguon_gui_hang: 'TRUNG_TAM',
+        ly_do_khong_gui_tu_trung_tam: 'Hàng đã rời trung tâm',
+      },
+      admin,
+    ),
+    false,
+  );
   assert.equal(duocGuiHang({ ...don, trang_thai: 'DA_GUI_HANG' }, ban), false);
 });
 

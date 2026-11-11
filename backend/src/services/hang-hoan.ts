@@ -78,11 +78,26 @@ function cacThaoTacHang(nguoiDung: NguoiDungDangNhap, don): string[] {
   return [];
 }
 
+// Kết luận trách nhiệm và chi phí chỉ khi đã biết tình trạng hàng: đã kiểm kê, thất lạc có căn cứ,
+// dừng thu hồi hoặc các bước sau kiểm kê. Hàng còn ở người mua, đang về hoặc chờ kiểm kê thì chưa.
+const DA_RO_TINH_TRANG_HANG = [
+  'DA_KIEM_KE',
+  'CAN_XU_LY',
+  'KHONG_KHOP',
+  'THAT_LAC',
+  'DA_DUNG_THU_HOI',
+  'DU_DIEU_KIEN_BAN_LAI',
+  'DANG_TRA_NGUOI_BAN',
+  'DA_TRA_NGUOI_BAN',
+  'DA_GUI_LAI_NGUOI_MUA',
+  'DA_GIAO_LAI_NGUOI_MUA',
+];
+
 export function cacThaoTac(nguoiDung: NguoiDungDangNhap, don): string[] {
   const hang = docXuLyHang(don);
   const cacNut = cacThaoTacHang(nguoiDung, don);
 
-  if (nguoiDung.vai_tro === 'QUAN_TRI' && hang) {
+  if (nguoiDung.vai_tro === 'QUAN_TRI' && hang && DA_RO_TINH_TRANG_HANG.includes(hang.trang_thai)) {
     if (!hang.trach_nhiem) {
       cacNut.push('KET_LUAN_TRACH_NHIEM');
     } else if (

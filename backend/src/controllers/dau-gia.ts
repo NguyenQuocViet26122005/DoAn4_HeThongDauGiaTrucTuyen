@@ -1,6 +1,5 @@
 import xuLyHTTP = require('./xu-ly-http');
 import dichVu = require('../services/dau-gia');
-import khoDuLieu = require('../repositories/dau-gia');
 import kiemTra = require('../validations/du-lieu-dau-vao');
 import cauHinhNghiepVu = require('../services/cau-hinh');
 import heThong = require('../repositories/he-thong');
@@ -18,9 +17,7 @@ export = {
   yeuCauHuy: xuLyHTTP((yeuCau) => dichVu.guiYeuCauHuy(yeuCau.user, yeuCau.params.id, yeuCau.body), {
     status: 201,
   }),
-  hangDoiYeuCauHuy: xuLyHTTP((yeuCau) =>
-    khoDuLieu.danhSachYeuCauHuy(kiemTra.phanTrang(yeuCau.query)),
-  ),
+  hangDoiYeuCauHuy: xuLyHTTP((yeuCau) => dichVu.danhSachYeuCauHuy(kiemTra.phanTrang(yeuCau.query))),
   duyetHuyPhien: xuLyHTTP((yeuCau) =>
     dichVu.duyetHuyPhien(yeuCau.user, yeuCau.params.id, yeuCau.body),
   ),

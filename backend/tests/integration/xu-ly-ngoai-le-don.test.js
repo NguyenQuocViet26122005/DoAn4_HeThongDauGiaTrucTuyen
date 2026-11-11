@@ -188,6 +188,8 @@ test('Tranh chấp đang mở không được gỡ cờ; giải ngân quyết đ
       mo_ta: 'Đề nghị đối chiếu hàng thực tế',
     });
 
+    await tranhChap.tiepNhan(d.admin, tc.id);
+
     await records.capNhat('don_hang', don.id, {
       can_admin_xu_ly: 1,
       ly_do_can_xu_ly: 'Đang kiểm tra',
@@ -235,6 +237,8 @@ test('Hàng chưa rời trung tâm: trả seller cập nhật đúng lưu giữ,
       mo_ta: 'Xin hủy trước khi giao hàng',
       yeu_cau_huy: true,
     });
+
+    await tranhChap.tiepNhan(d.admin, tc.id);
 
     await thuHoiVaKiemKe(d, don.id);
     await tranhChap.giaiQuyet(d.admin, tc.id, { ket_qua: 'NGUOI_MUA', ket_qua_xu_ly: lyDo });
@@ -287,6 +291,9 @@ test('Phí hoàn và bồi thường có biên bản, chứng từ; không đổ
       ghi_chu: lyDo,
     };
 
+    // Chưa rõ tình trạng hàng (đang chờ thu hồi) thì chưa được kết luận trách nhiệm.
+    await assert.rejects(hang.xuLy(d.admin, don.id, nd), { status: 409 });
+    await hang.xuLy(d.admin, don.id, { thao_tac: 'DUNG_THU_HOI', ghi_chu: lyDo });
     await assert.rejects(hang.xuLy(d.a, don.id, nd), { status: 403 });
     await assert.rejects(hang.xuLy(d.admin, don.id, { ...nd, ben_chiu_phi: 'KHONG_PHAT_SINH' }), {
       status: 400,
