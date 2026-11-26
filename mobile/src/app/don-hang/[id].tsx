@@ -464,7 +464,12 @@ const kieu = StyleSheet.create({
     padding: khoang.m,
   },
   diaChiChon: { borderColor: mau.vangDam, backgroundColor: 'rgba(213,183,120,0.06)' },
-  dong: { flexDirection: 'row', flexWrap: 'wrap', gap: khoang.s, justifyContent: 'space-between' },
+  dong: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: khoang.s,
+    justifyContent: 'space-between',
+  },
   tong: {
     flexDirection: 'row',
     justifyContent: 'space-between',

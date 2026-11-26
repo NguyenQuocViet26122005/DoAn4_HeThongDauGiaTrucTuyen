@@ -9,6 +9,7 @@ import { AnhSanPham, Chu, DemNguoc, NhanTrangThai, TieuDe } from './giao-dien';
 // Cùng thứ tự thông tin với thẻ web: ảnh, danh mục, tên, giá và thời gian.
 export function ThePhien({ phien }: { phien: Phien }) {
   const dangMo = ['HOAT_DONG', 'DA_LEN_LICH'].includes(phien.trang_thai);
+
   return (
     <Pressable
       accessibilityRole="link"
@@ -49,6 +50,7 @@ export function ThePhien({ phien }: { phien: Phien }) {
     </Pressable>
   );
 }
+
 const kieu = StyleSheet.create({
   the: {
     backgroundColor: mau.nenThe,
@@ -77,7 +79,12 @@ const kieu = StyleSheet.create({
   },
   noiDung: { padding: khoang.l, gap: khoang.s },
   danhMuc: { color: mau.vang, fontSize: 12 },
-  hangGia: { flexDirection: 'row', alignItems: 'flex-end', gap: khoang.m, marginTop: khoang.s },
+  hangGia: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: khoang.m,
+    marginTop: khoang.s,
+  },
   gia: {
     color: mau.vang,
     fontFamily: phong.thanVua,
