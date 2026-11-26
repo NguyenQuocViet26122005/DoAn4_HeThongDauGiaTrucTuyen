@@ -1,5 +1,7 @@
 # Backend — Đồ án 4: Hệ thống đấu giá trực tuyến
 
+Tính năng tùy chọn mới: [kiểm duyệt tin, đăng bán từ ảnh và tham khảo giá](docs/HO-TRO-DANG-BAN.md). AI dùng các biến `AI_ENABLED`, `OPENAI_API_KEY`, `OPENAI_MODEL` ở backend; không cần bật để chạy hệ thống cơ bản. Sau `npm install`, dữ liệu OCR tiếng Anh/Việt đã nằm trong gói npm, không tải từ mạng khi xử lý ảnh.
+
 Backend TypeScript + Express + Zod (biên dịch sang CommonJS) dùng MySQL 8 `doan4_daugia`, đã đồng bộ cấu trúc 21 bảng. Mã nguồn chia theo Route → Controller → Service → Repository → MySQL. Tên tệp, hàm và biến nghiệp vụ dùng tiếng Việt không dấu; chú thích và thông báo dùng tiếng Việt có dấu. Tên thư mục kiến trúc, cú pháp TypeScript, API thư viện và hợp đồng HTTP/Socket.IO giữ quy ước kỹ thuật đang dùng.
 
 ## Chạy trên máy hiện tại

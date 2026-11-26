@@ -19,7 +19,7 @@ async function cacRouteHienCo() {
 
   for (const ten of await tepTin.readdir(thuMuc)) {
     // 16 route mới được đối chiếu riêng trong api-kiem-dinh-dat-coc.test.js.
-    if (ten === 'kiem-dinh-dat-coc.ts') {
+    if (['kiem-dinh-dat-coc.ts', 'ho-tro-dang-ban.ts'].includes(ten)) {
       continue;
     }
 

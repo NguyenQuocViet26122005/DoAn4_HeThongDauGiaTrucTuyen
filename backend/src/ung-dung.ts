@@ -59,6 +59,7 @@ ungDung.get('/api/health', async (yeuCau, phanHoi, tiepTheo) => {
   }
 });
 ungDung.use('/api', require('./routes/nguoi-dung'));
+ungDung.use('/api', require('./routes/ho-tro-dang-ban'));
 ungDung.use('/api', require('./routes/danh-muc-san-pham'));
 ungDung.use('/api', require('./routes/tai-tep'));
 ungDung.use('/api', require('./routes/dau-gia'));

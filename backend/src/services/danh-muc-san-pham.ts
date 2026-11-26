@@ -350,7 +350,12 @@ async function chiTiet(nguoiDung: NguoiDungDangNhap, id) {
   return {
     ...sanPham,
     ...(laChuSanPham ? { co_the_sua: !lyDo, ly_do_khong_the_sua: lyDo } : {}),
-    ...(coQuyenRieng ? { kiem_dinh_moi_nhat: kiemDinhMoiNhat } : {}),
+    ...(coQuyenRieng
+      ? {
+          kiem_dinh_moi_nhat: kiemDinhMoiNhat,
+          kiem_duyet_noi_dung: await require('./kiem-duyet-tin').canhBaoCoBan(banGhi),
+        }
+      : {}),
     ...(nguoiDung?.vai_tro === 'QUAN_TRI'
       ? { ten_nguoi_ban: (await cacNguoiDung.layTheoId(banGhi.nguoi_ban_id))?.ho_ten ?? null }
       : {}),

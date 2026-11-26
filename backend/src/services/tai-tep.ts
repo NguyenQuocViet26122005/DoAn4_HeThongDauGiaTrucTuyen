@@ -6,6 +6,7 @@ import { cauHinh } from '../config/moi-truong';
 import kiemTra = require('../validations/du-lieu-dau-vao');
 import { baoDam, cungId } from '../utils/loi';
 import khoDuLieu = require('../repositories/he-thong');
+import { luuDauVan } from './dau-van-anh';
 const cacNhom = ['avatar', 'product', 'verification', 'evidence', 'inspection'];
 
 function nhanDangLoaiTep(boDem) {
@@ -73,6 +74,9 @@ async function luu(nguoiDung: NguoiDungDangNhap, nhom, tep) {
 
   await tepTin.mkdir(duongDan.dirname(dich.absolute), { recursive: true });
   await tepTin.writeFile(dich.absolute, tep.buffer, { flag: 'wx' });
+  if (nhom === 'product') {
+    await luuDauVan(dich.absolute, tep.buffer);
+  }
 
   return {
     duong_dan: dich.url,

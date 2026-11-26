@@ -1,5 +1,7 @@
 # Danh sách API Backend
 
+Các API hỗ trợ đăng bán mới và hợp đồng đầy đủ: [Hỗ trợ đăng bán, kiểm duyệt và tham khảo giá](HO-TRO-DANG-BAN.md). Bao gồm trạng thái AI, rà soát tin, chuẩn bị ảnh, gợi ý hồ sơ từ ảnh và giá tham khảo. Không thay đổi hợp đồng giao dịch.
+
 Đã đối chiếu 107 cặp phương thức/đường dẫn với các tệp thật trong src/routes và ung-dung.ts. Bộ Postman có các biến thể đăng nhập, đặt giá và cấu hình để chạy từng kịch bản. Nghiệp vụ 3.0 dùng 21 bảng.
 
 Địa chỉ gốc: `http://localhost:5000/api`. `GET /` ngoài tiền tố `/api` trả thông tin máy chủ.

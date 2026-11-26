@@ -30,6 +30,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
+    "@tesseract.js-data/vie": "^1.0.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -37,8 +39,10 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.3.0",
     "mysql2": "^3.24.4",
+    "sharp": "^0.35.5",
     "socket.io": "^4.8.3",
     "swagger-ui-express": "^5.0.1",
+    "tesseract.js": "^7.0.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {

@@ -4604,6 +4604,89 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Hỗ trợ đăng bán, kiểm duyệt và giá tham khảo",
+      "item": [
+        {
+          "name": "Trạng thái AI",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/listing-support/status",
+            "header": [],
+            "description": "Cần Bearer token. Xem HO-TRO-DANG-BAN.md; ảnh 3–5 tệp ở trường photos. Không dùng ảnh có thông tin cá nhân. Chỉ gửi bước suggest sau khi người bán xem lại ảnh."
+          },
+          "response": []
+        },
+        {
+          "name": "Rà soát tin đã lưu",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/listing-support/products/{{sanPhamId}}/review",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dung_ai\": false\n}"
+            },
+            "description": "Cần Bearer token. Xem HO-TRO-DANG-BAN.md; ảnh 3–5 tệp ở trường photos. Không dùng ảnh có thông tin cá nhân. Chỉ gửi bước suggest sau khi người bán xem lại ảnh."
+          },
+          "response": []
+        },
+        {
+          "name": "Giá thực bán tham khảo",
+          "request": {
+            "method": "GET",
+            "url": "{{diaChiGoc}}/listing-support/products/{{sanPhamId}}/prices",
+            "header": [],
+            "description": "Cần Bearer token. Xem HO-TRO-DANG-BAN.md; ảnh 3–5 tệp ở trường photos. Không dùng ảnh có thông tin cá nhân. Chỉ gửi bước suggest sau khi người bán xem lại ảnh."
+          },
+          "response": []
+        },
+        {
+          "name": "Chuẩn bị ảnh cục bộ",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/listing-support/photos/prepare",
+            "header": [],
+            "description": "Cần Bearer token. Xem HO-TRO-DANG-BAN.md; ảnh 3–5 tệp ở trường photos. Không dùng ảnh có thông tin cá nhân. Chỉ gửi bước suggest sau khi người bán xem lại ảnh.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gợi ý từ ảnh đã kiểm tra",
+          "request": {
+            "method": "POST",
+            "url": "{{diaChiGoc}}/listing-support/photos/suggest",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ma\": \"{{maBanXemAnh}}\",\n  \"ghi_chu\": \"Bình gốm có vết xước nhỏ\",\n  \"xac_nhan_anh_an_toan\": true\n}"
+            },
+            "description": "Cần Bearer token. Xem HO-TRO-DANG-BAN.md; ảnh 3–5 tệp ở trường photos. Không dùng ảnh có thông tin cá nhân. Chỉ gửi bước suggest sau khi người bán xem lại ảnh."
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
