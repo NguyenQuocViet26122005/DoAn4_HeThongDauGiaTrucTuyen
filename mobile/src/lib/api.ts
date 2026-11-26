@@ -3,16 +3,15 @@ import { focusManager, QueryClient } from '@tanstack/react-query';
 import * as Crypto from 'expo-crypto';
 import { ghiNhanGioMayChu } from './gio-may-chu';
 
-// Địa chỉ API: điện thoại thật cần IP máy chạy backend trong mạng LAN (xem `npm run dev:lan`),
-// ví dụ EXPO_PUBLIC_API_URL=http://192.168.1.10:5000/api. Mặc định dùng cho bản xem trên web.
-export const DIA_CHI_API = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api').replace(
-  /\/$/,
-  '',
-);
+// Bản cài mặc định dùng hosting; có thể đặt EXPO_PUBLIC_API_URL riêng khi phát triển LAN.
+export const DIA_CHI_API = (
+  process.env.EXPO_PUBLIC_API_URL || 'https://vietbid-qviet2612.alwaysdata.net/api'
+).replace(/\/$/, '');
 export const GOC_MAY_CHU = DIA_CHI_API.replace(/\/api$/, '');
-// Trang web VietBid (bán hàng, kiểm định, khiếu nại): mặc định cùng máy với API, cổng Vite 5173.
+// HTTPS dùng web cùng hosting; môi trường LAN vẫn suy ra cổng Vite khi không cấu hình riêng.
 export const DIA_CHI_WEB = (
-  process.env.EXPO_PUBLIC_WEB_URL || GOC_MAY_CHU.replace(/:\d+$/, ':5173')
+  process.env.EXPO_PUBLIC_WEB_URL ||
+  (GOC_MAY_CHU.startsWith('https://') ? GOC_MAY_CHU : GOC_MAY_CHU.replace(/:\d+$/, ':5173'))
 ).replace(/\/$/, '');
 
 let tokenHienTai: string | null = null;

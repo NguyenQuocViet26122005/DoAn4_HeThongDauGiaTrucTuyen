@@ -2,6 +2,14 @@
 
 App Expo cho người mua của hệ thống đấu giá VietBid. App dùng chung API với web trong `../backend`. Bán hàng, kiểm định, khiếu nại và quản trị vẫn làm trên web.
 
+## Bản Android dùng hosting
+
+App mặc định kết nối `https://vietbid-qviet2612.alwaysdata.net/api` và mở web cùng hosting. Tài khoản, sản phẩm, phiên, đơn và thông báo dùng chung CSDL với website; điện thoại không cần chung Wi-Fi hay máy phát triển đang bật. Có thể đặt hai biến `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_WEB_URL` để phát triển với backend khác.
+
+Workflow **APK và cập nhật Android** build APK release ARM64 khi thay đổi mã mobile trên `main` hoặc chạy thủ công. APK được ký bằng khóa riêng trong GitHub Actions Secrets, phát hành tại GitHub Releases kèm SHA256. Cài APK ngoài cửa hàng cần người dùng cho phép cài đặt và xác nhận; Android không cho app tự cài APK thay thế âm thầm.
+
+`expo-updates` đã được cấu hình kiểm tra cập nhật khi khởi động, xác minh chữ ký bằng chứng chỉ công khai đóng trong APK. Runtime được tính từ dependency lockfile, cấu hình native, chứng chỉ và icon: thay đổi các phần này tạo runtime khác và cần APK mới. Mã JavaScript dùng runtime cũ có thể cập nhật từ xa; bản đã tải áp dụng vào lần mở app sau, không tự ngắt thao tác đặt giá/thanh toán đang diễn ra. Chi tiết triển khai máy chủ và kết quả kiểm tra được ghi trong tài liệu `deploy`.
+
 ## Chạy app
 
 Cần backend đang chạy trước (xem `../backend/HUONG-DAN.md`). Mở terminal trong thư mục `mobile`:
@@ -28,7 +36,7 @@ npx expo start --web
 
 3. Mở Expo Go trên điện thoại (cùng mạng Wi-Fi với máy tính) và quét mã QR.
 
-Biến tùy chọn `EXPO_PUBLIC_WEB_URL` là địa chỉ web VietBid cho nút "Mở VietBid trên web". Mặc định app lấy máy chủ của API và đổi sang cổng 5173.
+Biến tùy chọn `EXPO_PUBLIC_WEB_URL` là địa chỉ web VietBid cho nút "Mở VietBid trên web". API HTTPS dùng web cùng hosting; khi phát triển bằng HTTP LAN thì mặc định đổi cổng API sang 5173.
 
 ## Kiểm tra code
 

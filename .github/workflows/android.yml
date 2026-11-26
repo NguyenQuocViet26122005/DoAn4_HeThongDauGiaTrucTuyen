@@ -1,0 +1,72 @@
+name: APK và cập nhật Android
+
+on:
+  push:
+    branches: [main]
+    paths: ['mobile/**', '.github/workflows/android.yml', 'deploy/mobile-*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vietbid-android
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    env:
+      EXPO_PUBLIC_API_URL: https://vietbid-qviet2612.alwaysdata.net/api
+      EXPO_PUBLIC_WEB_URL: https://vietbid-qviet2612.alwaysdata.net
+      CI: '1'
+    steps:
+      - name: Lấy mã nguồn
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Node.js 24
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - name: Cài và kiểm tra app
+        run: |
+          npm --prefix mobile ci --no-audit --no-fund
+          npm --prefix mobile run check
+      - name: Tạo dự án Android từ Expo
+        working-directory: mobile
+        run: |
+          npx expo prebuild --platform android --no-install
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+      - name: Build APK release
+        working-directory: mobile/android
+        run: ./gradlew app:assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon --max-workers=2
+      - name: Ký và xác minh APK
+        env:
+          STORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          umask 077
+          printf '%s' "$STORE_BASE64" | base64 --decode > "$RUNNER_TEMP/vietbid.jks"
+          trap 'rm -f "$RUNNER_TEMP/vietbid.jks"' EXIT
+          BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)
+          "$BUILD_TOOLS/apksigner" sign --ks "$RUNNER_TEMP/vietbid.jks" --ks-key-alias vietbid \
+            --ks-pass env:STORE_PASSWORD --key-pass env:STORE_PASSWORD \
+            --out "$RUNNER_TEMP/VietBid.apk" mobile/android/app/build/outputs/apk/release/app-release.apk
+          "$BUILD_TOOLS/apksigner" verify --verbose "$RUNNER_TEMP/VietBid.apk"
+          cd "$RUNNER_TEMP"
+          sha256sum VietBid.apk > VietBid.apk.sha256
+      - name: Phát hành APK để tải về
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "android-$GITHUB_RUN_NUMBER" "$RUNNER_TEMP/VietBid.apk" "$RUNNER_TEMP/VietBid.apk.sha256" \
+            --target "$GITHUB_SHA" --title "VietBid Android $GITHUB_RUN_NUMBER" --latest \
+            --notes 'APK Android ARM64 dùng API VietBid trên hosting. Dữ liệu đồng bộ với web; cập nhật JavaScript có chữ ký số. Thay đổi native cần cài APK mới.'
