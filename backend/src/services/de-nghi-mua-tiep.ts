@@ -84,7 +84,7 @@ async function deNghiNguoiTiepTheoDaKhoa(phienDauGia, banGoc, nguoiYeuCauId) {
   }
   if (
     (await khoDuLieu.donDangXuLyCuaPhien(phienDauGia.id)) ||
-    (await khoDuLieu.deNghiDangCho(phienDauGia.id))
+    (await khoDuLieu.deNghiDangCho(phienDauGia.id, true))
   ) {
     return null;
   }
@@ -137,8 +137,20 @@ async function deNghiNguoiTiepTheoDaKhoa(phienDauGia, banGoc, nguoiYeuCauId) {
 }
 
 async function tao(nguoiDung: NguoiDungDangNhap, donHangId) {
+  const donId = kiemTra.id(donHangId);
+
   return coSoDuLieu.giaoDich(async () => {
-    const banGhi = batBuocTonTai(await khoDuLieu.khoaDuLieu(kiemTra.id(donHangId)));
+    const donBanDau = batBuocTonTai(await khoBanGhi.layTheoId('don_hang', donId));
+
+    baoDam(cungId(nguoiDung.id, donBanDau.nguoi_ban_id), 403, 'Chỉ người bán được tạo đề nghị');
+
+    const phienBanDau = batBuocTonTai(await cacPhienDauGia.layTheoId(donBanDau.phien_dau_gia_id));
+
+    // Dùng cùng khóa món hàng với tạo phiên và chấp nhận đề nghị.
+    await khoaSanPham(phienBanDau.san_pham_id);
+
+    const phien = batBuocTonTai(await cacPhienDauGia.layTheoId(phienBanDau.id, true));
+    const banGhi = batBuocTonTai(await khoDuLieu.khoaDuLieu(donId));
 
     baoDam(cungId(nguoiDung.id, banGhi.nguoi_ban_id), 403, 'Chỉ người bán được tạo đề nghị');
     baoDam(
@@ -147,11 +159,14 @@ async function tao(nguoiDung: NguoiDungDangNhap, donHangId) {
       'Chỉ tạo đề nghị khi người thắng không thanh toán',
     );
 
-    const deNghi = await deNghiNguoiTiepTheoDaKhoa(
-      await cacPhienDauGia.layTheoId(banGhi.phien_dau_gia_id),
-      banGhi,
-      nguoiDung.id,
-    );
+    // Khóa duy nhất trong CSDL còn giữ chỗ tới khi đề nghị cũ được đánh dấu hết hạn.
+    const deNghiCu = await khoDuLieu.deNghiDangCho(phien.id, true);
+
+    if (deNghiCu) {
+      await xuLyHetHan(deNghiCu.id);
+    }
+
+    const deNghi = await deNghiNguoiTiepTheoDaKhoa(phien, banGhi, nguoiDung.id);
 
     baoDam(deNghi, 409, 'Không có ứng viên phù hợp hoặc đã có đơn/đề nghị đang xử lý');
 

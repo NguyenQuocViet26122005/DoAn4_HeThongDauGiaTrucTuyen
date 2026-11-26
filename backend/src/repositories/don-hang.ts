@@ -169,9 +169,10 @@ const ungVienTiepTheo = (id) =>
      ORDER BY b.so_tien DESC,b.ngay_tao,b.id`,
     [id],
   );
-const deNghiDangCho = (id) =>
+const deNghiDangCho = (id, keCaHetHan = false) =>
   coSoDuLieu.layMot(
-    "SELECT * FROM de_nghi_mua_tiep_theo WHERE phien_dau_gia_id=? AND trang_thai='CHO_XU_LY' LIMIT 1",
+    `SELECT * FROM de_nghi_mua_tiep_theo WHERE phien_dau_gia_id=? AND trang_thai='CHO_XU_LY'
+     ${keCaHetHan ? '' : 'AND het_han_luc>NOW()'} LIMIT 1`,
     [id],
   );
 const cacDeNghi = (nguoiDung, { limit: gioiHan, offset: viTriBatDau }) =>

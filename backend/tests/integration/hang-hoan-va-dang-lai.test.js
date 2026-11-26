@@ -334,6 +334,38 @@ test('Đã đăng phiên mới thì không gửi Second Chance từ phiên cũ; 
     assert.ok(!(await khoTuongTac.daBaoCaoSanPham(d.a.id, lienKet)));
   }));
 
+test('Chỉ đề nghị mua tiếp còn hạn mới chặn mở phiên mới cho cùng món hàng', () =>
+  hoanTac(async () => {
+    const d = await taoDuLieuKiemThu();
+    const id = await phienDauGia(d);
+
+    await dauGia.datGia(d.b, id, { gia_toi_da: '20000000' });
+    await dauGia.datGia(d.a, id, { gia_toi_da: '22000000' });
+    await records.capNhat('phien_dau_gia', id, { thoi_gian_ket_thuc: await db.thoiGianHienTai() });
+    await dauGia.xuLyDenHan(id);
+
+    const don = await khoDon.donDangXuLyCuaPhien(id);
+    const truocHienTai = thoiGian.congGiay(await db.thoiGianHienTai(), -5);
+
+    await records.capNhat('don_hang', don.id, { han_thanh_toan: truocHienTai });
+    await donHang.xuLyDenHan(don.id);
+
+    const deXuat = await deNghi.tao(d.seller, don.id);
+    const phien = await khoPhien.layTheoId(id);
+    const duLieuMoi = await duLieuPhienMoi(phien.san_pham_id);
+
+    assert.equal(await khoSanPham.sanPhamDuocTaoPhien(phien.san_pham_id), null);
+    await assert.rejects(dauGia.tao(d.seller, duLieuMoi), { status: 409 });
+    await records.capNhat('de_nghi_mua_tiep_theo', deXuat.id, { het_han_luc: truocHienTai });
+
+    assert.ok(await khoSanPham.sanPhamDuocTaoPhien(phien.san_pham_id));
+    assert.ok((await dauGia.tao(d.seller, duLieuMoi)).id);
+    await assert.rejects(deNghi.phanHoiDeNghi(d.b, deXuat.id, { chap_nhan: true }), {
+      status: 409,
+    });
+    await assert.rejects(deNghi.tao(d.seller, don.id), { status: 409 });
+  }));
+
 test('Cọc từng phiên: bắt buộc/tùy chọn/tắt và snapshot không đổi sau cập nhật chính sách', () =>
   hoanTac(async () => {
     const d = await taoDuLieuKiemThu();

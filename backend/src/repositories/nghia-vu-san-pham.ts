@@ -16,6 +16,7 @@ const PHIEN_CON_HIEU_LUC = "a.trang_thai IN ('DA_LEN_LICH','HOAT_DONG')";
 const PHIEN_THANG_CHUA_CO_DON = `a.trang_thai='DA_KET_THUC'
         AND a.ly_do_ket_thuc IN ('CO_NGUOI_THANG','MUA_NGAY')
         AND NOT EXISTS (SELECT 1 FROM don_hang d WHERE d.phien_dau_gia_id=a.id)`;
+const DE_NGHI_CON_HAN = "n.trang_thai='CHO_XU_LY' AND n.het_han_luc>NOW()";
 
 const donConNghiaVu = (maBang) => `(
         d.trang_thai<>'DA_HUY'
@@ -51,7 +52,7 @@ export function dieuKienKhongConNghiaVu(maBang = 'p') {
       SELECT 1 FROM de_nghi_mua_tiep_theo n
       JOIN phien_dau_gia a ON a.id=n.phien_dau_gia_id
       JOIN san_pham s ON s.id=a.san_pham_id
-      WHERE ${cungMon} AND n.trang_thai='CHO_XU_LY'
+      WHERE ${cungMon} AND ${DE_NGHI_CON_HAN}
     )`;
 }
 
@@ -78,7 +79,7 @@ export async function nghiaVuDangChan(sanPhamId) {
     ),
     deNghi: await coSoDuLieu.layMot(
       `SELECT n.id ${tu} JOIN de_nghi_mua_tiep_theo n ON n.phien_dau_gia_id=a.id
-       WHERE p.id=? AND n.trang_thai='CHO_XU_LY' ORDER BY n.id DESC LIMIT 1`,
+       WHERE p.id=? AND ${DE_NGHI_CON_HAN} ORDER BY n.id DESC LIMIT 1`,
       [sanPhamId],
     ),
   };
