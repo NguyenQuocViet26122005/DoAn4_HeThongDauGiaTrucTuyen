@@ -14,6 +14,9 @@ const cauHinh = {
   ),
   webRoot: process.env.WEB_DIST ? duongDan.resolve(process.env.WEB_DIST) : null,
   trustProxyHops: Number(process.env.TRUST_PROXY_HOPS || 0),
+  revision: /^[0-9a-f]{40}$/.test(process.env.RELEASE_SHA || '')
+    ? process.env.RELEASE_SHA
+    : undefined,
 };
 
 function kiemTraMoiTruong() {

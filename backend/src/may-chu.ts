@@ -61,11 +61,13 @@ async function khoiDongMayChu(diaChiLangNghe?: string) {
 
 function ungDungKemGiaoDien(webRoot: string) {
   const trangChinh = join(webRoot, 'index.html');
+
   if (!existsSync(trangChinh)) {
     throw new Error('WEB_DIST thiếu index.html, cần build frontend');
   }
 
   const web = express();
+
   web.disable('x-powered-by');
   web.use((req, res, next) => {
     if (/^\/(?:api|api-docs)(?:[/.]|$)/.test(req.path)) {

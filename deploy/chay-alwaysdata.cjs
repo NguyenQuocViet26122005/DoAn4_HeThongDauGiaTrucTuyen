@@ -1,5 +1,5 @@
 const { readFileSync, statSync } = require('node:fs');
-const { join } = require('node:path');
+const { join, resolve } = require('node:path');
 
 const cacBien = new Set([
   'NODE_ENV',
@@ -19,7 +19,8 @@ const cacBien = new Set([
 ]);
 
 async function main() {
-  const tep = join(__dirname, '../backend/.local/alwaysdata.json');
+  const root = process.env.VIETBID_SHARED_ROOT || resolve(__dirname, '..');
+  const tep = join(root, 'backend/.local/alwaysdata.json');
   const thongTin = statSync(tep);
   if (process.platform !== 'win32' && (thongTin.mode & 0o077) !== 0) {
     throw new Error('PRIVATE_CONFIG_PERMISSIONS');
@@ -36,6 +37,13 @@ async function main() {
   }
 
   const lenh = process.argv[2];
+  if (!lenh) {
+    const giamSat = require('./quan-ly-phat-hanh.cjs').giamSat(root);
+    for (const tinHieu of ['SIGTERM', 'SIGINT']) {
+      process.once(tinHieu, () => giamSat.stop());
+    }
+    return;
+  }
   if (lenh === '--init') {
     require('./khoi-tao-mysql.cjs');
     return;
@@ -53,8 +61,11 @@ async function main() {
     await taoQuanTri();
     return;
   }
-  if (lenh) {
+  if (lenh !== '--worker') {
     throw new Error('UNKNOWN_COMMAND');
+  }
+  if (process.env.VIETBID_RELEASE_ROOT) {
+    process.env.WEB_DIST = join(process.env.VIETBID_RELEASE_ROOT, 'frontend/dist');
   }
   await require('../backend/dist/may-chu').khoiDongMayChu(process.env.IP);
 }

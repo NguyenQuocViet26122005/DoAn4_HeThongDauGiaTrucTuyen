@@ -52,7 +52,7 @@ ungDung.get('/api/health', async (yeuCau, phanHoi, tiepTheo) => {
     phanHoi.json({
       success: true,
       message: 'Backend và MySQL hoạt động',
-      data: { database: 'connected' },
+      data: { database: 'connected', ...(cauHinh.revision ? { revision: cauHinh.revision } : {}) },
     });
   } catch (loi) {
     tiepTheo(loi);

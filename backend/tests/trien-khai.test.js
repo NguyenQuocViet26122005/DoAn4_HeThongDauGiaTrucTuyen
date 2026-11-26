@@ -31,8 +31,9 @@ async function run(input, mode = 0o600) {
   const process = {
     platform: 'linux',
     env: { IP: '::1', PORT: '8100' },
-    argv: ['node', 'launcher'],
+    argv: ['node', 'launcher', '--worker'],
   };
+
   vm.runInNewContext(code, {
     __dirname: deploy,
     process,
@@ -58,7 +59,12 @@ async function run(input, mode = 0o600) {
     },
   });
   await new Promise(setImmediate);
-  return { started, errors, process };
+
+  return {
+    started,
+    errors,
+    process,
+  };
 }
 
 test('Trình chạy cloud giữ IP/PORT do hosting cấp và nạp cấu hình riêng', async () => {
@@ -68,6 +74,7 @@ test('Trình chạy cloud giữ IP/PORT do hosting cấp và nạp cấu hình r
 test('Cấu hình cloud sai khuôn bị chặn, lỗi không ghi bí mật ra log', async () => {
   for (const input of [{ ...config, PORT: '5000' }, { ...config, DB_PASSWORD: 123 }, {}, []]) {
     const result = await run(input);
+
     assert.equal(result.started, false);
     assert.equal(result.process.exitCode, 1);
     assert(!JSON.stringify(result.errors).includes(config.DB_PASSWORD));
