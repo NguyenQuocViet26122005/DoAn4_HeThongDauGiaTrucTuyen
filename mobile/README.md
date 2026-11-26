@@ -2,6 +2,12 @@
 
 App Expo cho người mua của hệ thống đấu giá VietBid. App dùng chung API với web trong `../backend`. Bán hàng, kiểm định, khiếu nại và quản trị vẫn làm trên web.
 
+## Đồng bộ giao diện với website
+
+App lấy giao diện web trên điện thoại làm chuẩn: nền `#111310`, màu vàng `#d5b778`, chữ Be Vietnam Pro và tiêu đề Cormorant Garamond; thẻ bo 12, nút bo 6. Thẻ phiên giữ cùng thứ tự ảnh, danh mục, tiêu đề, giá, lượt trả giá và thời gian. Biểu mẫu, nhãn trạng thái, tiến trình đơn và các trang tài khoản dùng chung bộ thành phần trong `src/components/giao-dien.tsx` và màu trong `src/lib/giao-dien.ts`.
+
+App giữ bốn tab và điều hướng native. Đây là sự thống nhất về hình thức và cách trình bày ở các màn hình hiện có; các chức năng bán hàng, kiểm định và quản trị tiếp tục mở trên web. Ảnh bản web Expo dùng để đối chiếu bố cục, không thay thế kiểm thử cài APK trên thiết bị Android.
+
 ## Bản Android dùng hosting
 
 App mặc định kết nối `https://vietbid-qviet2612.alwaysdata.net/api` và mở web cùng hosting. Tài khoản, sản phẩm, phiên, đơn và thông báo dùng chung CSDL với website; điện thoại không cần chung Wi-Fi hay máy phát triển đang bật. Có thể đặt hai biến `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_WEB_URL` để phát triển với backend khác.
