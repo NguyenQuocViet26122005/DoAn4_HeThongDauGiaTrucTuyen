@@ -74,11 +74,14 @@ export interface DonHang {
   anh_chinh?: string | null;
   anh_san_pham?: string | null;
   trang_thai: string;
+  ly_do_huy?: string | null;
+  nguon_gui_hang?: 'NGUOI_BAN' | 'TRUNG_TAM';
   gia_san_pham: string;
   phi_van_chuyen: string;
   tong_tien: string;
   tien_coc_da_chuyen: string;
   so_tien_da_thu: string;
+  so_tien_da_hoan?: string;
   so_tien_con_phai_thanh_toan: string;
   han_thanh_toan: string | null;
   han_kiem_tra: string | null;
@@ -89,6 +92,7 @@ export interface DonHang {
   ma_van_don: string | null;
   can_admin_xu_ly: number;
   trang_thai_giu_tien: string;
+  xu_ly_hang?: { trang_thai: string } | null;
   ngay_tao: string;
   thanh_toan?: { id: string; khoa_yeu_cau: string | null; trang_thai: string; so_tien: string }[];
   tranh_chap?: { id: string; trang_thai: string }[];

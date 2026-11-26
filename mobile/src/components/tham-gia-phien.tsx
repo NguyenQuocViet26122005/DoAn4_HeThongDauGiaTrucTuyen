@@ -11,7 +11,7 @@ import { gioMayChu } from '@/lib/gio-may-chu';
 import { usePhienDangNhap } from '@/lib/phien-dang-nhap';
 import { thongBao, xacNhan } from '@/lib/xac-nhan';
 import type { DatCoc, DiaChi, DonHang, Phien } from '@/lib/kieu';
-import { Chu, Nut, The } from './giao-dien';
+import { Chu, ManHinhCho, Nut, The } from './giao-dien';
 
 type BuocGia = { gia_tu: string; gia_den: string | null; muc_tang_gia: string };
 
@@ -56,14 +56,18 @@ const lamMoiPhien = (id: string) =>
   });
 
 export function ThamGiaPhien({ phien }: { phien: Phien }) {
-  const { nguoiDung } = usePhienDangNhap();
+  const { nguoiDung, dangKhoiTao } = usePhienDangNhap();
   const hienTai = useGioMayChu();
   const [mucNhap, datMucNhap] = useState('');
   const [dangGui, datDangGui] = useState('');
   const coTaiKhoan = !!nguoiDung && nguoiDung.vai_tro === 'NGUOI_DUNG';
   const laNguoiBan = String(nguoiDung?.id) === String(phien.nguoi_ban_id);
   const canCoc = !!Number(phien.yeu_cau_dat_coc);
-  const choThamGia = coTaiKhoan && !laNguoiBan;
+  const taiKhoanHoatDong = nguoiDung?.trang_thai_tai_khoan === 'HOAT_DONG';
+  const conHieuLuc =
+    ['DA_LEN_LICH', 'HOAT_DONG'].includes(phien.trang_thai) &&
+    mocThoiGian(phien.thoi_gian_ket_thuc) > hienTai;
+  const choThamGia = coTaiKhoan && taiKhoanHoatDong && !laNguoiBan && conHieuLuc;
 
   const diaChi = useQuery({
     queryKey: ['/users/me/addresses'],
@@ -86,6 +90,14 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
     enabled: choThamGia,
   });
 
+  if (!conHieuLuc) {
+    return (
+      <GhiChu bieuTuong="flag-outline" noiDung="Phiên đã kết thúc, không nhận thao tác mới." />
+    );
+  }
+  if (dangKhoiTao) {
+    return <ManHinhCho dangTai />;
+  }
   if (!nguoiDung) {
     return (
       <The style={kieu.khoi}>
@@ -112,24 +124,43 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
     );
   }
 
-  const conHieuLuc =
-    ['DA_LEN_LICH', 'HOAT_DONG'].includes(phien.trang_thai) &&
-    mocThoiGian(phien.thoi_gian_ket_thuc) > hienTai;
-  const daBatDau = mocThoiGian(phien.thoi_gian_bat_dau) <= hienTai;
-
-  if (!conHieuLuc) {
+  if (!taiKhoanHoatDong) {
     return (
-      <GhiChu bieuTuong="flag-outline" noiDung="Phiên đã kết thúc, không nhận thao tác mới." />
+      <GhiChu bieuTuong="lock-closed-outline" noiDung="Tài khoản hiện chưa thể tham gia đấu giá." />
+    );
+  }
+  if (!diaChi.isSuccess || (canCoc && !coc.isSuccess)) {
+    return (
+      <ManHinhCho
+        dangTai={diaChi.isPending || (canCoc && coc.isPending)}
+        loi={diaChi.error || (canCoc ? coc.error : null)}
+        thuLai={() => {
+          if (!diaChi.isSuccess) {
+            void diaChi.refetch();
+          }
+          if (canCoc && !coc.isSuccess) {
+            void coc.refetch();
+          }
+        }}
+      />
     );
   }
 
+  const daBatDau = mocThoiGian(phien.thoi_gian_bat_dau) <= hienTai;
   const diaChiNhan = diaChi.data?.[0];
-  const duCoc = !canCoc || coc.data?.trang_thai === 'DA_DAT_COC';
+  const daDatCoc = coc.data?.trang_thai === 'DA_DAT_COC';
+  const duCoc =
+    !canCoc || (daDatCoc && Number(coc.data?.so_tien) === Number(phien.so_tien_dat_coc));
   const mucCu = cuaToi.data?.muc_toi_da_cua_toi;
   const dangDanDau = phien.nguoi_dan_dau === `ND-${nguoiDung.id}`;
   const toiThieu = mucGoiY(phien, buocGia.data, mucCu, dangDanDau);
   const choMuaNgay =
     !!Number(phien.cho_phep_mua_ngay) && !!phien.gia_mua_ngay && daBatDau && !!diaChiNhan;
+  const tienCoc = daDatCoc ? coc.data!.so_tien : '0';
+  const tongMuaNgay =
+    Math.round(Number(phien.gia_mua_ngay || 0) * 100) +
+    Math.round(Number(phien.phi_van_chuyen) * 100);
+  const canTraMuaNgay = (tongMuaNgay - Math.round(Number(tienCoc) * 100)) / 100;
 
   async function thucHien(ten: string, viec: () => Promise<void>) {
     datDangGui(ten);
@@ -144,10 +175,15 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
   }
 
   async function datGia() {
-    const muc = Math.floor(Number(mucNhap.replace(/\D/g, '')));
+    const muc = mucNhap.replace(/^0+/, '');
 
-    if (!muc) {
-      thongBao('Nhập mức tối đa bạn chấp nhận');
+    if (!muc || muc.length > 13 || (toiThieu && Number(muc) < toiThieu)) {
+      thongBao(
+        'Mức tối đa chưa hợp lệ',
+        toiThieu
+          ? `Mức tối thiểu hiện tại là ${tien(toiThieu)}.`
+          : 'Nhập số tiền nguyên từ 1 đến 13 chữ số.',
+      );
 
       return;
     }
@@ -162,7 +198,7 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
     }
     await thucHien('gia', async () => {
       const ketQua = await gui<{ ban_dang_dan_dau: boolean }>(`/auctions/${phien.id}/bids`, {
-        gia_toi_da: String(muc),
+        gia_toi_da: muc,
       });
 
       datMucNhap('');
@@ -197,14 +233,15 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
             <Chu dam>Đặt cọc {tien(phien.so_tien_dat_coc)} để mở đặt giá</Chu>
           </View>
           <Chu phu>
-            Người không thắng được hoàn cọc; cọc của người thắng chuyển vào đơn. Bỏ thanh toán không
-            được hoàn cọc.
+            Người không thắng được hoàn cọc. Cọc của người thắng chuyển vào đơn. Nếu đơn quá hạn
+            thanh toán, Admin sẽ xem xét quyết toán khoản cọc.
           </Chu>
           {coc.data && <Chu phu>Trạng thái cọc: {nhan(coc.data.trang_thai)}</Chu>}
           {!coc.data ? (
             <Nut
               ten="Đăng ký tham gia phiên"
               dangTai={dangGui === 'dang-ky'}
+              khoa={!!dangGui}
               onPress={() =>
                 void thucHien('dang-ky', () => gui(`/auctions/${phien.id}/deposit/register`))
               }
@@ -214,7 +251,7 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
               ten={`Thanh toán cọc ${tien(phien.so_tien_dat_coc)}`}
               bieuTuong="card-outline"
               dangTai={dangGui === 'coc'}
-              khoa={!['CHO_THANH_TOAN', 'THAT_BAI'].includes(coc.data.trang_thai)}
+              khoa={!!dangGui || !['CHO_THANH_TOAN', 'THAT_BAI'].includes(coc.data.trang_thai)}
               onPress={async () => {
                 if (
                   await xacNhan(
@@ -256,10 +293,16 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
         {canCoc && !duCoc && <Chu style={{ color: mau.cam }}>Hoàn tất đặt cọc để mở đặt giá.</Chu>}
         <TextInput
           accessibilityLabel="Mức tối đa bí mật"
-          editable={duCoc && daBatDau}
+          editable={duCoc && daBatDau && !dangGui}
           keyboardType="number-pad"
           value={mucNhap ? Number(mucNhap.replace(/\D/g, '')).toLocaleString('vi-VN') : ''}
-          onChangeText={(chu) => datMucNhap(chu.replace(/\D/g, ''))}
+          onChangeText={(chu) => {
+            const so = chu.replace(/\D/g, '');
+
+            if (so.length <= 13) {
+              datMucNhap(so);
+            }
+          }}
           placeholder={toiThieu ? `Từ ${tien(toiThieu)}` : 'Nhập số tiền'}
           placeholderTextColor={mau.chuMo}
           style={kieu.oGia}
@@ -268,7 +311,7 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
           ten="Đặt mức tối đa"
           bieuTuong="hammer-outline"
           dangTai={dangGui === 'gia'}
-          khoa={!duCoc || !daBatDau}
+          khoa={!duCoc || !daBatDau || !!dangGui}
           onPress={() => void datGia()}
         />
       </The>
@@ -276,17 +319,20 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
       {choMuaNgay && (
         <The style={kieu.khoi}>
           <Chu dam>Mua ngay với {tien(phien.gia_mua_ngay)}</Chu>
-          <Chu phu>Kết thúc phiên ngay và tạo đơn cho bạn; thanh toán ngay sau khi xác nhận.</Chu>
+          <Chu phu>
+            Phí vận chuyển {tien(phien.phi_van_chuyen)}. Cọc được trừ {tien(tienCoc)}.
+          </Chu>
           <Nut
             phu
             ten="Mua ngay"
             bieuTuong="flash-outline"
             dangTai={dangGui === 'mua-ngay'}
+            khoa={!!dangGui || canTraMuaNgay < 0}
             onPress={async () => {
               if (
                 !(await xacNhan(
                   'Mua ngay',
-                  `Mua với giá ${tien(phien.gia_mua_ngay)} cộng phí vận chuyển ${tien(phien.phi_van_chuyen)}.`,
+                  `Thanh toán mô phỏng ${tien(canTraMuaNgay)} sau khi trừ cọc. Phiên sẽ kết thúc khi thanh toán thành công.`,
                   'Mua ngay',
                 ))
               ) {
@@ -298,8 +344,13 @@ export function ThamGiaPhien({ phien }: { phien: Phien }) {
                   { khoa_yeu_cau: maNgauNhien(), ket_qua_mo_phong: 'THANH_CONG' },
                 );
 
-                if (ketQua.don_hang) {
+                if (ketQua.ket_qua_mo_phong === 'THANH_CONG' && ketQua.don_hang) {
                   router.push(`/don-hang/${ketQua.don_hang.id}`);
+                } else {
+                  thongBao(
+                    'Thanh toán chưa thành công',
+                    'Hãy kiểm tra lại trạng thái phiên trước khi thử lại.',
+                  );
                 }
               });
             }}

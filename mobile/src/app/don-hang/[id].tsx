@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Linking, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useQuery } from '@tanstack/react-query';
-import { boNho, doc, gui, loiDeDoc, maNgauNhien } from '@/lib/api';
+import { boNho, DIA_CHI_WEB, doc, gui, loiDeDoc, maNgauNhien } from '@/lib/api';
 import { bo, khoang, mau } from '@/lib/giao-dien';
 import { mocThoiGian, ngayGio, nhan, tien } from '@/lib/dinh-dang';
 import { gioMayChu } from '@/lib/gio-may-chu';
@@ -47,7 +47,7 @@ const lamMoiDon = (id: string) =>
 
 export default function ChiTietDon() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { nguoiDung } = usePhienDangNhap();
+  const { nguoiDung, dangKhoiTao } = usePhienDangNhap();
   const [hienTai, datHienTai] = useState(gioMayChu);
   const [dangGui, datDangGui] = useState('');
   const truyVan = useQuery({
@@ -70,8 +70,11 @@ export default function ChiTietDon() {
     return () => clearInterval(dem);
   }, []);
 
+  if (dangKhoiTao) {
+    return <ManHinhCho dangTai />;
+  }
   if (!nguoiDung) {
-    return <ManHinhCho dangTai={false} rong thongDiepRong="Đăng nhập để xem đơn hàng." />;
+    return <Nut ten="Đăng nhập để xem đơn hàng" onPress={() => router.push('/dang-nhap')} />;
   }
   if (!don) {
     return (
@@ -115,12 +118,14 @@ export default function ChiTietDon() {
         ket_qua_mo_phong: 'THANH_CONG',
       });
 
-      thongBao(
-        xu(ketQua.so_tien_da_thu) === xu(ketQua.tong_tien)
-          ? 'Đơn đã thanh toán đủ'
-          : 'Thanh toán chưa thành công',
-        'Tiền được giữ trung gian, người bán sẽ gửi hàng cho bạn.',
-      );
+      if (ketQua.trang_thai !== 'DA_HUY' && xu(ketQua.so_tien_da_thu) === xu(ketQua.tong_tien)) {
+        thongBao('Đơn đã thanh toán đủ');
+      } else {
+        thongBao(
+          'Thanh toán chưa thành công',
+          'Hãy kiểm tra lại trạng thái đơn trước khi thử lại.',
+        );
+      }
     });
   }
 
@@ -217,13 +222,23 @@ export default function ChiTietDon() {
             <Chu phu>
               Thanh toán thất bại không kéo dài hạn. Đổi địa chỉ chỉ áp dụng trước khi thanh toán.
             </Chu>
-            {(diaChi.data || []).length > 1 && (
+            {diaChi.isError && (
+              <Nut phu ten="Tải lại sổ địa chỉ" onPress={() => void diaChi.refetch()} />
+            )}
+            {!!diaChi.data?.length && (
               <View style={{ gap: khoang.s }}>
                 <Chu phu>Giao tới</Chu>
-                {(diaChi.data || []).map((muc) => {
+                {diaChi.data.map((muc) => {
+                  const diaChiDayDu = [
+                    muc.dia_chi_chi_tiet,
+                    muc.phuong_xa,
+                    muc.quan_huyen,
+                    muc.tinh_thanh,
+                  ].join(', ');
                   const dangChon =
                     muc.ten_nguoi_nhan === don.ten_nguoi_nhan &&
-                    don.dia_chi_giao_hang.includes(muc.dia_chi_chi_tiet);
+                    muc.sdt_nguoi_nhan === don.sdt_nguoi_nhan &&
+                    diaChiDayDu.slice(0, 500) === don.dia_chi_giao_hang;
 
                   return (
                     <Pressable
@@ -248,12 +263,7 @@ export default function ChiTietDon() {
                           {muc.ten_nguoi_nhan} · {muc.sdt_nguoi_nhan}
                         </Chu>
                         <Chu phu numberOfLines={2} style={{ fontSize: 12 }}>
-                          {[
-                            muc.dia_chi_chi_tiet,
-                            muc.phuong_xa,
-                            muc.quan_huyen,
-                            muc.tinh_thanh,
-                          ].join(', ')}
+                          {diaChiDayDu}
                         </Chu>
                       </View>
                     </Pressable>
@@ -289,6 +299,7 @@ export default function ChiTietDon() {
             ten="Tôi đã nhận hàng"
             bieuTuong="archive-outline"
             dangTai={dangGui === 'delivered'}
+            khoa={!!dangGui}
             onPress={() => void xacNhanBuoc('delivered')}
           />
         </The>
@@ -310,7 +321,7 @@ export default function ChiTietDon() {
             ten="Hàng phù hợp — hoàn tất"
             bieuTuong="checkmark-done-outline"
             dangTai={dangGui === 'confirm'}
-            khoa={!duocHoanTat(don)}
+            khoa={!duocHoanTat(don) || !!dangGui}
             onPress={() => void xacNhanBuoc('confirm')}
           />
         </The>
@@ -327,6 +338,31 @@ export default function ChiTietDon() {
         </The>
       )}
 
+      {don.trang_thai === 'DA_HUY' && (
+        <The style={kieu.khoiViec}>
+          <Chu dam>Đơn đã hủy</Chu>
+          {don.ly_do_huy === 'KHONG_THANH_TOAN' && <Chu phu>Đơn quá hạn thanh toán.</Chu>}
+          {don.ly_do_huy === 'HOAN_TIEN_TRANH_CHAP' && (
+            <Chu phu>Đơn đã hủy theo kết quả xử lý tranh chấp.</Chu>
+          )}
+          {!!Number(don.can_admin_xu_ly) &&
+            don.ly_do_huy === 'KHONG_THANH_TOAN' &&
+            Number(don.tien_coc_da_chuyen) > 0 && (
+              <Chu phu>Tiền cọc đang chờ Admin quyết toán.</Chu>
+            )}
+          {!!don.xu_ly_hang && <Chu phu>Hàng hoàn: {nhan(don.xu_ly_hang.trang_thai)}</Chu>}
+          <Nut
+            phu
+            ten="Xem xử lý đơn trên web"
+            onPress={() =>
+              void Linking.openURL(`${DIA_CHI_WEB}/tai-khoan/don-hang/${don.id}`).catch(() =>
+                thongBao('Chưa mở được VietBid trên web'),
+              )
+            }
+          />
+        </The>
+      )}
+
       <The>
         <Chu dam style={{ fontSize: 17 }}>
           Thanh toán
@@ -335,6 +371,9 @@ export default function ChiTietDon() {
         <Dong ten="Phí vận chuyển" giaTri={tien(don.phi_van_chuyen)} />
         <Dong ten="Tiền cọc đã chuyển" giaTri={tien(don.tien_coc_da_chuyen)} />
         <Dong ten="Đã thu" giaTri={tien(don.so_tien_da_thu)} />
+        {Number(don.so_tien_da_hoan) > 0 && (
+          <Dong ten="Đã hoàn" giaTri={tien(don.so_tien_da_hoan)} />
+        )}
         <View style={kieu.tong}>
           <Chu dam>Tổng đơn</Chu>
           <Chu dam style={{ color: mau.vang, fontSize: 20 }}>
@@ -364,9 +403,11 @@ export default function ChiTietDon() {
         </Chu>
       </The>
 
-      {!laNguoiMua && (
+      {!laNguoiMua && ['DA_THANH_TOAN', 'CHO_GUI_HANG'].includes(don.trang_thai) && (
         <Chu phu style={{ textAlign: 'center' }}>
-          Đây là đơn bạn bán. Quản lý gửi hàng trên web VietBid.
+          {don.nguon_gui_hang === 'TRUNG_TAM'
+            ? 'Trung tâm phụ trách gửi hàng cho đơn này.'
+            : 'Quản lý gửi hàng trên web VietBid.'}
         </Chu>
       )}
     </ScrollView>

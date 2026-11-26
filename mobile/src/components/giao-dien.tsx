@@ -62,6 +62,7 @@ export function Nut({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={ten}
       accessibilityState={{ disabled: !!tat }}
       disabled={tat}
       onPress={onPress}
@@ -134,7 +135,12 @@ export function OTruong({ nhanTruong, ...props }: TextInputProps & { nhanTruong:
   return (
     <View style={{ gap: 6 }}>
       <Chu phu>{nhanTruong}</Chu>
-      <TextInput placeholderTextColor={mau.chuMo} {...props} style={[kieu.o, props.style]} />
+      <TextInput
+        accessibilityLabel={nhanTruong}
+        placeholderTextColor={mau.chuMo}
+        {...props}
+        style={[kieu.o, props.style]}
+      />
     </View>
   );
 }

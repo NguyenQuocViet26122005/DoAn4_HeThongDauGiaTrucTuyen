@@ -1,6 +1,6 @@
 // Định dạng giống web: tiền VND, ngày giờ theo múi giờ Việt Nam, nhãn trạng thái tiếng Việt.
 export const tien = (giaTri: unknown) =>
-  `${Math.round(Number(giaTri || 0)).toLocaleString('vi-VN')} ₫`;
+  `${Number(giaTri || 0).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} ₫`;
 
 const chuoi = (giaTri: unknown) => (giaTri == null ? '' : String(giaTri));
 
@@ -72,6 +72,19 @@ const nhanTrangThai: Record<string, string> = {
   DA_GIAI_NGAN: 'Đã giải ngân',
   DA_HOAN_TIEN: 'Đã hoàn tiền',
   HOAN_TIEN_MOT_PHAN: 'Hoàn tiền một phần',
+  CHO_THU_HOI: 'Chờ thu hồi',
+  DANG_HOAN_VE: 'Đang vận chuyển về',
+  CHO_KIEM_KE: 'Chờ kiểm kê',
+  DA_KIEM_KE: 'Đã kiểm kê',
+  CAN_XU_LY: 'Cần xử lý',
+  KHONG_KHOP: 'Hàng không khớp',
+  THAT_LAC: 'Thất lạc',
+  DU_DIEU_KIEN_BAN_LAI: 'Đủ điều kiện bán lại',
+  DANG_TRA_NGUOI_BAN: 'Đang trả người bán',
+  DA_TRA_NGUOI_BAN: 'Đã trả người bán',
+  DA_DUNG_THU_HOI: 'Đã dừng thu hồi',
+  DA_GUI_LAI_NGUOI_MUA: 'Đã gửi lại người mua',
+  DA_GIAO_LAI_NGUOI_MUA: 'Đã giao lại người mua',
   CHUA_THANH_TOAN: 'Chưa thanh toán',
   DANG_MO: 'Đang mở',
   NGUOI_BAN_DA_PHAN_HOI: 'Người bán đã phản hồi',
