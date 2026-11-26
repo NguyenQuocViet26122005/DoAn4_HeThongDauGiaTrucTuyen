@@ -4,6 +4,14 @@ const path = require('node:path');
 const test = require('node:test');
 const { actors, catalog, makePlan, addMonths } = require('../../deploy/ke-hoach-mau.cjs');
 const { samplePdf } = require('../../deploy/du-lieu-mau.cjs');
+const { tenSQL } = require('../../co-so-du-lieu/cong-cu/ban-sao-csdl.cjs');
+
+test('Sao lưu nhận tên CSDL hosting có gạch ngang, vẫn chặn ký tự thoát định danh', () => {
+  assert.equal(tenSQL('vietbid-qviet2612_auction'), '`vietbid-qviet2612_auction`');
+  for (const name of ['db`name', 'db.table', 'db;DROP', 'db name', '']) {
+    assert.throws(() => tenSQL(name));
+  }
+});
 
 test('Lịch mẫu phủ liên tục 4 tháng, 6 phiên mở ngay, 16 phiên nối tiếp và đủ 10 danh mục', () => {
   const now = new Date('2026-11-26T15:30:00Z');

@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const bam = (noiDung) => crypto.createHash('sha256').update(noiDung).digest('hex');
 
 function tenSQL(ten) {
-  assert(/^[a-z0-9_]+$/.test(ten));
+  assert(/^[a-z0-9_-]+$/.test(ten));
 
   return '`' + ten + '`';
 }
