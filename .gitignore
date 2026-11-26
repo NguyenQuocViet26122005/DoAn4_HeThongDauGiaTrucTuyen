@@ -19,6 +19,7 @@ build/
 **/dist/
 /.releases/
 /.incoming/
+/mobile/dist-update/
 __pycache__/
 
 # Logs

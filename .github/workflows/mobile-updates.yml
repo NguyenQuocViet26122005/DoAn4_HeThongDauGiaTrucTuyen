@@ -1,0 +1,62 @@
+name: Cập nhật mobile từ xa
+on:
+  push:
+    branches: [main]
+    paths:
+      [
+        'mobile/**',
+        '.github/workflows/mobile-updates.yml',
+        'deploy/cap-nhat-app.cjs',
+        'deploy/nhan-cap-nhat-app.py',
+      ]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: vietbid-mobile-update
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      EXPO_PUBLIC_API_URL: https://vietbid-qviet2612.alwaysdata.net/api
+      EXPO_PUBLIC_WEB_URL: https://vietbid-qviet2612.alwaysdata.net
+      CI: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - name: Kiểm tra và xuất Android bundle
+        working-directory: mobile
+        run: |
+          npm ci --no-audit --no-fund
+          npm run check
+          npx expo export --platform android --output-dir dist-update
+          npx expo config --type public --json > dist-update/expo-config.json
+      - name: Ký gói cập nhật
+        env:
+          MOBILE_UPDATE_PRIVATE_KEY: ${{ secrets.MOBILE_UPDATE_PRIVATE_KEY }}
+        run: |
+          node deploy/cap-nhat-app.cjs "$RUNNER_TEMP/mobile-update"
+          tar -czf "$RUNNER_TEMP/mobile-update.tar.gz" -C "$RUNNER_TEMP/mobile-update" manifest.json assets
+      - name: Phát hành qua hosting
+        env:
+          DEPLOY_KEY: ${{ secrets.ALWAYSDATA_SSH_KEY }}
+        run: |
+          umask 077
+          printf '%s\n' "$DEPLOY_KEY" > "$RUNNER_TEMP/deploy-key"
+          trap 'rm -f "$RUNNER_TEMP/deploy-key"' EXIT
+          ssh -T -i "$RUNNER_TEMP/deploy-key" -o IdentitiesOnly=yes -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes -o UserKnownHostsFile=deploy/alwaysdata_known_hosts \
+            -o ConnectTimeout=15 -o ServerAliveInterval=15 \
+            vietbid-qviet2612@ssh-vietbid-qviet2612.alwaysdata.net \
+            'python3 vietbid/deploy/nhan-cap-nhat-app.py' < "$RUNNER_TEMP/mobile-update.tar.gz"
+      - name: Kiểm tra manifest, chữ ký và tài nguyên công khai
+        run: node deploy/kiem-tra-cap-nhat-app.cjs "$RUNNER_TEMP/mobile-update"

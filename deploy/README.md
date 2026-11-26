@@ -59,7 +59,7 @@ Tài liệu chính thức: [gói alwaysdata](https://www.alwaysdata.com/en/offer
 - Quản trị: `admin@vietbid.example`, mật khẩu do người vận hành tự đặt trong SSH. Không lưu mật khẩu trong tài liệu hoặc Git.
 - Kiểm tra trực tiếp đã đạt: HTTPS, giao diện và đường dẫn React trực tiếp, API/danh mục, đăng ký/đăng nhập, chặn truy cập quản trị sai quyền, tải/đọc ảnh, bảo vệ tệp bằng chứng và WebSocket WSS. Đã khởi động lại site, đóng SSH rồi kiểm tra lại đăng nhập, ảnh và WSS thành công.
 - Tác vụ nền bật, chạy mỗi 60 giây; lần đọc trạng thái sau khởi động lại trả `enabled=true`, `failed=0`. Bộ kiểm thử backend tại thời điểm triển khai đạt 33/33.
-- Bản cloud dùng CSDL mới, có quản trị và một tài khoản kiểm tra tổng hợp được đánh dấu trong tên; chưa có sản phẩm hoặc phiên đấu giá. Không chuyển người dùng, hồ sơ hay giao dịch từ CSDL cá nhân. Các luồng cọc/trả giá/đơn hàng chưa được kiểm thử giao dịch đầy đủ trên bản cloud mới; các kết quả kiểm thử cục bộ trước đó không thay thế bước này.
+- Bản cloud khởi tạo CSDL mới; đã bổ sung riêng 6 tài khoản mẫu, 30 sản phẩm và 24 phiên ngày 26/11/2026. Sáu phiên đang chạy, 16 phiên mở nối tiếp đến 26/03/2027; hai phiên Mua ngay tạo đơn mẫu chờ gửi và đang kiểm tra. Đã kiểm tra 6 lượt đăng nhập, sản phẩm/hồ sơ của người bán, đơn/theo dõi của người mua, 22 ảnh và chặn sai quyền Admin qua API công khai. Không sao chép dữ liệu cá nhân từ CSDL cục bộ. Chưa coi đây là kiểm thử đầy đủ mọi tình huống cọc/trả giá/tranh chấp trên cloud.
 - AI gọi API trả phí đang tắt. Thanh toán, đặt cọc và vận chuyển tiếp tục là mô phỏng. Đây là cấu hình cho đồ án cá nhân trong giới hạn gói Free; chưa kiểm thử tải và OCR với giới hạn RAM của hosting.
 
 ## Dữ liệu mẫu cho bản cloud
@@ -71,3 +71,13 @@ Trên hosting đã cấu hình, chạy một lần `node deploy/du-lieu-mau.cjs 
 Ảnh được lấy từ tài nguyên đã có giấy phép trong repository, thu nhỏ, thêm nhãn DEMO và ghi nguồn trong mô tả; hồ sơ xác minh/kiểm định là tài liệu tổng hợp ghi rõ không có giá trị thực. Mật khẩu từng tài khoản được sinh ngẫu nhiên, lưu riêng trong `backend/.local/demo-cloud-accounts.json` trên hosting, không ghi vào Git hoặc log. Công cụ không được gọi tự động trong workflow triển khai.
 
 Các phiên dùng thời gian tuyệt đối lưu trong CSDL và được tác vụ nền mở/chốt như phiên thông thường; không tự lùi ngày khi push lại code. Lịch 4 tháng không gia hạn hosting hay thay hạn thanh toán, giao hàng, kiểm tra hàng. Hai đơn mẫu vẫn chịu thời hạn nghiệp vụ và chuyển trạng thái bình thường. Các phiên lịch mẫu không bật Mua ngay để giữ thời gian trải nghiệm; Admin vẫn có thể hủy theo quy tắc hiện hành.
+
+## APK và cập nhật mobile
+
+App Expo SDK 58 tiếp tục là ứng dụng React Native cho người mua, dùng API/CSDL chung với website. Workflow `android.yml` tạo APK release ARM64, ký bằng keystore riêng trong Secrets `ANDROID_KEYSTORE_BASE64` và `ANDROID_KEYSTORE_PASSWORD`, phát hành tại GitHub Releases. Không dùng khóa debug để phát hành. Mỗi lượt build tăng versionCode; cài APK thay thế vẫn cần người dùng xác nhận trên Android.
+
+Workflow `mobile-updates.yml` kiểm tra, xuất bundle Android, ký manifest bằng `MOBILE_UPDATE_PRIVATE_KEY`, đưa gói qua SSH đến bộ nhận `deploy/nhan-cap-nhat-app.py`. Cần cài bộ nhận này và chứng chỉ công khai `mobile/update-certificate.crt` một lần trên thư mục gốc của hosting. Bộ nhận kiểm tra chữ ký RSA/SHA256, đường dẫn/kích thước gói, URL và hash của từng tài nguyên trước khi thay manifest nguyên tử. Không đưa khóa ký riêng lên hosting. Dữ liệu cập nhật nằm trong `backend/.local/mobile-updates`, được giữ qua các lần triển khai web.
+
+API `/api/mobile-updates` phân biệt Android/runtime và trả manifest có chữ ký theo [Expo Updates v1](https://docs.expo.dev/technical-specs/expo-updates-1/); API assets chỉ nhận tên hash SHA256. App xác minh chữ ký bằng chứng chỉ đóng trong APK và giữ bản nhúng/bản đã lưu khi không có mạng hoặc gói không hợp lệ. Thư viện native/cấu hình/chứng chỉ/icon đổi sẽ đổi runtime; APK cũ tiếp tục dùng bản tương thích, cần cài APK mới để nhận chức năng native mới. Thay đổi dữ liệu/backend hiển thị qua API như web; thay đổi mã mobile trên `main` kích hoạt xuất cập nhật và build APK. Thay đổi riêng frontend web không tự thay giao diện React Native.
+
+Sau mỗi phát hành OTA, workflow đối chiếu manifest công khai, chữ ký và hash bundle/tài nguyên với gói vừa tạo. Việc này kiểm tra đường phân phối và tính toàn vẹn; vẫn cần kiểm thử APK trên thiết bị Android để xác nhận đầy đủ hành vi native.

@@ -6,6 +6,8 @@ import { LoiUngDung } from './utils/loi';
 import { khongTimThay, xuLyLoi } from './middlewares/xu-ly-loi';
 import swaggerUi = require('swagger-ui-express');
 import { taoTaiLieuSwagger } from './docs/swagger';
+import path = require('node:path');
+import { boDinhTuyenCapNhat } from './routes/cap-nhat-mobile';
 const ungDung = express();
 ungDung.disable('x-powered-by');
 ungDung.use(
@@ -29,6 +31,10 @@ ungDung.use((yeuCau, phanHoi, tiepTheo) => {
   tiepTheo();
 });
 ungDung.use(express.json({ limit: '128kb' }));
+ungDung.use(
+  '/api',
+  boDinhTuyenCapNhat(path.resolve(cauHinh.uploadRoot, '../.local/mobile-updates')),
+);
 const taiLieuSwagger = taoTaiLieuSwagger();
 ungDung.get('/api-docs.json', (yeuCau, phanHoi) => phanHoi.json(taiLieuSwagger));
 ungDung.use(
