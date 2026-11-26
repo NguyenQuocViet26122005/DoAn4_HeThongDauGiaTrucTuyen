@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { khoang, mau } from '@/lib/giao-dien';
@@ -19,12 +18,9 @@ export function CanDangNhap({
   return (
     <View style={kieu.khung}>
       <Animated.View entering={FadeInDown.springify().damping(16)}>
-        <LinearGradient
-          colors={['rgba(213,183,120,0.28)', 'rgba(213,183,120,0.04)']}
-          style={kieu.vong}
-        >
+        <View style={kieu.vong}>
           <Ionicons name={bieuTuong} size={40} color={mau.vang} />
-        </LinearGradient>
+        </View>
       </Animated.View>
       <Animated.View entering={FadeInDown.delay(90).springify().damping(18)} style={{ gap: 6 }}>
         <TieuDe style={{ textAlign: 'center' }}>{tieuDe}</TieuDe>
@@ -51,6 +47,7 @@ const kieu = StyleSheet.create({
     gap: khoang.l,
   },
   vong: {
+    backgroundColor: mau.nenNoi,
     width: 96,
     height: 96,
     borderRadius: 48,

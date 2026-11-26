@@ -8,7 +8,6 @@ import {
   View,
 } from 'react-native';
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp, LinearTransition } from 'react-native-reanimated';
 import { gui, loiDeDoc } from '@/lib/api';
@@ -67,25 +66,14 @@ export default function DangNhap() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={kieu.khung} keyboardShouldPersistTaps="handled">
-        <LinearGradient
-          colors={['#3a311d', '#1a1712', 'rgba(11,12,10,0)']}
-          style={kieu.nenSang}
-          pointerEvents="none"
-        />
         <Animated.View entering={FadeInUp.springify().damping(16)} style={kieu.logo}>
-          <LinearGradient
-            colors={[mau.vang, mau.vangDam]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={kieu.oLogo}
-          >
+          <View style={kieu.oLogo}>
             <Ionicons name="diamond" size={30} color={mau.nen} />
-          </LinearGradient>
+          </View>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(100).springify().damping(18)} style={{ gap: 4 }}>
-          <Chu style={kieu.thuongHieu}>VIETBID</Chu>
-          <TieuDe style={kieu.tieuDe}>{dangKy ? 'Tạo tài khoản' : 'Chào mừng trở lại'}</TieuDe>
+          <TieuDe style={kieu.tieuDe}>{dangKy ? 'Tạo tài khoản' : 'Đăng nhập'}</TieuDe>
           <Chu phu style={{ textAlign: 'center' }}>
             {dangKy
               ? 'Một tài khoản để đấu giá, theo dõi đơn và nhận thông báo tức thì.'
@@ -226,36 +214,18 @@ export default function DangNhap() {
 const kieu = StyleSheet.create({
   khung: {
     padding: khoang.xl,
-    paddingTop: 48,
+    paddingTop: khoang.xl,
     gap: khoang.xl,
     flexGrow: 1,
-  },
-  nenSang: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 320,
   },
   logo: { alignItems: 'center' },
   oLogo: {
     width: 72,
     height: 72,
-    borderRadius: 22,
+    borderRadius: bo.the,
+    backgroundColor: mau.vang,
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ rotate: '-6deg' }],
-    shadowColor: mau.vang,
-    shadowOpacity: 0.45,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 10,
-  },
-  thuongHieu: {
-    color: mau.vang,
-    letterSpacing: 4,
-    fontSize: 12,
-    textAlign: 'center',
   },
   tieuDe: {
     fontSize: 38,
@@ -265,7 +235,7 @@ const kieu = StyleSheet.create({
   chuyen: {
     flexDirection: 'row',
     backgroundColor: mau.nenThe,
-    borderRadius: 999,
+    borderRadius: bo.nut,
     padding: 4,
     borderWidth: 1,
     borderColor: mau.vien,
@@ -273,22 +243,28 @@ const kieu = StyleSheet.create({
   oChuyen: {
     flex: 1,
     alignItems: 'center',
+    minHeight: 48,
+    justifyContent: 'center',
     paddingVertical: 10,
-    borderRadius: 999,
+    borderRadius: bo.nut,
   },
   oChuyenChon: { backgroundColor: mau.vang },
   bieuMau: {
     gap: khoang.m,
-    backgroundColor: 'rgba(21,23,19,0.85)',
-    borderRadius: bo.the + 6,
+    backgroundColor: mau.nenThe,
+    borderRadius: bo.the,
     borderWidth: 1,
     borderColor: mau.vien,
     padding: khoang.l,
   },
   nutMat: {
     position: 'absolute',
-    right: 14,
-    bottom: 14,
+    right: 0,
+    bottom: 0,
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loi: {
     flexDirection: 'row',

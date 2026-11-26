@@ -9,7 +9,14 @@ import { bo, khoang, mau, phong } from '@/lib/giao-dien';
 import { ngayGio, tien } from '@/lib/dinh-dang';
 import { usePhienDangNhap } from '@/lib/phien-dang-nhap';
 import type { DonHang } from '@/lib/kieu';
-import { AnhSanPham, Chu, ManHinhCho, NhanTrangThai, TienTrinhDon } from '@/components/giao-dien';
+import {
+  AnhSanPham,
+  Chu,
+  ManHinhCho,
+  NhanTrangThai,
+  TienTrinhDon,
+  TieuDeTrang,
+} from '@/components/giao-dien';
 import { CanDangNhap } from '@/components/can-dang-nhap';
 
 const VAI_TRO = [
@@ -50,26 +57,35 @@ export default function DonHangCuaToi() {
         />
       }
       ListHeaderComponent={
-        <View style={kieu.chuyen}>
-          {VAI_TRO.map((muc) => {
-            const chon = vaiTro === muc.giaTri;
+        <View style={{ gap: khoang.l }}>
+          <TieuDeTrang
+            ten="Đơn hàng của tôi"
+            moTa="Theo dõi thanh toán, giao hàng và kiểm tra sản phẩm."
+          />
+          <View style={kieu.chuyen}>
+            {VAI_TRO.map((muc) => {
+              const chon = vaiTro === muc.giaTri;
 
-            return (
-              <Pressable
-                key={muc.giaTri}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: chon }}
-                onPress={() => datVaiTro(muc.giaTri)}
-                style={[kieu.oChuyen, chon && kieu.oChuyenChon]}
-              >
-                <Chu
-                  style={[{ fontSize: 14 }, chon && { color: mau.nen, fontFamily: phong.thanDam }]}
+              return (
+                <Pressable
+                  key={muc.giaTri}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: chon }}
+                  onPress={() => datVaiTro(muc.giaTri)}
+                  style={[kieu.oChuyen, chon && kieu.oChuyenChon]}
                 >
-                  {muc.ten}
-                </Chu>
-              </Pressable>
-            );
-          })}
+                  <Chu
+                    style={[
+                      { fontSize: 14 },
+                      chon && { color: mau.nen, fontFamily: phong.thanDam },
+                    ]}
+                  >
+                    {muc.ten}
+                  </Chu>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
       }
       ListEmptyComponent={
@@ -161,7 +177,7 @@ const kieu = StyleSheet.create({
   chuyen: {
     flexDirection: 'row',
     backgroundColor: mau.nenThe,
-    borderRadius: 999,
+    borderRadius: bo.nut,
     padding: 4,
     borderWidth: 1,
     borderColor: mau.vien,
@@ -170,15 +186,17 @@ const kieu = StyleSheet.create({
   oChuyen: {
     flex: 1,
     alignItems: 'center',
+    minHeight: 48,
+    justifyContent: 'center',
     paddingVertical: 10,
-    borderRadius: 999,
+    borderRadius: bo.nut,
   },
   oChuyenChon: { backgroundColor: mau.vang },
   the: {
     backgroundColor: mau.nenThe,
     borderWidth: 1,
     borderColor: mau.vien,
-    borderRadius: bo.the + 4,
+    borderRadius: bo.the,
     padding: khoang.l,
     gap: khoang.m,
   },

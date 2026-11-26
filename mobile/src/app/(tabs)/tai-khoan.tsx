@@ -1,6 +1,5 @@
 import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useQuery } from '@tanstack/react-query';
@@ -61,24 +60,15 @@ export default function TaiKhoan() {
   return (
     <ScrollView contentContainerStyle={kieu.khung}>
       <Animated.View entering={FadeInDown.springify().damping(18)}>
-        <LinearGradient
-          colors={['#3a311d', '#1a1712', '#0b0c0a']}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={kieu.hoSo}
-        >
-          <View style={kieu.vongSang} />
-          <LinearGradient
-            colors={[mau.vang, mau.vangDam]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={kieu.anhDaiDien}
-          >
+        <View style={kieu.hoSo}>
+          <View style={kieu.anhDaiDien}>
             <Chu style={kieu.chuCai}>{chuCai}</Chu>
-          </LinearGradient>
+          </View>
           <View style={{ gap: 2, alignItems: 'center' }}>
             <TieuDe style={{ textAlign: 'center' }}>{nguoiDung.ho_ten}</TieuDe>
-            <Chu phu>{nguoiDung.email}</Chu>
+            <Chu phu style={{ textAlign: 'center', flexShrink: 1 }}>
+              {nguoiDung.email}
+            </Chu>
           </View>
           <View style={kieu.hangNhan}>
             <View style={kieu.nhan}>
@@ -96,7 +86,7 @@ export default function TaiKhoan() {
               </View>
             )}
           </View>
-        </LinearGradient>
+        </View>
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(80).springify().damping(18)} style={kieu.luoiChiSo}>
@@ -217,34 +207,22 @@ const kieu = StyleSheet.create({
     paddingBottom: 48,
   },
   hoSo: {
-    borderRadius: bo.the + 8,
+    backgroundColor: mau.nenNoi,
+    borderRadius: bo.the,
     borderWidth: 1,
-    borderColor: 'rgba(213,183,120,0.25)',
+    borderColor: mau.vien,
     padding: khoang.xl,
     alignItems: 'center',
     gap: khoang.m,
     overflow: 'hidden',
   },
-  vongSang: {
-    position: 'absolute',
-    right: -50,
-    top: -50,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: 'rgba(213,183,120,0.14)',
-  },
   anhDaiDien: {
+    backgroundColor: mau.vang,
     width: 84,
     height: 84,
     borderRadius: 42,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: mau.vang,
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
   },
   chuCai: {
     color: mau.nen,
@@ -263,7 +241,7 @@ const kieu = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: 'rgba(11,12,10,0.6)',
-    borderRadius: 999,
+    borderRadius: bo.nut,
     paddingHorizontal: 12,
     paddingVertical: 5,
   },
@@ -289,7 +267,7 @@ const kieu = StyleSheet.create({
     backgroundColor: mau.nenThe,
     borderWidth: 1,
     borderColor: mau.vien,
-    borderRadius: bo.the + 4,
+    borderRadius: bo.the,
     overflow: 'hidden',
   },
   muc: {

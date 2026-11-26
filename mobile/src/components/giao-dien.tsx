@@ -36,6 +36,15 @@ export function TieuDe({ style, nho, ...props }: TextProps & { nho?: boolean }) 
   return <Text {...props} style={[kieu.tieuDe, nho && { fontSize: 22, lineHeight: 28 }, style]} />;
 }
 
+export function TieuDeTrang({ ten, moTa }: { ten: string; moTa?: string }) {
+  return (
+    <View style={{ gap: khoang.s, marginBottom: khoang.s }}>
+      <TieuDe>{ten}</TieuDe>
+      {!!moTa && <Chu phu>{moTa}</Chu>}
+    </View>
+  );
+}
+
 export function The({ style, ...props }: ViewProps) {
   return <View {...props} style={[kieu.the, style]} />;
 }
@@ -69,7 +78,7 @@ export function Nut({
       style={({ pressed }) => [
         kieu.nut,
         phu ? kieu.nutPhu : kieu.nutChinh,
-        nguyHiem && { borderColor: mau.do },
+        nguyHiem && { borderColor: mau.do, backgroundColor: mau.nenThe },
         tat && { opacity: 0.45 },
         pressed && { opacity: 0.8 },
       ]}
@@ -79,7 +88,9 @@ export function Nut({
       ) : (
         <View style={kieu.hang}>
           {bieuTuong && <Ionicons name={bieuTuong} size={18} color={phu ? mau.vang : mau.nen} />}
-          <Text style={[kieu.chuNut, phu && { color: nguyHiem ? mau.do : mau.vang }]}>{ten}</Text>
+          <Text style={[kieu.chuNut, phu && { color: mau.vang }, nguyHiem && { color: mau.do }]}>
+            {ten}
+          </Text>
         </View>
       )}
     </Pressable>
@@ -104,7 +115,7 @@ export function NhanTrangThai({ giaTri }: { giaTri: string }) {
   const m = mauTrangThai[giaTri] || mau.chuPhu;
 
   return (
-    <View style={[kieu.nhan, { borderColor: m }]}>
+    <View style={[kieu.nhan, { borderColor: m, backgroundColor: mau.nenNoi }]}>
       <Text style={[kieu.chuNhan, { color: m }]}>{nhan(giaTri)}</Text>
     </View>
   );
@@ -112,7 +123,7 @@ export function NhanTrangThai({ giaTri }: { giaTri: string }) {
 
 export function AnhSanPham({
   src,
-  cao = 180,
+  cao,
   vuong,
 }: {
   src?: string | null;
@@ -120,7 +131,11 @@ export function AnhSanPham({
   vuong?: boolean;
 }) {
   const url = duongDanAnh(src);
-  const khung = [kieu.anh, { height: cao }, vuong && { borderRadius: 0 }];
+  const khung = [
+    kieu.anh,
+    cao ? { height: cao } : { aspectRatio: 1.22 },
+    vuong && { borderRadius: 0 },
+  ];
 
   return url ? (
     <Image source={url} style={khung} contentFit="cover" transition={250} />
@@ -236,12 +251,23 @@ export function TienTrinhDon({ trangThai }: { trangThai: string }) {
     <View style={kieu.tienTrinh}>
       {BUOC_DON.map((buoc, i) => (
         <View key={buoc} style={{ flex: 1, gap: 6 }}>
-          <View
-            style={[
-              kieu.vach,
-              { backgroundColor: i < viTri ? mau.vang : i === viTri ? mau.vangDam : mau.vien },
-            ]}
-          />
+          <View style={kieu.duongBuoc}>
+            <View
+              style={[
+                kieu.vach,
+                { backgroundColor: i < viTri ? mau.vang : i === viTri ? mau.vangDam : mau.vien },
+              ]}
+            />
+            <View
+              style={[
+                kieu.chamBuoc,
+                {
+                  backgroundColor: i < viTri ? mau.vang : mau.nenNoi,
+                  borderColor: i <= viTri ? mau.vang : mau.vien,
+                },
+              ]}
+            />
+          </View>
           <Text
             style={[kieu.chuBuoc, i === viTri && { color: mau.chu, fontFamily: phong.thanVua }]}
           >
@@ -263,8 +289,8 @@ export const kieu = StyleSheet.create({
   tieuDe: {
     color: mau.chu,
     fontFamily: phong.tieuDe,
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: 34,
+    lineHeight: 40,
   },
   the: {
     backgroundColor: mau.nenThe,
@@ -287,6 +313,8 @@ export const kieu = StyleSheet.create({
     color: mau.nen,
     fontFamily: phong.thanDam,
     fontSize: 15,
+    textAlign: 'center',
+    flexShrink: 1,
   },
   hang: {
     flexDirection: 'row',
@@ -296,7 +324,7 @@ export const kieu = StyleSheet.create({
   nhan: {
     alignSelf: 'flex-start',
     borderWidth: 1,
-    borderRadius: 999,
+    borderRadius: 4,
     paddingHorizontal: 10,
     paddingVertical: 3,
   },
@@ -317,6 +345,7 @@ export const kieu = StyleSheet.create({
     fontFamily: phong.than,
     fontSize: 16,
     backgroundColor: mau.nenNoi,
+    paddingVertical: 10,
   },
   giua: {
     flex: 1,
@@ -331,7 +360,16 @@ export const kieu = StyleSheet.create({
     gap: 6,
     marginTop: khoang.s,
   },
-  vach: { height: 4, borderRadius: 2 },
+  duongBuoc: { height: 14, justifyContent: 'center' },
+  vach: { height: 1 },
+  chamBuoc: {
+    position: 'absolute',
+    left: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2,
+  },
   chuBuoc: {
     color: mau.chuPhu,
     fontFamily: phong.than,

@@ -1,15 +1,15 @@
 // Cùng bộ màu đen–vàng và phông chữ với web VietBid để hai nền tảng nhìn thống nhất.
 export const mau = {
-  nen: '#0b0c0a',
-  nenThe: '#151713',
-  nenNoi: '#1b1e18',
+  nen: '#111310',
+  nenThe: '#191c17',
+  nenNoi: '#181a16',
   nenChon: '#262821',
-  vien: '#2a2c26',
+  vien: '#34382e',
   vang: '#d5b778',
   vangDam: '#b8955a',
   chu: '#eeeee7',
   chuPhu: '#aaa99e',
-  chuMo: '#7d7c72',
+  chuMo: '#999b90',
   xanh: '#7fc8a9',
   do: '#e07a6f',
   cam: '#e2a65a',
@@ -23,7 +23,7 @@ export const phong = {
   tieuDeNghieng: 'CormorantGaramond_500Medium_Italic',
 };
 
-export const bo = { the: 12, nut: 8 };
+export const bo = { the: 12, nut: 6 };
 export const khoang = {
   xs: 4,
   s: 8,

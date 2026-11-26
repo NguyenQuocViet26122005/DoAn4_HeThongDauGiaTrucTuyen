@@ -10,7 +10,7 @@ import { ngayGio } from '@/lib/dinh-dang';
 import { usePhienDangNhap } from '@/lib/phien-dang-nhap';
 import { thongBao } from '@/lib/xac-nhan';
 import type { ThongBao } from '@/lib/kieu';
-import { Chu, ManHinhCho } from '@/components/giao-dien';
+import { Chu, ManHinhCho, TieuDeTrang } from '@/components/giao-dien';
 import { CanDangNhap } from '@/components/can-dang-nhap';
 
 // Chỉ mở các đích app có màn hình; đường dẫn khác trong dữ liệu không được điều hướng tùy ý.
@@ -105,37 +105,44 @@ export default function TrangThongBao() {
         />
       }
       ListHeaderComponent={
-        <View style={kieu.dau}>
-          <View style={kieu.hangLoc}>
-            {[
-              { ten: 'Tất cả', giaTri: false },
-              { ten: 'Chưa đọc', giaTri: true },
-            ].map((muc) => {
-              const chon = chiChuaDoc === muc.giaTri;
+        <View style={{ gap: khoang.l }}>
+          <TieuDeTrang ten="Thông báo" moTa="Cập nhật từ phiên đấu giá và đơn hàng của bạn." />
+          <View style={kieu.dau}>
+            <View style={kieu.hangLoc}>
+              {[
+                { ten: 'Tất cả', giaTri: false },
+                { ten: 'Chưa đọc', giaTri: true },
+              ].map((muc) => {
+                const chon = chiChuaDoc === muc.giaTri;
 
-              return (
-                <Pressable
-                  key={muc.ten}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: chon }}
-                  onPress={() => datChiChuaDoc(muc.giaTri)}
-                  style={[kieu.loc, chon && kieu.locChon]}
-                >
-                  <Chu
-                    style={[
-                      { fontSize: 13 },
-                      chon && { color: mau.nen, fontFamily: phong.thanDam },
-                    ]}
+                return (
+                  <Pressable
+                    key={muc.ten}
+                    accessibilityRole="tab"
+                    accessibilityState={{ selected: chon }}
+                    onPress={() => datChiChuaDoc(muc.giaTri)}
+                    style={[kieu.loc, chon && kieu.locChon]}
                   >
-                    {muc.ten}
-                  </Chu>
-                </Pressable>
-              );
-            })}
+                    <Chu
+                      style={[
+                        { fontSize: 13 },
+                        chon && { color: mau.nen, fontFamily: phong.thanDam },
+                      ]}
+                    >
+                      {muc.ten}
+                    </Chu>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => void docTatCa()}
+              style={{ minHeight: 48, justifyContent: 'center' }}
+            >
+              <Chu style={{ color: mau.vang, fontSize: 13 }}>Đọc tất cả</Chu>
+            </Pressable>
           </View>
-          <Pressable accessibilityRole="button" onPress={() => void docTatCa()} hitSlop={8}>
-            <Chu style={{ color: mau.vang, fontSize: 13 }}>Đọc tất cả</Chu>
-          </Pressable>
         </View>
       }
       ListEmptyComponent={
@@ -200,6 +207,8 @@ const kieu = StyleSheet.create({
   },
   dau: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: khoang.s,
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: khoang.s,
@@ -208,9 +217,11 @@ const kieu = StyleSheet.create({
   loc: {
     borderWidth: 1,
     borderColor: mau.vien,
-    borderRadius: 999,
+    borderRadius: bo.nut,
     paddingHorizontal: 14,
-    paddingVertical: 7,
+    minHeight: 48,
+    justifyContent: 'center',
+    paddingVertical: 10,
     backgroundColor: mau.nenThe,
   },
   locChon: { backgroundColor: mau.vang, borderColor: mau.vang },

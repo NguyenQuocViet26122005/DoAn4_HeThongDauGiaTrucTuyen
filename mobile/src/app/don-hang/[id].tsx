@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Linking, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useQuery } from '@tanstack/react-query';
@@ -173,12 +172,7 @@ export default function ChiTietDon() {
       <Stack.Screen options={{ title: 'Chi tiết đơn hàng' }} />
 
       <Animated.View entering={FadeInDown.springify().damping(18)}>
-        <LinearGradient
-          colors={['rgba(213,183,120,0.18)', 'rgba(21,23,19,1)']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={kieu.dau}
-        >
+        <View style={kieu.dau}>
           <View style={kieu.hang}>
             <View style={kieu.anh}>
               <AnhSanPham src={don.anh_san_pham || don.anh_chinh} cao={92} />
@@ -202,7 +196,7 @@ export default function ChiTietDon() {
             <Chu style={{ color: mau.vang, fontSize: 13 }}>Xem phiên #{don.phien_dau_gia_id}</Chu>
             <Ionicons name="arrow-forward" size={14} color={mau.vang} />
           </Pressable>
-        </LinearGradient>
+        </View>
       </Animated.View>
 
       {duocThaoTac && choThanhToan && (
@@ -430,9 +424,10 @@ const kieu = StyleSheet.create({
     paddingBottom: 48,
   },
   dau: {
-    borderRadius: bo.the + 6,
+    backgroundColor: mau.nenNoi,
+    borderRadius: bo.the,
     borderWidth: 1,
-    borderColor: 'rgba(213,183,120,0.3)',
+    borderColor: mau.vien,
     padding: khoang.l,
     gap: khoang.m,
   },
@@ -469,7 +464,7 @@ const kieu = StyleSheet.create({
     padding: khoang.m,
   },
   diaChiChon: { borderColor: mau.vangDam, backgroundColor: 'rgba(213,183,120,0.06)' },
-  dong: { flexDirection: 'row', justifyContent: 'space-between' },
+  dong: { flexDirection: 'row', flexWrap: 'wrap', gap: khoang.s, justifyContent: 'space-between' },
   tong: {
     flexDirection: 'row',
     justifyContent: 'space-between',

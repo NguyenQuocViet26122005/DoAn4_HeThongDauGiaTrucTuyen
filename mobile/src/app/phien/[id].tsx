@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, FlatList, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  useWindowDimensions,
+  FlatList,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -25,8 +31,6 @@ import {
   TieuDe,
 } from '@/components/giao-dien';
 import { ThamGiaPhien } from '@/components/tham-gia-phien';
-
-const RONG = Dimensions.get('window').width;
 
 // Giá lóe vàng mỗi khi có lượt giá mới để người xem nhận ra ngay.
 function GiaNhapNhay({ gia }: { gia: string }) {
@@ -52,6 +56,7 @@ function GiaNhapNhay({ gia }: { gia: string }) {
 }
 
 export default function ChiTietPhien() {
+  const { width: RONG } = useWindowDimensions();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { nguoiDung } = usePhienDangNhap();
   const [anh, datAnh] = useState(0);
@@ -115,11 +120,6 @@ export default function ChiTietPhien() {
             </View>
           )}
         />
-        <LinearGradient
-          colors={['rgba(11,12,10,0)', 'rgba(11,12,10,1)']}
-          style={kieu.chanAnh}
-          pointerEvents="none"
-        />
         {cacAnh.length > 1 && (
           <View style={kieu.chamAnh}>
             {cacAnh.map((_, i) => (
@@ -132,17 +132,12 @@ export default function ChiTietPhien() {
       <View style={kieu.noiDung}>
         <Animated.View entering={FadeInDown.springify().damping(18)} style={{ gap: khoang.s }}>
           <NhanTrangThai giaTri={p.trang_thai} />
-          {!!p.ten_danh_muc && <Chu style={kieu.danhMuc}>{p.ten_danh_muc.toUpperCase()}</Chu>}
+          {!!p.ten_danh_muc && <Chu style={kieu.danhMuc}>{p.ten_danh_muc}</Chu>}
           <TieuDe>{p.tieu_de}</TieuDe>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(80).springify().damping(18)}>
-          <LinearGradient
-            colors={['rgba(213,183,120,0.16)', 'rgba(213,183,120,0.02)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={kieu.khungGia}
-          >
+          <View style={kieu.khungGia}>
             <Chu phu>{tenGiaPhien(p.trang_thai, p.ly_do_ket_thuc)}</Chu>
             <GiaNhapNhay gia={p.gia_hien_tai} />
             <View style={kieu.hangGiua}>
@@ -161,7 +156,7 @@ export default function ChiTietPhien() {
                 </Chu>
               </View>
             )}
-          </LinearGradient>
+          </View>
         </Animated.View>
 
         <View style={kieu.luoi}>
@@ -230,13 +225,6 @@ function ODuLieu({ nhanO, giaTri }: { nhanO: string; giaTri: string }) {
 }
 
 const kieu = StyleSheet.create({
-  chanAnh: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 120,
-  },
   chamAnh: {
     position: 'absolute',
     bottom: 16,
@@ -254,25 +242,26 @@ const kieu = StyleSheet.create({
   noiDung: {
     padding: khoang.l,
     gap: khoang.l,
-    marginTop: -24,
+    marginTop: 0,
   },
   danhMuc: {
     color: mau.vang,
     fontSize: 11,
-    letterSpacing: 1.4,
+    letterSpacing: 0,
   },
   khungGia: {
-    borderRadius: bo.the + 4,
+    backgroundColor: mau.nenNoi,
+    borderRadius: bo.the,
     borderWidth: 1,
-    borderColor: 'rgba(213,183,120,0.3)',
+    borderColor: mau.vien,
     padding: khoang.l,
     gap: khoang.xs,
   },
   gia: {
     color: mau.vang,
     fontFamily: 'BeVietnamPro_600SemiBold',
-    fontSize: 34,
-    lineHeight: 42,
+    fontSize: 30,
+    lineHeight: 40,
     alignSelf: 'flex-start',
   },
   hangGiua: {
