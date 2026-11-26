@@ -42,7 +42,9 @@ jobs:
       - name: Tạo dự án Android từ Expo
         working-directory: mobile
         run: |
+          export EXPECTED_RUNTIME=$(node scripts/runtime.cjs)
           npx expo prebuild --platform android --no-install
+          node -e 'const fs=require("fs"),assert=require("assert/strict");const xml=fs.readFileSync("android/app/src/main/res/values/strings.xml","utf8");const actual=xml.match(/<string name="expo_runtime_version">([^<]+)<\/string>/)?.[1];assert.equal(actual,process.env.EXPECTED_RUNTIME);console.log("APK_RUNTIME",actual);'
           echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
           echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
       - name: Build APK release
