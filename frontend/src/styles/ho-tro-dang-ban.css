@@ -1,0 +1,44 @@
+.dang-ban-tu-anh {
+  border: 1px solid var(--vien);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.dang-ban-tu-anh summary {
+  cursor: pointer;
+  color: var(--vang);
+  padding-block: 8px;
+}
+.dang-ban-tu-anh fieldset {
+  border: 0;
+  padding: 16px 0 0;
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+}
+.dang-ban-tu-anh fieldset > label:not(.ant-checkbox-wrapper) {
+  display: grid;
+  gap: 8px;
+}
+.anh-da-che {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+.anh-da-che img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: var(--nen);
+}
+.truong-goi-y p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin-block: 8px;
+}
+.kiem-duyet-tin {
+  display: grid;
+  gap: 12px;
+  margin-block: 16px;
+}

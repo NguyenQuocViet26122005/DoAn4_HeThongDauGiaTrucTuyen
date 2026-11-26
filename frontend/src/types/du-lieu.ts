@@ -54,6 +54,7 @@ export interface SanPham {
   thuong_hieu: string | null;
   trang_thai_duyet?: string;
   ly_do_tu_choi?: string;
+  kiem_duyet_noi_dung?: import('../services/ho-tro-dang-ban').KiemDuyetTin;
   co_the_sua?: boolean;
   ly_do_khong_the_sua?: string | null;
   bat_buoc_kiem_dinh?: number;

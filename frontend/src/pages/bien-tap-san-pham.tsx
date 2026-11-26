@@ -5,6 +5,9 @@ import { ChoDuLieu, TieuDe, TrangThai } from '../components/dung-chung';
 import QuyenNguoiBan from '../components/quyen-nguoi-ban';
 import ThuocTinhSanPham from '../components/thuoc-tinh-san-pham';
 import AnhSanPhamNguoiBan from '../components/anh-san-pham-nguoi-ban';
+import DangBanTuAnh from '../components/dang-ban-tu-anh';
+import KiemDuyetNoiDung from '../components/kiem-duyet-tin';
+import { raSoatTin } from '../services/ho-tro-dang-ban';
 import { useDuLieu } from '../hooks/su-dung-du-lieu';
 import { usePhienDangNhap } from '../store/phien-dang-nhap';
 import { boNho, loiDeDoc } from '../services/api';
@@ -87,6 +90,37 @@ function BieuMauBienTap({
     datLoi('');
 
     try {
+      const raSoat = await raSoatTin(sanPham.id);
+
+      const tiepTuc = await new Promise<boolean>((resolve) =>
+        modal.confirm({
+          title: raSoat.canh_bao.length
+            ? 'Tin đăng có cảnh báo cần kiểm tra'
+            : 'Gửi sản phẩm để xét duyệt?',
+          content: (
+            <>
+              <p>
+                Thông tin và ảnh đã lưu sẽ được gửi đến Admin. Bạn không thể chỉnh sửa trong thời
+                gian chờ duyệt.
+              </p>
+              <ul>
+                {raSoat.canh_bao.map((c) => (
+                  <li key={c.ma}>{c.noi_dung}</li>
+                ))}
+              </ul>
+            </>
+          ),
+          okText: raSoat.canh_bao.length ? 'Vẫn gửi để Admin xét' : 'Gửi duyệt',
+          cancelText: 'Quay lại chỉnh sửa',
+          onOk: () => resolve(true),
+          onCancel: () => resolve(false),
+        }),
+      );
+
+      if (!tiepTuc) {
+        return;
+      }
+
       const ketQua = await guiDuyetSanPham(sanPham.id);
 
       capNhatSanPham(ketQua);
@@ -170,6 +204,21 @@ function BieuMauBienTap({
               onFinish={luu}
               scrollToFirstError
             >
+              {coTheSua && (
+                <DangBanTuAnh
+                  disabled={dangXuLy}
+                  apDung={(d) => {
+                    if (
+                      d.danh_muc_id &&
+                      String(d.danh_muc_id) !== String(bieuMau.getFieldValue('danh_muc_id'))
+                    ) {
+                      bieuMau.setFieldValue('gia_tri', {});
+                    }
+                    bieuMau.setFieldsValue(d);
+                    datChuaLuu(true);
+                  }}
+                />
+              )}
               <Form.Item
                 name="tieu_de"
                 label="Tên sản phẩm"
@@ -310,6 +359,13 @@ function BieuMauBienTap({
         <aside className="kiem-tra-gui-duyet tam-noi-dung">
           <span className="nhan-nho">TRƯỚC KHI ĐĂNG BÁN</span>
           <h2>Sẵn sàng gửi duyệt?</h2>
+          {sanPham && (
+            <KiemDuyetNoiDung
+              key={sanPham.id}
+              id={sanPham.id}
+              coBan={sanPham.kiem_duyet_noi_dung}
+            />
+          )}
           <ul>
             <li>Lưu đầy đủ tên, mô tả và tình trạng.</li>
             <li>Thêm ít nhất một ảnh thật, tối đa 12 ảnh.</li>
@@ -343,16 +399,7 @@ function BieuMauBienTap({
                   thuocTinh.isError ||
                   !!thieuThuocTinh?.length
                 }
-                onClick={() =>
-                  modal.confirm({
-                    title: 'Gửi sản phẩm để xét duyệt?',
-                    content:
-                      'Thông tin và ảnh đã lưu sẽ được gửi đến quản trị viên. Bạn không thể chỉnh sửa trong thời gian chờ duyệt.',
-                    okText: 'Gửi duyệt',
-                    cancelText: 'Kiểm tra lại',
-                    onOk: guiDuyet,
-                  })
-                }
+                onClick={() => void guiDuyet()}
               >
                 Gửi duyệt sản phẩm
               </Button>

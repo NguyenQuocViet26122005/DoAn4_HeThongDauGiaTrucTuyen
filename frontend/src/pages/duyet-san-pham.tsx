@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, App, Button, Descriptions, Form, Input, Modal, Select, Tag } from 'antd';
 import OTimKiem from '../components/o-tim-kiem';
+import KiemDuyetNoiDung from '../components/kiem-duyet-tin';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AnhSanPham, ChoDuLieu, PhanTrang, TieuDe, TrangThai } from '../components/dung-chung';
 import { useDuLieu, useDanhSachDuLieu } from '../hooks/su-dung-du-lieu';
@@ -186,6 +187,7 @@ function QuyetDinhSanPham({ sanPham }: { sanPham: SanPham }) {
     <aside className="tam-noi-dung kiem-tra-gui-duyet">
       <span className="nhan-nho">KẾT QUẢ XÉT DUYỆT</span>
       <h2>Kiểm tra trước khi duyệt</h2>
+      <KiemDuyetNoiDung key={sanPham.id} id={sanPham.id} coBan={sanPham.kiem_duyet_noi_dung} />
       <TrangThai giaTri={sanPham.trang_thai_duyet} />
       <p>
         {canKiemDinh

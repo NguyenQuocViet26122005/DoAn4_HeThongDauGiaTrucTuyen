@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Alert, App, Button, Descriptions, Form, Input, InputNumber, Modal, Switch } from 'antd';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import ChonSanPhamPhien from '../components/chon-san-pham-phien';
+import ThamKhaoGia from '../components/tham-khao-gia';
 import QuyenNguoiBan from '../components/quyen-nguoi-ban';
 import { TieuDe } from '../components/dung-chung';
 import { loiDeDoc } from '../services/api';
@@ -99,6 +100,7 @@ function TruongGiaVaThoiGian() {
     <>
       <section className="tam-noi-dung">
         <h2>2. Giá và vận chuyển</h2>
+        <ThamKhaoGia />
         <p className="chu-mo">Nhập số tiền VND nguyên. Bước giá do hệ thống cấu hình.</p>
         <div className="luoi-truong-san-pham">
           <Form.Item
