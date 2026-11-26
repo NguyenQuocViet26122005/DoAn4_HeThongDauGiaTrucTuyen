@@ -19,6 +19,7 @@ RELEASE_PATTERN = re.compile(r"([0-9a-f]{40})-[0-9]{1,20}-[0-9]{1,5}\Z")
 PREFIXES = ("backend/dist/", "backend/node_modules/", "frontend/dist/")
 FILES = {
     "backend/package.json", "backend/package-lock.json",
+    "backend/docs/doan4-dau-gia.postman_collection.json",
     "backend/scripts/kiem-tra-cau-truc.js", "doan4_daugia_tieng_viet.sql",
     "deploy/chay-alwaysdata.cjs", "deploy/quan-ly-phat-hanh.cjs",
     "deploy/khoi-tao-mysql.cjs", "deploy/kiem-tra-websocket.cjs", "release.json",
@@ -200,6 +201,8 @@ def receive(root, stream):
             subprocess.run(["node", "-e", 'require("./backend/node_modules/sharp");require("./backend/node_modules/bcrypt")'],
                            cwd=candidate, env=env, check=True, timeout=30)
             subprocess.run(["node", "deploy/chay-alwaysdata.cjs", "--check-schema"],
+                           cwd=candidate, env=env, check=True, timeout=30)
+            subprocess.run(["node", "deploy/chay-alwaysdata.cjs", "--check-runtime"],
                            cwd=candidate, env=env, check=True, timeout=30)
             candidate.rename(destination)
             config = json.loads((private / "alwaysdata.json").read_text())

@@ -61,6 +61,18 @@ async function main() {
     await taoQuanTri();
     return;
   }
+  if (lenh === '--check-runtime') {
+    const db = require('../backend/dist/repositories/ket-noi');
+    try {
+      require('../backend/dist/config/moi-truong').kiemTraMoiTruong();
+      require('../backend/dist/may-chu');
+      statSync(resolve(__dirname, '../frontend/dist/index.html'));
+      console.log('RUNTIME_READY');
+    } finally {
+      await db.nhomKetNoi.end();
+    }
+    return;
+  }
   if (lenh !== '--worker') {
     throw new Error('UNKNOWN_COMMAND');
   }

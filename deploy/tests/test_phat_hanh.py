@@ -57,6 +57,11 @@ class DeploymentTests(unittest.TestCase):
             self.assertEqual(json.loads((target / "frontend/dist/version.json").read_text())["sha"], SHA)
             self.assertFalse((target / "backend/.local").exists())
             self.assertFalse((target / "backend/node_modules/example/.env").exists())
+            # Swagger đọc tệp này ngay khi nạp ứng dụng, dù không mở trang tài liệu.
+            self.assertEqual(
+                (target / "backend/docs/doan4-dau-gia.postman_collection.json").read_text(),
+                "fixture",
+            )
 
     def test_rollback_restores_previous_pointer_on_failed_health(self):
         with tempfile.TemporaryDirectory() as tmp:
