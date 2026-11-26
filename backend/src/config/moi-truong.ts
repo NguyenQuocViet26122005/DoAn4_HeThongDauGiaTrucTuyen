@@ -9,7 +9,11 @@ const cauHinh = {
   dbTimezone: process.env.DB_TIMEZONE || '+07:00',
   jobsEnabled: process.env.JOBS_ENABLED !== 'false',
   jobIntervalMs: 60000,
-  uploadRoot: duongDan.join(__dirname, '../../uploads'),
+  uploadRoot: duongDan.resolve(
+    process.env.UPLOAD_ROOT || duongDan.join(__dirname, '../../uploads'),
+  ),
+  webRoot: process.env.WEB_DIST ? duongDan.resolve(process.env.WEB_DIST) : null,
+  trustProxyHops: Number(process.env.TRUST_PROXY_HOPS || 0),
 };
 
 function kiemTraMoiTruong() {
@@ -28,6 +32,9 @@ function kiemTraMoiTruong() {
   }
   if (!Number.isInteger(cauHinh.port) || cauHinh.port < 1 || cauHinh.port > 65535) {
     throw new Error('PORT không hợp lệ');
+  }
+  if (!Number.isInteger(cauHinh.trustProxyHops) || cauHinh.trustProxyHops < 0) {
+    throw new Error('TRUST_PROXY_HOPS không hợp lệ');
   }
 }
 
