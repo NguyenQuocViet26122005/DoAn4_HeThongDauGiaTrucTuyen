@@ -2,7 +2,7 @@
 
 **Bổ sung 25/11/2026:** hỗ trợ kiểm duyệt tin đăng hai lớp, gợi ý hồ sơ từ ảnh có xác nhận từng trường và giá bán lịch sử cùng danh mục khi đủ mẫu. Quy tắc, quyền, dữ liệu AI và hợp đồng API tại [Hỗ trợ đăng bán](backend/docs/HO-TRO-DANG-BAN.md). AI chỉ gợi ý, Admin vẫn quyết định; không có chatbot quyết định chính sách cọc hoặc hoàn tiền.
 
-**Tên website: VietBid.** Ưu tiên trải nghiệm web trên máy tính; giao diện tự điều chỉnh theo màn hình nhỏ, không tạo ứng dụng điện thoại riêng.
+**Tên website: VietBid.** Website phục vụ người mua, người bán và Admin, ưu tiên trải nghiệm máy tính và tự điều chỉnh theo màn hình nhỏ. **Cập nhật 26/11/2026:** đã bổ sung ứng dụng React Native/Expo dành cho người mua trong `mobile`, phát hành APK Android và dùng chung API/CSDL với website. Hướng dẫn trải nghiệm và tải app tại [README](README.md); chi tiết triển khai, cập nhật và giới hạn tại [hướng dẫn triển khai](deploy/README.md).
 
 **Tài liệu nghiệp vụ chi tiết và công nghệ — phiên bản 3.2, ngày 17/10/2026.**
 
