@@ -32,6 +32,23 @@ OCR có thể cần nhiều RAM hơn mức gói Free. Cần đo trên hosting; c
 
 `Dockerfile` tại gốc repo build frontend và backend thành dịch vụ HTTP cổng `8080`. Gắn volume có quyền ghi cho UID 1000 vào `/app/backend/uploads`, cung cấp MySQL bền vững và các biến bên trên. Trong container, chạy `node khoi-tao-mysql.cjs` một lần trước khi bật tác vụ nền. Docker image cần được build và kiểm tra trên môi trường có Docker; kiểm thử Node trên Windows không thay thế bước này.
 
+## Tự triển khai khi push lên main
+
+Workflow `.github/workflows/trien-khai.yml` chạy khi push lên `main` hoặc chọn **Actions → Triển khai VietBid → Run workflow** trên nhánh `main`. GitHub cài thư viện, kiểm tra backend/frontend và công cụ triển khai, build frontend với API cùng tên miền, rồi đóng gói backend cùng thư viện Linux. Mỗi lượt chỉ triển khai một bản; lượt đang triển khai được phép hoàn tất trước lượt tiếp theo.
+
+Một lần thiết lập ban đầu:
+
+1. Cấp một khóa SSH riêng cho GitHub Actions trong tài khoản hosting `vietbid-qviet2612`. Lưu khóa riêng trong **repository Actions Secret** tên `ALWAYSDATA_SSH_KEY`; không đưa vào tệp mã nguồn. Khóa SSH của tài khoản này có quyền truy cập tệp của hosting, vì vậy chỉ cấp cho repository do mình quản lý. Người có quyền sửa workflow trên `main` có thể sử dụng quyền triển khai này.
+2. Cài các tệp `deploy/chay-alwaysdata.cjs`, `deploy/quan-ly-phat-hanh.cjs`, `deploy/phat_hanh.py`, `deploy/kiem-tra-websocket.cjs` đã kiểm tra vào thư mục dự án trên hosting. Khởi động lại site một lần để trình quản lý bản chạy có hiệu lực. Lệnh site vẫn là `node deploy/chay-alwaysdata.cjs`.
+3. Đối chiếu host key SSH và tệp `deploy/alwaysdata_known_hosts`. Workflow kiểm tra host key nghiêm ngặt, không tự chấp nhận host key mới trong mỗi lượt chạy.
+4. Chạy workflow đầu tiên và kiểm tra kết quả **DEPLOYED** cùng bước kiểm tra phiên bản/API/WebSocket. Khi chưa có Secret, workflow chỉ build và ghi rõ chưa triển khai trong bản tổng kết.
+
+Máy chủ nhận gói vào `.incoming`, kiểm tra đường dẫn/kích thước gói, thư viện native và cấu trúc CSDL trước khi chuyển bản chạy. Các bản nằm trong `.releases`; con trỏ `backend/.local/current-release.json` được thay nguyên tử. Tiến trình quản lý dừng worker cũ theo cơ chế graceful shutdown rồi chạy worker của bản mới. Cấu hình MySQL/JWT và ảnh tiếp tục nằm trong vị trí lưu bền vững ban đầu, không đóng gói hay truyền qua GitHub.
+
+Kiểm tra sau triển khai yêu cầu cả `/api/health` và `/version.json` khớp SHA của commit. Nếu bản mới không lên được, bộ nhận tự khôi phục con trỏ trước đó rồi kiểm tra lại. Chỉ giữ bản hiện tại và bản liền trước sau lượt triển khai thành công; bản cài đặt ban đầu vẫn có thể dùng khi chưa có con trỏ. Kết nối Socket.IO sẽ kết nối lại trong lúc đổi worker; có thể gián đoạn ngắn lúc cập nhật.
+
+Thay đổi schema cần migration được kiểm tra và sao lưu riêng. Workflow không tự chạy SQL tạo mới hoặc migration trên CSDL đang có dữ liệu; cấu trúc không khớp sẽ chặn bản mới trước khi chuyển. Bộ quản lý/bootstrap tại thư mục `deploy` của hosting là phần vận hành cố định; khi nâng cấp chính bộ quản lý này, cần cập nhật nó và khởi động lại site có kiểm soát.
+
 Tài liệu chính thức: [gói alwaysdata](https://www.alwaysdata.com/en/offers/), [cấu hình Node.js](https://help.alwaysdata.com/en/docs/web-hosting/languages/nodejs/configuration/), [WebSocket](https://help.alwaysdata.com/en/blog/2023-03-14-hold-on-to-your-socks-high-speed-data-stream-hosting-with-websockets/).
 
 ## Kết quả triển khai ngày 26/11/2026
