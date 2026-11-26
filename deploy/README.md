@@ -54,10 +54,20 @@ Tài liệu chính thức: [gói alwaysdata](https://www.alwaysdata.com/en/offer
 ## Kết quả triển khai ngày 26/11/2026
 
 - Website: [VietBid](https://vietbid-qviet2612.alwaysdata.net/). Node.js, MariaDB và ảnh tải lên đều ở hosting alwaysdata Free, chạy độc lập với máy phát triển và đường hầm demo trước đây.
-- Bản mã ứng dụng triển khai: `ff4e5b8`. Site dùng Node.js 24, lệnh `node deploy/chay-alwaysdata.cjs`, thư mục `vietbid`, thời gian dừng khi không hoạt động đặt bằng `0`.
+- Site dùng Node.js 24, lệnh `node deploy/chay-alwaysdata.cjs`, thư mục `vietbid`, thời gian dừng khi không hoạt động đặt bằng `0`. Phiên bản hiện hành đọc tại `/api/health` và `/version.json`; workflow yêu cầu hai SHA cùng khớp commit vừa push. Lượt push `b9638e6` đã qua đầy đủ kiểm thử, triển khai và xác minh công khai trên GitHub Actions.
 - CSDL MariaDB 11.8 đã khởi tạo và đối chiếu đủ 21 bảng, 324 cột, không thiếu cột/bảng, tất cả dùng InnoDB. Cấu hình và mật khẩu chỉ lưu ở tệp riêng trên máy chủ.
 - Quản trị: `admin@vietbid.example`, mật khẩu do người vận hành tự đặt trong SSH. Không lưu mật khẩu trong tài liệu hoặc Git.
 - Kiểm tra trực tiếp đã đạt: HTTPS, giao diện và đường dẫn React trực tiếp, API/danh mục, đăng ký/đăng nhập, chặn truy cập quản trị sai quyền, tải/đọc ảnh, bảo vệ tệp bằng chứng và WebSocket WSS. Đã khởi động lại site, đóng SSH rồi kiểm tra lại đăng nhập, ảnh và WSS thành công.
 - Tác vụ nền bật, chạy mỗi 60 giây; lần đọc trạng thái sau khởi động lại trả `enabled=true`, `failed=0`. Bộ kiểm thử backend tại thời điểm triển khai đạt 33/33.
 - Bản cloud dùng CSDL mới, có quản trị và một tài khoản kiểm tra tổng hợp được đánh dấu trong tên; chưa có sản phẩm hoặc phiên đấu giá. Không chuyển người dùng, hồ sơ hay giao dịch từ CSDL cá nhân. Các luồng cọc/trả giá/đơn hàng chưa được kiểm thử giao dịch đầy đủ trên bản cloud mới; các kết quả kiểm thử cục bộ trước đó không thay thế bước này.
 - AI gọi API trả phí đang tắt. Thanh toán, đặt cọc và vận chuyển tiếp tục là mô phỏng. Đây là cấu hình cho đồ án cá nhân trong giới hạn gói Free; chưa kiểm thử tải và OCR với giới hạn RAM của hosting.
+
+## Dữ liệu mẫu cho bản cloud
+
+`node deploy/du-lieu-mau.cjs --plan` xem lịch trước khi tạo, không kết nối CSDL. Công cụ tạo 6 tài khoản tổng hợp (3 người bán đã xác minh, 1 người bán chờ xác minh, 2 người mua), 30 sản phẩm thuộc 10 danh mục, 6 phiên mở ngay và 16 phiên mở nối tiếp cách nhau 14 ngày, phủ 4 tháng lịch. Sáu sản phẩm khác ở bước nháp/chờ duyệt/kiểm định/sẵn sàng/từ chối; hai sản phẩm dùng tạo đơn Mua ngay mẫu (chờ gửi và đang kiểm tra). Người mua có danh sách theo dõi, người bán/Admin có hồ sơ và thông báo để thao tác. Không tạo lượt trả giá hay đánh giá giả.
+
+Trên hosting đã cấu hình, chạy một lần `node deploy/du-lieu-mau.cjs --apply --database=vietbid-qviet2612_auction`. Công cụ xác nhận đúng CSDL, sao lưu riêng có checksum trước khi ghi và gọi các service hiện hành trong transaction. Không xóa dữ liệu, sửa Admin, thay chính sách cọc hoặc tắt trigger. Mỗi phiên chụp chính sách cọc đang có. Nhãn nhật ký duy nhất ngăn tạo lặp; chạy lại hoặc dùng `--verify` với cùng tham số CSDL chỉ kiểm tra các bản ghi đã tạo.
+
+Ảnh được lấy từ tài nguyên đã có giấy phép trong repository, thu nhỏ, thêm nhãn DEMO và ghi nguồn trong mô tả; hồ sơ xác minh/kiểm định là tài liệu tổng hợp ghi rõ không có giá trị thực. Mật khẩu từng tài khoản được sinh ngẫu nhiên, lưu riêng trong `backend/.local/demo-cloud-accounts.json` trên hosting, không ghi vào Git hoặc log. Công cụ không được gọi tự động trong workflow triển khai.
+
+Các phiên dùng thời gian tuyệt đối lưu trong CSDL và được tác vụ nền mở/chốt như phiên thông thường; không tự lùi ngày khi push lại code. Lịch 4 tháng không gia hạn hosting hay thay hạn thanh toán, giao hàng, kiểm tra hàng. Hai đơn mẫu vẫn chịu thời hạn nghiệp vụ và chuyển trạng thái bình thường. Các phiên lịch mẫu không bật Mua ngay để giữ thời gian trải nghiệm; Admin vẫn có thể hủy theo quy tắc hiện hành.
