@@ -82,7 +82,7 @@ function ungDungKemGiaoDien(webRoot: string) {
       return next();
     }
 
-    res.sendFile(trangChinh);
+    res.sendFile('index.html', { root: webRoot });
   });
 
   return web;
@@ -101,4 +101,4 @@ if (require.main === module) {
     process.exitCode = 1;
   });
 }
-export { khoiDongMayChu };
+export { khoiDongMayChu, ungDungKemGiaoDien };
