@@ -33,3 +33,14 @@ OCR có thể cần nhiều RAM hơn mức gói Free. Cần đo trên hosting; c
 `Dockerfile` tại gốc repo build frontend và backend thành dịch vụ HTTP cổng `8080`. Gắn volume có quyền ghi cho UID 1000 vào `/app/backend/uploads`, cung cấp MySQL bền vững và các biến bên trên. Trong container, chạy `node khoi-tao-mysql.cjs` một lần trước khi bật tác vụ nền. Docker image cần được build và kiểm tra trên môi trường có Docker; kiểm thử Node trên Windows không thay thế bước này.
 
 Tài liệu chính thức: [gói alwaysdata](https://www.alwaysdata.com/en/offers/), [cấu hình Node.js](https://help.alwaysdata.com/en/docs/web-hosting/languages/nodejs/configuration/), [WebSocket](https://help.alwaysdata.com/en/blog/2023-03-14-hold-on-to-your-socks-high-speed-data-stream-hosting-with-websockets/).
+
+## Kết quả triển khai ngày 26/11/2026
+
+- Website: [VietBid](https://vietbid-qviet2612.alwaysdata.net/). Node.js, MariaDB và ảnh tải lên đều ở hosting alwaysdata Free, chạy độc lập với máy phát triển và đường hầm demo trước đây.
+- Bản mã ứng dụng triển khai: `ff4e5b8`. Site dùng Node.js 24, lệnh `node deploy/chay-alwaysdata.cjs`, thư mục `vietbid`, thời gian dừng khi không hoạt động đặt bằng `0`.
+- CSDL MariaDB 11.8 đã khởi tạo và đối chiếu đủ 21 bảng, 324 cột, không thiếu cột/bảng, tất cả dùng InnoDB. Cấu hình và mật khẩu chỉ lưu ở tệp riêng trên máy chủ.
+- Quản trị: `admin@vietbid.example`, mật khẩu do người vận hành tự đặt trong SSH. Không lưu mật khẩu trong tài liệu hoặc Git.
+- Kiểm tra trực tiếp đã đạt: HTTPS, giao diện và đường dẫn React trực tiếp, API/danh mục, đăng ký/đăng nhập, chặn truy cập quản trị sai quyền, tải/đọc ảnh, bảo vệ tệp bằng chứng và WebSocket WSS. Đã khởi động lại site, đóng SSH rồi kiểm tra lại đăng nhập, ảnh và WSS thành công.
+- Tác vụ nền bật, chạy mỗi 60 giây; lần đọc trạng thái sau khởi động lại trả `enabled=true`, `failed=0`. Bộ kiểm thử backend tại thời điểm triển khai đạt 33/33.
+- Bản cloud dùng CSDL mới, có quản trị và một tài khoản kiểm tra tổng hợp được đánh dấu trong tên; chưa có sản phẩm hoặc phiên đấu giá. Không chuyển người dùng, hồ sơ hay giao dịch từ CSDL cá nhân. Các luồng cọc/trả giá/đơn hàng chưa được kiểm thử giao dịch đầy đủ trên bản cloud mới; các kết quả kiểm thử cục bộ trước đó không thay thế bước này.
+- AI gọi API trả phí đang tắt. Thanh toán, đặt cọc và vận chuyển tiếp tục là mô phỏng. Đây là cấu hình cho đồ án cá nhân trong giới hạn gói Free; chưa kiểm thử tải và OCR với giới hạn RAM của hosting.
