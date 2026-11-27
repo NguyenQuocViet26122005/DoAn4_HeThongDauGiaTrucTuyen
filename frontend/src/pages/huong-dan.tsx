@@ -118,6 +118,53 @@ export default function HuongDan() {
           </li>
         </ol>
       </section>
+      <section id="cai-iphone" className="cai-iphone" aria-labelledby="tieu-de-cai-iphone">
+        <div className="gioi-thieu-cai-iphone">
+          <img src="/icons/apple-touch-icon.png" alt="" width="72" height="72" />
+          <h2 id="tieu-de-cai-iphone">VietBid trên màn hình chính iPhone</h2>
+          <p>
+            Cài miễn phí từ Safari. Mở bằng biểu tượng VietBid để dùng cùng giao diện, tài khoản và
+            dữ liệu với website.
+          </p>
+        </div>
+        <div>
+          <ol className="buoc-cai-iphone">
+            <li>
+              <strong>Mở VietBid bằng Safari</strong>
+              <p>
+                Truy cập <a href="https://vietbid.alwaysdata.net/">vietbid.alwaysdata.net</a>. Nếu
+                đang xem trong ứng dụng khác, hãy mở liên kết bằng Safari trước.
+              </p>
+            </li>
+            <li>
+              <strong>Thêm vào Màn hình chính</strong>
+              <p>
+                Mở menu Chia sẻ của Safari, chọn “Thêm vào Màn hình chính” (Add to Home Screen). Nếu
+                chưa thấy, chọn “Sửa tác vụ” để tìm mục này.
+              </p>
+            </li>
+            <li>
+              <strong>Mở bằng biểu tượng VietBid</strong>
+              <p>
+                Bật “Mở dưới dạng ứng dụng web” (Open as Web App) nếu có, rồi nhấn “Thêm”. Về màn
+                hình chính và chạm VietBid để bắt đầu.
+              </p>
+            </li>
+          </ol>
+          <p className="ghi-chu-cai-iphone">
+            Cần kết nối Internet. Giao diện mới hiển thị khi mở hoặc tải lại trang sau khi website
+            cập nhật. Bạn có thể cần đăng nhập lại lần đầu mở từ màn hình chính.
+          </p>
+          <a
+            className="link-vang"
+            href="https://support.apple.com/vi-vn/guide/iphone/iphea86e5236/ios"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Xem hướng dẫn của Apple <BieuTuong ten="muiTen" size={16} />
+          </a>
+        </div>
+      </section>
       <section className="khu-vuc cau-hoi">
         <span className="nhan-nho">TRƯỚC KHI BẠN BẮT ĐẦU</span>
         <h2>Những điều cần biết</h2>

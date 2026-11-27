@@ -19,6 +19,9 @@
 }
 body {
   margin: 0;
+  /* Giữ nội dung ngoài tai thỏ và thanh Home khi mở web app trên iPhone. */
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
   min-width: 320px;
   font-variant-numeric: tabular-nums;
   scrollbar-color: #4a4c3f #111310;
@@ -38,6 +41,7 @@ body,
 }
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 a {
   color: inherit;
@@ -108,6 +112,14 @@ em {
 }
 /* Vùng chạm đủ lớn cho liên kết chữ trên màn hình cảm ứng. */
 @media (pointer: coarse) {
+  /* Safari không phóng to biểu mẫu khi người dùng chạm vào ô nhập. */
+  .ant-app input.ant-input,
+  .ant-app textarea.ant-input,
+  .ant-app .ant-input-number-input,
+  .ant-app .ant-select-input {
+    font-size: 16px;
+  }
+
   .link-vang,
   .hanh-dong-san-pham-ban a,
   .chan-trang a {

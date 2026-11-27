@@ -213,6 +213,7 @@ export default function KhungTrang() {
             <div>
               <span className="nhan-nho">ĐỒNG HÀNH CÙNG BẠN</span>
               <Link to="/huong-dan">Hướng dẫn đấu giá</Link>
+              <Link to="/huong-dan#cai-iphone">Cài VietBid trên iPhone</Link>
               <Link to="/tai-khoan/xac-minh">Trở thành người bán</Link>
               <Link to="/tai-khoan/tranh-chap">Hỗ trợ giao dịch</Link>
             </div>

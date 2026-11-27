@@ -85,9 +85,13 @@
   background: #111310f5;
   border-bottom: 1px solid #2c3026;
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 20;
   backdrop-filter: blur(14px);
+}
+.ant-drawer-content {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .thanh-dieu-huong {
   display: flex;

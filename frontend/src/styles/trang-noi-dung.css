@@ -68,6 +68,52 @@
   max-width: 880px;
   margin-inline: auto;
 }
+.cai-iphone {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 64px;
+  margin-top: 56px;
+  padding-block: 42px;
+  border-block: 1px solid var(--vien);
+  scroll-margin-top: calc(115px + env(safe-area-inset-top, 0px));
+}
+.gioi-thieu-cai-iphone {
+  max-width: 36ch;
+}
+.gioi-thieu-cai-iphone img {
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+.gioi-thieu-cai-iphone h2 {
+  font-size: 33px;
+  margin-bottom: 16px;
+}
+.buoc-cai-iphone {
+  padding-left: 24px;
+  margin: 0;
+}
+.buoc-cai-iphone li {
+  padding-left: 8px;
+  margin-bottom: 24px;
+}
+.buoc-cai-iphone li::marker {
+  color: var(--vang);
+}
+.buoc-cai-iphone strong {
+  font-weight: 600;
+}
+.buoc-cai-iphone p {
+  margin: 6px 0 0;
+}
+.buoc-cai-iphone a {
+  color: var(--vang);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+.ghi-chu-cai-iphone {
+  margin-block: 28px 12px;
+}
 .cau-hoi h2 {
   margin-top: 12px;
 }
@@ -265,6 +311,10 @@
   }
 }
 @media (max-width: 760px) {
+  .cai-iphone {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
   .chi-tiet-phien,
   .chi-tiet-bo-sung,
   .huong-dan-ban {
