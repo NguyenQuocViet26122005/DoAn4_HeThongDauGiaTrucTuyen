@@ -71,4 +71,4 @@ jobs:
         run: |
           gh release create "android-$GITHUB_RUN_NUMBER" "$RUNNER_TEMP/VietBid.apk" "$RUNNER_TEMP/VietBid.apk.sha256" \
             --target "$GITHUB_SHA" --title "VietBid Android $GITHUB_RUN_NUMBER" --latest \
-            --notes 'APK Android ARM64 dùng https://vietbid.alwaysdata.net. Cần cài APK mới sau khi hosting đổi tên; có thể cài đè bản cũ. Dữ liệu đồng bộ với web; cập nhật JavaScript có chữ ký số. Thay đổi native cần cài APK mới.'
+            --notes 'APK Android ARM64 mở trực tiếp giao diện web responsive tại https://vietbid.alwaysdata.net bằng WebView. Người mua, người bán và Admin dùng cùng giao diện theo quyền tài khoản. Cài đè APK cũ để chuyển sang miền và phần vỏ mới; các lần cập nhật giao diện web sau hiển thị khi mở/tải lại trang. Bundle phần vỏ có chữ ký; thay đổi native cần APK mới.'
