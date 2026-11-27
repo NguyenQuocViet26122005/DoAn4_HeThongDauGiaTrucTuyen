@@ -4,7 +4,7 @@ module.exports = ({ config }) => ({
   ...config,
   runtimeVersion: runtimeVersion(),
   updates: {
-    url: 'https://vietbid-qviet2612.alwaysdata.net/api/mobile-updates',
+    url: 'https://vietbid.alwaysdata.net/api/mobile-updates',
     checkAutomatically: 'ON_LOAD',
     fallbackToCacheTimeout: 0,
     codeSigningCertificate: './update-certificate.crt',

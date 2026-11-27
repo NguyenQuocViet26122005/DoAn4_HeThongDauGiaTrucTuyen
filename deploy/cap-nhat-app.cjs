@@ -33,7 +33,7 @@ function asset(file, ext, launch = false) {
     hash,
     fileExtension: launch ? '.bundle' : '.' + ext,
     contentType: launch ? 'application/javascript' : types[ext] || 'application/octet-stream',
-    url: 'https://vietbid-qviet2612.alwaysdata.net/api/mobile-updates/assets/' + hex,
+    url: 'https://vietbid.alwaysdata.net/api/mobile-updates/assets/' + hex,
   };
 }
 const config = JSON.parse(fs.readFileSync(path.join(source, 'expo-config.json')));

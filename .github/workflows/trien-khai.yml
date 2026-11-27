@@ -86,7 +86,7 @@ jobs:
             -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes \
             -o UserKnownHostsFile=deploy/alwaysdata_known_hosts \
             -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=4 \
-            vietbid-qviet2612@ssh-vietbid-qviet2612.alwaysdata.net \
+            vietbid@ssh-vietbid.alwaysdata.net \
             'python3 vietbid/deploy/phat_hanh.py receive' < "$RUNNER_TEMP/vietbid-release.tar.gz"
 
       - name: Kiểm tra phiên bản và WebSocket công khai

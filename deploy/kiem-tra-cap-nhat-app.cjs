@@ -8,7 +8,7 @@ const certificate = fs.readFileSync(path.join(__dirname, '../mobile/update-certi
 async function main() {
   let response;
   for (let i = 0; i < 40; i++) {
-    response = await fetch('https://vietbid-qviet2612.alwaysdata.net/api/mobile-updates', {
+    response = await fetch('https://vietbid.alwaysdata.net/api/mobile-updates', {
       headers: {
         'expo-protocol-version': '1',
         'expo-platform': 'android',

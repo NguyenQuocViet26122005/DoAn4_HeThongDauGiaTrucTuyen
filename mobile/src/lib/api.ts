@@ -5,7 +5,7 @@ import { ghiNhanGioMayChu } from './gio-may-chu';
 
 // Bản cài mặc định dùng hosting; có thể đặt EXPO_PUBLIC_API_URL riêng khi phát triển LAN.
 export const DIA_CHI_API = (
-  process.env.EXPO_PUBLIC_API_URL || 'https://vietbid-qviet2612.alwaysdata.net/api'
+  process.env.EXPO_PUBLIC_API_URL || 'https://vietbid.alwaysdata.net/api'
 ).replace(/\/$/, '');
 export const GOC_MAY_CHU = DIA_CHI_API.replace(/\/api$/, '');
 // HTTPS dùng web cùng hosting; môi trường LAN vẫn suy ra cổng Vite khi không cấu hình riêng.

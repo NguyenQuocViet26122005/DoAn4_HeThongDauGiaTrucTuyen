@@ -39,7 +39,7 @@ class MobileUpdatesTests(unittest.TestCase):
         self.runtime = 'vietbid-android-' + 'a' * 32
         manifest = {'id': 'f7b53ddb-7930-4b23-9e2a-c193411c83c0', 'runtimeVersion': self.runtime,
                     'assets': [], 'launchAsset': {'key': key,
-                    'url': 'https://vietbid-qviet2612.alwaysdata.net/api/mobile-updates/assets/' + key,
+                    'url': 'https://vietbid.alwaysdata.net/api/mobile-updates/assets/' + key,
                     'hash': base64.urlsafe_b64encode(hashlib.sha256(asset).digest()).decode().rstrip('=')}}
         body = json.dumps(manifest)
         signature = subprocess.run(['openssl', 'dgst', '-sha256', '-sign', str(self.key)],

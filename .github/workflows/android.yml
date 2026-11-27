@@ -21,8 +21,8 @@ jobs:
     permissions:
       contents: write
     env:
-      EXPO_PUBLIC_API_URL: https://vietbid-qviet2612.alwaysdata.net/api
-      EXPO_PUBLIC_WEB_URL: https://vietbid-qviet2612.alwaysdata.net
+      EXPO_PUBLIC_API_URL: https://vietbid.alwaysdata.net/api
+      EXPO_PUBLIC_WEB_URL: https://vietbid.alwaysdata.net
       CI: '1'
     steps:
       - name: Lấy mã nguồn
@@ -71,4 +71,4 @@ jobs:
         run: |
           gh release create "android-$GITHUB_RUN_NUMBER" "$RUNNER_TEMP/VietBid.apk" "$RUNNER_TEMP/VietBid.apk.sha256" \
             --target "$GITHUB_SHA" --title "VietBid Android $GITHUB_RUN_NUMBER" --latest \
-            --notes 'APK Android ARM64 dùng API VietBid trên hosting. Dữ liệu đồng bộ với web; cập nhật JavaScript có chữ ký số. Thay đổi native cần cài APK mới.'
+            --notes 'APK Android ARM64 dùng https://vietbid.alwaysdata.net. Cần cài APK mới sau khi hosting đổi tên; có thể cài đè bản cũ. Dữ liệu đồng bộ với web; cập nhật JavaScript có chữ ký số. Thay đổi native cần cài APK mới.'

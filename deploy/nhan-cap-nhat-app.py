@@ -69,7 +69,7 @@ def receive(stream):
             for asset in [manifest['launchAsset'], *manifest['assets']]:
                 key = asset['key']
                 if not re.fullmatch(r'[a-f0-9]{64}', key): raise ValueError('INVALID_ASSET')
-                if asset['url'] != 'https://vietbid-qviet2612.alwaysdata.net/api/mobile-updates/assets/' + key:
+                if asset['url'] != 'https://vietbid.alwaysdata.net/api/mobile-updates/assets/' + key:
                     raise ValueError('INVALID_ASSET_ORIGIN')
                 file = staging / 'assets' / key
                 digest = hashlib.sha256(file.read_bytes()).digest()

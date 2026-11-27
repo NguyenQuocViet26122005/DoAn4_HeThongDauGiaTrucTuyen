@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { createRequire } = require('node:module');
 const { join } = require('node:path');
 const frontend = createRequire(join(__dirname, '../frontend/package.json'));
-const origin = 'https://vietbid-qviet2612.alwaysdata.net';
+const origin = 'https://vietbid.alwaysdata.net';
 
 async function main() {
   const health = await fetch(origin + '/api/health', { signal: AbortSignal.timeout(15000) });
