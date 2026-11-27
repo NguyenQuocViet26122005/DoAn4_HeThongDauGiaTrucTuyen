@@ -38,7 +38,7 @@ Workflow `.github/workflows/trien-khai.yml` chạy khi push lên `main` hoặc c
 
 Một lần thiết lập ban đầu:
 
-1. Cấp một khóa SSH riêng cho GitHub Actions trong tài khoản hosting `vietbid-qviet2612`. Lưu khóa riêng trong **repository Actions Secret** tên `ALWAYSDATA_SSH_KEY`; không đưa vào tệp mã nguồn. Khóa SSH của tài khoản này có quyền truy cập tệp của hosting, vì vậy chỉ cấp cho repository do mình quản lý. Người có quyền sửa workflow trên `main` có thể sử dụng quyền triển khai này.
+1. Cấp một khóa SSH riêng cho GitHub Actions trong tài khoản hosting `vietbid`. Lưu khóa riêng trong **repository Actions Secret** tên `ALWAYSDATA_SSH_KEY`; không đưa vào tệp mã nguồn. Khóa SSH của tài khoản này có quyền truy cập tệp của hosting, vì vậy chỉ cấp cho repository do mình quản lý. Người có quyền sửa workflow trên `main` có thể sử dụng quyền triển khai này.
 2. Cài các tệp `deploy/chay-alwaysdata.cjs`, `deploy/quan-ly-phat-hanh.cjs`, `deploy/phat_hanh.py`, `deploy/kiem-tra-websocket.cjs` đã kiểm tra vào thư mục dự án trên hosting. Khởi động lại site một lần để trình quản lý bản chạy có hiệu lực. Lệnh site vẫn là `node deploy/chay-alwaysdata.cjs`.
 3. Đối chiếu host key SSH và tệp `deploy/alwaysdata_known_hosts`. Workflow kiểm tra host key nghiêm ngặt, không tự chấp nhận host key mới trong mỗi lượt chạy.
 4. Chạy workflow đầu tiên và kiểm tra kết quả **DEPLOYED** cùng bước kiểm tra phiên bản/API/WebSocket. Khi chưa có Secret, workflow chỉ build và ghi rõ chưa triển khai trong bản tổng kết.
@@ -53,7 +53,7 @@ Tài liệu chính thức: [gói alwaysdata](https://www.alwaysdata.com/en/offer
 
 ## Kết quả triển khai ngày 26/11/2026
 
-- Website: [VietBid](https://vietbid-qviet2612.alwaysdata.net/). Node.js, MariaDB và ảnh tải lên đều ở hosting alwaysdata Free, chạy độc lập với máy phát triển và đường hầm demo trước đây.
+- Website: [VietBid](https://vietbid.alwaysdata.net/). Node.js, MariaDB và ảnh tải lên đều ở hosting alwaysdata Free, chạy độc lập với máy phát triển và đường hầm demo trước đây.
 - Site dùng Node.js 24, lệnh `node deploy/chay-alwaysdata.cjs`, thư mục `vietbid`, thời gian dừng khi không hoạt động đặt bằng `0`. Phiên bản hiện hành đọc tại `/api/health` và `/version.json`; workflow yêu cầu hai SHA cùng khớp commit vừa push. Lượt push `b9638e6` đã qua đầy đủ kiểm thử, triển khai và xác minh công khai trên GitHub Actions.
 - CSDL MariaDB 11.8 đã khởi tạo và đối chiếu đủ 21 bảng, 324 cột, không thiếu cột/bảng, tất cả dùng InnoDB. Cấu hình và mật khẩu chỉ lưu ở tệp riêng trên máy chủ.
 - Quản trị: `admin@vietbid.example`, mật khẩu do người vận hành tự đặt trong SSH. Không lưu mật khẩu trong tài liệu hoặc Git.
@@ -66,13 +66,15 @@ Tài liệu chính thức: [gói alwaysdata](https://www.alwaysdata.com/en/offer
 
 `node deploy/du-lieu-mau.cjs --plan` xem lịch trước khi tạo, không kết nối CSDL. Công cụ tạo 6 tài khoản tổng hợp (3 người bán đã xác minh, 1 người bán chờ xác minh, 2 người mua), 30 sản phẩm thuộc 10 danh mục, 6 phiên mở ngay và 16 phiên mở nối tiếp cách nhau 14 ngày, phủ 4 tháng lịch. Sáu sản phẩm khác ở bước nháp/chờ duyệt/kiểm định/sẵn sàng/từ chối; hai sản phẩm dùng tạo đơn Mua ngay mẫu (chờ gửi và đang kiểm tra). Người mua có danh sách theo dõi, người bán/Admin có hồ sơ và thông báo để thao tác. Không tạo lượt trả giá hay đánh giá giả.
 
-Trên hosting đã cấu hình, chạy một lần `node deploy/du-lieu-mau.cjs --apply --database=vietbid-qviet2612_auction`. Công cụ xác nhận đúng CSDL, sao lưu riêng có checksum trước khi ghi và gọi các service hiện hành trong transaction. Không xóa dữ liệu, sửa Admin, thay chính sách cọc hoặc tắt trigger. Mỗi phiên chụp chính sách cọc đang có. Nhãn nhật ký duy nhất ngăn tạo lặp; chạy lại hoặc dùng `--verify` với cùng tham số CSDL chỉ kiểm tra các bản ghi đã tạo.
+Trên hosting đã cấu hình, chạy một lần `node deploy/du-lieu-mau.cjs --apply --database=vietbid_auction`. Công cụ xác nhận đúng CSDL, sao lưu riêng có checksum trước khi ghi và gọi các service hiện hành trong transaction. Không xóa dữ liệu, sửa Admin, thay chính sách cọc hoặc tắt trigger. Mỗi phiên chụp chính sách cọc đang có. Nhãn nhật ký duy nhất ngăn tạo lặp; chạy lại hoặc dùng `--verify` với cùng tham số CSDL chỉ kiểm tra các bản ghi đã tạo.
 
 Ảnh được lấy từ tài nguyên đã có giấy phép trong repository, thu nhỏ, thêm nhãn DEMO và ghi nguồn trong mô tả; hồ sơ xác minh/kiểm định là tài liệu tổng hợp ghi rõ không có giá trị thực. Mật khẩu từng tài khoản được sinh ngẫu nhiên, lưu riêng trong `backend/.local/demo-cloud-accounts.json` trên hosting, không ghi vào Git hoặc log. Công cụ không được gọi tự động trong workflow triển khai.
 
 Các phiên dùng thời gian tuyệt đối lưu trong CSDL và được tác vụ nền mở/chốt như phiên thông thường; không tự lùi ngày khi push lại code. Lịch 4 tháng không gia hạn hosting hay thay hạn thanh toán, giao hàng, kiểm tra hàng. Hai đơn mẫu vẫn chịu thời hạn nghiệp vụ và chuyển trạng thái bình thường. Các phiên lịch mẫu không bật Mua ngay để giữ thời gian trải nghiệm; Admin vẫn có thể hủy theo quy tắc hiện hành.
 
 ## APK và cập nhật mobile
+
+Hosting đã đổi tên thành `vietbid` từ tài khoản cũ `vietbid-qviet2612`. Cấu hình riêng trên máy chủ phải dùng database `vietbid_auction`, host MySQL `mysql-vietbid.alwaysdata.net`, người dùng `vietbid` và thư mục `/home/vietbid`. Giữ nguyên mật khẩu, khóa ký và dữ liệu. Tên miền cập nhật nằm trong cấu hình native nên người dùng cần cài APK mới để nhận miền mới; APK cũ không được chuyển hướng sang miền của tài khoản khác.
 
 App Expo SDK 58 tiếp tục là ứng dụng React Native cho người mua, dùng API/CSDL chung với website. Workflow `android.yml` tạo APK release ARM64, ký bằng keystore riêng trong Secrets `ANDROID_KEYSTORE_BASE64` và `ANDROID_KEYSTORE_PASSWORD`, phát hành tại GitHub Releases. Không dùng khóa debug để phát hành. Mỗi lượt build tăng versionCode; cài APK thay thế vẫn cần người dùng xác nhận trên Android.
 

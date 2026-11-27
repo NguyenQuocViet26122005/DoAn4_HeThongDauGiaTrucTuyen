@@ -2,7 +2,7 @@
 
 VietBid là đồ án xây dựng hệ thống đấu giá trực tuyến dành cho những món đồ có giá trị sưu tầm: đồng hồ, đồ cổ, tác phẩm nghệ thuật, máy ảnh, nhạc cụ vintage và các bộ sưu tập hiếm. Dự án có website cho người mua, người bán, Admin và ứng dụng Android dành cho người mua.
 
-**[Trải nghiệm website](https://vietbid-qviet2612.alwaysdata.net/)** · **[Tải app Android](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases/latest/download/VietBid.apk)** · **[Các bản phát hành](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases)**
+**[Trải nghiệm website](https://vietbid.alwaysdata.net/)** · **[Tải app Android](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases/latest/download/VietBid.apk)** · **[Các bản phát hành](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases)**
 
 > Bản công khai phục vụ học tập và trải nghiệm. Hàng hóa, hồ sơ và giao dịch mẫu được ghi rõ là mô phỏng. Đặt cọc, thanh toán và vận chuyển trong đồ án không sử dụng tiền hoặc đơn giao hàng thực tế.
 

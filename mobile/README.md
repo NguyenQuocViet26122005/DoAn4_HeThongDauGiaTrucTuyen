@@ -10,7 +10,9 @@ App giữ bốn tab và điều hướng native. Đây là sự thống nhất v
 
 ## Bản Android dùng hosting
 
-App mặc định kết nối `https://vietbid-qviet2612.alwaysdata.net/api` và mở web cùng hosting. Tài khoản, sản phẩm, phiên, đơn và thông báo dùng chung CSDL với website; điện thoại không cần chung Wi-Fi hay máy phát triển đang bật. Có thể đặt hai biến `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_WEB_URL` để phát triển với backend khác.
+App mặc định kết nối `https://vietbid.alwaysdata.net/api` và mở web cùng hosting. Tài khoản, sản phẩm, phiên, đơn và thông báo dùng chung CSDL với website; điện thoại không cần chung Wi-Fi hay máy phát triển đang bật. Có thể đặt hai biến `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_WEB_URL` để phát triển với backend khác.
+
+Sau khi hosting đổi tên từ `vietbid-qviet2612` sang `vietbid`, cần cài APK mới từ GitHub Releases. APK cũ chứa miền API và URL cập nhật cũ nên không thể dựa vào cập nhật từ xa để chuyển miền. Bản mới vẫn dùng cùng mã ứng dụng và khóa ký; có thể cài đè để cập nhật.
 
 Workflow **APK và cập nhật Android** build APK release ARM64 khi thay đổi mã mobile trên `main` hoặc chạy thủ công. APK được ký bằng khóa riêng trong GitHub Actions Secrets, phát hành tại GitHub Releases kèm SHA256. Cài APK ngoài cửa hàng cần người dùng cho phép cài đặt và xác nhận; Android không cho app tự cài APK thay thế âm thầm.
 
