@@ -756,4 +756,3 @@ Máy chủ giao diện thử dùng cổng riêng, tắt jobs và nối doan4_dau
 5. **Phí hoàn hoặc thất lạc:** Admin ghi bên chịu trách nhiệm, số tiền và căn cứ. Nếu có chi phí, xác nhận đối soát chỉ sau khi có chứng từ. Kiểm tra tổng đơn, tiền hoàn và giải ngân không tự thay đổi theo biên bản chi phí; hàng thất lạc không được mở bán lại.
 
 Chạy ứng dụng thường ở localhost:5173 với backend cổng 5000. Cổng 5175 đã dùng cho máy chủ kiểm thử tạm và không phải địa chỉ mặc định. Khởi động backend bằng `npm --prefix backend run dev:local`, frontend bằng `npm --prefix frontend run dev` từ thư mục gốc, trên hai terminal riêng; không chạy lại SQL để thử các chức năng này.
-
