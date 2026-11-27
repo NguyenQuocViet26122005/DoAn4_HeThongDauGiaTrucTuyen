@@ -198,6 +198,14 @@ Push giao diện web lên main được CI kiểm tra và triển khai; app nh�
 
 Kiểm tra gồm lint, TypeScript, 6 ca chính sách điều hướng, xuất bundle Android và bố cục responsive của các vai trò trong bộ E2E frontend. Ảnh báo cáo được chụp từ web responsive đang chạy, cùng nội dung mà app tải, không được coi là ảnh thiết bị Android. Chưa nghiệm thu cài đặt trên điện thoại hoặc máy ảo, Back, bàn phím, tải/chọn tệp và khôi phục mạng trên phần cứng thật. Chi tiết phát hành, chữ ký và hướng dẫn dùng tại `mobile/README.md` và `deploy/README.md`.
 
+### 3.5. Web app cài trên iPhone và iPad — 27/11/2026
+
+Website có `manifest.webmanifest` với chế độ `standalone`, biểu tượng PNG 192/512 px và Apple touch icon 180 px dùng cùng nhận diện VietBid. Metadata Apple cho phép mở từ màn hình chính; viewport và CSS dành vùng an toàn cho tai thỏ/thanh Home, giữ khả năng zoom và tăng cỡ chữ ô nhập trên màn hình cảm ứng. Hướng dẫn Safari nằm tại `/huong-dan#cai-iphone`, có liên kết ở chân trang và README.
+
+Người dùng mở website trong Safari → Chia sẻ → Thêm vào Màn hình chính; bật “Mở dưới dạng ứng dụng web” nếu tùy chọn hiện. Đây là web app miễn phí, không phải IPA hoặc bản App Store. Web app dùng cùng giao diện, API, CSDL và quyền tài khoản; có thể cần đăng nhập lại khi mở lần đầu từ màn hình chính. Không thêm service worker hoặc cache offline cho API/giao dịch. Cần kết nối Internet; bản web mới hiển thị khi mở/tải lại trang sau triển khai, không tự nạp lại giữa giao dịch.
+
+Kiểm tra tự động đối chiếu manifest được phục vụ đúng kiểu nội dung, kích thước thật của ba biểu tượng, metadata Apple, khả năng zoom, liên kết và bố cục hướng dẫn ở cỡ máy tính/điện thoại. Chưa nghiệm thu cài đặt, bàn phím, vùng an toàn và vòng đời phiên trên iPhone/iPad thật.
+
 ## 4. Tài khoản, đăng nhập và xác minh người bán
 
 Người dùng đăng ký bằng thông tin hợp lệ; email duy nhất, mật khẩu được băm. Không nhận vai trò/quyền Admin từ body đăng ký. JWT hết hạn theo cấu hình; máy chủ kiểm tra trạng thái tài khoản khi thực hiện thao tác riêng tư. Tài khoản bị khóa/tạm ngưng không được tiếp tục hoạt động mua bán mới.

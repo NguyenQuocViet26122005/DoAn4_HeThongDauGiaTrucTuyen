@@ -2,7 +2,7 @@
 
 VietBid là đồ án xây dựng hệ thống đấu giá trực tuyến dành cho những món đồ có giá trị sưu tầm: đồng hồ, đồ cổ, tác phẩm nghệ thuật, máy ảnh, nhạc cụ vintage và các bộ sưu tập hiếm. Website và ứng dụng Android dùng chung giao diện responsive cho người mua, người bán và Admin theo quyền tài khoản.
 
-**[Trải nghiệm website](https://vietbid.alwaysdata.net/)** · **[Tải app Android](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases/latest/download/VietBid.apk)** · **[Các bản phát hành](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases)**
+**[Trải nghiệm website](https://vietbid.alwaysdata.net/)** · **[Tải app Android](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases/latest/download/VietBid.apk)** · **[Cài trên iPhone](https://vietbid.alwaysdata.net/huong-dan#cai-iphone)** · **[Các bản phát hành](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases)**
 
 > Bản công khai phục vụ học tập và trải nghiệm. Hàng hóa, hồ sơ và giao dịch mẫu được ghi rõ là mô phỏng. Đặt cọc, thanh toán và vận chuyển trong đồ án không sử dụng tiền hoặc đơn giao hàng thực tế.
 
@@ -39,6 +39,17 @@ APK được build từ **Expo/React Native trong thư mục `mobile`**, dùng W
 3. Mở VietBid, đăng ký hoặc đăng nhập để trải nghiệm.
 
 APK release được ký riêng và phát hành kèm [tệp SHA256](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases/latest/download/VietBid.apk.sha256). Ứng dụng kết nối tới hosting, hoạt động độc lập với máy phát triển.
+
+## VietBid trên iPhone và iPad
+
+Bản web app cài miễn phí từ Safari, dùng chung giao diện responsive, API, dữ liệu và quyền tài khoản với website. Đây là web app thêm vào màn hình chính, không phải bản IPA/App Store; không cần tài khoản Apple Developer để cài theo cách này.
+
+1. Mở [website VietBid](https://vietbid.alwaysdata.net/) bằng **Safari**.
+2. Mở **Chia sẻ → Thêm vào Màn hình chính** (Add to Home Screen). Nếu mục này chưa hiện, tìm trong **Sửa tác vụ**.
+3. Bật **Mở dưới dạng ứng dụng web** (Open as Web App) nếu có, rồi chọn **Thêm**.
+4. Chạm biểu tượng **VietBid** trên màn hình chính; đăng nhập lại nếu được yêu cầu.
+
+Web app có manifest, biểu tượng riêng và vùng an toàn cho tai thỏ/thanh Home. Cần Internet; không lưu giao dịch hoặc API vào bộ nhớ đệm offline và không tự tải lại giữa thao tác. Giao diện mới xuất hiện khi mở/tải lại trang sau khi web triển khai. Chưa nghiệm thu cài đặt, bàn phím và vùng an toàn trên iPhone thật. Xem [hướng dẫn trong website](https://vietbid.alwaysdata.net/huong-dan#cai-iphone) hoặc [hướng dẫn Apple](https://support.apple.com/vi-vn/guide/iphone/iphea86e5236/ios).
 
 ## Dữ liệu trải nghiệm
 
