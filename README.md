@@ -1,6 +1,6 @@
 # VietBid — Đấu giá và sưu tầm
 
-VietBid là đồ án xây dựng hệ thống đấu giá trực tuyến dành cho những món đồ có giá trị sưu tầm: đồng hồ, đồ cổ, tác phẩm nghệ thuật, máy ảnh, nhạc cụ vintage và các bộ sưu tập hiếm. Dự án có website cho người mua, người bán, Admin và ứng dụng Android dành cho người mua.
+VietBid là đồ án xây dựng hệ thống đấu giá trực tuyến dành cho những món đồ có giá trị sưu tầm: đồng hồ, đồ cổ, tác phẩm nghệ thuật, máy ảnh, nhạc cụ vintage và các bộ sưu tập hiếm. Website và ứng dụng Android dùng chung giao diện responsive cho người mua, người bán và Admin theo quyền tài khoản.
 
 **[Trải nghiệm website](https://vietbid.alwaysdata.net/)** · **[Tải app Android](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases/latest/download/VietBid.apk)** · **[Các bản phát hành](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases)**
 
@@ -32,7 +32,7 @@ VietBid là đồ án xây dựng hệ thống đấu giá trực tuyến dành 
 
 ## Ứng dụng Android
 
-APK được build từ giao diện **React Native/Expo trong thư mục `mobile`**, gồm bốn tab **Khám phá, Đơn hàng, Thông báo, Tài khoản**. App dùng chung API và CSDL với website, nên tài khoản và dữ liệu giao dịch được đồng bộ. Các chức năng bán hàng, kiểm định và quản trị sử dụng trên web.
+APK được build từ **Expo/React Native trong thư mục `mobile`**, dùng WebView mở trực tiếp giao diện web responsive. Bố cục, trang, biểu mẫu và chức năng theo quyền tài khoản dùng cùng mã với website; không có một bộ giao diện native riêng cần đồng bộ lại. Bản chuyển sang WebView và miền `vietbid.alwaysdata.net` cần cài APK mới, có thể cài đè bản cũ.
 
 1. Mở **[link tải APK mới nhất](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases/latest/download/VietBid.apk)** bằng điện thoại Android ARM64.
 2. Mở tệp tải về và làm theo hướng dẫn cài đặt của Android.
@@ -50,7 +50,8 @@ Trạng thái tiếp tục thay đổi theo thời gian và thao tác của ngư
 
 - **Website:** push lên `main` kích hoạt kiểm tra, build và triển khai. Hệ thống kiểm tra phiên bản, CSDL và WebSocket sau khi chuyển bản; bản mới khởi động lỗi được khôi phục về bản trước.
 - **Mobile:** thay đổi mã mobile kích hoạt build APK và phát hành gói cập nhật có chữ ký. Bản cập nhật tương thích được tải khi app khởi động và áp dụng ở lần mở tiếp theo. Thay đổi thư viện native hoặc cấu hình làm đổi runtime sẽ cần cài APK mới.
-- **Dữ liệu:** web và app dùng chung máy chủ. Thay đổi riêng giao diện web không tự thay giao diện React Native.
+- **Giao diện trong APK:** tải trực tiếp từ website nên nhận bản web mới khi mở/tải lại trang. Không tự tải lại khi đang thao tác giao dịch.
+- **Dữ liệu:** web và app dùng chung máy chủ, API và CSDL; quyền và quy tắc nghiệp vụ được kiểm tra tại Backend.
 
 Xem tiến trình tại [GitHub Actions](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/actions).
 

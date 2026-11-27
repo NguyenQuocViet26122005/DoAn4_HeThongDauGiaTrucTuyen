@@ -1,69 +1,42 @@
-# VietBid — ứng dụng di động
+# VietBid Android
 
-App Expo cho người mua của hệ thống đấu giá VietBid. App dùng chung API với web trong `../backend`. Bán hàng, kiểm định, khiếu nại và quản trị vẫn làm trên web.
+App Expo SDK 58 dùng React Native WebView để mở trực tiếp [website VietBid](https://vietbid.alwaysdata.net/). APK và trình duyệt điện thoại tải cùng giao diện React/Vite responsive từ hosting, gồm các khu vực người mua, người bán và Admin theo quyền tài khoản. App không dựng lại trang bằng một bộ màn hình native khác.
 
-## Đồng bộ giao diện với website
+## Cập nhật
 
-App lấy giao diện web trên điện thoại làm chuẩn: nền `#111310`, màu vàng `#d5b778`, chữ Be Vietnam Pro và tiêu đề Cormorant Garamond; thẻ bo 12, nút bo 6. Thẻ phiên giữ cùng thứ tự ảnh, danh mục, tiêu đề, giá, lượt trả giá và thời gian. Biểu mẫu, nhãn trạng thái, tiến trình đơn và các trang tài khoản dùng chung bộ thành phần trong `src/components/giao-dien.tsx` và màu trong `src/lib/giao-dien.ts`.
+- Push giao diện web lên `main`: GitHub Actions kiểm tra và triển khai; APK tải giao diện mới khi mở/tải lại trang. Không tự tải lại lúc người dùng đang đặt giá hoặc thanh toán.
+- Đổi mã phần vỏ app: workflow xuất bundle có chữ ký và build APK. Bundle chỉ áp dụng cho runtime tương thích.
+- Đổi thư viện native, miền cập nhật hoặc cấu hình: cần cài APK mới. Bản chuyển sang WebView ngày 27/11/2026 cần cài đè APK cũ.
 
-App giữ bốn tab và điều hướng native. Đây là sự thống nhất về hình thức và cách trình bày ở các màn hình hiện có; các chức năng bán hàng, kiểm định và quản trị tiếp tục mở trên web. Ảnh bản web Expo dùng để đối chiếu bố cục, không thay thế kiểm thử cài APK trên thiết bị Android.
+[Tải APK mới nhất](https://github.com/NguyenQuocViet26122005/DoAn4_HeThongDauGiaTrucTuyen/releases/latest/download/VietBid.apk). APK release ARM64 dùng cùng mã ứng dụng `vn.vietbid.app` và khóa ký riêng, có tệp SHA256 đi kèm. Web, API, ảnh và CSDL nằm trên hosting nên máy phát triển tắt vẫn truy cập được; app cần kết nối mạng.
 
-## Bản Android dùng hosting
+## Hành vi của app
 
-App mặc định kết nối `https://vietbid.alwaysdata.net/api` và mở web cùng hosting. Tài khoản, sản phẩm, phiên, đơn và thông báo dùng chung CSDL với website; điện thoại không cần chung Wi-Fi hay máy phát triển đang bật. Có thể đặt hai biến `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_WEB_URL` để phát triển với backend khác.
+Nội dung web chiếm màn hình trong vùng an toàn của Android, giữ nguyên bố cục và điều hướng responsive của website. Nút Back quay lại lịch sử WebView; ở trang đầu hệ thống xử lý Back bình thường. Lỗi tải hoặc tiến trình web bị dừng có màn thử lại, không tự gửi lại giao dịch. Liên kết HTTPS ngoài VietBid mở bằng trình duyệt hệ thống; URL có thông tin đăng nhập, giao thức tệp, JavaScript, intent và HTTP bị chặn.
 
-Sau khi hosting đổi tên từ `vietbid-qviet2612` sang `vietbid`, cần cài APK mới từ GitHub Releases. APK cũ chứa miền API và URL cập nhật cũ nên không thể dựa vào cập nhật từ xa để chuyển miền. Bản mới vẫn dùng cùng mã ứng dụng và khóa ký; có thể cài đè để cập nhật.
+Đăng nhập và kiểm tra quyền do website/Backend thực hiện. Token của phiên web nằm trong sessionStorage của WebView, không được chuyển từ SecureStore của app cũ hoặc đưa vào URL. Bộ điều hướng native không nhận lệnh thực thi hay dữ liệu giao dịch từ JavaScript trang web. Chứng chỉ HTTPS được kiểm tra bình thường; app không tải nội dung HTTP trộn trong trang HTTPS.
 
-Workflow **APK và cập nhật Android** build APK release ARM64 khi thay đổi mã mobile trên `main` hoặc chạy thủ công. APK được ký bằng khóa riêng trong GitHub Actions Secrets, phát hành tại GitHub Releases kèm SHA256. Cài APK ngoài cửa hàng cần người dùng cho phép cài đặt và xác nhận; Android không cho app tự cài APK thay thế âm thầm.
+Các thành phần cọc, giá tối đa bí mật, chống gửi trùng, xác nhận giao dịch và Socket.IO dùng chính mã frontend web. AI có cùng trạng thái và điều kiện sẵn sàng với website; WebView không tự bật AI hoặc vượt quyền.
 
-`expo-updates` đã được cấu hình kiểm tra cập nhật khi khởi động, xác minh chữ ký bằng chứng chỉ công khai đóng trong APK. Runtime được tính từ dependency lockfile, cấu hình native, chứng chỉ và icon: thay đổi các phần này tạo runtime khác và cần APK mới. Mã JavaScript dùng runtime cũ có thể cập nhật từ xa; bản đã tải áp dụng vào lần mở app sau, không tự ngắt thao tác đặt giá/thanh toán đang diễn ra. Chi tiết triển khai máy chủ và kết quả kiểm tra được ghi trong tài liệu `deploy`.
-
-## Chạy app
-
-Cần backend đang chạy trước (xem `../backend/HUONG-DAN.md`). Mở terminal trong thư mục `mobile`:
+## Chạy và kiểm tra
 
 ```powershell
-npm install
+npm ci
+npm run check
+npx expo start
 ```
 
-**Xem nhanh trên trình duyệt** (backend chạy `npm run dev:local`, thêm `http://localhost:8081` vào `FRONTEND_URL` của backend):
+Mặc định app mở website đang chạy. Biến `EXPO_PUBLIC_WEB_URL` có thể chỉ định một website HTTPS khác cho môi trường phát triển; bản phát hành dùng `https://vietbid.alwaysdata.net`. Bản Expo Web chuyển trực tiếp sang website này để xem cùng giao diện, không tạo iframe hoặc bản giao diện thứ hai.
 
-```powershell
-npx expo start --web
-```
+`npm run check` gồm lint, TypeScript và kiểm thử chính sách URL. Bộ kiểm thử bố cục điện thoại của frontend kiểm tra các trang công khai và khu vực của từng vai trò. Các kiểm tra bundle, chữ ký và hash không thay cho nghiệm thu APK trên thiết bị Android thật, đặc biệt thao tác Back, bàn phím, tải/chọn tệp và khôi phục sau mất mạng.
 
-**Chạy trên điện thoại thật bằng Expo Go:**
+## Mã nguồn
 
-1. Trong `backend`, chạy `npm run dev:lan`. Lệnh in ra địa chỉ dạng `http://192.168.x.x:5000/api`.
-2. Trong `mobile`, đặt địa chỉ đó rồi khởi động:
+- `src/app/_layout.tsx`: navigator không thêm header hay thanh tab lên nội dung web.
+- `src/app/index.tsx`: mở website.
+- `src/app/[...duongDan].tsx`: chuyển đường dẫn vào trang web tương ứng, gồm các liên kết từ app cũ.
+- `src/components/trang-web.tsx`: WebView native, điều hướng, vùng an toàn và thử lại khi lỗi.
+- `src/components/trang-web.web.tsx`: chuyển bản xem trước sang website.
+- `src/lib/dieu-huong-web.ts`: miền cho phép và quy tắc liên kết.
 
-   ```powershell
-   $env:EXPO_PUBLIC_API_URL = 'http://192.168.x.x:5000/api'
-   npx expo start
-   ```
-
-3. Mở Expo Go trên điện thoại (cùng mạng Wi-Fi với máy tính) và quét mã QR.
-
-Biến tùy chọn `EXPO_PUBLIC_WEB_URL` là địa chỉ web VietBid cho nút "Mở VietBid trên web". API HTTPS dùng web cùng hosting; khi phát triển bằng HTTP LAN thì mặc định đổi cổng API sang 5173.
-
-## Kiểm tra code
-
-```powershell
-npm run check      # expo lint + tsc --noEmit
-npx expo-doctor    # kiểm tra phiên bản thư viện và cấu hình
-```
-
-Lệnh `npm run check` ở thư mục gốc cũng chạy phần này. Thêm thư viện bằng `npx expo install <tên>` để lấy đúng phiên bản theo SDK.
-
-## Cấu trúc
-
-- `src/app/` — màn hình theo Expo Router:
-  - `(tabs)/` — bốn tab Khám phá, Đơn hàng, Thông báo, Tài khoản;
-  - `phien/[id]` — chi tiết phiên;
-  - `don-hang/[id]` — chi tiết đơn;
-  - `dang-nhap`, `dia-chi` — đăng nhập và sổ địa chỉ.
-- `src/components/` — thẻ phiên, khối tham gia phiên, thành phần giao diện dùng chung.
-- `src/lib/` — gọi API, phiên đăng nhập (token trong SecureStore), realtime Socket.IO, giờ máy chủ, định dạng tiền và thời gian, màu và phông.
-- `assets/images/` — icon và màn chờ kim cương vàng.
-
-Không tạo hoặc sửa tay thư mục `ios/`, `android/`. Cấu hình native đặt trong `app.json`.
+Các thành phần màn hình native trước đây còn trong lịch sử Git; bộ route bốn tab đã được thay thế. Không sửa tay `ios/` hoặc `android/`; cấu hình native đặt trong `app.json` và `app.config.js`.

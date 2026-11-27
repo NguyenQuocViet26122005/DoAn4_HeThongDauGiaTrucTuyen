@@ -2,7 +2,7 @@
 
 **Bổ sung 25/11/2026:** hỗ trợ kiểm duyệt tin đăng hai lớp, gợi ý hồ sơ từ ảnh có xác nhận từng trường và giá bán lịch sử cùng danh mục khi đủ mẫu. Quy tắc, quyền, dữ liệu AI và hợp đồng API tại [Hỗ trợ đăng bán](backend/docs/HO-TRO-DANG-BAN.md). AI chỉ gợi ý, Admin vẫn quyết định; không có chatbot quyết định chính sách cọc hoặc hoàn tiền.
 
-**Tên website: VietBid.** Website phục vụ người mua, người bán và Admin, ưu tiên trải nghiệm máy tính và tự điều chỉnh theo màn hình nhỏ. **Cập nhật 26/11/2026:** đã bổ sung ứng dụng React Native/Expo dành cho người mua trong `mobile`, phát hành APK Android và dùng chung API/CSDL với website. Hướng dẫn trải nghiệm và tải app tại [README](README.md); chi tiết triển khai, cập nhật và giới hạn tại [hướng dẫn triển khai](deploy/README.md).
+**Tên website: VietBid.** Website phục vụ người mua, người bán và Admin, ưu tiên trải nghiệm máy tính và tự điều chỉnh theo màn hình nhỏ. **Cập nhật 27/11/2026:** ứng dụng Expo/React Native trong `mobile` dùng WebView mở trực tiếp giao diện responsive của website tại `https://vietbid.alwaysdata.net`, dùng cùng quyền tài khoản và nghiệp vụ. Hướng dẫn trải nghiệm và tải app tại [README](README.md); chi tiết triển khai, cập nhật và giới hạn tại [hướng dẫn triển khai](deploy/README.md).
 
 **Tài liệu nghiệp vụ chi tiết và công nghệ — phiên bản 3.2, ngày 17/10/2026.**
 
@@ -186,38 +186,17 @@ Giữ tên tệp/hàm/biến nghiệp vụ tiếng Việt không dấu và cấu
 
 Lệnh `npm run format`, `npm run format:check`, `npm run check` ở gốc áp dụng chuẩn chung cho code dự án. Không định dạng thư viện, bản build, bản sao riêng hoặc SQL lịch sử. Không đọc/hiển thị mật khẩu trong `.env`.
 
-### 3.4. Ứng dụng di động VietBid — 11/11/2026
+### 3.4. Ứng dụng Android dùng chung giao diện web — 27/11/2026
 
-Thư mục `mobile/` là app di động **VietBid** cho người mua, dùng chung API và CSDL với web; không có bảng, endpoint hay quy tắc nghiệp vụ riêng. Bán hàng, kiểm định, khiếu nại và quản trị vẫn làm trên web; app có nút mở web trong tab Tài khoản.
+App Expo SDK 58, React Native 0.88 và React Native WebView 14.0.1 mở trực tiếp `https://vietbid.alwaysdata.net`. Trang, bố cục responsive, biểu mẫu, thông báo, dữ liệu, realtime và thao tác nghiệp vụ đều dùng chính mã React/Vite của website. Người mua, người bán và Admin truy cập theo quyền tài khoản; app không bổ sung quyền hoặc quy tắc giao dịch riêng.
 
-**Công nghệ:** Expo SDK 58 (React Native 0.88, React 19, React Compiler), **Expo Router** định tuyến theo tệp trong `src/app`, **TanStack Query** cho dữ liệu, **Socket.IO client** cho realtime, **expo-secure-store** giữ token đăng nhập, **expo-crypto** tạo khóa chống gửi trùng, **Reanimated** cho hiệu ứng, **expo-linear-gradient** và **expo-image** cho giao diện. Phông Be Vietnam Pro và Cormorant Garamond, nền tối vàng đồng giống web. Icon và màn chờ là viên kim cương vàng nhiều mặt.
+Bộ màn hình bốn tab native đã được thay bằng một màn WebView không thêm header/tab riêng. Expo Router chỉ khởi tạo phần vỏ và chuyển liên kết vào trang web tương ứng; các đường dẫn đơn hàng, thông báo và địa chỉ từ app cũ được ánh xạ sang trang tài khoản trên web. Safe area, Back Android, trạng thái tải và thử lại khi lỗi được xử lý ở phần vỏ. Liên kết ngoài HTTPS mở bằng trình duyệt hệ thống; nội dung HTTP trộn, giao thức tệp, JavaScript và intent bị chặn.
 
-**Màn hình:**
+Website quản lý phiên đăng nhập trong sessionStorage của WebView và kiểm tra quyền tại Backend. Token SecureStore từ app cũ không được tự sao chép vào web hoặc URL. Các quy tắc cọc, giá tối đa bí mật, xác nhận và khóa chống gửi trùng tiếp tục do frontend web/Backend hiện hành xử lý. AI có cùng khả năng sẵn sàng với website, hiện chưa bật trên hosting.
 
-- Khám phá: lọc Đang diễn ra / Sắp mở / Đã kết thúc và tìm kiếm.
-- Chi tiết phiên: ảnh vuốt ngang, giá nhấp nháy khi đổi, đếm ngược theo giờ máy chủ, lịch sử trả giá công khai.
-- Tham gia phiên: thêm địa chỉ → đăng ký → thanh toán cọc → đặt mức tối đa; Mua ngay khi phiên cho phép.
-- Đăng nhập / đăng ký.
-- Đơn hàng: tách "Tôi mua" và "Tôi bán". Chi tiết đơn có đổi địa chỉ, thanh toán phần còn lại, xác nhận đã nhận hàng và hoàn tất.
-- Thông báo: lọc chưa đọc, đọc tất cả, mở đúng phiên hoặc đơn.
-- Tài khoản và sổ địa chỉ.
+Push giao diện web lên main được CI kiểm tra và triển khai; app nhận giao diện mới khi mở/tải lại trang, không bị ép tải lại giữa giao dịch. Thay đổi phần vỏ app có bundle Expo Updates được ký và phân biệt runtime; thay đổi native hoặc miền cần APK mới. Bản chuyển sang WebView và miền mới ngày 27/11/2026 phải cài đè APK trước đó. API, CSDL và ảnh ở hosting, không phụ thuộc máy phát triển; app cần kết nối mạng.
 
-**Ràng buộc thứ tự:** app chặn đúng như web — chưa có địa chỉ thì chưa tham gia; chưa đủ cọc hoặc phiên chưa bắt đầu thì khóa đặt giá; chỉ hiện "Tôi đã nhận hàng" khi đơn đang vận chuyển; chỉ cho hoàn tất khi đơn đã nhận, tiền đang giữ, đã thu đủ, không có tranh chấp mở và không cần Admin xử lý. Mọi thao tác có hậu quả đều qua hộp xác nhận, và backend vẫn kiểm tra lại toàn bộ.
-
-**Kết nối:** địa chỉ API đặt bằng `EXPO_PUBLIC_API_URL`, mặc định `http://localhost:5000/api`. Điện thoại thật dùng IP máy tính do `npm run dev:lan` của backend in ra. Khi app trở lại từ nền, dữ liệu được làm mới.
-
-**Đã kiểm tra:** `tsc`, `expo lint` và `expo-doctor` (20/20) sạch. Bản web của app chạy với máy chủ kiểm thử rollback (cổng 5001, cho phép nguồn `localhost:8081`); CSDL chính không đổi. Các luồng đã chạy trên bản web:
-
-- đăng nhập;
-- đăng ký phiên, thanh toán cọc và đặt giá dẫn đầu;
-- đấu giá ủy quyền: mức 20 triệu của A thắng mức 19 triệu của B, giá công khai 19,5 triệu;
-- thanh toán đơn, xác nhận nhận hàng và hoàn tất (tiền chuyển "Đã giải ngân");
-- xem tài khoản, sổ địa chỉ và thông báo.
-
-**Chưa kiểm tra:**
-
-- Chưa chạy trên điện thoại thật hoặc máy ảo; mới thử bản web.
-- Sự kiện realtime chưa thử được: máy chủ kiểm thử bọc mọi thao tác trong một giao dịch không commit nên không phát sự kiện. App làm mới khi kéo xuống hoặc mở lại màn hình.
+Kiểm tra gồm lint, TypeScript, 5 ca chính sách điều hướng, xuất bundle Android và bố cục responsive của các vai trò trong bộ E2E frontend. Ảnh báo cáo được chụp từ web responsive đang chạy, cùng nội dung mà app tải, không được coi là ảnh thiết bị Android. Chưa nghiệm thu cài đặt trên điện thoại hoặc máy ảo, Back, bàn phím, tải/chọn tệp và khôi phục mạng trên phần cứng thật. Chi tiết phát hành, chữ ký và hướng dẫn dùng tại `mobile/README.md` và `deploy/README.md`.
 
 ## 4. Tài khoản, đăng nhập và xác minh người bán
 
