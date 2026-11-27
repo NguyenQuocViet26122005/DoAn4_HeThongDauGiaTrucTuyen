@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
-import { diaChiTrang, phanLoaiUrl } from '@/lib/dieu-huong-web';
+import { diaChiTrang, laKhungTepNoiBo, phanLoaiUrl } from '@/lib/dieu-huong-web';
 import { mau } from '@/lib/giao-dien';
 
 export default function TrangWeb({ duongDan = '/' }: { duongDan?: string }) {
@@ -59,6 +59,10 @@ export default function TrangWeb({ duongDan = '/' }: { duongDan?: string }) {
         style={kieu.web}
         originWhitelist={['*']}
         onShouldStartLoadWithRequest={(request) => {
+          if (laKhungTepNoiBo(request.url, request.isTopFrame)) {
+            return true;
+          }
+
           const loai = phanLoaiUrl(request.url);
 
           if (loai === 'noi-bo') {
@@ -74,6 +78,7 @@ export default function TrangWeb({ duongDan = '/' }: { duongDan?: string }) {
         onNavigationStateChange={(state) => {
           quayLai.current = state.canGoBack;
           hienTai.current = state.url;
+          datDangTai(state.loading);
         }}
         onLoadStart={() => datDangTai(true)}
         onLoadProgress={(event) => {

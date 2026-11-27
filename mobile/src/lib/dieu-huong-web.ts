@@ -38,3 +38,10 @@ export function diaChiTrang(duongDan = '/', goc = GOC_WEB) {
 
   return phanLoaiUrl(url, goc) === 'noi-bo' ? url : goc + '/';
 }
+
+// Bản xem trước tệp riêng tư của web dùng iframe blob cùng nguồn, không đổi trang chính.
+export function laKhungTepNoiBo(url: string, isTopFrame: boolean | undefined, goc = GOC_WEB) {
+  return (
+    isTopFrame === false && url.startsWith('blob:') && phanLoaiUrl(url.slice(5), goc) === 'noi-bo'
+  );
+}

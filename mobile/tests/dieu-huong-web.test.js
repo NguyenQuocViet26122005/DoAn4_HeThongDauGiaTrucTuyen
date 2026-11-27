@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const { phanLoaiUrl, diaChiTrang } = require('../src/lib/dieu-huong-web.ts');
+const { phanLoaiUrl, diaChiTrang, laKhungTepNoiBo } = require('../src/lib/dieu-huong-web.ts');
 
 test('Các trang nghiệp vụ và liên kết có query vẫn ở trong cùng website', () => {
   for (const path of [
@@ -57,4 +57,18 @@ test('Đường dẫn đầu vào không thể chuyển WebView sang máy chủ 
   ]) {
     assert.equal(diaChiTrang(path), 'https://vietbid.alwaysdata.net/');
   }
+});
+
+test('Chỉ khung tệp blob cùng nguồn được mở, không điều hướng trang chính ra blob', () => {
+  assert.equal(laKhungTepNoiBo('blob:https://vietbid.alwaysdata.net/123', false), true);
+  for (const url of [
+    'blob:https://evil.example/123',
+    'blob:https://vietbid.alwaysdata.net.evil.example/123',
+    'file:///data/private',
+    'data:text/html,hello',
+  ]) {
+    assert.equal(laKhungTepNoiBo(url, false), false);
+  }
+  assert.equal(laKhungTepNoiBo('blob:https://vietbid.alwaysdata.net/123', true), false);
+  assert.equal(laKhungTepNoiBo('blob:https://vietbid.alwaysdata.net/123', undefined), false);
 });

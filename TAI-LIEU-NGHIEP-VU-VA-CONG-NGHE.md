@@ -196,7 +196,7 @@ Website quản lý phiên đăng nhập trong sessionStorage của WebView và k
 
 Push giao diện web lên main được CI kiểm tra và triển khai; app nhận giao diện mới khi mở/tải lại trang, không bị ép tải lại giữa giao dịch. Thay đổi phần vỏ app có bundle Expo Updates được ký và phân biệt runtime; thay đổi native hoặc miền cần APK mới. Bản chuyển sang WebView và miền mới ngày 27/11/2026 phải cài đè APK trước đó. API, CSDL và ảnh ở hosting, không phụ thuộc máy phát triển; app cần kết nối mạng.
 
-Kiểm tra gồm lint, TypeScript, 5 ca chính sách điều hướng, xuất bundle Android và bố cục responsive của các vai trò trong bộ E2E frontend. Ảnh báo cáo được chụp từ web responsive đang chạy, cùng nội dung mà app tải, không được coi là ảnh thiết bị Android. Chưa nghiệm thu cài đặt trên điện thoại hoặc máy ảo, Back, bàn phím, tải/chọn tệp và khôi phục mạng trên phần cứng thật. Chi tiết phát hành, chữ ký và hướng dẫn dùng tại `mobile/README.md` và `deploy/README.md`.
+Kiểm tra gồm lint, TypeScript, 6 ca chính sách điều hướng, xuất bundle Android và bố cục responsive của các vai trò trong bộ E2E frontend. Ảnh báo cáo được chụp từ web responsive đang chạy, cùng nội dung mà app tải, không được coi là ảnh thiết bị Android. Chưa nghiệm thu cài đặt trên điện thoại hoặc máy ảo, Back, bàn phím, tải/chọn tệp và khôi phục mạng trên phần cứng thật. Chi tiết phát hành, chữ ký và hướng dẫn dùng tại `mobile/README.md` và `deploy/README.md`.
 
 ## 4. Tài khoản, đăng nhập và xác minh người bán
 
@@ -756,3 +756,4 @@ Máy chủ giao diện thử dùng cổng riêng, tắt jobs và nối doan4_dau
 5. **Phí hoàn hoặc thất lạc:** Admin ghi bên chịu trách nhiệm, số tiền và căn cứ. Nếu có chi phí, xác nhận đối soát chỉ sau khi có chứng từ. Kiểm tra tổng đơn, tiền hoàn và giải ngân không tự thay đổi theo biên bản chi phí; hàng thất lạc không được mở bán lại.
 
 Chạy ứng dụng thường ở localhost:5173 với backend cổng 5000. Cổng 5175 đã dùng cho máy chủ kiểm thử tạm và không phải địa chỉ mặc định. Khởi động backend bằng `npm --prefix backend run dev:local`, frontend bằng `npm --prefix frontend run dev` từ thư mục gốc, trên hai terminal riêng; không chạy lại SQL để thử các chức năng này.
+
